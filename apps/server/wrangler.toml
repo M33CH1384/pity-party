@@ -97,5 +97,5 @@ new_sqlite_classes = ["ChallengeDO"]
 [[d1_databases]]
 binding = "DB"
 database_name = "pity-party"
-database_id = "00000000-0000-0000-0000-000000000000" # PLACEHOLDER: fill with the id printed by `wrangler d1 create pity-party` (docs/plan/DEPLOY.md)
+database_id = "b9cfe76c-22e9-4208-9066-f62d1ea646e4" # PLACEHOLDER: fill with the id printed by `wrangler d1 create pity-party` (docs/plan/DEPLOY.md)
 migrations_dir = "migrations"
