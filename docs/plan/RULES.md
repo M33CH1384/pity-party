@@ -53,6 +53,21 @@ HAND_OVER → NEXT_DEAL | GAME_OVER
 - Hard: track remaining-rank counts; minimise P(next seat matches) using their observed passes (a pass on rank R ⇒ they lack R); with mustPair=may, decline pairs that would expose a needed rank.
 ### Edge cases
 Upcard matches two hand cards (only one pairs unless tripsAsOne). 2 players: stock cycles fast → reshuffle often. Multiple dealt-win claims → first in turn order [UNVERIFIED]. Disconnect → bot (BWM behavior). Deck exhaustion with no discards (impossible ≤5 players at 5 cards).
+### Chosen readings (M6, 2026-10-26: Demetrius "use defaults, everything a setup option")
+Each reading below is the default of a setup option in `PITTY_PAT_OPTIONS` (packages/game/src/modes/schemas.ts); changing the option changes the rule, no code change needed.
+| # | Question | Reading (default) | Option | Other choices |
+|---|---|---|---|---|
+| 1 | Starting coins (not given by RRB-PP) | 10 coins per player per game | `stack` | 1–100 |
+| 2 | How "pity" is paid (when `pityPayouts` on) | each loser pays one extra ante, two on a dealt win, never more than they hold | `pityStyle` = perHand | perPair: one ante per pair the winner laid (×2 on a dealt win) |
+| 3 | Dealt win with 7 cards | counts (3 pairs + upcard matching the 7th card) | `dealtWin7` = on | off |
+| 4 | Dead-card steal | window on the hand's first upcard only, for seats (other than the first player) holding a match, asked in turn order; after the steal + shed, play continues from the stealer's left | `stealResume` = stealerLeft | firstPlayer: the first player then takes their normal turn |
+| 5 | Hands-won game coins | game winner gets ante × (players − 1), everyone else pays the ante; a tie pays nothing | `handsWonPayout` = antePerOpponent | none |
+| 6 | Hands won + "last with coins" (no coins in play) | ends at first to N wins | `handsWonEnd` = firstToWins | fixedHands: after N hands |
+| 7 | may-pair: declining before any flip | you flip instead (after a flip, declining = pass) | `declineAction` = flip | pass |
+| 8 | Max players / hand size | engine 2–5 (online tables seat 4); 5 cards | table seats, `handSize` = 5 | 7 |
+Table pacing (not a rule): `pauseBetweenHands` (default off) holds each hand's result until the winner (or the next dealer after a void) taps Next hand.
+Engine bounds (keep every option combination finite): 200 hands per game, 2000 moves per hand (then void), 60 flips per turn in until-match, 5 redeals on a dealt-win tie.
+
 ### Open questions (ranked)
 1. Must you pair when you can? 2. Pot/ante and "pity" payouts – amounts, per-pair pay, double for dealt win? 3. Hand size 5 or 7? 4. Does three of a kind shed together? 5. Out-of-turn dead-card steal on the first upcard – real? 6. One flip per turn or flip until match? 7. Stock empty: reshuffle or void? 8. Max players 4 or 5?
 

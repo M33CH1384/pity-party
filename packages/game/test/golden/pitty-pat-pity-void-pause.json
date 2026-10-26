@@ -1,0 +1,54 @@
+{
+ "preset": {
+  "seats": 2,
+  "seed": "golden-pity",
+  "options": {
+   "pityPayouts": true,
+   "pityStyle": "perPair",
+   "stockEmpty": "void",
+   "pauseBetweenHands": true,
+   "ante": 2,
+   "stack": 8
+  }
+ },
+ "moves": 22,
+ "moveLog": "0:flip 0:pair:3S 0:discard:2D 1:pair:2C 1:discard:5S 0:flip 0:pass 1:flip 1:pass 0:flip 0:pass 1:pair:4H 1:discard:10D 0:flip 0:pass 1:flip 1:pass 0:pair:JH 0:discard:2H 1:flip 1:pass 0:pair:7S",
+ "results": {
+  "placements": [
+   0,
+   1
+  ],
+  "deltas": [
+   8,
+   -8
+  ],
+  "recap": {
+   "v": 1,
+   "hands": [
+    {
+     "n": 0,
+     "winner": 0,
+     "how": "out",
+     "pot": 4,
+     "deltas": [
+      8,
+      -8
+     ]
+    }
+   ],
+   "pairs": [
+    3,
+    2
+   ],
+   "wins": [
+    1,
+    0
+   ],
+   "chips": [
+    16,
+    0
+   ],
+   "dealtWins": 0
+  }
+ }
+}

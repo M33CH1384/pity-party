@@ -19,6 +19,8 @@ export class FakeEnv {
   challengeResults: import('../src/room').ChallengeResult[] = [];
   /** generic per-game stats records (modeGameOver) */
   records: import('../src/room').ModeGameRecord[] = [];
+  /** RoomIO.previewModes (PREVIEW_MODES): set before sending `mode` to open a registered-but-unlisted engine */
+  previewModes: string[] = [];
   /** The DO's socket close can re-enter the room. Tests set this to simulate that. */
   onClose?: (cid: string) => void;
   timing: RoomTiming;
@@ -31,6 +33,7 @@ export class FakeEnv {
   }
 
   io(): RoomIO {
+    const env = this; // eslint-disable-line @typescript-eslint/no-this-alias
     return {
       now: () => this.t,
       send: (cid, msg) => {
@@ -46,6 +49,8 @@ export class FakeEnv {
       setAlarm: (at) => { if (at === null || (this.alarm !== null && this.alarm <= at)) return; this.alarm = at; this.alarmSets++; },
       persist: () => { this.persists++; },
       modeGameOver: (rec) => { this.records.push(rec); },
+      // eslint-disable-next-line @typescript-eslint/no-this-alias
+      get previewModes() { return env.previewModes; },
       tournamentResult: (t, scores, places) => { this.tourResults.push({ match: t.match, scores, places }); },
       challengeResult: (_c, r) => { this.challengeResults.push(r); },
       randomId: () => Array.from({ length: 4 }, () => Math.floor(this.rng() * 0x1_0000_0000).toString(16).padStart(8, '0')).join(''),

@@ -33,6 +33,13 @@ export interface PpOptions {
   gameEnd: 'lastWithChips' | 'firstToWins' | 'fixedHands';
   gameTarget: number;
   dealtWinTie: 'turnOrder' | 'redeal';
+  pityStyle: 'perHand' | 'perPair';
+  dealtWin7: boolean;
+  stealResume: 'stealerLeft' | 'firstPlayer';
+  handsWonPayout: 'antePerOpponent' | 'none';
+  handsWonEnd: 'firstToWins' | 'fixedHands';
+  declineAction: 'flip' | 'pass';
+  pauseBetweenHands: boolean;
 }
 
 export type PpMove =
@@ -41,7 +48,8 @@ export type PpMove =
   | { t: 'flip' }
   | { t: 'pass' }
   | { t: 'steal'; cardIds: string[] }
-  | { t: 'waive' };
+  | { t: 'waive' }
+  | { t: 'nextHand' };
 
 /** Public event log entry (everything here was face-up at the table). */
 export type PpEvent =
@@ -78,6 +86,8 @@ export interface PpState {
   redeals: number;
   over: boolean;
   history: HandEnd[];
+  /** pairs laid per seat across finished hands (recap) */
+  pairsTotal: number[];
   /** hand-level */
   hands: Card[][];
   shelves: Card[][];
@@ -87,7 +97,11 @@ export interface PpState {
   upcard: Card | null;
   pot: number;
   turn: number;
-  phase: 'act' | 'shed' | 'steal';
+  phase: 'act' | 'shed' | 'steal' | 'handOver';
+  /** steal: the seat whose turn the steal interrupted (stealResume = firstPlayer) */
+  resumeAt: number | null;
+  /** handOver (pauseBetweenHands): who confirms the next deal */
+  ackSeat: number | null;
   /** flips this turn; matched = the current upcard came from this turn's flip */
   flips: number;
   /** steal window: seats still to answer, in turn order; and the seat whose turn follows */
@@ -131,6 +145,9 @@ export function ppOptions(input: unknown): PpOptions {
     stockEmpty: o.stockEmpty as PpOptions['stockEmpty'], scoring: o.scoring as PpOptions['scoring'], stack: o.stack as number,
     ante: o.ante as number, pityPayouts: o.pityPayouts as boolean, gameEnd: o.gameEnd as PpOptions['gameEnd'],
     gameTarget: o.gameTarget as number, dealtWinTie: o.dealtWinTie as PpOptions['dealtWinTie'],
+    pityStyle: o.pityStyle as PpOptions['pityStyle'], dealtWin7: o.dealtWin7 as boolean, stealResume: o.stealResume as PpOptions['stealResume'],
+    handsWonPayout: o.handsWonPayout as PpOptions['handsWonPayout'], handsWonEnd: o.handsWonEnd as PpOptions['handsWonEnd'],
+    declineAction: o.declineAction as PpOptions['declineAction'], pauseBetweenHands: o.pauseBetweenHands as boolean,
   };
 }
 
@@ -169,11 +186,12 @@ function startHand(s: PpState): PpState {
   const out: PpState = {
     ...ns, chips, hands, shelves: Array.from({ length: s.seats }, () => []), stock: dealt.stock.slice(1), discards: [], upcard,
     pot: antes * order.length, turn: order[0]!, phase: 'act', flips: 0, stealQueue: [], reshuffles: 0, handMoves: 0, dealtWin: false,
+    resumeAt: null, ackSeat: null,
     log: [], // the log is per hand: last hand's outcome lives in history/lastHand
   };
   pushLog(out, { e: 'deal', hand: s.handNo, dealer: s.dealer, upcard });
   // CHECK_DEALT_WIN: dealt pairs + an upcard that pairs the odd card
-  if (o.dealtWinAuto) {
+  if (o.dealtWinAuto && (o.handSize !== 7 || o.dealtWin7)) {
     const winners = order.filter((seat) => allPairs([...hands[seat]!, upcard]));
     if (winners.length > 1 && o.dealtWinTie === 'redeal' && s.redeals < PP_LIMITS.maxRedeals) {
       const back: PpState = { ...out, chips: s.chips, redeals: s.redeals + 1 };
@@ -191,7 +209,7 @@ function startHand(s: PpState): PpState {
   }
   if (o.deadCardSteal) {
     const q = order.slice(1).filter((seat) => hands[seat]!.some((c) => c.rank === upcard.rank));
-    if (q.length) return { ...out, phase: 'steal', stealQueue: q };
+    if (q.length) return { ...out, phase: 'steal', stealQueue: q, resumeAt: order[0]! };
   }
   return out;
 }
@@ -213,7 +231,9 @@ function endHand(s: PpState, winner: number | null, how: HandEnd['how']): PpStat
       chips[winner]! += s.pot; deltas[winner]! += s.pot;
       if (o.pityPayouts && each > 0) {
         // house "pity": every other active player pays one more ante, two on a dealt win (never more than they hold)
-        const extra = each * (how === 'dealt' ? 2 : 1);
+        const mult = how === 'dealt' ? 2 : 1;
+        const pairs = Math.floor(s.shelves[winner]!.length / 2);
+        const extra = each * mult * (o.pityStyle === 'perPair' ? Math.max(1, pairs) : 1);
         for (let i = 0; i < s.seats; i++) if (s.active[i] && i !== winner) {
           const pay = Math.min(extra, chips[i]!);
           chips[i]! -= pay; deltas[i]! -= pay; chips[winner]! += pay; deltas[winner]! += pay;
@@ -222,17 +242,24 @@ function endHand(s: PpState, winner: number | null, how: HandEnd['how']): PpStat
     }
   }
   const rec: HandEnd = { hand: s.handNo, winner, how, pot: s.pot, deltas };
-  const ns: PpState = { ...s, chips, wins, pot: 0, history: [...s.history, rec], phase: 'act', stealQueue: [] };
+  const pairsTotal = s.pairsTotal.map((p, i) => p + Math.floor((s.shelves[i]?.length ?? 0) / 2));
+  const ns: PpState = { ...s, chips, wins, pairsTotal, pot: 0, history: [...s.history, rec], phase: 'act', stealQueue: [] };
   pushLog(ns, winner === null ? { e: 'void', why: s.handMoves >= PP_LIMITS.maxHandMoves ? 'moveCap' : 'stockEmpty' } : { e: 'out', seat: winner, how });
   // GAME_OVER?
   const played = ns.history.length;
   const stillIn = ns.chips.map((c) => (o.scoring === 'pot' && o.ante > 0 ? c >= o.ante : true));
   const end = o.gameEnd === 'fixedHands' ? played >= o.gameTarget
+    : o.scoring === 'handsWon' && o.gameEnd === 'lastWithChips' && o.handsWonEnd === 'fixedHands' ? played >= o.gameTarget
     : o.gameEnd === 'firstToWins' || o.scoring === 'handsWon' ? wins.some((w) => w >= o.gameTarget)
     : stillIn.filter((x, i) => x && ns.active[i]).length < 2;
   if (end || played >= PP_LIMITS.maxHands) return { ...ns, over: true };
   const next: PpState = { ...ns, active: ns.active.map((a, i) => a && stillIn[i]!), handNo: ns.handNo + 1, redeals: 0 };
   if (next.active.filter(Boolean).length < 2) return { ...next, over: true };
+  if (o.pauseBetweenHands) {
+    // the table shows this hand's result; the winner (or the next dealer on a void) deals on
+    const ack = winner ?? nextActive(next, next.dealer);
+    return { ...next, phase: 'handOver', ackSeat: ack, turn: ack };
+  }
   return startHand({ ...next, dealer: nextActive(next, next.dealer) });
 }
 
@@ -276,11 +303,12 @@ function doFlip(s: PpState, seat: number): PpState {
 const nextTurn = (s: PpState, from: number): PpState => ({ ...s, turn: nextActive(s, from), phase: 'act', flips: 0 });
 
 /* ------------------------------------------------------------------ rule set */
-const toActOf = (s: PpState): number[] => (s.over ? [] : s.phase === 'steal' ? [s.stealQueue[0]!] : [s.turn]);
+const toActOf = (s: PpState): number[] => (s.over ? [] : s.phase === 'steal' ? [s.stealQueue[0]!] : s.phase === 'handOver' ? [s.ackSeat!] : [s.turn]);
 
 function legal(s: PpState, seat: number): PpMove[] {
   if (s.over) return [];
   const o = s.opts;
+  if (s.phase === 'handOver') return seat === s.ackSeat ? [{ t: 'nextHand' }] : [];
   if (s.phase === 'steal') {
     if (seat !== s.stealQueue[0]) return [];
     return [...pairMoves(s.hands[seat]!, s.upcard, o.tripsAsOne, 'steal'), { t: 'waive' }];
@@ -293,7 +321,8 @@ function legal(s: PpState, seat: number): PpMove[] {
   if (pairs.length) {
     if (o.mustPair === 'must') return pairs;
     // may: decline = flip (first look) or pass (after a flip; or flip on in until-match)
-    return [...pairs, s.flips === 0 || canFlipMore ? { t: 'flip' } : { t: 'pass' }];
+    const decline: PpMove = s.flips === 0 ? (o.declineAction === 'pass' ? { t: 'pass' } : { t: 'flip' }) : canFlipMore ? { t: 'flip' } : { t: 'pass' };
+    return [...pairs, decline];
   }
   if (s.flips === 0) return [{ t: 'flip' }];
   return canFlipMore ? [{ t: 'flip' }] : [{ t: 'pass' }];
@@ -309,9 +338,9 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
     if (!Number.isInteger(seats) || seats < 2 || seats > 5) throw new RuleError('BAD_SEATS', 'Pitty Pat seats 2–5');
     const opts = ppOptions(options);
     const base: PpState = {
-      opts, seed, seats, chips: Array(seats).fill(opts.scoring === 'pot' ? opts.stack : 0), wins: Array(seats).fill(0), active: Array(seats).fill(true),
+      opts, seed, seats, chips: Array(seats).fill(opts.scoring === 'pot' ? opts.stack : 0), wins: Array(seats).fill(0), pairsTotal: Array(seats).fill(0), active: Array(seats).fill(true),
       handNo: 0, dealer: seats - 1, redeals: 0, over: false, history: [], hands: Array.from({ length: seats }, () => []), shelves: Array.from({ length: seats }, () => []), stock: [], discards: [], upcard: null,
-      pot: 0, turn: 0, phase: 'act', flips: 0, stealQueue: [], reshuffles: 0, handMoves: 0, log: [], dealtWin: false,
+      pot: 0, turn: 0, phase: 'act', flips: 0, stealQueue: [], reshuffles: 0, handMoves: 0, log: [], dealtWin: false, resumeAt: null, ackSeat: null,
     };
     return startHand(base);
   },
@@ -330,16 +359,23 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
       case 'waive': {
         pushLog(ns, { e: 'waive', seat });
         const q = ns.stealQueue.slice(1);
-        return { ...ns, stealQueue: q, phase: q.length ? 'steal' : 'act' };
+        return { ...ns, stealQueue: q, phase: q.length ? 'steal' : 'act', ...(q.length ? {} : { resumeAt: null }) };
       }
       case 'pair': return doPair(ns, seat, move.cardIds, false);
       case 'discard': {
         const card = ns.hands[seat]!.find((c) => c.id === move.cardId)!;
         ns = { ...ns, hands: ns.hands.map((h, i) => (i === seat ? h.filter((c) => c !== card) : h)), discards: ns.upcard ? [...ns.discards, ns.upcard] : ns.discards, upcard: card };
         pushLog(ns, { e: 'discard', seat, card });
+        if (ns.resumeAt !== null && ns.opts.stealResume === 'firstPlayer' && seat !== ns.resumeAt) {
+          const back = ns.resumeAt;
+          ns = { ...ns, resumeAt: null };
+          return checkOut(ns, seat) ?? { ...ns, turn: back, phase: 'act', flips: 0 };
+        }
+        ns = { ...ns, resumeAt: null };
         return checkOut(ns, seat) ?? (ns.handMoves >= PP_LIMITS.maxHandMoves ? endHand(ns, null, 'void') : nextTurn(ns, seat));
       }
       case 'flip': return doFlip(ns, seat);
+      case 'nextHand': return startHand({ ...ns, phase: 'act', ackSeat: null, dealer: nextActive(ns, ns.dealer) });
       case 'pass': {
         pushLog(ns, { e: 'pass', seat, upcard: ns.upcard! });
         return ns.handMoves >= PP_LIMITS.maxHandMoves ? endHand(ns, null, 'void') : nextTurn(ns, seat);
@@ -358,7 +394,7 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
       discardCount: s.discards.length,
       chips: s.chips.slice(), wins: s.wins.slice(), active: s.active.slice(),
       pot: s.pot, handNo: s.handNo, dealer: s.dealer,
-      turn: s.over ? null : s.phase === 'steal' ? s.stealQueue[0]! : s.turn,
+      turn: s.over ? null : toActOf(s)[0] ?? null,
       phase: s.over ? 'over' : s.phase,
       flips: s.flips,
       lastHand: s.history[s.history.length - 1] ?? null,
@@ -376,18 +412,45 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
       if (o.scoring === 'pot') deltas = s.chips.map((c) => c - o.stack);
       else {
         const top = s.wins[placements[0]!]!;
-        if (s.wins.filter((w) => w === top).length === 1) deltas = s.wins.map((_, i) => (i === placements[0] ? o.ante * (s.seats - 1) : -o.ante));
+        if (o.handsWonPayout === 'antePerOpponent' && s.wins.filter((w) => w === top).length === 1) deltas = s.wins.map((_, i) => (i === placements[0] ? o.ante * (s.seats - 1) : -o.ante));
       }
     }
-    return { done: s.over, placements, deltas, recap: { hands: s.history.slice(), chips: s.chips.slice(), wins: s.wins.slice(), shelves: s.shelves.map((x) => x.length / 2) } };
+    return { done: s.over, placements, deltas, recap: ppRecap(s) };
   },
 };
+
+/**
+ * Per-game stats record (mode_games.recap_json) for Pitty Pat: small and public only.
+ *   hands:  one row per hand — winner seat (null = void), how it ended, pot, coin change per seat
+ *   pairs:  pairs laid per seat over the whole game
+ *   wins / chips: final tallies; dealtWins: hands won on the deal
+ */
+export interface PpRecap {
+  v: 1;
+  hands: { n: number; winner: number | null; how: HandEnd['how']; pot: number; deltas: number[] }[];
+  pairs: number[];
+  wins: number[];
+  chips: number[];
+  dealtWins: number;
+}
+export function ppRecap(s: PpState): PpRecap {
+  return {
+    v: 1,
+    hands: s.history.map((h) => ({ n: h.hand, winner: h.winner, how: h.how, pot: h.pot, deltas: h.deltas.slice() })),
+    pairs: s.pairsTotal.slice(),
+    wins: s.wins.slice(),
+    chips: s.chips.slice(),
+    dealtWins: s.history.filter((h) => h.how === 'dealt').length,
+  };
+}
 
 /** Placeholder bot until milestone 7 (tiers): pair when it can, otherwise flip/pass; shed a random card. Tell-free: own view only. */
 export const pittyPatBot: BotStrategy<PpMove, PpView> = {
   modeId: 'pitty-pat',
   choose(_view, legalMoves, _tier, rng) {
     if (!legalMoves.length) throw new Error('no legal move');
+    const next = legalMoves.find((m) => m.t === 'nextHand');
+    if (next) return next;
     const pair = legalMoves.find((m) => m.t === 'pair' || m.t === 'steal');
     if (pair) return pair;
     const sheds = legalMoves.filter((m) => m.t === 'discard');

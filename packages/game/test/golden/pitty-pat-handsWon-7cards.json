@@ -1,0 +1,108 @@
+{
+ "preset": {
+  "seats": 5,
+  "seed": "golden-hw",
+  "options": {
+   "scoring": "handsWon",
+   "handSize": "7",
+   "gameTarget": 3
+  }
+ },
+ "moves": 328,
+ "moveLog": "0:flip 0:pair:AS 0:discard:7D 1:flip 1:pass 2:flip 2:pass 3:pair:2C 3:discard:QC 4:pair:QH 4:discard:10C 0:flip 0:pass 1:pair:6S 1:discard:AH 2:flip 2:pair:7H 2:discard:8D 3:flip 3:pass 4:pair:4D 4:discard:JS 0:flip 0:pass 1:flip 1:pair:8S 1:discard:9C 2:flip 2:pair:KS 2:discard:KH 3:flip 3:pair:3D 3:discard:JD 4:pair:JC 4:discard:AD 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:pair:QS 0:discard:KC 1:flip 1:pass 2:pair:5C 2:discard:4C 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:pair:10S 1:discard:9D 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pair:6H 3:discard:5D 4:flip 4:pass 0:pair:9S 0:discard:5H 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:pair:JH 1:flip 1:pass 2:flip 2:pass 3:flip 3:pair:KC 3:discard:8S 4:pair:8C 4:discard:KH 0:flip 0:pass 1:pair:8D 1:discard:7D 2:flip 2:pass 3:flip 3:pass 4:pair:QD 4:discard:6C 0:flip 0:pass 1:flip 1:pass 2:pair:AC 2:discard:3D 3:flip 3:pass 4:pair:5C 4:discard:JH 0:pair:JD 0:discard:10D 1:pair:10S 1:discard:5S 2:pair:5H 2:discard:9H 3:pair:9D 3:discard:AH 4:flip 4:pair:2H 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:pair:8H 2:discard:10D 3:flip 3:pair:AD 3:discard:7H 4:pair:7C 4:discard:4C 0:pair:4S 0:discard:KS 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:pair:3C 1:discard:JD 2:flip 2:pair:6H 2:discard:9D 3:pair:9S 3:discard:9C 4:pair:9H 4:discard:2C 0:pair:2D 0:discard:KC 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pair:10H 4:discard:3D 0:flip 0:pass 1:flip 1:pair:5H 1:discard:JC 2:flip 2:pass 3:flip 3:pair:QS 3:discard:6C 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pair:KH 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:pair:2C 2:discard:3H 3:pair:3S 3:discard:AD 4:flip 4:pass 0:flip 0:pair:KC 0:discard:8S 1:pair:8C 1:discard:10S 2:flip 2:pair:5C 2:discard:9D 3:flip 3:pass 4:pair:QD 4:discard:2D 0:flip 0:pass 1:flip 1:pair:7S 1:discard:4H 2:flip 2:pass 3:flip 3:pass 4:pair:6S 4:discard:KD 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:pair:8D 4:discard:4S 0:flip 0:pass 1:pair:AH 1:discard:10C 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:9H 2:discard:6D 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:pair:3D 3:discard:AS 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:pair:2S",
+ "results": {
+  "placements": [
+   4,
+   2,
+   0,
+   1,
+   3
+  ],
+  "deltas": [
+   -1,
+   -1,
+   -1,
+   -1,
+   4
+  ],
+  "recap": {
+   "v": 1,
+   "hands": [
+    {
+     "n": 0,
+     "winner": 2,
+     "how": "out",
+     "pot": 0,
+     "deltas": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "n": 1,
+     "winner": 4,
+     "how": "out",
+     "pot": 0,
+     "deltas": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "n": 2,
+     "winner": 4,
+     "how": "out",
+     "pot": 0,
+     "deltas": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "n": 3,
+     "winner": 4,
+     "how": "out",
+     "pot": 0,
+     "deltas": [
+      0,
+      0,
+      0,
+      0,
+      0
+     ]
+    }
+   ],
+   "pairs": [
+    7,
+    10,
+    11,
+    10,
+    15
+   ],
+   "wins": [
+    0,
+    0,
+    1,
+    0,
+    3
+   ],
+   "chips": [
+    0,
+    0,
+    0,
+    0,
+    0
+   ],
+   "dealtWins": 0
+  }
+ }
+}
