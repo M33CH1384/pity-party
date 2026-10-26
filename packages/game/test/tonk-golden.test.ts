@@ -1,6 +1,6 @@
 /**
  * Fixed-seed reference games for Tonk (M8b), one per main option preset: seed → full move log → results.
- * The stand-in bot plays every seat with an RNG keyed like the server's (seed:bot:moveNo:seat). A rules or bot
+ * The Tonk bot tiers play the seats (hard, normal, easy, …) with an RNG keyed like the server's (seed:bot:moveNo:seat). A rules or bot
  * change that alters any game fails here on purpose: check the diff, then regenerate deliberately with
  * `UPDATE_GOLDEN=1 npx vitest run packages/game/test/tonk-golden.test.ts`.
  */
@@ -18,6 +18,8 @@ export const PRESETS: Record<string, { seats: number; seed: string; options: Rec
   'stockVoid-coins-pause': { seats: 5, seed: 'tk-coins', options: { stockOut: 'void', coinStakes: true, stake: 2, pauseBetweenHands: true, gameTarget: 6 } },
 };
 
+/** M9a: seats rotate through the bot tiers so every tier is pinned. */
+const TIERS = ['hard', 'normal', 'easy'] as const;
 const fmt = (m: TkMove) => m.t + ('cardIds' in m ? `:${m.cardIds.join('+')}` : '') + ('cardId' in m ? `:${m.cardId}` : '') + ('spreadId' in m ? `@${m.spreadId}` : '');
 
 export function playGolden(p: (typeof PRESETS)[string]) {
@@ -26,7 +28,7 @@ export function playGolden(p: (typeof PRESETS)[string]) {
   const moves: string[] = [];
   while (!s.over) {
     const seat = R.toAct(s)[0]!;
-    const move = bot.choose(R.view(s, seat), R.legalMoves(s, seat), 'normal', seededRng(`${p.seed}:bot:${moves.length}:${seat}`)) as TkMove;
+    const move = bot.choose(R.view(s, seat), R.legalMoves(s, seat), TIERS[seat % 3]!, seededRng(`${p.seed}:bot:${moves.length}:${seat}`)) as TkMove;
     moves.push(`${seat}:${fmt(move)}`);
     s = R.applyMove(s, seat, move);
   }
