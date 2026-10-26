@@ -45,9 +45,9 @@ describe('Pitty Pat through the room (engine adapter)', () => {
     expect(env.errors('a').at(-1)!.code).toBe('BAD_MODE');
   });
 
-  it('plays a full game: 2 humans + 2 bots, hidden hands, ends over with a zero-sum coin record and the recap shape', () => {
-    const env = table({ stack: 4, ante: 1, pauseBetweenHands: true });
-    expect(st(env, 'a').room).toMatchObject({ modeId: 'pitty-pat', modeOptions: { stack: 4, pauseBetweenHands: true, mustPair: 'must' } });
+  it('plays a full game: 2 humans + 2 bots, hidden hands, ends over with a points record (default scoring) and the recap shape', () => {
+    const env = table({ targetPoints: 3, pauseBetweenHands: true });
+    expect(st(env, 'a').room).toMatchObject({ modeId: 'pitty-pat', modeOptions: { targetPoints: 3, pauseBetweenHands: true, mustPair: 'must', coinPot: false, gameEnd: 'firstToPoints' } });
     env.send('a', { t: 'start' });
     const s0 = st(env, 'a');
     expect(s0.room.phase).toBe('playing');
@@ -64,14 +64,17 @@ describe('Pitty Pat through the room (engine adapter)', () => {
     expect(s.mode!.results.deltas.reduce((x, y) => x + y, 0)).toBe(0);
     expect(env.records).toHaveLength(1);
     const rec = env.records[0]!;
-    expect(rec).toMatchObject({ modeId: 'pitty-pat', options: { stack: 4 } });
+    expect(rec).toMatchObject({ modeId: 'pitty-pat', options: { targetPoints: 3 } });
     expect(rec.seats.map((x) => x.bot)).toEqual([false, false, true, true]);
     const recap = rec.recap as PpRecap;
-    expect(recap.v).toBe(1);
+    expect(recap.v).toBe(2);
+    expect(recap.coinPot).toBe(false);
+    expect(Math.max(...recap.points)).toBe(3);
+    expect(rec.placements[0]).toBe(recap.points.indexOf(3));
     expect(recap.hands.length).toBeGreaterThan(0);
     for (const h of recap.hands) { expect(['out', 'dealt', 'void']).toContain(h.how); expect(h.deltas).toHaveLength(4); }
     expect(recap.pairs).toHaveLength(4);
-    expect(recap.chips.reduce((a, b) => a + b, 0)).toBe(16);
+    expect(recap.chips).toEqual([0, 0, 0, 0]); // no coins in play by default
     expect(JSON.stringify(recap)).not.toMatch(/"id":"/);
   });
 

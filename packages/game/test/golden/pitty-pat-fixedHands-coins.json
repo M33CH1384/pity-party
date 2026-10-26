@@ -1,0 +1,118 @@
+{
+ "preset": {
+  "seats": 3,
+  "seed": "golden-fixed",
+  "options": {
+   "coinPot": true,
+   "gameEnd": "fixedHands",
+   "gameTarget": 6
+  }
+ },
+ "moves": 131,
+ "moveLog": "0:pair:8S 0:discard:5S 1:flip 1:pair:QH 1:discard:10D 2:flip 2:pass 0:flip 0:pair:JS 2:flip 2:pass 0:flip 0:pass 1:pair:2D 1:discard:3S 2:flip 2:pair:6C 2:discard:8S 0:flip 0:pass 1:pair:2C 1:discard:QH 2:pair:QD 2:discard:10C 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 0:pair:JD 0:discard:4C 1:flip 1:pass 2:flip 2:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:8C 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 0:pair:JS 0:discard:9C 1:pair:9S 1:discard:6D 2:flip 2:pair:3C 2:discard:QD 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:7C 2:discard:3S 0:flip 0:pass 1:flip 1:pass 2:pair:KS 1:pair:QS 1:discard:QC 2:pair:2H 2:discard:5D 0:flip 0:pair:10D 0:discard:4H 1:flip 1:pass 2:pair:JH 2:discard:9D 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 0:pair:10H 0:discard:QH 1:flip 1:pair:6D 1:discard:KS 2:pair:KH 2:flip 2:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:9S 2:discard:3S 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:4C 2:discard:4D 0:flip 0:pass 1:flip 1:pair:9D 1:discard:9H 2:flip 2:pass 0:pair:10C 0:discard:KS 1:flip 1:pair:6D 1:discard:7H 2:pair:7S",
+ "results": {
+  "placements": [
+   2,
+   0,
+   1
+  ],
+  "deltas": [
+   0,
+   -6,
+   6
+  ],
+  "recap": {
+   "v": 2,
+   "points": [
+    2,
+    0,
+    4
+   ],
+   "coinPot": true,
+   "hands": [
+    {
+     "n": 0,
+     "winner": 0,
+     "how": "out",
+     "pot": 3,
+     "deltas": [
+      2,
+      -1,
+      -1
+     ]
+    },
+    {
+     "n": 1,
+     "winner": 0,
+     "how": "dealt",
+     "pot": 3,
+     "deltas": [
+      2,
+      -1,
+      -1
+     ]
+    },
+    {
+     "n": 2,
+     "winner": 2,
+     "how": "out",
+     "pot": 3,
+     "deltas": [
+      -1,
+      -1,
+      2
+     ]
+    },
+    {
+     "n": 3,
+     "winner": 2,
+     "how": "out",
+     "pot": 3,
+     "deltas": [
+      -1,
+      -1,
+      2
+     ]
+    },
+    {
+     "n": 4,
+     "winner": 2,
+     "how": "out",
+     "pot": 3,
+     "deltas": [
+      -1,
+      -1,
+      2
+     ]
+    },
+    {
+     "n": 5,
+     "winner": 2,
+     "how": "out",
+     "pot": 3,
+     "deltas": [
+      -1,
+      -1,
+      2
+     ]
+    }
+   ],
+   "pairs": [
+    11,
+    8,
+    12
+   ],
+   "wins": [
+    2,
+    0,
+    4
+   ],
+   "chips": [
+    10,
+    4,
+    16
+   ],
+   "dealtWins": 1
+  }
+ }
+}

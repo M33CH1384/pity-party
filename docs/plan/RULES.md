@@ -31,7 +31,8 @@ HAND_OVER → NEXT_DEAL | GAME_OVER
 - Dealt pair(s) held; player with pairs wins once they shed non-matching cards [V BLZ, RRB-PP]. Auto-win when dealt 2 pairs + matching upcard? [UNVERIFIED].
 - Stock empty: shuffle discard pile (keep none face-up), flip new upcard [V RRB-PP].
 ### Scoring / pot
-- No points [V RRB-PP]. Default: each player antes 1 chip/hand; winner takes pot [V RRB-PP "chips… pay the winning player"]. Players out of chips drop; last with chips wins [V RRB-PP]. Alt: most hands won after N hands/time [V RRB-PP].
+- **Default since Demetrius 2026-10-26: POINTS.** Each hand won (first to empty their hand, incl. a dealt win) = 1 point; a void hand scores nobody. Default game end: first to `targetPoints` (1–15, default 5). Points are the main score in the view, results (standings by points) and the stats record (`recap.points`, recap v2). The coin ante & pot below is now an optional setting (`coinPot`, default off).
+- Sourced coin rules (now the optional `coinPot`): no points [V RRB-PP]; each player antes 1 chip/hand; winner takes pot [V RRB-PP "chips… pay the winning player"]. Players out of chips drop; last with chips wins [V RRB-PP]. Alt: most hands won after N hands/time [V RRB-PP].
 - "Pity" per-pair payouts, double for dealt win [UNVERIFIED].
 ### Options (default first)
 | Option | Default | Choices | Tag |
@@ -43,10 +44,11 @@ HAND_OVER → NEXT_DEAL | GAME_OVER
 | tripsAsOne (3-of-kind shed together) | off | on | [UNVERIFIED] DNX-PP comment |
 | deadCardSteal (out-of-turn match on first upcard) | off | on | [UNVERIFIED] DNX-PP comment |
 | stockEmpty | reshuffle | reshuffle / void hand | void [UNVERIFIED] |
-| scoring | pot | pot / hands-won race | V |
+| coinPot | off (points only) | off / on (coin ante & pot) | V (chips, optional) |
+| targetPoints | 5 | 1–15 points | Demetrius |
 | ante | 1 | 0–10 coins | V (chips) |
 | pityPayouts | off | on | [UNVERIFIED] |
-| gameEnd | last with chips | last with chips / first to N wins / N hands | V |
+| gameEnd | first to N points | first to N points / last with chips (needs `coinPot` on and ante > 0; otherwise falls back to first to N points) / N hands (`gameTarget`) | V |
 ### Bots
 - Info used: own hand, upcard, all discards/flips (public). Tell-free: fixed think time + jitter, no talk keyed to hidden cards.
 - Easy: pair if possible; shed random non-paired card.
@@ -62,8 +64,8 @@ Each reading below is the default of a setup option in `PITTY_PAT_OPTIONS` (pack
 | 2 | How "pity" is paid (when `pityPayouts` on) | each loser pays one extra ante, two on a dealt win, never more than they hold | `pityStyle` = perHand | perPair: one ante per pair the winner laid (×2 on a dealt win) |
 | 3 | Dealt win with 7 cards | counts (3 pairs + upcard matching the 7th card) | `dealtWin7` = on | off |
 | 4 | Dead-card steal | window on the hand's first upcard only, for seats (other than the first player) holding a match, asked in turn order; after the steal + shed, play continues from the stealer's left | `stealResume` = stealerLeft | firstPlayer: the first player then takes their normal turn |
-| 5 | Hands-won game coins | game winner gets ante × (players − 1), everyone else pays the ante; a tie pays nothing | `handsWonPayout` = antePerOpponent | none |
-| 6 | Hands won + "last with coins" (no coins in play) | ends at first to N wins | `handsWonEnd` = firstToWins | fixedHands: after N hands |
+| 5 | Points game coins (no pot) | game winner gets ante × (players − 1), everyone else pays the ante; a tie pays nothing | `handsWonPayout` = antePerOpponent | none |
+| 6 | "Last with coins" with no coins in play | superseded 2026-10-26: `handsWonEnd` removed; that combination falls back to first to N points (pick "After N hands" via `gameEnd` instead) | — | — |
 | 7 | may-pair: declining before any flip | you flip instead (after a flip, declining = pass) | `declineAction` = flip | pass |
 | W1 | Deuces wild | on | `deucesWild` | off (a 2 is just a 2) |
 | W2 | Can a 2 pair with another 2 | yes | `deuceOnDeuce` | no (a 2 still pairs with any natural) |

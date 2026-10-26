@@ -13,8 +13,10 @@ export const PRESETS: Record<string, { seats: number; seed: string; options: Rec
   defaults: { seats: 4, seed: 'golden-defaults', options: {} },
   'may-untilMatch': { seats: 3, seed: 'golden-may', options: { mustPair: 'may', flipsPerTurn: 'untilMatch' } },
   'trips-steal': { seats: 4, seed: 'golden-trips', options: { tripsAsOne: true, deadCardSteal: true, stealResume: 'firstPlayer' } },
-  'handsWon-7cards': { seats: 5, seed: 'golden-hw', options: { scoring: 'handsWon', handSize: '7', gameTarget: 3 } },
-  'pity-void-pause': { seats: 2, seed: 'golden-pity', options: { pityPayouts: true, pityStyle: 'perPair', stockEmpty: 'void', pauseBetweenHands: true, ante: 2, stack: 8 } },
+  'points3-7cards': { seats: 5, seed: 'golden-hw', options: { handSize: '7', targetPoints: 3 } },
+  'coins-lastWithChips': { seats: 4, seed: 'golden-coins', options: { coinPot: true, gameEnd: 'lastWithChips' } },
+  'fixedHands-coins': { seats: 3, seed: 'golden-fixed', options: { coinPot: true, gameEnd: 'fixedHands', gameTarget: 6 } },
+  'pity-void-pause': { seats: 2, seed: 'golden-pity', options: { coinPot: true, pityPayouts: true, pityStyle: 'perPair', stockEmpty: 'void', pauseBetweenHands: true, ante: 2, stack: 8 } },
 };
 
 export function playGolden(p: (typeof PRESETS)[string]) {

@@ -6,7 +6,7 @@
  * upcard, then clockwise turns:
  *   upcard matches a hand card → pair it (must, or may) → shed any card (it becomes the upcard) → next seat
  *   no match → flip the stock's top card onto the upcard → match? pair + shed : pass
- * First to empty their hand wins the hand. Stakes are PLAY COINS ONLY (never real money): with pot scoring
+ * First to empty their hand wins the hand. Stakes are PLAY COINS ONLY (never real money): with the optional coin pot
  * every active player antes, the winner takes the pot; players who can't cover the ante drop out.
  *
  * Pure and deterministic: every shuffle comes from seededRng(`${seed}:…`) keyed by hand/redeal/reshuffle
@@ -29,18 +29,19 @@ export interface PpOptions {
   deadCardSteal: boolean;
   dealtWinAuto: boolean;
   stockEmpty: 'reshuffle' | 'void';
-  scoring: 'pot' | 'handsWon';
+  /** coin ante & pot (optional, default off); points (hands won) are always the main score */
+  coinPot: boolean;
+  targetPoints: number;
   stack: number;
   ante: number;
   pityPayouts: boolean;
-  gameEnd: 'lastWithChips' | 'firstToWins' | 'fixedHands';
+  gameEnd: 'firstToPoints' | 'lastWithChips' | 'fixedHands';
   gameTarget: number;
   dealtWinTie: 'turnOrder' | 'redeal';
   pityStyle: 'perHand' | 'perPair';
   dealtWin7: boolean;
   stealResume: 'stealerLeft' | 'firstPlayer';
   handsWonPayout: 'antePerOpponent' | 'none';
-  handsWonEnd: 'firstToWins' | 'fixedHands';
   declineAction: 'flip' | 'pass';
   pauseBetweenHands: boolean;
 }
@@ -124,6 +125,12 @@ export interface PpView {
   stockCount: number;
   discardCount: number;
   chips: number[];
+  /** MAIN SCORE: points = hands won (1 per hand) */
+  points: number[];
+  /** points to win (gameEnd firstToPoints) */
+  targetPoints: number;
+  /** coins in play (coin ante & pot option) — show coins only when true */
+  coinPot: boolean;
   wins: number[];
   active: boolean[];
   pot: number;
@@ -142,14 +149,16 @@ export const PP_LIMITS = { maxHands: 200, maxHandMoves: 2000, maxFlipsPerTurn: 6
 
 export function ppOptions(input: unknown): PpOptions {
   const o = validateOptions(PITTY_PAT_OPTIONS, input) as OptionValues;
+  // "last with coins" needs coins in play: without the pot (or with a 0 ante) it falls back to first-to-N-points
+  if (o.gameEnd === 'lastWithChips' && (!o.coinPot || o.ante === 0)) o.gameEnd = 'firstToPoints';
   return {
     handSize: Number(o.handSize), deucesWild: o.deucesWild as boolean, deuceOnDeuce: o.deuceOnDeuce as boolean, dealtWinWild: o.dealtWinWild as boolean, mustPair: o.mustPair as PpOptions['mustPair'], flipsPerTurn: o.flipsPerTurn as PpOptions['flipsPerTurn'],
     tripsAsOne: o.tripsAsOne as boolean, deadCardSteal: o.deadCardSteal as boolean, dealtWinAuto: o.dealtWinAuto as boolean,
-    stockEmpty: o.stockEmpty as PpOptions['stockEmpty'], scoring: o.scoring as PpOptions['scoring'], stack: o.stack as number,
+    stockEmpty: o.stockEmpty as PpOptions['stockEmpty'], coinPot: o.coinPot as boolean, targetPoints: o.targetPoints as number, stack: o.stack as number,
     ante: o.ante as number, pityPayouts: o.pityPayouts as boolean, gameEnd: o.gameEnd as PpOptions['gameEnd'],
     gameTarget: o.gameTarget as number, dealtWinTie: o.dealtWinTie as PpOptions['dealtWinTie'],
     pityStyle: o.pityStyle as PpOptions['pityStyle'], dealtWin7: o.dealtWin7 as boolean, stealResume: o.stealResume as PpOptions['stealResume'],
-    handsWonPayout: o.handsWonPayout as PpOptions['handsWonPayout'], handsWonEnd: o.handsWonEnd as PpOptions['handsWonEnd'],
+    handsWonPayout: o.handsWonPayout as PpOptions['handsWonPayout'],
     declineAction: o.declineAction as PpOptions['declineAction'], pauseBetweenHands: o.pauseBetweenHands as boolean,
   };
 }
@@ -200,7 +209,7 @@ function pairMoves(hand: readonly Card[], up: Card | null, trips: boolean, t: 'p
 function startHand(s: PpState): PpState {
   const o = s.opts;
   // who plays: pot scoring needs the ante covered (a 0 ante keeps everyone in)
-  const active = s.chips.map((c, i) => (o.scoring === 'pot' && o.ante > 0 ? c >= o.ante : true) && (s.handNo === 0 || s.active[i]!));
+  const active = s.chips.map((c, i) => (o.coinPot && o.ante > 0 ? c >= o.ante : true) && (s.handNo === 0 || s.active[i]!));
   const ns: PpState = { ...s, active };
   if (active.filter(Boolean).length < 2) return { ...ns, over: true };
   const order = activeOrder(ns, nextActive(ns, ns.dealer));
@@ -209,7 +218,7 @@ function startHand(s: PpState): PpState {
   const hands: Card[][] = Array.from({ length: s.seats }, () => []);
   order.forEach((seat, k) => { hands[seat] = dealt.hands[k]!; });
   const upcard = dealt.stock[0]!;
-  const antes = o.scoring === 'pot' ? o.ante : 0;
+  const antes = o.coinPot ? o.ante : 0;
   const chips = s.chips.map((c, i) => (active[i] ? c - antes : c));
   const out: PpState = {
     ...ns, chips, hands, shelves: Array.from({ length: s.seats }, () => []), stock: dealt.stock.slice(1), discards: [], upcard,
@@ -250,11 +259,11 @@ function endHand(s: PpState, winner: number | null, how: HandEnd['how']): PpStat
   const wins = s.wins.slice();
   if (winner === null) {
     // void: antes go back
-    const each = o.scoring === 'pot' ? o.ante : 0;
+    const each = o.coinPot ? o.ante : 0;
     chips = chips.map((c, i) => (s.active[i] ? c + each : c));
   } else {
     wins[winner]!++;
-    if (o.scoring === 'pot') {
+    if (o.coinPot) {
       const each = o.ante;
       for (let i = 0; i < s.seats; i++) if (s.active[i]) deltas[i]! -= each;
       chips[winner]! += s.pot; deltas[winner]! += s.pot;
@@ -276,10 +285,9 @@ function endHand(s: PpState, winner: number | null, how: HandEnd['how']): PpStat
   pushLog(ns, winner === null ? { e: 'void', why: s.handMoves >= PP_LIMITS.maxHandMoves ? 'moveCap' : 'stockEmpty' } : { e: 'out', seat: winner, how });
   // GAME_OVER?
   const played = ns.history.length;
-  const stillIn = ns.chips.map((c) => (o.scoring === 'pot' && o.ante > 0 ? c >= o.ante : true));
+  const stillIn = ns.chips.map((c) => (o.coinPot && o.ante > 0 ? c >= o.ante : true));
   const end = o.gameEnd === 'fixedHands' ? played >= o.gameTarget
-    : o.scoring === 'handsWon' && o.gameEnd === 'lastWithChips' && o.handsWonEnd === 'fixedHands' ? played >= o.gameTarget
-    : o.gameEnd === 'firstToWins' || o.scoring === 'handsWon' ? wins.some((w) => w >= o.gameTarget)
+    : o.gameEnd === 'firstToPoints' ? wins.some((w) => w >= o.targetPoints)
     : stillIn.filter((x, i) => x && ns.active[i]).length < 2;
   if (end || played >= PP_LIMITS.maxHands) return { ...ns, active: ns.active.map((a, i) => a && stillIn[i]!), over: true };
   const next: PpState = { ...ns, active: ns.active.map((a, i) => a && stillIn[i]!), handNo: ns.handNo + 1, redeals: 0 };
@@ -367,7 +375,7 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
     if (!Number.isInteger(seats) || seats < 2 || seats > 5) throw new RuleError('BAD_SEATS', 'Pitty Pat seats 2–5');
     const opts = ppOptions(options);
     const base: PpState = {
-      opts, seed, seats, chips: Array(seats).fill(opts.scoring === 'pot' ? opts.stack : 0), wins: Array(seats).fill(0), pairsTotal: Array(seats).fill(0), active: Array(seats).fill(true),
+      opts, seed, seats, chips: Array(seats).fill(opts.coinPot ? opts.stack : 0), wins: Array(seats).fill(0), pairsTotal: Array(seats).fill(0), active: Array(seats).fill(true),
       handNo: 0, dealer: seats - 1, redeals: 0, over: false, history: [], hands: Array.from({ length: seats }, () => []), shelves: Array.from({ length: seats }, () => []), stock: [], discards: [], upcard: null,
       pot: 0, turn: 0, phase: 'act', flips: 0, stealQueue: [], reshuffles: 0, handMoves: 0, log: [], dealtWin: false, resumeAt: null, ackSeat: null,
     };
@@ -421,6 +429,7 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
       upcard: s.upcard,
       stockCount: s.stock.length,
       discardCount: s.discards.length,
+      points: s.wins.slice(), targetPoints: s.opts.targetPoints, coinPot: s.opts.coinPot,
       chips: s.chips.slice(), wins: s.wins.slice(), active: s.active.slice(),
       pot: s.pot, handNo: s.handNo, dealer: s.dealer,
       turn: s.over ? null : toActOf(s)[0] ?? null,
@@ -434,11 +443,12 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
   results(s): Results {
     const o = s.opts;
     const seats = [...Array(s.seats).keys()];
-    const score = (i: number) => (o.scoring === 'pot' ? s.chips[i]! : s.wins[i]!);
-    const placements = seats.sort((a, b) => score(b) - score(a) || s.wins[b]! - s.wins[a]! || a - b);
+    // points (hands won) are the main score; only "last with coins" ranks by coins first
+    const byCoins = o.gameEnd === 'lastWithChips';
+    const placements = seats.sort((a, b) => (byCoins ? s.chips[b]! - s.chips[a]! : 0) || s.wins[b]! - s.wins[a]! || (o.coinPot ? s.chips[b]! - s.chips[a]! : 0) || a - b);
     let deltas = Array(s.seats).fill(0) as number[];
     if (s.over) {
-      if (o.scoring === 'pot') deltas = s.chips.map((c) => c - o.stack);
+      if (o.coinPot) deltas = s.chips.map((c) => c - o.stack);
       else {
         const top = s.wins[placements[0]!]!;
         if (o.handsWonPayout === 'antePerOpponent' && s.wins.filter((w) => w === top).length === 1) deltas = s.wins.map((_, i) => (i === placements[0] ? o.ante * (s.seats - 1) : -o.ante));
@@ -452,10 +462,14 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
  * Per-game stats record (mode_games.recap_json) for Pitty Pat: small and public only.
  *   hands:  one row per hand — winner seat (null = void), how it ended, pot, coin change per seat
  *   pairs:  pairs laid per seat over the whole game
- *   wins / chips: final tallies; dealtWins: hands won on the deal
+ *   points: MAIN SCORE, hands won per seat (1 point each); coinPot: whether coins were in play
+ *   wins / chips: final tallies (chips only meaningful with coinPot); dealtWins: hands won on the deal
  */
 export interface PpRecap {
-  v: 1;
+  v: 2;
+  /** main score: points (hands won) per seat */
+  points: number[];
+  coinPot: boolean;
   hands: { n: number; winner: number | null; how: HandEnd['how']; pot: number; deltas: number[] }[];
   pairs: number[];
   wins: number[];
@@ -464,7 +478,9 @@ export interface PpRecap {
 }
 export function ppRecap(s: PpState): PpRecap {
   return {
-    v: 1,
+    v: 2,
+    points: s.wins.slice(),
+    coinPot: s.opts.coinPot,
     hands: s.history.map((h) => ({ n: h.hand, winner: h.winner, how: h.how, pot: h.pot, deltas: h.deltas.slice() })),
     pairs: s.pairsTotal.slice(),
     wins: s.wins.slice(),
