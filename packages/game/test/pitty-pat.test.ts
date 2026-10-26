@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
 import {
   type Card, type PpMove, type PpState, type PpView, PITTY_PAT_OPTIONS, PP_LIMITS, RuleError, buildDeck, defaultsOf, getBot, getRules,
-  listModes, pittyPatRules as R, seededRng,
+  allPairs, listModes, pairsWith, pittyPatRules as R, seededRng,
 } from '../src';
 
 const DECK = buildDeck();
@@ -15,7 +15,9 @@ const C = (id: string): Card => { const c = DECK.find((d) => d.id === id); if (!
 const ids = (cs: readonly Card[]) => cs.map((c) => c.id);
 
 /** Rig a hand: given hands + upcard (+ optional stock head), the rest of the deck becomes the stock (conservation holds). */
-function rig(hands: string[][], upcard: string, opts: Record<string, unknown> = {}, stockHead: string[] = []): PpState {
+function rig(hands: string[][], upcard: string, opts0: Record<string, unknown> = {}, stockHead: string[] = []): PpState {
+  // rigged hands use natural ranks unless a test turns deuces wild on
+  const opts = { deucesWild: false, ...opts0 };
   const base = R.newGame({ ...opts, dealtWinAuto: false, deadCardSteal: false }, hands.length, 'rig');
   const used = new Set([...hands.flat(), upcard, ...stockHead]);
   const stock = [...stockHead.map(C), ...DECK.filter((c) => !used.has(c.id))];
@@ -300,6 +302,75 @@ describe('stats recap (mode_games.recap_json)', () => {
   });
 });
 
+describe('deuces wild (Demetrius 2026-10-26)', () => {
+  const W = { deucesWild: true };
+  it('defaults: deuces wild on, 2+2 allowed, deuces count for a dealt win', () => {
+    expect(defaultsOf(PITTY_PAT_OPTIONS)).toMatchObject({ deucesWild: true, deuceOnDeuce: true, dealtWinWild: true });
+  });
+  it('a 2 in hand pairs with any upcard; any card pairs with a 2 upcard', () => {
+    const s = rig([['2C', '5D', '9H', 'KS', '4C'], ['3C', '3D', '5H', '6S', '8C']], 'QD', W);
+    expect(R.legalMoves(s, 0)).toEqual([{ t: 'pair', cardIds: ['2C'] }]);
+    const up2 = rig([['7C', '5D', '9H'], ['3C', '3D', '5H']], '2D', W);
+    expect(R.legalMoves(up2, 0).map((m) => (m as { cardIds: string[] }).cardIds[0])).toEqual(['7C', '5D', '9H']);
+    const next = play(s, 0, { t: 'pair', cardIds: ['2C'] });
+    expect(ids(next.shelves[0]!)).toEqual(['QD', '2C']);
+    expect(conserved(next)).toBe(true);
+  });
+  it('off: a 2 is just a 2', () => {
+    const s = rig([['2C', '5D', '9H', 'KS', '4C'], ['3C', '3D', '5H', '6S', '8C']], 'QD', { deucesWild: false });
+    expect(R.legalMoves(s, 0)).toEqual([{ t: 'flip' }]);
+  });
+  it('deuce on deuce: allowed by default, refused when deuceOnDeuce is off', () => {
+    const hands = [['2C', '5D', '9H', 'KS', '4C'], ['3C', '3D', '5H', '6S', '8C']];
+    expect(R.legalMoves(rig(hands, '2D', W), 0)).toContainEqual({ t: 'pair', cardIds: ['2C'] });
+    const off = R.legalMoves(rig(hands, '2D', { ...W, deuceOnDeuce: false }), 0);
+    expect(off).not.toContainEqual({ t: 'pair', cardIds: ['2C'] });
+    expect(off).toHaveLength(4); // the four naturals still pair with the 2
+  });
+  it('trips with wilds: two naturals shed together with the upcard; a 2 never makes trips', () => {
+    const s = rig([['7C', '7H', '2S', 'KS', '4C'], ['3C', '3D', '5H', '6S', '8C']], '7D', { ...W, tripsAsOne: true });
+    expect(R.legalMoves(s, 0)).toEqual([{ t: 'pair', cardIds: ['7C', '7H'] }]);
+    const one = rig([['7C', '2S', 'KS', '4C', '9C'], ['3C', '3D', '5H', '6S', '8C']], '7D', { ...W, tripsAsOne: true });
+    expect(R.legalMoves(one, 0)).toEqual([{ t: 'pair', cardIds: ['7C'] }, { t: 'pair', cardIds: ['2S'] }]);
+  });
+  it('allPairs with wilds: deuces cover odd ranks; spare deuces pair together or split a natural pair', () => {
+    const w = { on: true, deuceOnDeuce: true }, noDD = { on: true, deuceOnDeuce: false };
+    expect(allPairs(['KS', '2C', '4C', '4D'].map(C), w)).toBe(true);
+    expect(allPairs(['KS', 'QS', '4C', '4D'].map(C), w)).toBe(false);
+    expect(allPairs(['2S', '2C', '4C', '4D'].map(C), w)).toBe(true);
+    expect(allPairs(['2S', '2C', '4C', '4D'].map(C), noDD)).toBe(true); // 4+2, 4+2
+    expect(allPairs(['2S', '2C'].map(C), noDD)).toBe(false);
+    expect(allPairs(['2S', '2C', '4C', '4D'].map(C), { on: false, deuceOnDeuce: false })).toBe(true); // natural 2-2, 4-4
+    expect(pairsWith(C('2S'), C('KD'), w)).toBe(true);
+    expect(pairsWith(C('2S'), C('2D'), noDD)).toBe(false);
+  });
+  it('dealt win with deuces counts (dealtWinWild on), and not when off', () => {
+    // K K 9 4 2 + upcard 4 → (KK)(44)(9,2): a win on the deal only with wilds
+    let seed: string | null = null;
+    for (let i = 0; i < 20000 && !seed; i++) {
+      const g = R.newGame({ dealtWinWild: false }, 4, `dw2-${i}`);
+      if (g.history.length) continue;
+      const w = R.newGame({}, 4, `dw2-${i}`);
+      if (w.history[0]?.how === 'dealt') seed = `dw2-${i}`;
+    }
+    expect(seed).not.toBeNull();
+    const won = R.newGame({}, 4, seed!);
+    const winner = won.history[0]!.winner!;
+    const dealt = R.newGame({ dealtWinAuto: false }, 4, seed!); // same deal, nobody wins on it
+    expect([...dealt.hands[winner]!, dealt.upcard!].some((c) => c.rank === 2)).toBe(true);
+    expect(R.newGame({ dealtWinWild: false }, 4, seed!).history).toHaveLength(0);
+    expect(R.newGame({ deucesWild: false }, 4, seed!).history).toHaveLength(0);
+  });
+  it('held pairs go out with a wild (dealtWinAuto)', () => {
+    const s = rig([['7C', 'KS', '2H', '4C', '4D'], ['3C', '3D', '5H', '6S', '8C']], '7D', { ...W, dealtWinAuto: true });
+    expect(play(s, 0, { t: 'pair', cardIds: ['7C'] }).history[0]).toMatchObject({ winner: 0, how: 'out' });
+  });
+  it('the stand-in bot prefers a natural pair over spending a 2', () => {
+    const s = rig([['2C', '7H', '9H', 'KS', '4C'], ['3C', '3D', '5H', '6S', '8C']], '7D', W);
+    expect(getBot('pitty-pat').choose(R.view(s, 0), R.legalMoves(s, 0), 'easy', seededRng('b'))).toEqual({ t: 'pair', cardIds: ['7H'] });
+  });
+});
+
 describe('deadCardSteal (out-of-turn match on the first upcard)', () => {
   it('off: no steal window; on: seats holding a match (after the first player) may steal or waive in turn order', () => {
     let found: PpState | null = null;
@@ -358,6 +429,7 @@ const optArb = fc.record({
   pityStyle: fc.constantFrom('perHand', 'perPair'), dealtWin7: fc.boolean(), stealResume: fc.constantFrom('stealerLeft', 'firstPlayer'),
   handsWonPayout: fc.constantFrom('antePerOpponent', 'none'), handsWonEnd: fc.constantFrom('firstToWins', 'fixedHands'), declineAction: fc.constantFrom('flip', 'pass'),
   pauseBetweenHands: fc.boolean(),
+  deucesWild: fc.boolean(), deuceOnDeuce: fc.boolean(), dealtWinWild: fc.boolean(),
 });
 
 describe('properties (fast-check)', () => {

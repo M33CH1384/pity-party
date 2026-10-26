@@ -11,42 +11,42 @@
    "stack": 8
   }
  },
- "moves": 22,
- "moveLog": "0:flip 0:pair:3S 0:discard:2D 1:pair:2C 1:discard:5S 0:flip 0:pass 1:flip 1:pass 0:flip 0:pass 1:pair:4H 1:discard:10D 0:flip 0:pass 1:flip 1:pass 0:pair:JH 0:discard:2H 1:flip 1:pass 0:pair:7S",
+ "moves": 16,
+ "moveLog": "0:pair:2D 0:discard:3S 1:pair:2C 1:discard:QS 0:pair:2H 0:discard:JH 1:flip 1:pass 0:flip 0:pass 1:flip 1:pair:5S 1:discard:10D 0:flip 0:pass 1:pair:4H",
  "results": {
   "placements": [
-   0,
-   1
+   1,
+   0
   ],
   "deltas": [
-   8,
-   -8
+   -8,
+   8
   ],
   "recap": {
    "v": 1,
    "hands": [
     {
      "n": 0,
-     "winner": 0,
+     "winner": 1,
      "how": "out",
      "pot": 4,
      "deltas": [
-      8,
-      -8
+      -8,
+      8
      ]
     }
    ],
    "pairs": [
-    3,
-    2
+    2,
+    3
    ],
    "wins": [
-    1,
-    0
+    0,
+    1
    ],
    "chips": [
-    16,
-    0
+    0,
+    16
    ],
    "dealtWins": 0
   }

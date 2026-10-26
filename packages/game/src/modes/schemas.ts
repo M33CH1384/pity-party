@@ -11,6 +11,9 @@ const choices = (...v: [string, string][]) => v.map(([value, label]) => ({ value
 /** Mode A — Pitty Pat (Belize pairs). */
 export const PITTY_PAT_OPTIONS: readonly OptionDef[] = [
   { key: 'handSize', label: 'Cards dealt', type: 'enum', default: '5', choices: choices(['5', '5 cards'], ['7', '7 cards']), source: 'PAGAT-PP / RRB-PP (5); 7 house', verified: false, help: '5 is verified; 7 is a house variant' },
+  { key: 'deucesWild', label: 'Deuces wild (a 2 pairs with any card)', type: 'bool', default: true, source: 'Demetrius 2026-10-26', verified: true },
+  { key: 'deuceOnDeuce', label: 'A 2 can pair with another 2', type: 'bool', default: true, source: 'house (deuces-wild reading)', verified: false },
+  { key: 'dealtWinWild', label: 'Deuces count for a win on the deal', type: 'bool', default: true, source: 'house (deuces-wild reading)', verified: false },
   { key: 'mustPair', label: 'Must pair when able', type: 'enum', default: 'must', choices: choices(['must', 'Must pair'], ['may', 'May pair']), source: 'GR-PP must / DNX-PP may', verified: true },
   { key: 'flipsPerTurn', label: 'Flips when you can’t match', type: 'enum', default: 'one', choices: choices(['one', 'One flip'], ['untilMatch', 'Flip until a match']), source: 'RRB-PP / GR-PP (one); until-match house', verified: false },
   { key: 'tripsAsOne', label: 'Three of a kind sheds together', type: 'bool', default: false, source: 'DNX-PP reader comment', verified: false },

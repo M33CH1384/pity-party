@@ -20,6 +20,9 @@ import { PITTY_PAT_OPTIONS } from './schemas';
 
 export interface PpOptions {
   handSize: number;
+  deucesWild: boolean;
+  deuceOnDeuce: boolean;
+  dealtWinWild: boolean;
   mustPair: 'must' | 'may';
   flipsPerTurn: 'one' | 'untilMatch';
   tripsAsOne: boolean;
@@ -140,7 +143,7 @@ export const PP_LIMITS = { maxHands: 200, maxHandMoves: 2000, maxFlipsPerTurn: 6
 export function ppOptions(input: unknown): PpOptions {
   const o = validateOptions(PITTY_PAT_OPTIONS, input) as OptionValues;
   return {
-    handSize: Number(o.handSize), mustPair: o.mustPair as PpOptions['mustPair'], flipsPerTurn: o.flipsPerTurn as PpOptions['flipsPerTurn'],
+    handSize: Number(o.handSize), deucesWild: o.deucesWild as boolean, deuceOnDeuce: o.deuceOnDeuce as boolean, dealtWinWild: o.dealtWinWild as boolean, mustPair: o.mustPair as PpOptions['mustPair'], flipsPerTurn: o.flipsPerTurn as PpOptions['flipsPerTurn'],
     tripsAsOne: o.tripsAsOne as boolean, deadCardSteal: o.deadCardSteal as boolean, dealtWinAuto: o.dealtWinAuto as boolean,
     stockEmpty: o.stockEmpty as PpOptions['stockEmpty'], scoring: o.scoring as PpOptions['scoring'], stack: o.stack as number,
     ante: o.ante as number, pityPayouts: o.pityPayouts as boolean, gameEnd: o.gameEnd as PpOptions['gameEnd'],
@@ -154,18 +157,43 @@ export function ppOptions(input: unknown): PpOptions {
 const bad = (code: string, msg: string): never => { throw new RuleError(code, msg); };
 const rankCounts = (cards: readonly Card[]) => { const m = new Map<Rank, number>(); for (const c of cards) m.set(c.rank, (m.get(c.rank) ?? 0) + 1); return m; };
 /** every rank an even number of times (and non-empty): the hand lays down as pairs */
-const allPairs = (cards: readonly Card[]) => cards.length > 0 && [...rankCounts(cards).values()].every((n) => n % 2 === 0);
+/** Wild rules in force: deuces wild (a 2 pairs with any card), and whether 2 may pair with 2. */
+export interface Wild { on: boolean; deuceOnDeuce: boolean }
+const NO_WILD: Wild = { on: false, deuceOnDeuce: false };
+const wildOf = (o: PpOptions): Wild => ({ on: o.deucesWild, deuceOnDeuce: o.deuceOnDeuce });
+const isDeuce = (c: Card) => c.rank === 2;
+/** Do two cards make a pair? Same rank, or (deuces wild) either is a 2 — 2+2 only when deuceOnDeuce. */
+export function pairsWith(a: Card, b: Card, w: Wild): boolean {
+  if (!w.on) return a.rank === b.rank;
+  if (isDeuce(a) && isDeuce(b)) return w.deuceOnDeuce;
+  return a.rank === b.rank || isDeuce(a) || isDeuce(b);
+}
+/** Can every card be laid down as pairs (non-empty)? With wilds: deuces cover odd ranks; spare deuces pair
+ *  with each other (deuceOnDeuce) or split a natural pair. */
+export function allPairs(cards: readonly Card[], w: Wild = NO_WILD): boolean {
+  if (!cards.length || cards.length % 2) return false;
+  if (!w.on) return [...rankCounts(cards).values()].every((n) => n % 2 === 0);
+  const naturals = cards.filter((c) => !isDeuce(c));
+  const d = cards.length - naturals.length;
+  const counts = [...rankCounts(naturals).values()];
+  const odd = counts.filter((n) => n % 2).length;
+  if (d < odd) return false;
+  const spare = d - odd; // even, since the total is even
+  if (spare === 0 || w.deuceOnDeuce) return true;
+  const naturalPairs = counts.reduce((n, c) => n + Math.floor(c / 2), 0);
+  return spare / 2 <= naturalPairs; // each natural pair splits to take two deuces
+}
 const nextActive = (s: Pick<PpState, 'active' | 'seats'>, from: number) => { for (let k = 1; k <= s.seats; k++) { const i = (from + k) % s.seats; if (s.active[i]) return i; } return from; };
 const activeOrder = (s: Pick<PpState, 'active' | 'seats'>, first: number) => { const out: number[] = []; for (let k = 0; k < s.seats; k++) { const i = (first + k) % s.seats; if (s.active[i]) out.push(i); } return out; };
 const pushLog = (s: PpState, ev: PpEvent) => { s.log = [...s.log, ev].slice(-PP_LIMITS.logKeep); };
 
 /** The pair moves `seat` has against the upcard (tripsAsOne: two matching cards shed together with it). */
-function pairMoves(hand: readonly Card[], up: Card | null, trips: boolean, t: 'pair' | 'steal'): PpMove[] {
+function pairMoves(hand: readonly Card[], up: Card | null, trips: boolean, t: 'pair' | 'steal', w: Wild = NO_WILD): PpMove[] {
   if (!up) return [];
-  const m = hand.filter((c) => c.rank === up.rank);
-  if (!m.length) return [];
-  if (trips && m.length >= 2) return [{ t, cardIds: m.slice(0, 2).map((c) => c.id).sort() }];
-  return m.map((c) => ({ t, cardIds: [c.id] }));
+  // trips shed together on natural rank only (two naturals of the upcard's rank); wilds always pair one card
+  const natural = hand.filter((c) => c.rank === up.rank);
+  if (trips && natural.length >= 2 && !(w.on && isDeuce(up))) return [{ t, cardIds: natural.slice(0, 2).map((c) => c.id).sort() }];
+  return hand.filter((c) => pairsWith(c, up, w)).map((c) => ({ t, cardIds: [c.id] }));
 }
 
 /* ------------------------------------------------------------------ hand lifecycle */
@@ -192,7 +220,8 @@ function startHand(s: PpState): PpState {
   pushLog(out, { e: 'deal', hand: s.handNo, dealer: s.dealer, upcard });
   // CHECK_DEALT_WIN: dealt pairs + an upcard that pairs the odd card
   if (o.dealtWinAuto && (o.handSize !== 7 || o.dealtWin7)) {
-    const winners = order.filter((seat) => allPairs([...hands[seat]!, upcard]));
+    const dw: Wild = o.dealtWinWild ? wildOf(o) : NO_WILD;
+    const winners = order.filter((seat) => allPairs([...hands[seat]!, upcard], dw));
     if (winners.length > 1 && o.dealtWinTie === 'redeal' && s.redeals < PP_LIMITS.maxRedeals) {
       const back: PpState = { ...out, chips: s.chips, redeals: s.redeals + 1 };
       pushLog(back, { e: 'redeal', why: 'dealtWinTie' });
@@ -208,7 +237,7 @@ function startHand(s: PpState): PpState {
     }
   }
   if (o.deadCardSteal) {
-    const q = order.slice(1).filter((seat) => hands[seat]!.some((c) => c.rank === upcard.rank));
+    const q = order.slice(1).filter((seat) => hands[seat]!.some((c) => pairsWith(c, upcard, wildOf(o))));
     if (q.length) return { ...out, phase: 'steal', stealQueue: q, resumeAt: order[0]! };
   }
   return out;
@@ -252,7 +281,7 @@ function endHand(s: PpState, winner: number | null, how: HandEnd['how']): PpStat
     : o.scoring === 'handsWon' && o.gameEnd === 'lastWithChips' && o.handsWonEnd === 'fixedHands' ? played >= o.gameTarget
     : o.gameEnd === 'firstToWins' || o.scoring === 'handsWon' ? wins.some((w) => w >= o.gameTarget)
     : stillIn.filter((x, i) => x && ns.active[i]).length < 2;
-  if (end || played >= PP_LIMITS.maxHands) return { ...ns, over: true };
+  if (end || played >= PP_LIMITS.maxHands) return { ...ns, active: ns.active.map((a, i) => a && stillIn[i]!), over: true };
   const next: PpState = { ...ns, active: ns.active.map((a, i) => a && stillIn[i]!), handNo: ns.handNo + 1, redeals: 0 };
   if (next.active.filter(Boolean).length < 2) return { ...next, over: true };
   if (o.pauseBetweenHands) {
@@ -267,7 +296,7 @@ function endHand(s: PpState, winner: number | null, how: HandEnd['how']): PpStat
 function checkOut(s: PpState, seat: number): PpState | null {
   const h = s.hands[seat]!;
   if (h.length === 0) return endHand(s, seat, 'out');
-  if (s.opts.dealtWinAuto && allPairs(h)) {
+  if (s.opts.dealtWinAuto && allPairs(h, wildOf(s.opts))) {
     const ns = { ...s, shelves: s.shelves.map((sh, i) => (i === seat ? [...sh, ...h] : sh)), hands: s.hands.map((x, i) => (i === seat ? [] : x)) };
     return endHand(ns, seat, 'out');
   }
@@ -311,12 +340,12 @@ function legal(s: PpState, seat: number): PpMove[] {
   if (s.phase === 'handOver') return seat === s.ackSeat ? [{ t: 'nextHand' }] : [];
   if (s.phase === 'steal') {
     if (seat !== s.stealQueue[0]) return [];
-    return [...pairMoves(s.hands[seat]!, s.upcard, o.tripsAsOne, 'steal'), { t: 'waive' }];
+    return [...pairMoves(s.hands[seat]!, s.upcard, o.tripsAsOne, 'steal', wildOf(o)), { t: 'waive' }];
   }
   if (seat !== s.turn) return [];
   const hand = s.hands[seat]!;
   if (s.phase === 'shed') return hand.map((c) => ({ t: 'discard' as const, cardId: c.id }));
-  const pairs = pairMoves(hand, s.upcard, o.tripsAsOne, 'pair');
+  const pairs = pairMoves(hand, s.upcard, o.tripsAsOne, 'pair', wildOf(o));
   const canFlipMore = o.flipsPerTurn === 'untilMatch' && s.flips < PP_LIMITS.maxFlipsPerTurn;
   if (pairs.length) {
     if (o.mustPair === 'must') return pairs;
@@ -447,12 +476,16 @@ export function ppRecap(s: PpState): PpRecap {
 /** Placeholder bot until milestone 7 (tiers): pair when it can, otherwise flip/pass; shed a random card. Tell-free: own view only. */
 export const pittyPatBot: BotStrategy<PpMove, PpView> = {
   modeId: 'pitty-pat',
-  choose(_view, legalMoves, _tier, rng) {
+  choose(view, legalMoves, _tier, rng) {
     if (!legalMoves.length) throw new Error('no legal move');
     const next = legalMoves.find((m) => m.t === 'nextHand');
     if (next) return next;
-    const pair = legalMoves.find((m) => m.t === 'pair' || m.t === 'steal');
-    if (pair) return pair;
+    // pair when able; spend a wild 2 only if no natural pair is on offer (a held 2 pairs with anything later)
+    const pairs = legalMoves.filter((m): m is Extract<PpMove, { t: 'pair' | 'steal' }> => m.t === 'pair' || m.t === 'steal');
+    if (pairs.length) {
+      const deuce = new Set(view.hand.filter((c) => c.rank === 2).map((c) => c.id));
+      return pairs.find((m) => !m.cardIds.some((id) => deuce.has(id))) ?? pairs[0]!;
+    }
     const sheds = legalMoves.filter((m) => m.t === 'discard');
     if (sheds.length) return sheds[Math.floor(rng() * sheds.length)]!;
     return legalMoves[0]!;
