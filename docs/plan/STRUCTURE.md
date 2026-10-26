@@ -37,20 +37,27 @@ export const REGISTRY: Record<ModeId, RuleSet<any, any, any>>;
 - Bot arena: seeded bot-vs-bot batches; hard beats easy >60%; no illegal moves.
 - Server room tests use a placeholder mode so shell tests don't depend on Pitty Pat rules.
 
-## Milestones (revised)
-1. Snapshot copy, renames, strip story/voice/Spades UI, build green (2 PRs).
-2. game/core + registry + placeholder mode; room.ts on registry (3 PRs).
+## Milestones (revised 2026-10-26: every BWM feature is kept)
+Demetrius wants **all** Bid Wit Me functions. The Spades-only features were switched off in 2.2b part 2
+and come back on the registry. See `docs/plan/REBUILD.md`.
+
+1. Snapshot copy, renames, strip story/voice/Spades UI, build green (3 PRs, done: #1–#3).
+2. game/core + registry + placeholder mode; room.ts on registry (4 PRs: #4 core, #5 adapter, #6 turn clock, 2.2b-2 registry-only room).
 3. Web TableShell + GameViews/Recaps registry; schema-driven Setup with mode picker (2 PRs).
 4. Online rooms/chat/spectators on new worker (1 PR). ← skeleton boots
 5. Accounts, social, push on new D1/secrets (1–2 PRs).
-6. Mode A engine + options + tests (2 PRs).
-7. Mode A bots (3 tiers) + table view + recap (2–3 PRs).
-8. Mode B engine (spreads, hit, drop, payouts) + meld solver + tests (3 PRs).
-9. Mode B bots (3 tiers) + table view (spread areas, hit targets) + recap (3 PRs).
+6. Mode A (Pitty Pat) engine + options + tests (2 PRs).
+7. Mode A bots (3 tiers) + table view + recap (2–3 PRs). ← **Mode A playable**
+7R. **Rebuild (a):** series/rematch tally (1), rated games/Elo per mode (1), richer stats + leaderboards/honors + abandoned records (1–2). **3–4 PRs.**
+8. Mode B (Tonk) engine (spreads, hit, drop, payouts) + meld solver + tests (3 PRs).
+9. Mode B bots (3 tiers) + table view (spread areas, hit targets) + recap (3 PRs). ← **Mode B playable**
+9R. **Rebuild (b), before visuals/deploy:** tournaments on placements + coin deltas (2), Big Bank escrow/wagers (2), leagues/season challenges (1), challenges (1, shares Big Bank plumbing), bot chat/trash talk + highlights per mode (1–2), hand log/Run It equivalents per mode (1–2). **8–10 PRs.**
 10. Desi visuals/palette, venues, PWA (2 PRs).
-11. Cloudflare provisioning + first deploy after Yoda confirms (1 PR).
-12. Later: leagues/tournaments/wagers/story.
-Total ≈ 20–22 PRs vs 18–22 before → **about +2–3 PRs, ~30% more effort**, mostly Mode B (meld solver, hit UI, drop-EV bots). Skeleton = steps 1–4, about 8 PRs (the registry is already counted in step 2). Mode A can ship first with Mode B hidden behind a setup flag.
+11. Cloudflare provisioning + first deploy after Yoda confirms (1 PR). **(c) Every rebuild item must be back before this.**
+
+Total ≈ **33–38 PRs** (was 20–22): +2 because milestones 1 and 2 each took one PR more than planned, +3–4 for rebuild (a), +8–10 for rebuild (b).
+Done so far: 6 merged plus this one. Skeleton = steps 1–4. Mode A can still ship first internally with Mode B
+hidden behind a setup flag, but launch (11) waits for everything.
 
 ## Risks
 - room.ts/Table.tsx untangling (3k LOC each) — highest effort.
