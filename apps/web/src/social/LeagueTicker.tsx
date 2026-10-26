@@ -238,7 +238,7 @@ export function LeagueTicker({ variant, onHasLines }: { variant: 'bar' | 'panel'
       onPointerDown={() => setHeld(true)} onPointerUp={() => setHeld(false)}
       onPointerLeave={() => setHeld(false)} onPointerCancel={() => setHeld(false)}>
       <span className="ticker-bug" aria-hidden="true">
-        <img src="/assets/bwm-wordmark-white.svg" alt="" />
+        <span className="pp-wordmark" aria-hidden>Pity Party</span>
         <span className="ticker-beta">BETA</span>
       </span>
       <span className="sr-only" role="status">{lines.map((l) => l.text).join(' ')}</span>

@@ -39,3 +39,13 @@ describe('lobby GAME panel (3c)', () => {
     expect(h).toMatch(/45s/);
   });
 });
+
+describe('catalog seat labels match the table seat range (3d)', () => {
+  it('every mode tile says exactly the seats a table can offer', async () => {
+    const { modeCatalog } = await import('../src/modes/catalog');
+    for (const m of modeCatalog()) {
+      const { min, max } = tableSeatRange(m.modeId);
+      expect(m.seats, m.modeId).toBe(min === max ? `${min} players` : `${min}–${max} players`);
+    }
+  });
+});

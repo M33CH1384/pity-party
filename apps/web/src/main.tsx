@@ -24,6 +24,7 @@ import EntryFlow from './EntryFlow';
 import '@fontsource/barlow-condensed/600.css';
 import '@fontsource/barlow-condensed/700.css';
 import '@fontsource/barlow-condensed/800.css';
+import './theme.css';
 import './styles.css';
 
 // Route chunks load through importChunk: a deploy deletes the previous build's hashed

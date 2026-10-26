@@ -322,7 +322,7 @@ export function NotificationsSection() {
                 Get a ping when it&rsquo;s your turn, when friends invite you, and for rank ups and rewards —
                 even with the app closed.
               </p>
-              <p className="acct-fine"><b>On iPhone:</b> add Bid Wit Me to your Home Screen first (Safari → Share → Add to Home Screen, iOS 16.4+), then launch the app from the Home Screen icon and enable here. Push will not work from inside Safari.</p>
+              <p className="acct-fine"><b>On iPhone:</b> add Pity Party to your Home Screen first (Safari → Share → Add to Home Screen, iOS 16.4+), then launch the app from the Home Screen icon and enable here. Push will not work from inside Safari.</p>
               {perm === 'denied' ? (
                 <p className="acct-fine">Notifications are blocked for this site — allow them in your browser settings, then come back.</p>
               ) : (

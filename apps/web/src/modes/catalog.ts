@@ -15,7 +15,7 @@ export interface ModeEntry {
 }
 
 const BLURB: Record<ModeId, { title: string; blurb: string; seats: string }> = {
-  placeholder: { title: 'High Card', blurb: 'Test mode: highest card takes the round', seats: '2–5 players' },
+  placeholder: { title: 'High Card', blurb: 'Test mode: highest card takes the round', seats: '2–4 players' },
   'pitty-pat': { title: 'Pitty Pat', blurb: 'Belize pairs: shed your hand in pairs', seats: '2–4 players' },
   tonk: { title: 'Tonk', blurb: 'Spreads, hits and drops, lowest hand wins', seats: '2–4 players' },
 };

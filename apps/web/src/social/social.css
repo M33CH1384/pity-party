@@ -30,7 +30,7 @@
 .soc-player.friend { border-color: rgba(var(--gold-rgb),.45); }
 .soc-pl-main { display: flex; align-items: center; gap: 10px; }
 .soc-av { width: 44px; height: 44px; border-radius: 50%; flex: none; display: inline-grid; place-items: center; font-family: var(--display); font-weight: 800; font-size: 22px; color: #1d1204; background: linear-gradient(180deg, var(--gold-hi), var(--gold-deep)); }
-.soc-av.guest { background: #3a2f52; color: var(--muted); }
+.soc-av.guest { background: #3a3f47; color: var(--muted); }
 .soc-av.big { width: 120px; height: 120px; font-size: 56px; }
 .soc-pl-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; text-align: left; }
 .soc-pl-name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -58,7 +58,7 @@ button.ghost { background: transparent !important; }
 /* League Wire (item 7): a system line in global chat — unmistakably not a
    player message. Full-width block, gold byline, deep purple in Classic;
    Neon gets the navy/violet treatment. Same layout and function in both. */
-.soc-wire { margin-top: 12px; padding: 9px 12px 10px; border-radius: 12px; border: 1px solid rgba(var(--gold-rgb),.55); border-left: 4px solid var(--gold); background: linear-gradient(180deg, rgba(64,32,110,.85), rgba(32,16,58,.9)); display: flex; flex-direction: column; gap: 3px; }
+.soc-wire { margin-top: 12px; padding: 9px 12px 10px; border-radius: 12px; border: 1px solid rgba(var(--gold-rgb),.55); border-left: 4px solid var(--gold); background: linear-gradient(180deg, rgba(64,70,78,.85), rgba(33,36,41,.9)); display: flex; flex-direction: column; gap: 3px; }
 .soc-wire-byline { font-family: var(--display); font-weight: 800; font-size: 11px; letter-spacing: .14em; color: var(--gold); }
 .soc-wire-text { font-size: 14px; font-weight: 600; line-height: 1.35; color: var(--ink); }
 html[data-theme="neon"] .soc-wire { border-color: rgba(128,84,255,.6); border-left-color: #5BDFFF; background: linear-gradient(180deg, rgba(38,44,96,.9), rgba(14,18,46,.92)); }
@@ -74,20 +74,20 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
 .soc-bubble-row { display: flex; align-items: center; gap: 2px; max-width: 100%; }
 .soc-line.mine .soc-bubble-row { flex-direction: row-reverse; }
 /* bubbles are long-press targets (msgPress.ts): no iOS callout, no text selection */
-.soc-bubble { padding: 9px 13px; border-radius: 18px; background: #2b1c47; border: 1px solid rgba(var(--edge-rgb),.16); box-shadow: 0 1px 2px rgba(0,0,0,.3); min-width: 0; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; transition: transform .15s ease, box-shadow .15s ease; }
+.soc-bubble { padding: 9px 13px; border-radius: 18px; background: #2d3136; border: 1px solid rgba(var(--edge-rgb),.16); box-shadow: 0 1px 2px rgba(0,0,0,.3); min-width: 0; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; transition: transform .15s ease, box-shadow .15s ease; }
 /* the pressed message while its action popover is open: gold ring + a slight lift */
-.soc-line.armed .soc-bubble { transform: scale(1.02); box-shadow: 0 0 0 2px rgba(255,213,109,.85), 0 6px 18px rgba(0,0,0,.45); }
+.soc-line.armed .soc-bubble { transform: scale(1.02); box-shadow: 0 0 0 2px rgba(175,181,189,.85), 0 6px 18px rgba(0,0,0,.45); }
 .soc-bubble.tail { border-bottom-left-radius: 6px; }
-.soc-line.mine .soc-bubble { background: linear-gradient(180deg, rgba(var(--gold-rgb),.30), rgba(201,150,42,.20)); border-color: rgba(var(--gold-rgb),.38); }
+.soc-line.mine .soc-bubble { background: linear-gradient(180deg, rgba(var(--gold-rgb),.30), rgba(109,119,134,.20)); border-color: rgba(var(--gold-rgb),.38); }
 .soc-line.mine .soc-bubble.tail { border-bottom-left-radius: 18px; border-bottom-right-radius: 6px; }
 .soc-line-text { font-size: 14.5px; line-height: 1.35; word-break: break-word; overflow-wrap: anywhere; }
 /* the quoted snapshot at the top of a reply's bubble: name + snippet, muted, gold rule */
 .soc-quote { display: block; width: 100%; min-width: 0; margin: 0 0 6px; text-align: left; background: rgba(0,0,0,.28); border: 0; border-left: 3px solid var(--gold); border-radius: 8px; padding: 6px 9px; font-size: 12.5px; line-height: 1.3; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; }
 .soc-quote b { color: var(--gold); font-weight: 700; }
-.soc-line.mine .soc-quote { border-left-color: #ffe9a8; }
+.soc-line.mine .soc-quote { border-left-color: #cfd3d8; }
 /* brief highlight on the original bubble after tapping a quote */
 .soc-line.flash .soc-bubble { animation: soc-flash 1.6s ease-out; }
-@keyframes soc-flash { 0% { box-shadow: 0 0 0 3px rgba(255,213,109,.9); } 100% { box-shadow: 0 0 0 0 rgba(255,213,109,0); } }
+@keyframes soc-flash { 0% { box-shadow: 0 0 0 3px rgba(175,181,189,.9); } 100% { box-shadow: 0 0 0 0 rgba(175,181,189,0); } }
 .soc-line-acts { display: inline-flex; align-items: center; flex: none; }
 .soc-more { background: none; border: 0; color: var(--muted); min-width: 44px; min-height: 44px; padding: 4px; font-size: 14px; }
 .soc-line-menu { display: flex; gap: 6px; }
@@ -95,12 +95,12 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
 .soc-line-menu button.danger { border-color: rgba(255,77,109,.6); color: #ff9db0; }
 /* reaction chips inside a bubble's column (base rules live in styles.css; these win on specificity) */
 .soc-lines .soc-line .rx-chips { flex-basis: auto; margin: 0; gap: 4px; }
-.soc-lines .rx-chip { background: #241539; border-color: rgba(var(--edge-rgb),.4); box-shadow: 0 1px 3px rgba(0,0,0,.35); }
+.soc-lines .rx-chip { background: #23262b; border-color: rgba(var(--edge-rgb),.4); box-shadow: 0 1px 3px rgba(0,0,0,.35); }
 .soc-lines .rx-chip.mine { background: rgba(var(--gold-rgb),.22); border-color: var(--gold); }
 /* long-press action popover: transparent tap-eating backdrop + the card itself
    (reaction strip on top, Reply row under a divider — iMessage's shape) */
 .soc-pop-backdrop { position: fixed; inset: 0; z-index: 30; }
-.soc-pop { position: fixed; z-index: 31; width: 292px; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow-y: auto; box-sizing: border-box; display: flex; flex-direction: column; padding: 6px; background: #241539; border: 1px solid rgba(var(--edge-rgb),.45); border-radius: 18px; box-shadow: 0 16px 44px rgba(0,0,0,.65); animation: soc-pop-in .16s ease-out; }
+.soc-pop { position: fixed; z-index: 31; width: 292px; max-width: calc(100vw - 16px); max-height: calc(100dvh - 16px); overflow-y: auto; box-sizing: border-box; display: flex; flex-direction: column; padding: 6px; background: #23262b; border: 1px solid rgba(var(--edge-rgb),.45); border-radius: 18px; box-shadow: 0 16px 44px rgba(0,0,0,.65); animation: soc-pop-in .16s ease-out; }
 @keyframes soc-pop-in { from { transform: scale(.92); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .soc-pop { animation: none; } }
 .soc-pop .rx-picker { margin: 0; padding: 2px; width: 100%; box-sizing: border-box; justify-content: space-between; background: transparent; border: 0; }
@@ -146,15 +146,8 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
    profile in place. The card is SOLID — an opaque background, no .glass, no backdrop
    filter (the owner killed transparent overlays over the table). The .modal-backdrop
    shell gives the tap-outside dismissal + the .modal-open blur exemption. ---- */
-.modal-backdrop.profile-modal-backdrop { z-index: 1040; }
-.profile-modal-card { position: relative; width: min(430px, 100%); max-height: 86dvh; overflow-y: auto; overscroll-behavior: contain; border-radius: 18px; padding: 18px; background: #201334; box-shadow: 0 24px 60px rgba(0,0,0,.65), inset 0 0 0 1px rgba(var(--edge-rgb),.4); }
-.profile-modal-body { display: flex; flex-direction: column; gap: 10px; }
-.profile-modal-body h4 { margin: 0 0 6px; font-family: var(--display); letter-spacing: .08em; font-size: 14px; color: var(--muted); text-transform: uppercase; }
-.profile-modal-body h3 { margin: 0; font-size: 22px; }
-.profile-modal-x { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.45); color: var(--ink); font-size: 16px; line-height: 1; display: grid; place-items: center; cursor: pointer; z-index: 2; }
-.profile-modal-x:hover { background: rgba(var(--purple-rgb),.35); }
+.profile-modal-card { position: relative; width: min(430px, 100%); max-height: 86dvh; overflow-y: auto; overscroll-behavior: contain; border-radius: 18px; padding: 18px; background: #202327; box-shadow: 0 24px 60px rgba(0,0,0,.65), inset 0 0 0 1px rgba(var(--edge-rgb),.4); }
 /* quick-send DM confirmation (the box itself reuses the panel's .soc-compose styles) */
-.profile-modal-sent { margin: 0; font-size: 13px; font-weight: 600; color: var(--green); }
 
 .soc-friends { display: flex; flex-direction: column; gap: 14px; }
 .soc-sec h4, .soc-profile h4 { margin: 0 0 6px; font-family: var(--display); letter-spacing: .08em; font-size: 14px; color: var(--muted); text-transform: uppercase; }
@@ -184,21 +177,19 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
    under its Message button */
 .soc-prof-head > .soc-prof-acts,
 .soc-prof-head > .soc-note,
-.soc-prof-head > .profile-modal-compose,
-.soc-prof-head > .profile-modal-sent,
 .soc-prof-head > .soc-prof-rep { flex: 1 1 100%; min-width: 0; }
 .soc-prof-head > .soc-note { margin: 0; }
 /* the Rep block (Level/title, division chips, coins) lives IN the header now —
    one combined profile area at the top, like the /profile header card; there is
    no second REP section further down (Demetrius 2026-10-20) */
 .soc-prof-rep { margin-bottom: 0; }
-.soc-tagline { font-size: 13.5px; color: #ece5cf; overflow-wrap: anywhere; }
+.soc-tagline { font-size: 13.5px; color: #dadde1; overflow-wrap: anywhere; }
 .soc-tagline a { color: var(--gold); text-decoration: underline; }
 .soc-champ { margin-left: 8px; font-size: 18px; }
 .soc-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 /* the profile summary grids keep only games + wins now (the 2v2 / Cutthroat
    rating tiles duplicated the header's division chips) — two tiles, two columns */
-.profile-view .soc-stats.wins-summary, .profile-modal-body > .soc-stats { grid-template-columns: repeat(2, 1fr); }
+.profile-view .soc-stats.wins-summary { grid-template-columns: repeat(2, 1fr); }
 .soc-stats div { background: rgba(255,255,255,.05); border-radius: 8px; padding: 8px 4px; text-align: center; display: flex; flex-direction: column; }
 .soc-stats b { font-family: var(--display); font-size: 22px; }
 .soc-stats small { font-size: 11px; color: var(--muted); }
@@ -268,45 +259,29 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
 .soc-tabs > button { flex: 0 0 auto; }
 .soc-seg { display: inline-flex; gap: 2px; padding: 2px; border-radius: 10px; background: rgba(255,255,255,.06); margin: 4px 6px 4px 0; flex-wrap: wrap; }
 .soc-seg > button { border: 0; background: transparent; color: inherit; padding: 6px 10px; border-radius: 8px; font: inherit; font-size: 13px; cursor: pointer; min-height: 44px; }
-.soc-seg > button.on { background: #f5c242; color: var(--panel-2); font-weight: 700; }
-.soc-lb-filters { display: flex; flex-wrap: wrap; }
-.soc-serverstats { font-size: 12px; opacity: .8; margin: 0 0 6px; }
+.soc-seg > button.on { background: #929aa5; color: var(--panel-2); font-weight: 700; }
 .soc-lb-table { width: 100%; border-collapse: collapse; margin: 6px 0; font-size: 14px; }
 .soc-lb-table td { padding: 6px 4px; border-bottom: 1px solid rgba(255,255,255,.07); }
 .soc-lb-table td.rk { width: 2.2em; text-align: center; font-weight: 700; }
 .soc-lb-table td.v { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
-.soc-lb-table tr.soc-me td { background: rgba(245,194,66,.12); }
+.soc-lb-table tr.soc-me td { background: rgba(146,154,165,.12); }
 .soc-lb-table th { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--gold); text-align: right; padding: 2px 4px 4px; }
 .soc-lb-table th:first-child, .soc-lb-table th:nth-child(2) { text-align: left; }
-.soc-wins td.v { width: 4.8em; color: var(--gold); }
-.soc-own-acc td.soc-muted { color: var(--gold); font-size: 12px; white-space: nowrap; }
-.soc-lb-empty { text-align: center; padding: 16px 12px; border-radius: 12px; border: 1px dashed rgba(var(--edge-rgb),.45); line-height: 1.45; background: rgba(var(--edge-rgb),.06); }
 .soc-lb > .soc-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0; margin: 0 0 6px; }
 .soc-lb > .soc-seg > button { min-width: 0; }
-.soc-mystats { margin: 0 0 10px; padding: 10px 10px 8px; border-radius: 14px; background: radial-gradient(ellipse at 0% 0%, rgba(var(--purple-rgb),.32), transparent 58%), linear-gradient(180deg, var(--panel-hi), var(--panel)); border: 1px solid rgba(var(--gold-rgb),.5); box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.22); }
-.soc-mystats-title { margin: 0; font-family: var(--display); font-weight: 800; letter-spacing: .1em; font-size: 15px; color: var(--gold); text-transform: uppercase; }
-.soc-mystats-mode { margin: 1px 0 6px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.soc-my-elo { margin: 0 0 8px; font-family: var(--display); font-weight: 800; font-size: 28px; letter-spacing: .03em; color: var(--gold); line-height: 1; }
-.soc-my-elo span { display: block; margin-top: 2px; font-family: system-ui, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-.soc-my-unrated { margin: 0 0 8px; font-size: 13px; line-height: 1.35; color: var(--gold); background: rgba(var(--gold-rgb),.1); border: 1px solid rgba(var(--gold-rgb),.4); border-radius: 8px; padding: 7px 8px; }
-.soc-my-other { margin: 8px 0 0; font-size: 12px; color: var(--muted); }
-.soc-mystats .soc-stats { grid-template-columns: repeat(3, 1fr); }
-.soc-mystats .soc-stats b { font-size: 18px; }
-.soc-mystats .soc-stats div { background: rgba(255,255,255,.04); border: 1px solid rgba(var(--edge-rgb),.18); }
-.soc-mystats .soc-stats small { line-height: 1.25; }
 .soc-tour-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
 .soc-tour-list { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; }
 .soc-tour-item { width: 100%; text-align: left; display: grid; gap: 2px; padding: 10px 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.04); color: inherit; font: inherit; cursor: pointer; }
 .soc-tour-item small { font-size: 12px; }
-.soc-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 6px; font-size: 11px; background: rgba(245,194,66,.2); color: #f5c242; vertical-align: middle; }
+.soc-tag { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 6px; font-size: 11px; background: rgba(146,154,165,.2); color: #929aa5; vertical-align: middle; }
 .soc-tag.ok { background: rgba(80,200,120,.2); color: #7be39b; margin: 0; padding: 6px 10px; font-size: 13px; }
 .soc-tour-form { display: grid; gap: 8px; }
 .soc-tour-form label { display: grid; gap: 4px; font-size: 13px; }
 .soc-tour-form label.soc-check { display: flex; align-items: center; gap: 8px; }
 .soc-tour-form input:not([type=checkbox]), .soc-tour-form select, .soc-tour-reg input { padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,.2); background: #0e0718; color: inherit; font: inherit; min-height: 44px; }
 .soc-err { color: #ff8a8a; font-size: 13px; }
-.soc-tour-status { font-weight: 700; color: #f5c242; margin: 4px 0; }
-.soc-champion { font-size: 20px; font-weight: 800; text-align: center; padding: 10px; border-radius: 12px; background: linear-gradient(90deg, rgba(245,194,66,.25), rgba(245,194,66,.05)); }
+.soc-tour-status { font-weight: 700; color: #929aa5; margin: 4px 0; }
+.soc-champion { font-size: 20px; font-weight: 800; text-align: center; padding: 10px; border-radius: 12px; background: linear-gradient(90deg, rgba(146,154,165,.25), rgba(146,154,165,.05)); }
 .soc-tour-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
 .soc-tour-reg { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
 .soc-tour-reg input { flex: 1 1 140px; }
@@ -315,17 +290,17 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
 .soc-round { display: flex; flex-direction: column; justify-content: space-around; gap: 8px; min-width: 150px; }
 .soc-round-h { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; opacity: .7; }
 .soc-match { border: 1px solid rgba(255,255,255,.12); border-radius: 10px; overflow: hidden; background: rgba(255,255,255,.03); }
-.soc-match.live { border-color: #f5c242; }
+.soc-match.live { border-color: #929aa5; }
 .soc-mrow { display: flex; justify-content: space-between; gap: 6px; padding: 5px 8px; font-size: 13px; }
 .soc-mrow + .soc-mrow { border-top: 1px solid rgba(255,255,255,.07); }
 .soc-mrow.won { font-weight: 800; color: #7be39b; }
-.soc-mrow.me span { text-decoration: underline; text-decoration-color: #f5c242; }
+.soc-mrow.me span { text-decoration: underline; text-decoration-color: #929aa5; }
 .soc-watch { display: block; padding: 4px 8px; font-size: 12px; }
 .soc-entrants { list-style: none; padding: 0; margin: 4px 0; display: grid; gap: 4px; font-size: 13px; }
 .soc-entrants li.dropped { opacity: .5; text-decoration: line-through; }
 .soc-stats.small b { font-size: 16px; }
-.soc-badge-chip.champ { border: 1px solid #f5c242; color: #f5c242; background: transparent; cursor: pointer; font: inherit; }
-.soc-notice { border-color: #f5c242; }
+.soc-badge-chip.champ { border: 1px solid #929aa5; color: #929aa5; background: transparent; cursor: pointer; font: inherit; }
+.soc-notice { border-color: #929aa5; }
 
 /* ---- Release 10: Open tables (online "Pick a game") ---- */
 .open-tables { width: min(100%, 720px); margin: 18px auto 0; display: flex; flex-direction: column; gap: 10px; }
@@ -346,7 +321,7 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
 .ot-filters button.on { background: var(--btn-gold-grad); color: var(--btn-ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.6); }
 .ot-filters button:focus-visible { outline: 2px solid var(--gold-hi); outline-offset: -2px; }
 .ot-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.ot-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(20,11,34,.78); border: 1px solid rgba(var(--edge-rgb),.25); }
+.ot-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: rgba(20,22,25,.78); border: 1px solid rgba(var(--edge-rgb),.25); }
 .ot-row.waiting { border-color: rgba(61,220,132,.45); }
 .ot-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
 .ot-title { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
@@ -379,7 +354,7 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
 .soc-head .soc-conn { margin-right: auto; }
 .soc-gear-wrap { position: relative; }
 .soc-gear-wrap .icon-btn.on { color: var(--gold); }
-.soc-gear-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 5; display: flex; flex-direction: column; min-width: 210px; background: #1d1030; border: 1px solid rgba(var(--edge-rgb),.4); border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.6); overflow: hidden; }
+.soc-gear-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 5; display: flex; flex-direction: column; min-width: 210px; background: #1d1f23; border: 1px solid rgba(var(--edge-rgb),.4); border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,.6); overflow: hidden; }
 .soc-gear-menu button { text-align: left; background: none; border: 0; color: var(--ink); padding: 12px 14px; font-size: 14px; font-weight: 600; }
 .soc-gear-menu button + button { border-top: 1px solid rgba(var(--edge-rgb),.18); }
 .soc-seg { display: flex; gap: 6px; padding: 8px 12px 0; flex: none; }
@@ -482,7 +457,7 @@ html[data-theme="neon"] .soc-wire-byline { color: #5BDFFF; }
 }
 div.ranks-row { cursor: default; }
 .ranks-row:active { background: rgba(255,255,255,.05); }
-.ranks-row.soc-me { background: rgba(245,194,66,.12); }
+.ranks-row.soc-me { background: rgba(146,154,165,.12); }
 .ranks-rk { width: 26px; flex: none; text-align: center; font-family: var(--display); font-weight: 800; font-size: 16px; font-variant-numeric: tabular-nums; color: var(--muted); }
 .ranks-rk.top { color: var(--gold); }
 .ranks-row .soc-av { width: 44px; height: 44px; font-size: 20px; }
@@ -500,7 +475,7 @@ div.ranks-row { cursor: default; }
 .ranks-empty { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 28px 12px 8px; }
 .ranks-empty p { margin: 0; color: var(--ink); font-size: 15px; line-height: 1.35; }
 .ranks-empty button { min-height: 44px; padding: 0 22px; border-radius: 12px; font-family: var(--display); font-weight: 800; letter-spacing: .04em; font-size: 17px; }
-.ranks-pin { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; background: #1a0e2c; border-top: 1px solid rgba(var(--gold-rgb),.55); box-shadow: 0 -10px 24px rgba(0,0,0,.4); padding: 0 12px; }
+.ranks-pin { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; background: #1a1d20; border-top: 1px solid rgba(var(--gold-rgb),.55); box-shadow: 0 -10px 24px rgba(0,0,0,.4); padding: 0 12px; }
 /* ESPN BottomLine ticker (leaderboard only): a flex footer under the scroll
    area, so it reserves its own 38px and never covers a row. The bug is the
    full BWM WORDMARK lockup (bwm-wordmark-white.svg: block BWM, spade cut
@@ -511,7 +486,7 @@ div.ranks-row { cursor: default; }
    pauses it; reduced motion swaps the marquee for stepping lines
    (.ticker-still, JS-driven). */
 .ranks-ticker { flex: none; display: flex; align-items: stretch; height: 38px; overflow: hidden; background: #12081f; border-top: 1px solid rgba(var(--gold-rgb),.4); }
-.ticker-bug { flex: none; position: relative; display: flex; align-items: center; padding: 3px 12px 3px 9px; background: #1d0b38; border-right: 1px solid rgba(var(--gold-rgb),.35); pointer-events: none; }
+.ticker-bug { flex: none; position: relative; display: flex; align-items: center; padding: 3px 12px 3px 9px; background: #1e2125; border-right: 1px solid rgba(var(--gold-rgb),.35); pointer-events: none; }
 .ticker-bug img { height: 32px; width: auto; display: block; }
 /* The BETA chip hugs the wordmark's lower-right corner. The bug stretches
    to the bar's FULL height (content box included — see .bar/.panel), and
@@ -793,7 +768,7 @@ html[data-theme="neon"] .soc-panel {
   background:
     linear-gradient(168deg, rgba(255,255,255,.13), rgba(255,255,255,.03) 34%, rgba(255,255,255,0) 55%) padding-box,
     linear-gradient(180deg, rgba(var(--glass-strong-rgb), .84), rgba(var(--glass-rgb), .72) 55%, rgba(var(--glass-rgb), .78)) padding-box,
-    linear-gradient(160deg, rgba(196,160,255,.85) 0%, rgba(var(--purple-rgb), .5) 30%, rgba(var(--blue-rgb), .45) 68%, rgba(var(--cyan-rgb), .75) 100%) border-box;
+    linear-gradient(160deg, rgba(203,207,212,.85) 0%, rgba(var(--purple-rgb), .5) 30%, rgba(var(--blue-rgb), .45) 68%, rgba(var(--cyan-rgb), .75) 100%) border-box;
   -webkit-backdrop-filter: blur(24px) saturate(175%) brightness(1.07);
   backdrop-filter: blur(24px) saturate(175%) brightness(1.07);
   box-shadow:
@@ -851,7 +826,7 @@ html[data-theme="neon"] .soc-bubble {
 html[data-theme="neon"] .soc-line.mine .soc-bubble {
   background:
     linear-gradient(165deg, rgba(255,255,255,.1), rgba(255,255,255,0) 55%),
-    linear-gradient(180deg, rgba(var(--gold-rgb), .34), rgba(201,150,42,.22));
+    linear-gradient(180deg, rgba(var(--gold-rgb), .34), rgba(109,119,134,.22));
   border-color: rgba(var(--gold-rgb), .45);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.18),
@@ -868,7 +843,7 @@ html[data-theme="neon"] .profile-modal-card {
   background:
     linear-gradient(168deg, rgba(255,255,255,.14), rgba(255,255,255,.03) 36%, rgba(255,255,255,0) 56%) padding-box,
     linear-gradient(180deg, rgba(var(--glass-strong-rgb), .9), rgba(var(--glass-rgb), .84)) padding-box,
-    linear-gradient(135deg, rgba(196,160,255,.9) 0%, rgba(var(--purple-rgb), .55) 30%, rgba(var(--blue-rgb), .5) 68%, rgba(var(--cyan-rgb), .85) 100%) border-box;
+    linear-gradient(135deg, rgba(203,207,212,.9) 0%, rgba(var(--purple-rgb), .55) 30%, rgba(var(--blue-rgb), .5) 68%, rgba(var(--cyan-rgb), .85) 100%) border-box;
   -webkit-backdrop-filter: blur(20px) saturate(170%) brightness(1.07);
   backdrop-filter: blur(20px) saturate(170%) brightness(1.07);
   box-shadow:
@@ -883,7 +858,7 @@ html[data-theme="neon"] .ranks-you {
   background:
     linear-gradient(168deg, rgba(255,255,255,.11), rgba(255,255,255,0) 55%) padding-box,
     linear-gradient(180deg, rgba(var(--glass-strong-rgb), .76), rgba(var(--glass-rgb), .62)) padding-box,
-    linear-gradient(135deg, rgba(196,160,255,.8) 0%, rgba(var(--purple-rgb), .5) 30%, rgba(var(--blue-rgb), .45) 68%, rgba(var(--cyan-rgb), .75) 100%) border-box;
+    linear-gradient(135deg, rgba(203,207,212,.8) 0%, rgba(var(--purple-rgb), .5) 30%, rgba(var(--blue-rgb), .45) 68%, rgba(var(--cyan-rgb), .75) 100%) border-box;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.26),
     inset 0 3px 3px -2px rgba(190,215,255,.32),
@@ -901,7 +876,7 @@ html[data-theme="neon"] .ranks-you {
 .power-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .power-head h3 { margin: 0; font-size: 15px; }
 .power-move { min-width: 38px; text-align: right; font-style: normal; }
-.power-new { font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--gold, #e8b64c); }
+.power-new { font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--gold, #9098a4); }
 .power-note { font-size: 12px; margin-top: 6px; }
 
 /* Record Book (league P-F). */
@@ -910,7 +885,7 @@ html[data-theme="neon"] .ranks-you {
 .record-book .cmp-table td { text-align: right; }
 
 /* Featured Table / Match spotlight (league P-G). */
-.featured { margin: 0 0 14px; padding: 10px 12px; border: 1px solid rgba(232, 182, 76, .35); border-radius: 12px; }
+.featured { margin: 0 0 14px; padding: 10px 12px; border: 1px solid rgba(144,152,164, .35); border-radius: 12px; }
 .featured-names { margin: 6px 0 2px; font-weight: 700; }
 .featured-acts { display: flex; gap: 8px; margin-top: 8px; }
 html[data-theme="neon"] .featured { border-color: rgba(128, 84, 255, .45); }
@@ -920,7 +895,7 @@ html[data-theme="neon"] .featured { border-color: rgba(128, 84, 255, .45); }
 .soc-mention { color: var(--gold); font-weight: 700; }
 .soc-bubble.mentions-me { border-color: rgba(var(--gold-rgb),.75); box-shadow: 0 0 0 1px rgba(var(--gold-rgb),.55), 0 1px 2px rgba(0,0,0,.3); }
 .soc-thread.legacy { opacity: .55; }
-.soc-mention-pop { position: absolute; left: 12px; right: 12px; bottom: calc(100% + 6px); margin: 0; padding: 6px; list-style: none; background: #241643; border: 1px solid rgba(var(--edge-rgb),.35); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.5); z-index: 5; }
+.soc-mention-pop { position: absolute; left: 12px; right: 12px; bottom: calc(100% + 6px); margin: 0; padding: 6px; list-style: none; background: #282c31; border: 1px solid rgba(var(--edge-rgb),.35); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.5); z-index: 5; }
 .soc-mention-pop button { display: block; width: 100%; min-height: 44px; text-align: left; padding: 8px 10px; border-radius: 8px; background: none; border: 0; color: inherit; font: inherit; cursor: pointer; }
 .soc-mention-pop button.on { background: rgba(var(--gold-rgb),.18); }
 .soc-compose { position: relative; }

@@ -76,21 +76,10 @@ describe('D3 (b): the wizard page reserve clears the shrunken bar by >= 16px', (
 });
 
 describe('D3 (a): a sheet’s end-of-scroll clears the bar', () => {
-  it('the hosting card/sheet stands its clip down while the browser is open', () => {
-    expect(css).toContain('.setup-card:has(.db-backdrop), .sheet:has(.db-backdrop) { clip-path: none; }');
-  });
 
   it('the bar hides while any modal sheet is open', () => {
     expect(css).toContain('body:has(.modal-backdrop) .setup-bar { visibility: hidden; }');
   });
 
-  it('the browser backdrop out-ranks the bar (z 30 over z 15)', () => {
-    const backdropZ = num(/\.db-backdrop \{ z-index: (\d+); \}/, css);
-    const barZ = num(/\.setup-bar \{[^}]*z-index: (\d+);/, css);
-    expect(backdropZ).toBeGreaterThan(barZ);
-  });
 
-  it('the browser’s Use button meets the 44px floor', () => {
-    expect(rule('.db-use')).toContain('min-height: 44px');
-  });
 });

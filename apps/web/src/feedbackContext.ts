@@ -59,7 +59,7 @@ export async function snapScreen(): Promise<string | null> {
   const out = document.createElement('canvas');
   out.width = Math.round(W * dpr); out.height = Math.round(H * dpr);
   const ctx = out.getContext('2d')!;
-  ctx.fillStyle = '#0c0712'; ctx.fillRect(0, 0, out.width, out.height);
+  ctx.fillStyle = '#111317'; ctx.fillRect(0, 0, out.width, out.height);
   const gl = document.querySelector<HTMLCanvasElement>('canvas.table-canvas, .table-canvas canvas');
   const glUrl = w.__bwmSnap?.();
   if (gl && glUrl) {

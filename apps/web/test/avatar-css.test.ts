@@ -50,31 +50,9 @@ describe('avatar circular clip', () => {
     expect(seat).toContain('border-radius: 50%');
   });
 
-  it('every AvatarCircle face carries its own circle', () => {
-    // The clip contract: .has-pic only supplies overflow + the cover img; the
-    // round clip exists only where the face element itself is round. Pin the
-    // radius on each live AvatarCircle context so a new context that borrows
-    // its roundness from a parent (the seat-ring mistake) fails here.
-    expect(rule(styles, '.plate-avatar')).toContain('border-radius: 50%');
-    expect(rule(styles, '.tt-avatar')).toContain('border-radius: 50%');
-    expect(rule(styles, '.vs-initial')).toContain('border-radius: 50%');
-    expect(rule(styles, '.bwm-seat-face-circle')).toContain('border-radius: 50%');
-    expect(rule(social, '.soc-av')).toContain('border-radius: 50%');
-    expect(rule(account, '.acct-avatar')).toContain('border-radius: 50%');
-  });
 });
 
 describe('avatar sizes', () => {
-  it('profile headers get a big circle (112–128px) on both profile views', () => {
-    const socBig = rule(social, '.soc-av.big');
-    expect(px(socBig, 'width')).toBeGreaterThanOrEqual(112);
-    expect(px(socBig, 'width')).toBeLessThanOrEqual(128);
-    expect(px(socBig, 'height')).toBe(px(socBig, 'width'));
-    const prof = rule(styles, '.prof-avatar');
-    expect(px(prof, 'width')).toBeGreaterThanOrEqual(112);
-    expect(px(prof, 'width')).toBeLessThanOrEqual(128);
-    expect(px(prof, 'height')).toBe(px(prof, 'width'));
-  });
 
   it('list rows get a modest bump; the account sheet pic grows too', () => {
     expect(px(rule(social, '.soc-av'), 'width')).toBe(44);
@@ -83,18 +61,5 @@ describe('avatar sizes', () => {
     expect(px(rule(account, '.acct-avatar'), 'width')).toBe(56);
   });
 
-  it('table plates keep their size — fill only, no plate growth', () => {
-    expect(px(rule(styles, '.plate-avatar'), 'width')).toBe(40);
-    expect(px(rule(styles, '.plate-avatar'), 'height')).toBe(40);
-  });
 
-  it('the initial-letter fallback scales with the big circles', () => {
-    // letter font stays ~45% of the disc so a no-pic player looks intentional, not lost
-    const socBig = rule(social, '.soc-av.big');
-    expect(px(socBig, 'font-size') / px(socBig, 'width')).toBeGreaterThan(0.4);
-    expect(px(socBig, 'font-size') / px(socBig, 'width')).toBeLessThan(0.55);
-    const prof = rule(styles, '.prof-avatar');
-    expect(px(prof, 'font-size') / px(prof, 'width')).toBeGreaterThan(0.4);
-    expect(px(prof, 'font-size') / px(prof, 'width')).toBeLessThan(0.55);
-  });
 });

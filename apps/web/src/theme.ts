@@ -17,7 +17,7 @@ export type ThemeName = 'classic' | 'neon';
 const KEY = 'bwm.theme.v1';
 
 /** Browser chrome color per theme (matches each theme's --bg). */
-export const THEME_COLORS: Record<ThemeName, string> = { classic: '#0c0712', neon: '#070914' };
+export const THEME_COLORS: Record<ThemeName, string> = { classic: '#111317', neon: '#070914' };
 
 /** Stored value → theme. Anything absent, malformed, or unknown falls back to Classic. */
 export function parseTheme(raw: string | null): ThemeName {

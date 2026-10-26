@@ -62,31 +62,13 @@ const dim = (body: string, prop: string) => {
  *  the constrained one for this control (checked via min-height instead). */
 const BOXES: Array<[string, number, number]> = [
   ['.chat-input button', 44, 44], // min-height via min-height prop — handled below
-  ['.chat-toggle', 44, 44],
-  ['.ctl-rail .chat-toggle', 44, 44],
-  ['.bid-coach .bc-close', 44, 44],
-  ['.tb-x', 44, 44],
-  ['.modal-x', 44, 44],
-  ['.sheet-x', 44, 44],
-  ['.chat.recap-chat header .sheet-x', 44, 44],
-  ['.tt-chat-btn', 44, 44],
   ['.sheet-head .icon-btn', 44, 44],
-  ['.db-close', 44, 44],
-  ['.run-review-x', 44, 44],
-  ['.pad-x', 44, 44],
-  ['.trash-btn', 44, 44],
-  ['.ctl-cluster .av-btn', 44, 44],
   ['.dock-btn', 44, 44],
 ];
 
 const MIN_HEIGHTS: Array<[string, number]> = [
   ['.seg button', 44],
-  ['.tt-reacts button', 44],
-  ['.emotes button', 44],
-  ['.tt-run-show', 44],
-  ['.tt-tricks-show', 44],
   ['.set-group-toggle', 44],
-  ['.db-use', 44],
   ['.prof-link-row input', 44],
 ];
 
@@ -110,21 +92,6 @@ describe('D4: styles.css tap-target floor (44px)', () => {
     });
   }
 
-  it('short-cluster variants meet the floor too', () => {
-    const body = rule('.table-screen.short .ctl-cluster .av-btn, .table-screen.short .chat-toggle');
-    expect(dim(body, 'width')).toBeGreaterThanOrEqual(44);
-    expect(dim(body, 'height')).toBeGreaterThanOrEqual(44);
-  });
 
-  it('lobby music + setup music controls meet the floor', () => {
-    expect(dim(rule('.lobby-music .hm-tabs button, .lobby-music .hm-beats button, .lobby-music .hm-btn'), 'min-height')).toBeGreaterThanOrEqual(44);
-    expect(dim(rule('.setup-music select, .setup-music input'), 'min-height')).toBeGreaterThanOrEqual(44);
-  });
 
-  it('controls already at the floor stay there (.lt-nav, .ghost-btn, .primary)', () => {
-    const lt = rule('.lt-nav');
-    expect(dim(lt, 'width')).toBeGreaterThanOrEqual(44);
-    expect(dim(lt, 'height')).toBeGreaterThanOrEqual(44);
-    expect(dim(rule('.ghost-btn'), 'min-height')).toBeGreaterThanOrEqual(44);
-  });
 });

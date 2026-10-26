@@ -49,7 +49,7 @@ describe('account.css covers every class the notifications markup renders', () =
     const knob = rule('.acct-switch::after');
     expect(knob).toContain('width: 20px');
     expect(knob).toContain('border-radius: 50%');
-    expect(rule('.acct-switch.on')).toContain('background: #7c3aed');
+    expect(rule('.acct-switch.on')).toContain('background: #89929e');
     expect(rule('.acct-switch.on::after')).toContain('left: 21px');
   });
   it('the row-button family behind Sign-in & security is styled too', () => {

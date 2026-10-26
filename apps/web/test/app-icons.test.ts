@@ -38,8 +38,8 @@ describe('app icons', () => {
     expect(bySrc.get('/icon-192.png')).toMatchObject({ type: 'image/png', sizes: '192x192', purpose: 'any' });
     expect(bySrc.get('/icon-512.png')).toMatchObject({ type: 'image/png', sizes: '512x512', purpose: 'any' });
     expect(bySrc.get('/icon-512-maskable.png')).toMatchObject({ type: 'image/png', sizes: '512x512', purpose: 'maskable' });
-    expect(m.theme_color).toBe('#0c0712');
-    expect(m.background_color).toBe('#0c0712');
+    expect(m.theme_color).toBe('#111317');
+    expect(m.background_color).toBe('#111317');
   });
 
   it('the icon PNGs exist at the promised sizes', () => {
