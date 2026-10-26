@@ -9,7 +9,6 @@
  */
 import { useCallback, useEffect, useState } from 'react';
 import { useAccount } from '../account/api';
-import { wasInGame } from '../save';
 import { social } from './store';
 import { fetchMyCred } from './wagerApi';
 import { parseSeen, popupDeferred, seenKey, unseenUnlocks, withSeen, type UnlockInfo } from './wagerLogic';
@@ -61,7 +60,7 @@ export function UnlockPopups() {
 
   const current = queue[0];
   if (!current || !accountId) return null;
-  if (popupDeferred(path, wasInGame())) return null; // stays queued until menus/lobby
+  if (popupDeferred(path, false)) return null; // stays queued until menus/lobby
   const copy = COPY[current.itemId];
   if (!copy) return null;
   const markSeen = () => {

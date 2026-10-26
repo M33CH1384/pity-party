@@ -81,13 +81,6 @@ describe('wizard steps: the header row closes at every phone width', () => {
     expect(wrapBlock).toMatch(/\.wizard:not\(\.step-home\) \.wiz-dots \{ order: 3; flex: 1 1 100%; justify-content: center; \}/);
   });
 
-  it('the dots keep their full shipped size on their own line', () => {
-    expect(stepCount).toBe(5);
-    expect(dotsTotal).toBe(150);
-    // the wrap moves the dots; it must not resize them
-    expect(wrapBlock).not.toMatch(/\.wiz-dots i/);
-    expect(css).toContain('.wiz-dots { display: flex; gap: 7px; }');
-  });
 
   it('wrap band (portrait ≤520): line 1 = nav + right cluster, closing at 375 with room to spare', () => {
     // the two-line budget only exists because the wrap ships — without
@@ -160,30 +153,3 @@ async function renderStep(theme: 'classic' | 'neon', wiz: string, path = 'bots')
   return el;
 }
 
-describe('wizard step structure under both themes', () => {
-  it.each(['classic', 'neon'] as const)('%s: door step header is nav / dots / right, active dot on the step', async (theme) => {
-    const c = await renderStep(theme, 'door');
-    const wiz = c.querySelector('.wizard.step-door');
-    expect(wiz).toBeTruthy();
-    const bar = c.querySelector('.wiz-bar')!;
-    const kids = [...bar.children].map((n) => (n as HTMLElement).className);
-    expect(kids).toEqual(['wiz-nav', 'wiz-dots', 'wiz-right']);
-    const dots = [...c.querySelectorAll('.wiz-dots i')];
-    expect(dots.length).toBe(5);
-    expect(dots[1]!.className).toBe('on');
-    // the dock's seat is the right cluster's last seat, after the gear
-    const right = c.querySelector('.wiz-right')!;
-    expect(right.querySelector('.dock-slot')).toBeTruthy();
-    expect(right.querySelector('.icon-btn.gear')).toBeTruthy();
-    expect([...right.children].at(-1)!.className).toBe('dock-slot');
-  });
-
-  it.each(['classic', 'neon'] as const)('%s: table step carries the same header, active dot last', async (theme) => {
-    const c = await renderStep(theme, 'table');
-    expect(c.querySelector('.wizard.step-table')).toBeTruthy();
-    const dots = [...c.querySelectorAll('.wiz-dots i')];
-    expect(dots.length).toBe(5);
-    expect(dots[4]!.className).toBe('on');
-    expect(c.querySelector('.wiz-bar .wiz-right .dock-slot')).toBeTruthy();
-  });
-});

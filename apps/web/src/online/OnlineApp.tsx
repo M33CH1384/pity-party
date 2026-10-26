@@ -12,10 +12,8 @@ import { canEnterTable, tableEntryName } from './entryGate';
 import { forgetToken, loadName, saveName } from './identity';
 import Lobby from './Lobby';
 import { codeFromPath, navigate } from './nav';
-import OnlineTable from './OnlineTable';
 import OnlineModeTable from './OnlineModeTable';
 import { loadModeChoice } from '../modes/catalog';
-import { preloadTable } from '../three/preload';
 import { takePendingVenue } from '../venues';
 import { TableLoading } from '../TableLoading';
 import { coverTableEntry, signalTableReady } from '../transitions';
@@ -49,7 +47,7 @@ export default function OnlineApp({ path }: { path: string }) {
     return (
       <>
         <Entry code={code} name={name} onName={setName} onGo={(c) => { saveName(name.trim()); if (c === code) coverTableEntry(); setReady(true); if (c !== code) navigate(`/t/${c}`); }} />
-        <SettingsSheetHost settings={settings} onChange={(s) => { setSettings(s); saveSettings(s); }} tips={tips} onTips={setTips} />
+        <SettingsSheetHost />
       </>
     );
   }
@@ -138,7 +136,6 @@ function TableRoomInner({ conn, code }: { conn: TableConnection; code: string })
   const cs = useConn(conn);
   const [settings, setSettings] = useState<Settings>(loadSettings);
   const [tips, setTips] = useState<TipsPref>(loadTips);
-  useEffect(() => { preloadTable(settings.quality); }, [settings.quality]); // lobby: the 3D table loads while you wait
   const [lobbyOpen, setLobbyOpen] = useState(false);
   const [mesh, setMesh] = useState<VideoMesh | null>(null);
 
@@ -307,15 +304,13 @@ function TableRoomInner({ conn, code }: { conn: TableConnection; code: string })
     setTimeout(() => navigate(to, true, to === '/' ? { wiz: 'home', d: 0 } : null), 50);
   };
   // spectators (Release 10) get a redacted view and watch on the same 3D table
-  const inGame = cs.room.phase !== 'lobby' && (!!cs.view || !!cs.mode) && (cs.seat !== null || !!cs.spectator);
+  const inGame = cs.room.phase !== 'lobby' && !!cs.mode && (cs.seat !== null || !!cs.spectator);
   return (
     <>
       <NowPlaying />
       <HostMusicBridge conn={conn} cs={cs} mesh={mesh} />
       {inGame && !lobbyOpen && cs.mode ? (
         <OnlineModeTable conn={conn} cs={cs} onLobby={() => setLobbyOpen(true)} onLeave={() => leave('/')} />
-      ) : inGame && !lobbyOpen ? (
-        <OnlineTable conn={conn} cs={cs} mesh={mesh} onLobby={() => setLobbyOpen(true)} onMainMenu={() => leave('/')} />
       ) : (
         <Lobby
           conn={conn} cs={cs} mesh={mesh} settings={settings}
@@ -327,7 +322,7 @@ function TableRoomInner({ conn, code }: { conn: TableConnection; code: string })
       <StatsOff conn={conn} on={cs.statsOff} />
       {/* one Settings sheet for the online side too: the lobby and the live table
           both reach it through the speaker (sound landing) via this host */}
-      <SettingsSheetHost settings={settings} onChange={(s) => { setSettings(s); saveSettings(s); }} tips={tips} onTips={setTips} />
+      <SettingsSheetHost />
     </>
   );
 }

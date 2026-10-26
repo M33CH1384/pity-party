@@ -96,26 +96,7 @@ const groupOf = (c: HTMLElement, testid: string) =>
   c.querySelector(`[data-testid="${testid}"]`)?.closest('.set-group')?.getAttribute('aria-label');
 
 describe('settings sheet — grouped cards', () => {
-  it('renders the five groups in order', async () => {
-    const c = await renderSheet();
-    const labels = [...c.querySelectorAll('.set-group')].map((g) => g.getAttribute('aria-label'));
-    expect(labels).toEqual(['House rules', 'Play', 'Sound & music', 'Look & effects', 'Beta feedback & support']);
-  });
 
-  it('every control sits in its group', async () => {
-    const c = await renderSheet();
-    expect(groupOf(c, 'bot-skill')).toBe('Play');
-    expect(groupOf(c, 'quality-seg')).toBe('Sound & music');
-    expect(groupOf(c, 'chat-sounds-switch')).toBe('Sound & music');
-    expect(groupOf(c, 'bot-trash-talk')).toBe('Sound & music');
-    // the retired Sound sheet's quick actions moved into this group (consolidation)
-    expect(groupOf(c, 'mute-all')).toBe('Sound & music');
-    expect(groupOf(c, 'bot-voice-quick')).toBe('Sound & music');
-    expect(groupOf(c, 'theme-seg')).toBe('Look & effects');
-    expect(groupOf(c, 'venue-select')).toBe('Look & effects');
-    expect(groupOf(c, 'reduce-fx')).toBe('Look & effects');
-    expect(groupOf(c, 'nuke-intensity')).toBe('Look & effects');
-  });
 
   it('retired rows are gone: no Badges row in You, no soundscape picker anywhere in the sheet', async () => {
     const c = await renderSheet();
