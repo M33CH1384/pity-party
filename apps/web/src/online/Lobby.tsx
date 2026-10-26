@@ -4,7 +4,8 @@ import { createPortal } from 'react-dom';
 import type { BotLevel, RoomInfo, SeatInfo } from '@pp/protocol';
 import type { ModeId } from '@pp/game';
 import { type Settings, TURN_TIMER_CHOICES } from '../settings';
-import { modeCatalog } from '../modes/catalog';
+import { modeCatalog, saveModeChoice } from '../modes/catalog';
+import { LobbyGame } from '../modes/LobbyGame';
 import type { ConnState, TableConnection } from './connection';
 import { inviteLink } from './config';
 import { navigate } from './nav';
@@ -130,6 +131,9 @@ export default function Lobby({ conn, cs, mesh, settings, onSettings, onBackToGa
       {wide && startBlock}
       </div>
       <div className="lobby-settings">
+      <LobbyGame room={room} editable={isHost && !playing}
+        onMode={(c) => { saveModeChoice(c); conn.send({ t: 'mode', modeId: c.modeId, options: c.options }); }}
+        onSeats={(count) => conn.send({ t: 'config', rules: { playerCount: count, turnTimerSec: r.turnTimerSec }, botLevel: room.botLevel, afkLimit: room.afkLimit ?? 3 })} />
       {isHost ? (
         <section className="panel table-panel" data-testid="table-settings">
           <div className="panel-title">TABLE <small>(host{playing ? ' · pace only mid-game' : ''})</small></div>
@@ -154,8 +158,6 @@ export default function Lobby({ conn, cs, mesh, settings, onSettings, onBackToGa
         </section>
       ) : (
         <div className="summary" data-testid="table-summary">
-          <span>{gameTitle(room)} · {n} seats</span>
-          <span>Turn timer {r.turnTimerSec}s · then a bot moves for you</span>
           <span>{room.afkLimit === 0 ? 'AFK kick off' : 'A timeout plays your turn. Your seat stays yours until you leave.'}</span>
         </div>
       )}

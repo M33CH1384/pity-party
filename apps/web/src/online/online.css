@@ -795,3 +795,10 @@
   .lobby-settings .settings-panel .sr-mode { display: none; }
 }
 .lobby-settings .table-panel { margin: 0; }
+/* 3c lobby GAME panel (neutral placeholder look; Desi's palette lands later) */
+.lobby-game { display: flex; flex-direction: column; gap: 8px; }
+.lobby-game .mode-picker { margin: 0; }
+.lobby-game-name { margin: 0; display: flex; flex-direction: column; gap: 2px; }
+.lobby-game-name small { opacity: .75; }
+.lobby-game-facts .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; }
+.lobby-game .mode-options[disabled] { opacity: .85; }
