@@ -92,16 +92,14 @@ describe('the rank ladder (cardRankForLevel)', () => {
     expect(cardRankForLevel(99).level).toBe(50);
     expect(cardRankForLevel(99).step).toBe(50);
   });
-  it('"all badges" is exactly the 18 achievements + the 13 story badges (31 total)', () => {
+  it('"all badges" is exactly the 18 achievements (Pity Party: story badges no longer count)', () => {
     expect(ACHIEVEMENTS).toHaveLength(18);
-    expect(STORY_BADGE_DEFS).toHaveLength(13);
     const mk = (kind: BadgeSummary['kind'], n: number): BadgeSummary[] =>
       Array.from({ length: n }, (_, i) => ({ kind, id: `${kind}-${i}`, name: null, icon: null, earnedAt: null }));
-    // progress badges never count toward the denominator or the numerator
-    expect(badgeCompletionFor([...mk('achievement', 18), ...mk('story', 13), ...mk('badge', 7)])).toMatchObject({ earned: 31, total: 31, complete: true });
-    expect(badgeCompletionFor([...mk('achievement', 18), ...mk('story', 12)])).toMatchObject({ earned: 30, total: 31, complete: false });
-    expect(badgeCompletionFor([...mk('achievement', 17), ...mk('story', 13)])).toMatchObject({ complete: false });
-    expect(badgeCompletionFor([])).toMatchObject({ earned: 0, total: 31, complete: false });
+    // progress and story badges never count toward the denominator or the numerator
+    expect(badgeCompletionFor([...mk('achievement', 18), ...mk('story', 13), ...mk('badge', 7)])).toMatchObject({ earned: 18, total: 18, complete: true });
+    expect(badgeCompletionFor([...mk('achievement', 17)])).toMatchObject({ earned: 17, total: 18, complete: false });
+    expect(badgeCompletionFor([])).toMatchObject({ earned: 0, total: 18, complete: false });
   });
 });
 
@@ -139,9 +137,9 @@ describe('the earned pool + card payload', () => {
     const byKey = new Map(badges.map((b) => [badgeKey(b), b]));
     expect(byKey.get('achievement:first-dub')).toMatchObject({ name: 'First Dub', earnedAt: 1000 });
     expect(byKey.get('achievement:clean-nil')).toMatchObject({ name: 'Clean Nil', earnedAt: 2000 });
-    expect(byKey.get('story:porch-graduate')).toMatchObject({ name: 'Porch Graduate', icon: '🎓', earnedAt: null });
+    expect(byKey.get('story:porch-graduate')).toBeUndefined(); // Pity Party: Story Mode removed
     expect(byKey.get('badge:storm-chaser')).toMatchObject({ name: null, earnedAt: 3000 });
-    expect(badges).toHaveLength(4);
+    expect(badges).toHaveLength(3);
   });
 
   it('cardFor assembles the whole card from real rows', async () => {
@@ -154,7 +152,7 @@ describe('the earned pool + card payload', () => {
     expect(c.rank).toMatchObject({ rank: '3', suit: 'hearts', level: 1 });
     expect(c.status).toBeNull();
     expect(c.tags).toEqual([]);
-    expect(c.story).toEqual({ stopsCleared: 1, stopsTotal: 11, completed: false });
+    expect(c.story).toEqual({ stopsCleared: 0, stopsTotal: 11, completed: false });
     // default showcase: the 3 most recently earned (story badges carry no
     // timestamp, so they sort after every dated earn)
     expect(c.showcase.map(badgeKey)).toEqual(['badge:storm-chaser', 'achievement:clean-nil', 'achievement:first-dub']);
@@ -265,13 +263,13 @@ describe('the card save route + profile payloads', () => {
     const tokA = await session('a');
     const saved = await call(tokB, '/api/profile/me/card', {
       method: 'POST',
-      body: JSON.stringify({ status: '  Tuesday   night champ ', tags: ['casual', 'story-coop'], showcase: ['story:porch-graduate', 'achievement:first-dub'] }),
+      body: JSON.stringify({ status: '  Tuesday   night champ ', tags: ['casual', 'story-coop'], showcase: ['achievement:first-dub'] }),
     });
     expect(saved.status).toBe(200);
     const savedCard = (await saved.json() as { card: PlayerCardData }).card;
     expect(savedCard.status).toBe('Tuesday night champ');
     expect(savedCard.tags).toEqual(['casual', 'story-coop']);
-    expect(savedCard.showcase.map(badgeKey)).toEqual(['story:porch-graduate', 'achievement:first-dub']);
+    expect(savedCard.showcase.map(badgeKey)).toEqual(['achievement:first-dub']);
 
     const me = await (await call(tokB, '/api/profile/me')).json() as { card: PlayerCardData };
     expect(me.card.status).toBe('Tuesday night champ');

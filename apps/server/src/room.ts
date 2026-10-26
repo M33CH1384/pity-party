@@ -13,7 +13,6 @@ import {
 import { voiceGender } from '@pp/bots';
 import { BUCKET_THIN } from './voice/writer';
 import { type TalkEvent, type TalkLine, type TalkState, type TalkTable, botTalk, chooseBotAction, loudLoser, parseHint, leanBid, botSkillFor, personaSkillFloor, seatSkill, leanNil, momentsFor, newTalkState, noteTalkHand, pickBotNames, platePersona, prePlayLine, activeCatalog, bucketFor } from '@pp/bots';
-import { GUIDE_FINALE, STORY_CHARACTERS, STORY_STOPS, STORY_TIER_SKILL, buzzMomentFor, deeSkillForStop, guideEventLine, guideFinaleLine, guideFinaleResolutionLine, guideFinaleStartLine, guideHandLine, mannerBandOf, newGuideState, storyFactsOf, storyPairTrackKey, storyRulesForStop, storyStopById, targetForStop, type AwarenessCase, type GuideFinaleFacts, type GuideState, type StoryBeat, type StoryBuzzInput, type StoryGameFacts, type StoryStop } from '@pp/bots';
 import {
   type BotLevel, type ChatLine, type ClientMsg, type HostMusic, type MediaState, type RoomInfo, type RoomPhase, type RunPlayback, type SeatInfo, type ServerMsg,
   DEFAULT_AFK_LIMIT, LIMITS, PROTOCOL_VERSION, parseClientMsg, toggleReaction,
@@ -131,8 +130,6 @@ export interface RoomData {
   tournament?: TournamentSeat;
   /** Big Bank Take Lil Bank: this table runs a wager match */
   challenge?: ChallengeSeat;
-  /** Story co-op: this table runs a pair's story stop (seats reserved, phase machine, Dee covers) */
-  story?: StorySeat;
   /** Release 10: hidden from Open tables (invite / code only) */
   private?: boolean;
   /**
@@ -200,93 +197,6 @@ export type ChallengeResult =
   | { kind: 'noshow'; shown: string[] }
   | { kind: 'abandoned'; leaverUid: string | null };
 
-/**
- * Story co-op: this table runs one pair's story run. Seats 0/2 are reserved for
- * the pair (host, partner), seats 1/3 are the stop's story pair as tier bots —
- * no bot fill for human seats, ever. The descriptor carries its own phase
- * machine (lobby → tape → scene → game → outro) beside the room phase; both
- * players ready advances it. Unrated, unstaked, private (never listed), and
- * unspectated in v1: only the two pair accounts may even join.
- */
-/** The King's finale on a pair track (Phase 4, spec §6): the pair holds
- *  the double mark and the room sits at the proposal until BOTH members
- *  agree — take the cutthroat, or bank leg 1 as a normal clear. */
-export interface StoryFinaleState {
-  /** the proposal scene's short form: a later sit-down (leg 1 was won in
-   *  an earlier room/session), not the win that just happened here */
-  short: boolean;
-  /** each member's standing choice, by account id — visible to both,
-   *  changeable until they agree */
-  choices: Record<string, 'cutthroat' | 'bank'>;
-  /** the witness gameId once the finale resolves (the cutthroat's family
-   *  id, or the decline's own id) */
-  gameId?: string;
-  /** how the finale resolved, once it has */
-  outcome?: 'double' | 'clear' | 'lost' | 'declined';
-}
-
-export interface StorySeat {
-  /** the pair track key ('pair:<uidA>:<uidB>'); null until a share-code partner binds */
-  track: string | null;
-  stopId: string;
-  /** [host account, partner account]; partner null until a share-code join binds them */
-  pairUids: [string, string | null];
-  phase: 'lobby' | 'tape' | 'scene' | 'game' | 'finale' | 'finale-game' | 'outro';
-  /** pair uids armed for the current story phase (both-ready advance) */
-  ready: string[];
-  /** the stop chosen at the outro for the next run (host's pick wins) */
-  nextStopId?: string;
-  nextStopBy?: string;
-  /** the gameId a witness row was already written for (one witness per game) */
-  resultGameId?: string;
-  /** the gameId the CURRENT outro posts against (a decline names its own
-   *  id, distinct from the leg-1 game's family id) */
-  outroGameId?: string;
-  /** the King's finale, while this room carries it (spec §6) */
-  finale?: StoryFinaleState;
-  /** display name of the player who conceded the current match (the partner's toast) */
-  concededBy?: string;
-  /** Awareness cases per stop (spec §7), computed by the story HTTP layer
-   *  from D1 at room creation / partner bind and refreshed by the room
-   *  itself as the pair plays stops in this room. Server-only: the
-   *  clients read their own copy from the pair-context endpoint. */
-  aware?: Record<string, AwarenessCase>;
-  /** Dee's guide-layer match memory (spec §5.3): said set, spacing,
-   *  once-only flags. Reset when a match starts; hers alone — the guide
-   *  layer's rolls and caps live in @pp/bots storyGuide. */
-  guide?: GuideState;
-  /** Forward-buzz facts per stop (word travels fast): how the pair's
-   *  latest game at the PREVIOUS stop went, computed by the story HTTP
-   *  layer from the PAIR track's rows at room creation / partner bind
-   *  (the same seam as `aware` — the room has no database) and refreshed
-   *  by the room itself from the games it witnesses. Server-only: the
-   *  clients never see the inputs, only the line the room chose. */
-  buzz?: Record<string, StoryBuzzInput>;
-  /** The buzz driver's per-match state: the seeded roll cursor, the
-   *  one-a-match cap and the said set. Reset when a match starts. It
-   *  lives in the room — never on a client — so the pair hears ONE
-   *  decision: both clients render the line the room pushed into the
-   *  shared chat, and a reconnect replays that chat instead of ever
-   *  rolling again. */
-  buzzState?: { checks: number; fired: number; said: string[] };
-}
-
-/** The room's witnessed story result (spec §3.3): written by the DO into story_room_results. */
-export interface StoryRoomResult {
-  gameId: string;
-  code: string;
-  track: string;
-  stopId: string;
-  uidA: string;
-  uidB: string;
-  /** true when the pair's side (seats 0/2) won; a concede is always false */
-  won: boolean;
-  facts: StoryGameFacts;
-  /** Phase 4: the finale outcome this game resolved, when it did
-   *  (migration 0029) — crediting maps it onto the double machine */
-  finale?: { outcome: 'double' | 'clear' | 'lost' | 'declined' };
-}
-
 export interface RoomTiming {
   /** delay before a bot moves */
   botMs: number;
@@ -352,8 +262,6 @@ export interface RoomIO {
   tournamentResult?(t: TournamentSeat, scores: number[], places: number[]): void;
   /** Big Bank: a wager match resolved (played out, a no-show at the start deadline, or abandoned mid-match) */
   challengeResult?(c: ChallengeSeat, r: ChallengeResult): void;
-  /** Story co-op: a story match finished (or was conceded) — the DO writes the witness row both players post against */
-  storyResult?(r: StoryRoomResult): void;
   /** Release 10: this table's Open tables entry (null = unlisted); called after every broadcast, the DO dedups */
   listing?(t: OpenTable | null): void;
   /** Voice (c): a persona's catalog bucket for a set/Wheels/win moment is thin; the DO runs the writer in waitUntil */
@@ -399,14 +307,6 @@ function clampRules(r: unknown): TableRules {
 export class Room {
   /** connection id → player id (null until `hello`) */
   private conns = new Map<string, string | null>();
-  /**
-   * Story rooms only: a hello held at the door while its account ticket is
-   * being verified (connId → the held hello). Production dispatch runs hello
-   * BEFORE the ticket lookup (it must bind the socket first — see dispatch.ts),
-   * so a first-ever join arrives with no verified uid and no member to read
-   * one from; linkUser completes the held hello once the account is proven.
-   */
-  private storyDoor = new Map<string, Extract<ClientMsg, { t: 'hello' }>>();
   private chatWindow = new Map<string, number[]>();
   /** serializes async @mention resolution so table chat lines post in send order */
   private chatChain: Promise<void> = Promise.resolve();
@@ -458,7 +358,6 @@ export class Room {
   close(connId: string): void {
     const pid = this.conns.get(connId);
     this.sentHistory.delete(connId);
-    this.storyDoor.delete(connId);
     this.conns.delete(connId);
     if (!pid || this.isConnected(pid)) return;
     const m = this.data.members[pid];
@@ -490,16 +389,6 @@ export class Room {
 
   /** Release 9: the connection proved an account (verified ticket): link its member for stats. One account, one seat. */
   linkUser(connId: string, uid: string): void {
-    // A story-room hello held at the door (see hello): the account is proven
-    // now, so run the held hello under it — the pair check inside decides
-    // whether this connection is seated or turned away, still before any
-    // member exists for it.
-    const held = this.storyDoor.get(connId);
-    if (held) {
-      this.storyDoor.delete(connId);
-      this.hello(connId, held, uid);
-      return;
-    }
     const pid = this.conns.get(connId);
     const m = pid ? this.data.members[pid] : undefined;
     if (!m || !pid) return;
@@ -559,84 +448,10 @@ export class Room {
     this.io.persist();
   }
 
-  /** Story co-op: turn a fresh table into a pair's story room (private, rules from the stop, pair bots seated). */
-  setupStory(stopId: string, hostUid: string, partnerUid: string | null, aware?: Record<string, AwarenessCase>, buzz?: Record<string, StoryBuzzInput>): void {
-    const d = this.data;
-    const stop = storyStopById(stopId);
-    if (!stop) return;
-    d.story = {
-      track: partnerUid ? storyPairTrackKey(hostUid, partnerUid) : null,
-      stopId, pairUids: [hostUid, partnerUid], phase: 'lobby', ready: [],
-      ...(aware ? { aware } : {}),
-      ...(buzz ? { buzz } : {}),
-    };
-    d.private = true;
-    d.botLevel = 'mixed';
-    d.seats = Array.from({ length: 4 }, () => ({ kind: 'empty' as const }));
-    d.teamNames = undefined;
-    this.applyStoryStop(stopId);
-    this.system(`Story co-op at ${stop.name}: seats are reserved for the pair; Dee guides`);
-    this.io.persist();
-  }
-
-  /** Point the room at a stop: its rules (built server-side from the stop), its venue, its pair in seats 1/3. */
-  private applyStoryStop(stopId: string): void {
-    const d = this.data;
-    const stop = storyStopById(stopId);
-    if (!stop || !d.story) return;
-    d.story.stopId = stopId;
-    if (stopId !== 'king') d.story.finale = undefined; // the finale record belongs to the King alone
-    d.rules = clampRules(storyRulesForStop(stop));
-    d.venue = stop.venueId as VenueChoice;
-    d.venueNow = stop.venueId as VenueId;
-    const level = STORY_TIER_SKILL[stop.tier];
-    d.seats[1] = { kind: 'bot', name: STORY_CHARACTERS[stop.pair[0]]!.name, level };
-    d.seats[3] = { kind: 'bot', name: STORY_CHARACTERS[stop.pair[1]]!.name, level };
-  }
-
-  /** Share-code join: bind the second account to the room (the pair track exists from this moment). */
-  bindStoryPartner(uid: string, aware?: Record<string, AwarenessCase>, buzz?: Record<string, StoryBuzzInput>): boolean {
-    const d = this.data;
-    const s = d.story;
-    if (!s) return false;
-    if (s.pairUids[0] === uid || s.pairUids[1] === uid) return true;
-    if (s.pairUids[1] !== null) return false;
-    s.pairUids[1] = uid;
-    s.track = storyPairTrackKey(s.pairUids[0], uid);
-    if (aware) s.aware = aware;
-    if (buzz) s.buzz = buzz;
-    this.system('Your partner is bound to this run');
-    this.io.persist();
-    return true;
-  }
-
-  /** The pair accounts of a story room (host, partner-or-null), for the story HTTP layer. */
-  storyMembers(): [string, string | null] | null {
-    const s = this.data.story;
-    return s ? [s.pairUids[0], s.pairUids[1]] : null;
-  }
-
   /** a member whose account owns a reserved seat sits there */
   private seatReserved(pid: string): void {
     const d = this.data;
     const m = d.members[pid];
-    if (d.story) {
-      const s = d.story;
-      if (!m?.uid || m.seat !== null) return;
-      const ix = (s.pairUids as (string | null)[]).indexOf(m.uid);
-      if (ix < 0) return;
-      const seat = ix === 0 ? 0 : 2;
-      const slot = d.seats[seat]!;
-      if (slot.kind === 'bot' && slot.replacedPid === pid) { this.reclaimSeat(pid); return; }
-      if (slot.kind === 'human' && slot.playerId !== pid) {
-        if (this.isConnected(slot.playerId)) return;
-        d.members[slot.playerId]!.seat = null;
-      }
-      d.seats[seat] = { kind: 'human', playerId: pid };
-      m.seat = seat;
-      m.timeouts = 0;
-      return;
-    }
     const t = d.tournament ?? d.challenge;
     if (!t || !m?.uid || m.seat !== null) return;
     const seat = t.reserved.findIndex((r) => r?.uid === m.uid);
@@ -876,40 +691,6 @@ export class Room {
       });
       if (pid) how = 'gid';
     }
-    // Story rooms seat only the pair — no spectators in v1 (spec §2.3): anyone
-    // whose account is not one of the two pair uids is turned away at the door,
-    // before a member (or a "joined" line) exists for them.
-    if (d.story) {
-      const suid = uid ?? (pid ? d.members[pid]?.uid : undefined);
-      if (!suid) {
-        // No verified identity yet. A reconnect finds its member above and
-        // reads the account from it, but a FIRST join has no member — and
-        // production dispatch deliberately runs hello with uid=null, linking
-        // the account only after the ticket verifies (linkUser). Refusing
-        // here turned the pair away from their own table (2026-10-24: the
-        // inviter and the accepting partner both hit SPOKEN_FOR on entry).
-        // A hello carrying a ticket is held at the door — no member, no
-        // welcome — until linkUser re-runs it under the proven account; a
-        // hello with no ticket has no proof coming, so it is refused now.
-        if (msg.ticket) {
-          this.storyDoor.set(connId, msg);
-          this.trace('reconnect', { cid: connId, how: 'story-door-hold', name });
-          return;
-        }
-        this.trace('reconnect', { cid: connId, how: 'spoken-for', name });
-        this.err(connId, 'SPOKEN_FOR', 'This story table is spoken for — it seats only the pair running it.');
-        this.conns.delete(connId);
-        this.io.close?.(connId, 4003, 'spoken-for');
-        return;
-      }
-      if (!(d.story.pairUids as (string | null)[]).includes(suid)) {
-        this.trace('reconnect', { cid: connId, how: 'spoken-for', name });
-        this.err(connId, 'SPOKEN_FOR', 'This story table is spoken for — it seats only the pair running it.');
-        this.conns.delete(connId);
-        this.io.close?.(connId, 4003, 'spoken-for');
-        return;
-      }
-    }
     const returning = !!pid && !this.isConnected(pid);
     if (pid) {
       const m = d.members[pid]!;
@@ -996,11 +777,6 @@ export class Room {
       case 'sit': {
         if (msg.seat >= n) throw new RoomError('BAD_SEAT', 'No such seat');
         if (d.phase === 'playing' && (d.outPlayers?.includes(pid) || d.game?.eliminated?.[msg.seat])) throw new RoomError('ELIMINATED', 'You are out of this game');
-        if (d.story) {
-          // seats are the pair's by account, not by tapping: sit them at THEIR seat
-          this.seatReserved(pid);
-          break;
-        }
         if (d.tournament) {
           const r = d.tournament.reserved[msg.seat];
           if (!r || r.uid !== me.uid) throw new RoomError('RESERVED', 'Seats at a tournament table are reserved for the entrants');
@@ -1038,7 +814,6 @@ export class Room {
         break;
       }
       case 'stand': {
-        if (d.story) break; // story seats are reserved for the pair — standing is not a thing here
         if (me.seat === null) return;
         if (d.phase === 'playing') throw new RoomError('IN_GAME', 'Leave the table to give your seat to a bot');
         d.seats[me.seat] = { kind: 'empty' };
@@ -1049,7 +824,6 @@ export class Room {
         this.requireHost(isHost);
         if (d.tournament) throw new RoomError('LOCKED', 'Tournament tables are locked');
         if (d.challenge) throw new RoomError('LOCKED', 'Big Bank tables are locked');
-        if (d.story) throw new RoomError('LOCKED', 'Story tables seat the pair and the stop\u2019s pair only');
         if (d.phase === 'playing') throw new RoomError('IN_GAME', 'Game in progress');
         if (msg.seat >= n) throw new RoomError('BAD_SEAT', 'No such seat');
         const slot = d.seats[msg.seat]!;
@@ -1065,7 +839,6 @@ export class Room {
         this.requireHost(isHost);
         if (d.tournament) throw new RoomError('LOCKED', 'Tournament tables are locked');
         if (d.challenge) throw new RoomError('LOCKED', 'Big Bank tables are locked');
-        if (d.story) throw new RoomError('LOCKED', 'Story tables seat the pair and the stop\u2019s pair only');
         if (d.phase === 'playing') throw new RoomError('IN_GAME', 'Game in progress');
         if (d.seats[msg.seat]?.kind !== 'bot') throw new RoomError('BAD_SEAT', 'No bot there');
         d.seats[msg.seat] = { kind: 'empty' };
@@ -1075,7 +848,6 @@ export class Room {
         this.requireHost(isHost);
         if (d.tournament) throw new RoomError('LOCKED', 'Tournament tables are locked');
         if (d.challenge) throw new RoomError('LOCKED', 'Big Bank tables are locked');
-        if (d.story) throw new RoomError('LOCKED', 'Story rules come from the stop, not the host');
         if (d.phase === 'playing') {
           // Rule lock: anything that affects scoring / the outcome is locked until the game ends (rematch / new game
           // unlocks it). Social + pace settings (Table Talk timer, AFK kick, bot chat on/off) stay adjustable.
@@ -1118,7 +890,6 @@ export class Room {
       }
       case 'music': {
         this.requireHost(isHost);
-        if (d.story) throw new RoomError('LOCKED', 'Story tables play the stop\u2019s own soundscape');
         const mu = msg.music;
         d.music = mu.mode === 'beat' ? { ...mu, startAt: this.io.now() + 1500 } // a beat of lead time so every client starts together
           : mu.mode === 'stream' ? { ...mu, by: pid }
@@ -1128,7 +899,6 @@ export class Room {
       }
       case 'venue': {
         this.requireHost(isHost);
-        if (d.story) throw new RoomError('LOCKED', 'A story stop plays at its own venue');
         if (d.phase === 'playing') throw new RoomError('IN_GAME', 'Pick the venue before the game starts');
         if ((d.venue ?? 'classic') === msg.venue) return;
         // The Pj's is earned, not picked: a locked venue from a host who hasn't unlocked it
@@ -1140,7 +910,6 @@ export class Room {
         break;
       }
       case 'teamName': {
-        if (d.story) throw new RoomError('LOCKED', 'Story teams are billed by the players\u2019 names');
         if (!d.rules.partnerships) throw new RoomError('NO_TEAMS', 'No teams in Cutthroat');
         if (me.seat === null || me.seat >= d.rules.playerCount) throw new RoomError('NOT_SEATED', 'Sit down to name your team');
         const name = cleanTeamName(msg.name);
@@ -1154,7 +923,6 @@ export class Room {
         break;
       }
       case 'start': {
-        if (d.story) throw new RoomError('LOCKED', 'Story runs advance from the story lobby, together');
         if (d.tournament) {
           if (d.phase !== 'lobby') throw new RoomError('IN_GAME', 'Game in progress');
           if (!this.allReservedSeated()) throw new RoomError('WAITING', 'Waiting for every entrant (the match starts automatically)');
@@ -1174,7 +942,6 @@ export class Room {
       }
       case 'rematch': {
         this.requireHost(isHost);
-        if (d.story) throw new RoomError('LOCKED', 'Story rematches are both-ready at the outro');
         if (d.tournament) throw new RoomError('LOCKED', 'Tournament matches have no rematch: check the bracket');
         if (d.challenge) throw new RoomError('LOCKED', 'Big Bank matches have no rematch: send a new challenge');
         if (d.phase !== 'over') throw new RoomError('WRONG_PHASE', 'The game is not over');
@@ -1265,7 +1032,6 @@ export class Room {
       case 'kick': {
         if (d.tournament) throw new RoomError('LOCKED', 'No kicking at tournament tables');
         if (d.challenge) throw new RoomError('LOCKED', 'No kicking at Big Bank tables');
-        if (d.story) throw new RoomError('LOCKED', 'No kicking at a story table');
         const slot = d.seats[msg.seat];
         if (!slot || slot.kind !== 'human') throw new RoomError('BAD_SEAT', 'No player there');
         const target = slot.playerId;
@@ -1314,58 +1080,8 @@ export class Room {
         this.requireHost(isHost);
         if (d.tournament) throw new RoomError('LOCKED', 'Tournament tables are locked');
         if (d.challenge) throw new RoomError('LOCKED', 'Big Bank tables are locked');
-        if (d.story) throw new RoomError('LOCKED', 'Story tables are private by design');
         if (msg.private !== undefined) d.private = msg.private;
         if (msg.replaceBots !== undefined) d.replaceBots = msg.replaceBots;
-        break;
-      }
-      case 'storyReady': {
-        const s = d.story;
-        if (!s) throw new RoomError('NOT_STORY', 'Not a story table');
-        const uid = me.uid;
-        if (!uid || !(s.pairUids as (string | null)[]).includes(uid)) throw new RoomError('RESERVED', 'Only the pair runs this table');
-        // Stop choice: the host picks in the lobby; at the outro either player
-        // may name the next stop and the host's pick wins (spec §2.2 / §5.5).
-        if (msg.stopId && storyStopById(msg.stopId)) {
-          if (s.phase === 'lobby' && uid === s.pairUids[0] && msg.stopId !== s.stopId) {
-            this.applyStoryStop(msg.stopId);
-            this.system(`The run starts at ${storyStopById(msg.stopId)!.name}`);
-          } else if (s.phase === 'outro') {
-            if (uid === s.pairUids[0] || s.nextStopBy !== s.pairUids[0]) {
-              s.nextStopId = msg.stopId;
-              s.nextStopBy = uid;
-            }
-          }
-        }
-        if (!s.ready.includes(uid)) s.ready.push(uid);
-        break;
-      }
-      case 'storyFinale': {
-        // The King's proposal (Phase 4, spec §6.3): record this member's
-        // standing choice. The room acts only when BOTH members agree —
-        // disagreement (or one member still deciding) parks the proposal
-        // with nothing lost, and either member may change their pick.
-        const s = d.story;
-        if (!s) throw new RoomError('NOT_STORY', 'Not a story table');
-        const uid = me.uid;
-        if (!uid || !(s.pairUids as (string | null)[]).includes(uid)) throw new RoomError('RESERVED', 'Only the pair answers the King');
-        if (s.phase !== 'finale' || !s.finale) throw new RoomError('WRONG_PHASE', 'No proposal is standing');
-        s.finale.choices[uid] = msg.choice;
-        const [a, b] = s.pairUids;
-        if (a && b && s.finale.choices[a] && s.finale.choices[a] === s.finale.choices[b]) {
-          if (msg.choice === 'cutthroat') this.storyStartFinaleGame();
-          else this.storyBankFinale();
-        }
-        break;
-      }
-      case 'concede': {
-        const s = d.story;
-        if (!s) throw new RoomError('NOT_STORY', 'Not a story table');
-        const uid = me.uid;
-        if (!uid || !(s.pairUids as (string | null)[]).includes(uid)) throw new RoomError('RESERVED', 'Only the pair can concede');
-        if (!((s.phase === 'game' || s.phase === 'finale-game') && d.phase === 'playing' && d.game)) throw new RoomError('WRONG_PHASE', 'No story match in progress');
-        if (s.phase === 'finale-game') this.storyFinaleConcede(me.name);
-        else this.storyConcede(me.name);
         break;
       }
       case 'leave': {
@@ -1493,20 +1209,6 @@ export class Room {
     const d = this.data;
     const m = d.members[pid];
     if (!m) return;
-    if (d.story && d.phase === 'playing' && m.seat !== null) {
-      // Story co-op (spec §2.4): a deliberate leave mid-match does not end the
-      // leaver's run — Dee covers the seat and the leaver STAYS a member until
-      // the match ends (equal credit follows membership). No abandon record:
-      // story rooms never write game records.
-      const seat = m.seat;
-      d.seats[seat] = this.deeCoverSeat(m.name, pid);
-      m.seat = null;
-      d.ready = d.ready.filter((x) => x !== pid);
-      this.system(`${m.name} stepped away — Dee's covering their seat`);
-      if (d.music?.mode === 'stream' && d.music.by === pid) d.music = { mode: 'off' };
-      if (d.hostId === pid) this.passHost();
-      return;
-    }
     if (m.seat !== null && d.phase === 'playing') this.reportAbandoned(pid);
     if (m.seat !== null) {
       // mid-game the seat goes to a bot so the others can finish; in the lobby it just opens up
@@ -1660,13 +1362,6 @@ export class Room {
     d.venueNow = picked === 'random'
       ? rollVenue(parseInt(secureSeed().slice(0, 8), 16) / 4294967296, d.venueNow, hostAccess)
       : isLockedVenue(picked) && !hostAccess ? 'classic' : picked;
-    // A story stop plays at its own venue — including The Pj's / the King's
-    // street at night, which story mode preserves regardless of the host's
-    // venue-picker entitlement (the stop IS the venue, as in solo).
-    if (d.story) {
-      const stop = storyStopById(d.story.stopId);
-      if (stop) d.venueNow = stop.venueId as VenueId;
-    }
     d.seq = (d.seq ?? 0) + 1;
     d.phase = 'playing';
     d.ready = [];
@@ -1742,9 +1437,6 @@ export class Room {
     this.parkEliminated();
     const evs = momentsFor(before, action, d.game);
     for (const ev of evs) this.talk(ev);
-    // Dee the guide (story rooms only, spec §5.3): the one marked
-    // mid-hand reaction — a pair-side human's nuke.
-    if (d.story) this.storyGuideMoments(evs);
     d.lastActive = this.io.now();
     const fresh = d.game.handNo === before.handNo ? d.game.tricks.slice(before.tricks.length) : [];
     if (d.live) for (const t of fresh) if (t.winner !== null && t.plays.some((p) => p.seat === t.winner && p.card === 'BJ')) d.live.bj[t.winner] = (d.live.bj[t.winner] ?? 0) + 1;
@@ -1776,26 +1468,11 @@ export class Room {
         for (const ev of handHighlights({ rec, seats, partnerships: d.rules.partnerships, code: d.code, at })) this.io.highlight(ev);
       }
     }
-    // Dee the guide, hand end (story rooms only, spec §5.3): the hand
-    // just closed — she reads the board and maybe speaks. In the King's
-    // cutthroat she reads the finale board instead (§6.4).
-    if (d.story && d.game.history.length > before.history.length) {
-      const guideSpoke = this.storyGuideHandEnd(before);
-      this.storyGuideFinaleHandEnd(before);
-      // FORWARD BUZZ (word travels fast): a hand end the guide didn't
-      // take is the seated pair's own moment to gossip about the last
-      // stop — never on the hand that ended the match, whose beat
-      // belongs to the outro.
-      if (!guideSpoke && d.game.phase !== 'gameOver') this.storyBuzzAt('handEnd');
-    }
     if (d.game.phase === 'gameOver') {
       d.phase = 'over';
       const res = d.game.result!;
       this.recordSeries();
-      // Story rooms are unrated and witnessed, not reported: the witness row
-      // (spec §3.3) is the only record a co-op game leaves behind.
-      if (d.story) this.storyGameOver(res.winners);
-      else this.reportGame();
+      this.reportGame();
       if (d.tournament && !d.tournament.reported) {
         d.tournament.reported = true;
         this.io.tournamentResult?.(d.tournament, [...res.finalScores], d.game.result ? placementsOf([...res.finalScores], [...res.winners]) : []);
@@ -1915,7 +1592,6 @@ export class Room {
    */
   private reportAbandoned(leaverPid: string | null): void {
     const d = this.data;
-    if (d.story) return; // story rooms never write game records (unrated, witnessed only)
     if (d.abandonReported || d.phase !== 'playing' || !d.game || d.game.phase === 'gameOver') return;
     d.abandonReported = true;
     const leaverId = leaverPid ? (d.members[leaverPid]?.uid ?? null) : null;
@@ -1946,467 +1622,6 @@ export class Room {
     const family = this.familyId();
     const rec = buildRecord({ id: family, room: d.code, game: d.game, seats, names: this.sideNames(), teamNames: d.teamNames, live: d.live, endedAt: this.io.now(), tournamentId: d.tournament?.id });
     this.io.gameOver(rec, isRated(rec, d.rules), { endReason: 'finished', family, venue: d.venueNow ?? d.venue ?? 'classic' });
-  }
-
-  /* ---------------------------------------------------------- story co-op */
-
-  /** A story match ended: move to the outro and write the ONE witness row both players post against. */
-  private storyGameOver(winners: number[]): void {
-    const d = this.data;
-    const s = d.story!;
-    if (s.phase === 'finale-game') { this.storyFinaleGameOver(); return; }
-    s.phase = 'outro';
-    s.ready = [];
-    s.outroGameId = this.familyId();
-    this.storyMarkPlayed(winners.includes(0));
-    this.storyWitness(winners.includes(0));
-  }
-
-  /** Either player conceded for the pair (shared fate): the match ends as a pair loss, witnessed like a finish. */
-  private storyConcede(byName: string): void {
-    const d = this.data;
-    const s = d.story!;
-    s.concededBy = byName;
-    s.phase = 'outro';
-    s.ready = [];
-    s.outroGameId = this.familyId();
-    d.phase = 'over';
-    this.storyMarkPlayed(false);
-    this.storyWitness(false);
-    this.system(`${byName} conceded the match`);
-  }
-
-  /** The witness (spec §3.3): facts computed here, from the room's own final state — never from a client. */
-  private storyWitness(won: boolean): void {
-    this.storyWitnessAs(this.familyId(), won);
-  }
-
-  /** The witness under an explicit gameId, optionally carrying a finale
-   *  outcome and explicit facts (the decline has no game of its own: its
-   *  facts are leg 1's when that game is still this room's, else zero —
-   *  crediting falls back to the banked leg facts either way). */
-  private storyWitnessAs(gameId: string, won: boolean, finaleOutcome?: 'double' | 'clear' | 'lost' | 'declined', facts?: StoryGameFacts): void {
-    const d = this.data;
-    const s = d.story!;
-    if (s.resultGameId === gameId) return; // one witness per game
-    s.resultGameId = gameId;
-    const [a, b] = s.pairUids;
-    if (!a || !b || !s.track) return; // an unbound share-code room never had a pair: nothing to witness
-    const gameFacts = facts ?? (d.game ? storyFactsOf(d.game) : null);
-    if (!gameFacts) return;
-    this.io.storyResult?.({ gameId, code: d.code, track: s.track, stopId: s.stopId, uidA: a, uidB: b, won, facts: gameFacts, ...(finaleOutcome ? { finale: { outcome: finaleOutcome } } : {}) });
-  }
-
-  /* ---------------------------------------------------- the King finale */
-
-  /** The pair holds the double mark in this room (spec §6.5): the King
-   *  stop, the awareness case standing at 'finale', and a live pair. */
-  private storyFinalePending(): boolean {
-    const s = this.data.story;
-    return !!s && s.stopId === 'king' && s.pairUids[1] !== null && s.aware?.['king'] === 'finale';
-  }
-
-  /** Seat the room at the King's proposal. `short` = a later sit-down
-   *  (the terms were already heard when leg 1 fell); the fresh win that
-   *  just happened in this room gets the full scene. */
-  private storyEnterFinale(short: boolean): void {
-    const s = this.data.story!;
-    s.phase = 'finale';
-    s.ready = [];
-    s.finale = { short, choices: {} };
-    this.system('The King has terms of his own for you two.');
-  }
-
-  /** Both members agreed to take the cutthroat (spec §6.1): the room
-   *  converts IN PLACE — same seats (the pair at 0/2, the King and the
-   *  Ringer across), the shipped 4P cutthroat preset (target 300,
-   *  third-set elimination rides the rules), a fresh game. Dee guides
-   *  from the rail; she never plays inside the cutthroat (§6.4). */
-  private storyStartFinaleGame(): void {
-    const d = this.data;
-    const s = d.story!;
-    d.rules = clampRules(makeRules('cutthroat'));
-    d.teamNames = undefined;
-    s.phase = 'finale-game';
-    s.ready = [];
-    s.resultGameId = undefined;
-    s.concededBy = undefined;
-    this.startGame(d.gamesPlayed > 0);
-    // Fresh guide memory for the cutthroat, with the proposal scene's
-    // own Dee beats ([1]/[2]) already spent — the scene spoke them.
-    s.guide = newGuideState('king', `${d.code}:${d.gamesPlayed}:king:finale`);
-    s.guide.said.push(GUIDE_FINALE[1]!, GUIDE_FINALE[2]!);
-    const start = guideFinaleStartLine(s.guide);
-    if (start) this.pushGuideLine(start.text);
-    this.system('Cutthroat — every player for themselves. The double rides on it.');
-  }
-
-  /** Both members agreed to bank leg 1 (spec §6.2): the room witnesses
-   *  the decline itself — no game is played — and the outro posts
-   *  against the decline's own gameId, never the leg-1 family's (that
-   *  claim already stands as 'started'). Crediting banks the normal
-   *  King clear and counts no further attempt. */
-  private storyBankFinale(): void {
-    const d = this.data;
-    const s = d.story!;
-    const gameId = `${this.familyId()}-decline`;
-    // Leg 1's facts ride along only when that game is still this room's
-    // finished game (its witness already stands under the family id).
-    const legFacts = s.resultGameId === this.familyId() && d.game
-      ? storyFactsOf(d.game)
-      : { margin: 0, handsPlayed: 0, setsAgainstUs: 0, setsAgainstThem: 0, ourNilsMade: 0, ourBlindNilsMade: 0, deeNilsMade: 0, deeSteady: false, setOnFirstHand: false, oppSetTwice: false, endReason: null };
-    s.finale = { ...(s.finale ?? { short: true, choices: {} }), gameId, outcome: 'declined' };
-    s.phase = 'outro';
-    s.ready = [];
-    s.outroGameId = gameId;
-    this.storyWitnessAs(gameId, true, 'declined', legFacts);
-    if (!s.aware) s.aware = {};
-    s.aware['king'] = 'e'; // settled here; a fresh leg-1 win re-arms it
-    this.system('The pair banks the clear and walks out together.');
-  }
-
-  /** The cutthroat ended: placements decide the outcome (spec §6.2) —
-   *  the best human finish rules. A human first pays the double to BOTH
-   *  names (even if the other human finished last); the King or the
-   *  Ringer first with a human second banks the normal clear; both
-   *  humans 3rd/4th loses the clear entirely. */
-  private storyFinaleGameOver(): void {
-    const d = this.data;
-    const s = d.story!;
-    const res = d.game!.result!;
-    const places = res.placements;
-    const humanBest = Math.min(places[0] ?? 9, places[2] ?? 9);
-    const outcome = humanBest === 1 ? 'double' as const : humanBest === 2 ? 'clear' as const : 'lost' as const;
-    const gameId = this.familyId();
-    s.finale = { ...(s.finale ?? { short: false, choices: {} }), gameId, outcome };
-    s.phase = 'outro';
-    s.ready = [];
-    s.outroGameId = gameId;
-    if (outcome === 'double' && s.guide) {
-      const winnerSeat = (places[0] === 1 ? 0 : 2);
-      const partnerSeat = winnerSeat === 0 ? 2 : 0;
-      const partnerLast = (places[partnerSeat] ?? 0) === Math.max(...places);
-      const line = guideFinaleResolutionLine(s.guide, partnerLast);
-      if (line) this.pushGuideLine(line.text);
-    }
-    this.storyWitnessAs(gameId, outcome !== 'lost', outcome);
-    if (!s.aware) s.aware = {};
-    s.aware['king'] = 'e'; // the gamble is spent either way; a fresh leg-1 win re-arms it
-    this.storyBuzzNoteGame(outcome !== 'lost');
-  }
-
-  /** A concede inside the cutthroat settles it as a lost gamble
-   *  (spec §6.2): the clear goes, the mark is consumed. */
-  private storyFinaleConcede(byName: string): void {
-    const d = this.data;
-    const s = d.story!;
-    s.concededBy = byName;
-    const gameId = this.familyId();
-    s.finale = { ...(s.finale ?? { short: false, choices: {} }), gameId, outcome: 'lost' };
-    s.phase = 'outro';
-    s.ready = [];
-    s.outroGameId = gameId;
-    d.phase = 'over';
-    this.storyWitnessAs(gameId, false, 'lost');
-    if (!s.aware) s.aware = {};
-    s.aware['king'] = 'e';
-    this.storyBuzzNoteGame(false);
-    this.system(`${byName} conceded the finale`);
-  }
-
-  /**
-   * Dee's finale read (spec §6.4): hand-end facts from the cutthroat's
-   * own board — per-seat scores, tricks, sets and who fell this hand.
-   * She speaks from the rail only: if a dropped human seat is covered,
-   * it is covered by a standard bot, never by her (see storyCoverCheck).
-   */
-  private storyGuideFinaleHandEnd(before: GameState): void {
-    const d = this.data;
-    const s = d.story!;
-    const g = d.game!;
-    if (s.phase !== 'finale-game' || !s.guide) return;
-    const rec = g.history[g.history.length - 1]!;
-    const bySeat = new Map(rec.sides.map((sd) => [sd.side, sd]));
-    const facts: GuideFinaleFacts = {
-      handNo: rec.handNo,
-      scores: [0, 1, 2, 3].map((seat) => g.scores[seat] ?? 0),
-      tricks: [0, 1, 2, 3].map((seat) => rec.tricksWon[seat] ?? bySeat.get(seat)?.tricks ?? 0),
-      setSeats: rec.sides.filter((sd) => sd.shot).map((sd) => sd.side),
-      alive: [0, 1, 2, 3].filter((seat) => !g.eliminated?.[seat]),
-      newlyEliminated: [0, 1, 2, 3].filter((seat) => !!g.eliminated?.[seat] && !before.eliminated?.[seat]),
-      humans: [0, 2],
-    };
-    const line = guideFinaleLine(s.guide, facts, Math.random);
-    if (line) this.pushGuideLine(line.text);
-  }
-
-  /** Is Dee currently seated, covering a dropped partner? While she
-   *  plays a seat her guide voice goes quiet (spec §2.4/§5.3) — she
-   *  can't narrate and play the hand at the same time. */
-  private storyDeeCovering(): boolean {
-    const d = this.data;
-    return [0, 2].some((seat) => {
-      const s = d.seats[seat];
-      return s?.kind === 'bot' && s.vacated === true && s.name === 'Dee';
-    });
-  }
-
-  /** Dee's guide line joins the table chat under her guide byline —
-   *  deliberately NO bot/persona payload: the line is text-only under
-   *  the voice fence until her cast recordings exist (Phase 4 bake),
-   *  so no client ever voices it from a substitute sprite or synth. */
-  private pushGuideLine(text: string): void {
-    const d = this.data;
-    this.pushChat({ id: d.chatSeq++, from: 'guide:dee', name: 'Dee · guide', text, at: this.io.now() });
-  }
-
-  /**
-   * FORWARD BUZZ in the room (word travels fast — the co-op parity of
-   * the solo build, owner 2026-10-24): the seated pair remarking, in
-   * relay voice, on how the pair handled the PREVIOUS stop. The solo
-   * driver evaluates in Table.tsx off its device save; a co-op table
-   * has two clients and one truth, so the ROOM evaluates — at the same
-   * moments (the sit-down, and hand ends no scripted beat took) with
-   * the same selector and pools (@pp/bots buzzMomentFor, unchanged)
-   * and the same discipline (seeded per-attempt roll, cap one a match,
-   * said-set no-repeat). The facts are the PAIR track's (s.buzz), the
-   * cursor is the room's (s.buzzState), and the chosen line is pushed
-   * into the shared chat: both partners render the identical line, and
-   * a reconnect replays the chat history it already carries — the roll
-   * is never re-thrown.
-   */
-  private storyBuzzAt(moment: 'sitDown' | 'handEnd'): void {
-    const d = this.data;
-    const s = d.story!;
-    if (s.phase !== 'game' || !s.buzzState) return;
-    const stop = storyStopById(s.stopId);
-    if (!stop) return;
-    const input = s.buzz?.[s.stopId];
-    const st = s.buzzState;
-    const checks = st.checks;
-    st.checks++;
-    const beats = buzzMomentFor(stop, moment, {
-      attempts: input?.attempts ?? 0, checks, fired: st.fired, said: st.said,
-      prevWon: input?.prevWon, prevBand: input?.prevBand ?? null,
-      prevStopName: input?.prevStopName, prevPairNames: input?.prevPairNames,
-    });
-    if (!beats) return;
-    // Dee's guide voice is quiet while she covers a seat (§2.4/§5.3):
-    // a buzz line of hers waits out the cover. The evaluation still
-    // counted — the moment passed, exactly as when the roll says no.
-    if (beats.some((bt) => bt.speaker === 'dee') && this.storyDeeCovering()) return;
-    st.fired++;
-    for (const bt of beats) { st.said.push(bt.line); this.pushBuzzLine(stop, bt); }
-  }
-
-  /** A buzz line joins the table chat under its own speaker: the
-   *  seated pair speak from their seats (1 and 3), Dee from the rail
-   *  under her guide byline. Deliberately NO bot/persona payload —
-   *  like the guide's lines, these render text-only under the voice
-   *  fence; no client voices them from a substitute sprite or synth. */
-  private pushBuzzLine(stop: StoryStop, bt: StoryBeat): void {
-    const d = this.data;
-    if (bt.speaker === 'dee') { this.pushGuideLine(bt.line); return; }
-    const seat = stop.pair[0] === bt.speaker ? 1 : 3;
-    const name = STORY_CHARACTERS[bt.speaker]?.name ?? bt.speaker;
-    this.pushChat({ id: d.chatSeq++, from: `bot:${seat}`, name, text: bt.line, at: this.io.now() });
-  }
-
-  /**
-   * The room witnessed a game at this stop (the buzz refresh, twin of
-   * the `aware` refresh in storyMarkPlayed): the pair's attempts here
-   * grow by one, and the NEXT stop's buzz facts now describe THIS game
-   * — the same facts the witness row records (the pair side's margin,
-   * how it ended), so what this room gossips at the next stop and what
-   * a later room seeds from D1 can never disagree.
-   */
-  private storyBuzzNoteGame(won: boolean): void {
-    const d = this.data;
-    const s = d.story!;
-    if (!s.buzz) s.buzz = {};
-    (s.buzz[s.stopId] ??= { attempts: 0 }).attempts++;
-    const stop = storyStopById(s.stopId);
-    const next = stop ? STORY_STOPS[stop.n] : undefined;
-    if (!stop || !next) return;
-    const facts = d.game ? storyFactsOf(d.game) : null;
-    const input = (s.buzz[next.id] ??= { attempts: 0 });
-    input.prevWon = won;
-    input.prevBand = mannerBandOf({ won, margin: facts?.margin, endReason: facts?.endReason }, targetForStop(stop));
-    input.prevStopName = stop.name;
-    input.prevPairNames = `${STORY_CHARACTERS[stop.pair[0]]!.name} and ${STORY_CHARACTERS[stop.pair[1]]!.name}`;
-  }
-
-  /** The marked mid-hand guide reaction (spec §5.3): a pair-side nuke
-   *  by the seat's player. Everything else she says waits for hand end. */
-  private storyGuideMoments(evs: TalkEvent[]): void {
-    const d = this.data;
-    const s = d.story!;
-    if (s.phase !== 'game' || !s.guide || !d.game) return;
-    if (this.storyDeeCovering()) return;
-    for (const ev of evs) {
-      if (ev.kind !== 'nuke' || (ev.seat !== 0 && ev.seat !== 2)) continue;
-      const line = guideEventLine(s.stopId, s.guide, d.game.handNo, Math.random);
-      if (line) this.pushGuideLine(line.text);
-    }
-  }
-
-  /**
-   * Hand-end guide evaluation (spec §5.3): build the public board
-   * facts from the hand that just closed and let the guide layer
-   * decide. She reads scores, contracts, nil results and book counts
-   * — the board — never a hand. Returns whether she spoke: the
-   * forward-buzz evaluation at a hand end runs only when she didn't
-   * (one scripted beat takes the moment, as at the solo table).
-   */
-  private storyGuideHandEnd(before: GameState): boolean {
-    const d = this.data;
-    const s = d.story!;
-    const g = d.game!;
-    if (s.phase !== 'game' || !s.guide) return false;
-    if (this.storyDeeCovering()) return false; // she's playing the seat, not narrating it
-    const rec = g.history[g.history.length - 1]!;
-    const us = rec.sides[0]!;
-    const them = rec.sides[1]!;
-    const nil = us.nils.some((n) => n.made) ? 'oursMade' as const
-      : them.nils.some((n) => !n.made) ? 'theirsBusted' as const
-      : us.nils.some((n) => !n.made) ? 'oursBusted' as const
-      : them.nils.some((n) => n.made) ? 'theirsMade' as const
-      : null;
-    const line = guideHandLine(s.stopId, s.guide, {
-      handNo: rec.handNo,
-      us: g.scores[0] ?? 0,
-      them: g.scores[1] ?? 0,
-      prevUs: before.scores[0] ?? 0,
-      prevThem: before.scores[1] ?? 0,
-      target: g.rules.targetScore,
-      usPoints: us.points,
-      themPoints: them.points,
-      setOnUs: us.contractMade === false,
-      setOnThem: them.contractMade === false,
-      nil,
-      // a standout by the pair's side: a made blind nil by a pair seat,
-      // or a 10+ book hand (the nuke form rides storyGuideMoments)
-      partnerMoment: us.nils.some((n) => n.kind === 'blindNil' && n.made) || us.tricks >= 10,
-      awareCase: s.aware?.[s.stopId] ?? 'a',
-    }, Math.random);
-    if (line) this.pushGuideLine(line.text);
-    return !!line;
-  }
-
-  /**
-   * The pair has now PLAYED this stop in this room: whatever the
-   * precomputed awareness case was, a rematch in this room is a pair
-   * return (case 'e') — except a King leg-1 win, which stands the
-   * double mark up and hands the sit-down to the finale ('finale').
-   */
-  private storyMarkPlayed(won: boolean): void {
-    const s = this.data.story!;
-    if (!s.aware) s.aware = {};
-    if (s.stopId === 'king' && won && s.aware['king'] !== 'finale') s.aware['king'] = 'finale';
-    else s.aware[s.stopId] = 'e';
-    this.storyBuzzNoteGame(won);
-  }
-
-  /**
-   * The story phase machine (both-ready advance, spec §2.3). Runs inside
-   * after(), so every message / reconnect / tick can move the run forward.
-   * tape → scene → game all wait for BOTH pair members to arm ready; the
-   * outro's ready pair starts the next run at the chosen stop.
-   */
-  private storyAdvance(): void {
-    const d = this.data;
-    const s = d.story;
-    if (!s) return;
-    const both = s.pairUids[1] !== null && s.pairUids.every((u) => !!u && s.ready.includes(u));
-    if (!both) return;
-    if (s.phase === 'lobby') {
-      // the run starts only with both humans actually seated (auto-seated on hello)
-      if (![0, 2].every((seat) => d.seats[seat]?.kind === 'human')) return;
-      s.ready = [];
-      // A pair holding the King's double mark settles it BEFORE any new
-      // tape: the proposal is the sit-down (Phase 4, spec §6.5 rule 5).
-      if (this.storyFinalePending()) { this.storyEnterFinale(true); return; }
-      s.phase = 'tape';
-    } else if (s.phase === 'tape') {
-      s.ready = [];
-      s.phase = 'scene';
-    } else if (s.phase === 'scene') {
-      s.ready = [];
-      s.phase = 'game';
-      s.resultGameId = undefined;
-      s.concededBy = undefined;
-      s.finale = undefined; // a fresh partnership match buries any settled finale record
-      s.outroGameId = undefined;
-      this.startGame(d.gamesPlayed > 0);
-      // A fresh match gets a fresh guide memory (spec §5.3): said set,
-      // spacing and once-only flags are per match, seeded by the room.
-      s.guide = newGuideState(s.stopId, `${d.code}:${d.gamesPlayed}:${s.stopId}`);
-      // A fresh match gets a fresh buzz cursor too (word travels fast):
-      // cap, roll cursor and said set are per match, held by the room —
-      // and the sit-down is the buzz's first moment, the arrival
-      // sizing-up, evaluated once here where both clients share it.
-      s.buzzState = { checks: 0, fired: 0, said: [] };
-      this.storyBuzzAt('sitDown');
-    } else if (s.phase === 'outro') {
-      const wasKing = s.stopId === 'king';
-      const next = s.nextStopId && storyStopById(s.nextStopId) ? s.nextStopId : s.stopId;
-      s.ready = [];
-      s.nextStopId = undefined;
-      s.nextStopBy = undefined;
-      s.outroGameId = undefined;
-      if (next !== s.stopId) this.applyStoryStop(next);
-      // The leg-1 win that just landed in this room stands the mark up:
-      // the outro's ready pair walks into the proposal, full scene.
-      // Arriving at the King from another stop with the mark standing
-      // takes the short form instead.
-      if (this.storyFinalePending()) { this.storyEnterFinale(!wasKing); return; }
-      s.phase = 'tape';
-    }
-  }
-
-  /**
-   * Dee covers a vacated seat (spec §2.4): past the disconnect grace, a story
-   * seat whose human is gone is played by Dee — her name on the plate, her
-   * skill for this stop — until the human reconnects and the shipped
-   * reclaimSeat hands it back (the bot carries their replacedPid).
-   */
-  private storyCoverCheck(now: number): boolean {
-    const d = this.data;
-    const s = d.story!;
-    const stop = storyStopById(s.stopId);
-    let changed = false;
-    for (let seat = 0; seat < d.rules.playerCount; seat++) {
-      const slot = d.seats[seat]!;
-      if (slot.kind !== 'human') continue;
-      const m = d.members[slot.playerId];
-      if (!m || this.isConnected(slot.playerId)) continue;
-      const since = m.disconnectedAt ?? now;
-      if (now - since < this.timing.disconnectGraceMs) {
-        // wake at the grace line so the cover lands on time, not on the turn clock
-        this.io.setAlarm(since + this.timing.disconnectGraceMs);
-        continue;
-      }
-      if (s.phase === 'finale-game') {
-        // Inside the cutthroat Dee NEVER plays (spec §6.4) — a dropped
-        // seat is covered by a standard pro bot, reclaimable as usual.
-        d.seats[seat] = { kind: 'bot', name: this.botName(), level: 'pro', vacated: true, was: m.name, replacedPid: slot.playerId };
-        m.seat = null;
-        this.system(`${m.name}'s seat is covered until they return.`);
-        changed = true;
-        continue;
-      }
-      d.seats[seat] = { kind: 'bot', name: 'Dee', level: stop ? deeSkillForStop(stop.n) : 'pro', vacated: true, was: m.name, replacedPid: slot.playerId };
-      m.seat = null;
-      this.system(`Dee's covering for ${m.name} — hurry back.`);
-      changed = true;
-    }
-    return changed;
-  }
-
-  /** Dee's cover seat for a story room: name, face persona and skill all hers. */
-  private deeCoverSeat(was: string, pid: string): SeatSlot {
-    const stop = storyStopById(this.data.story!.stopId);
-    return { kind: 'bot', name: 'Dee', level: stop ? deeSkillForStop(stop.n) : 'pro', vacated: true, was, replacedPid: pid };
   }
 
   private sideLabel(side: number): string {
@@ -2534,7 +1749,6 @@ export class Room {
     try {
       this.healNilRules();
       this.checkVotes();
-      this.storyAdvance(); // before drive(): a scene→game transition starts the game, and drive must see (and deal) it in this same pass
       this.considerHost();
       this.drive();
     } catch (e) {
@@ -2582,8 +1796,6 @@ export class Room {
         return changed;
       }
       const now = this.io.now();
-      // Story co-op: a partner gone past the grace is covered by Dee (spec §2.4)
-      if (d.story && this.storyCoverCheck(now)) changed = true;
       const key = this.turnKeyOf(g);
       if (key !== d.turnKey) {
         d.turnKey = key;
@@ -2887,7 +2099,6 @@ export class Room {
       teamNames: d.rules.partnerships ? [...(d.teamNames ?? [null, null])] : undefined, series: d.series ?? null, revealed: [...(d.talk?.revealed ?? [])],
       ...(d.tournament ? { tournament: { id: d.tournament.id, name: d.tournament.name, match: d.tournament.match, autostartAt: d.tournament.autostartAt, reserved: d.tournament.reserved.map((r) => r?.name ?? null) } } : {}),
       ...(d.challenge ? { challenge: { id: d.challenge.id, autostartAt: d.challenge.autostartAt, reserved: d.challenge.reserved.map((r) => r?.name ?? null) } } : {}),
-      ...(d.story ? { story: { track: d.story.track, stopId: d.story.stopId, phase: d.story.phase, gameId: d.story.outroGameId ?? this.familyId(), hostUid: d.story.pairUids[0], partnerUid: d.story.pairUids[1], ready: [...d.story.ready], ...(d.story.concededBy ? { concededBy: d.story.concededBy } : {}), ...(d.story.finale ? { finale: { short: d.story.finale.short, choices: Object.entries(d.story.finale.choices).map(([uid, choice]) => ({ uid, choice })), ...(d.story.finale.outcome ? { outcome: d.story.finale.outcome } : {}), ...(d.story.finale.gameId ? { gameId: d.story.finale.gameId } : {}) } } : {}) } } : {}),
       private: !!d.private, replaceBots: this.replaceBotsOn(), takeable: this.takeable(),
       spectators: d.phase === 'lobby' ? [] : Object.entries(d.members).filter(([id, m]) => m.seat === null && this.isConnected(id)).map(([playerId, m]) => ({ playerId, name: m.name })),
       ...(d.votes && Object.keys(d.votes).length ? { votes: Object.entries(d.votes).map(([target, by]) => ({ target, by: [...by], need: this.votesNeeded(target) })) } : {}), ...(d.music && d.music.mode !== 'off' ? { music: d.music } : {}),
@@ -2908,7 +2119,7 @@ export class Room {
   /** Release 10: seats a spectator may take right now (mid-game, not at a tournament table) */
   takeable(): number[] {
     const d = this.data;
-    if (d.phase !== 'playing' || d.tournament || d.challenge || d.story || !d.game) return [];
+    if (d.phase !== 'playing' || d.tournament || d.challenge || !d.game) return [];
     const bots = this.replaceBotsOn();
     return d.seats.slice(0, d.rules.playerCount).flatMap((s, i) => (s.kind === 'bot' && (s.vacated || bots) && !d.game?.eliminated?.[i] ? [i] : []));
   }

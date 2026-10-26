@@ -23,7 +23,7 @@
  * (cleanText + maskProfanity from @pp/protocol, via ../filter) — the
  * same treatment chat text gets; there is no second filter.
  */
-import { STORY_BADGE_DEFS, STORY_STOPS, storyBadgesFor, type StoryBadgeFacts } from '@pp/bots';
+import { STORY_STOPS, storyBadgesFor, type StoryBadgeFacts } from '@pp/bots';
 import { cleanText, maskProfanity } from '../filter';
 import { myStats, personalStats, type MyModeStats } from '../stats/boards';
 import { ACHIEVEMENTS, achievementStates } from './achievements';
@@ -93,41 +93,23 @@ export interface BadgeCompletion {
 }
 export function badgeCompletionFor(badges: BadgeSummary[]): BadgeCompletion {
   const achievements = badges.filter((b) => b.kind === 'achievement').length;
-  const story = badges.filter((b) => b.kind === 'story').length;
-  const total = ACHIEVEMENTS.length + STORY_BADGE_DEFS.length;
+  // Pity Party: Story Mode was removed, so the story set no longer counts toward completion.
+  const story = 0;
+  const total = ACHIEVEMENTS.length;
   const earned = achievements + story;
   return {
     achievements: { earned: achievements, total: ACHIEVEMENTS.length },
-    story: { earned: story, total: STORY_BADGE_DEFS.length },
+    story: { earned: story, total: 0 },
     earned, total,
-    complete: achievements >= ACHIEVEMENTS.length && story >= STORY_BADGE_DEFS.length,
+    complete: achievements >= ACHIEVEMENTS.length,
   };
 }
 
-/** The story facts the badge set derives from — the union across ALL the
- *  player's tracks (solo + every pair run), user_id-only, mirroring
- *  anyTrackSummaryFor in story/routes.ts: a clear anywhere earns. */
-async function storyFactsFor(db: D1Database, userId: string): Promise<{ facts: StoryBadgeFacts; stopsCleared: number; completed: boolean }> {
-  const rows = await db.prepare('SELECT stop_id AS stopId, COALESCE(SUM(attempts), 0) AS attempts, COALESCE(SUM(clears), 0) AS clears FROM story_progress WHERE user_id = ? GROUP BY stop_id')
-    .bind(userId).all<{ stopId: string; attempts: number; clears: number }>();
-  const byStop = new Map(rows.results.map((r) => [r.stopId, r]));
-  const findRows = await db.prepare('SELECT DISTINCT kind, find_id AS findId FROM story_finds WHERE user_id = ?')
-    .bind(userId).all<{ kind: string; findId: string }>();
-  const done = await db.prepare('SELECT COUNT(*) AS n FROM story_tracks WHERE user_id = ? AND completed_at IS NOT NULL')
-    .bind(userId).first<{ n: number }>();
-  const stops = STORY_STOPS.map((s) => ({ stopId: s.id, attempts: byStop.get(s.id)?.attempts ?? 0, clears: byStop.get(s.id)?.clears ?? 0 }));
-  return {
-    facts: {
-      stops,
-      finds: {
-        eggs: findRows.results.filter((r) => r.kind === 'egg').map((r) => r.findId),
-        feats: findRows.results.filter((r) => r.kind === 'feat').map((r) => r.findId),
-      },
-      completed: (done?.n ?? 0) > 0,
-    },
-    stopsCleared: stops.filter((s) => s.clears > 0).length,
-    completed: (done?.n ?? 0) > 0,
-  };
+/** Pity Party: Story Mode was removed, so there are no story facts and no
+ *  story_* table reads. Every stop reads as never attempted. */
+async function storyFactsFor(_db: D1Database, _userId: string): Promise<{ facts: StoryBadgeFacts; stopsCleared: number; completed: boolean }> {
+  const stops = STORY_STOPS.map((s) => ({ stopId: s.id, attempts: 0, clears: 0 }));
+  return { facts: { stops, finds: { eggs: [], feats: [] }, completed: false }, stopsCleared: 0, completed: false };
 }
 
 /** Every badge the player has actually earned, across all three sets —
