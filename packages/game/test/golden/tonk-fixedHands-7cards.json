@@ -1,0 +1,117 @@
+{
+ "preset": {
+  "seats": 3,
+  "seed": "tk-fixed",
+  "options": {
+   "gameEnd": "fixedHands",
+   "gameHands": 6,
+   "handSize": "7"
+  }
+ },
+ "moves": 150,
+ "moveLog": "1:drawStock 1:discard:JH 2:drawStock 2:discard:JD 0:drawDiscard 0:spread:JS+JC+JD 0:discard:9S 1:drawStock 1:discard:QH 2:drawStock 2:discard:10D 0:drawStock 0:discard:QC 1:drawStock 1:discard:8D 2:drawStock 2:discard:10C 0:drawStock 0:discard:6D 1:drawStock 1:spread:7C+7H+7D 1:discard:5H 2:drawStock 2:discard:9C 0:drawStock 0:discard:9D 1:drawStock 1:discard:QD 2:drawStock 2:discard:9H 0:drawStock 0:discard:10S 1:drawStock 1:discard:3H 2:drawStock 2:discard:6C 0:drawStock 0:discard:QS 1:drawStock 1:spread:2S+2C+2H 1:discard:3S 2:drawStock 2:hit:7S@2 2:discard:6H 0:drawStock 0:hit:2D@3 0:discard:8H 1:drop 2:drawStock 2:discard:JH 0:drawStock 0:discard:JC 1:drawDiscard 1:spread:KC+QC+JC 1:discard:QD 2:drawStock 2:discard:KS 0:drawStock 0:discard:10D 1:drawStock 1:discard:KH 2:drawStock 2:hit:10C@1 2:discard:5D 0:drawStock 0:spread:8C+8S+8D 0:discard:9D 1:drawStock 1:hit:9C@1 1:discard:JD 2:drawStock 2:discard:10H 0:drawStock 0:discard:QS 1:drawStock 1:discard:7D 2:drawStock 2:spread:3C+2C+4C 2:discard:4D 0:drawStock 0:discard:9S 1:drawStock 1:discard:JS 2:drop 1:drawStock 1:discard:QC 2:drawStock 2:discard:JC 0:drawStock 0:discard:10C 1:drawStock 1:discard:JH 2:drawStock 2:discard:QD 0:drawStock 0:spread:4C+5C+2C+3C 0:discard:8H 1:drawStock 1:discard:10S 2:drawStock 2:hit:AC@1 2:discard:QH 0:drawStock 0:discard:7S 1:drawStock 1:hit:6C@1 1:discard:KD 2:drawStock 2:discard:JD 0:drawStock 0:discard:6H 1:drawStock 1:hit:7C@1 1:discard:JS 2:drawStock 2:hit:8C@1 2:discard:10D 0:drawStock 0:discard:9D 1:drawStock 1:discard:KS 2:drawStock 2:discard:9S 0:drawStock 0:discard:KC 1:drawStock 1:discard:8S 2:drawStock 2:discard:7H 0:drawStock 0:discard:6D 1:drawStock 1:discard:8D 2:drawStock 2:discard:7D 0:drawStock 0:discard:9H 1:drawStock 1:discard:5S 2:drawStock 2:discard:6S 0:drawStock 0:discard:10H 1:drawStock 1:discard:KH 2:drawStock 2:hit:9C@1 2:discard:5D 0:drawStock 0:discard:5H",
+ "results": {
+  "placements": [
+   2,
+   0,
+   1
+  ],
+  "deltas": [
+   0,
+   0,
+   0
+  ],
+  "recap": {
+   "v": 1,
+   "points": [
+    -6,
+    -6,
+    12
+   ],
+   "coinStakes": false,
+   "hands": [
+    {
+     "n": 0,
+     "winner": 2,
+     "how": "instant",
+     "dropper": null,
+     "deltas": [
+      -2,
+      -2,
+      4
+     ]
+    },
+    {
+     "n": 1,
+     "winner": 1,
+     "how": "drop",
+     "dropper": 1,
+     "deltas": [
+      -1,
+      2,
+      -1
+     ]
+    },
+    {
+     "n": 2,
+     "winner": 2,
+     "how": "drop",
+     "dropper": 2,
+     "deltas": [
+      -1,
+      -1,
+      2
+     ]
+    },
+    {
+     "n": 3,
+     "winner": 2,
+     "how": "instant",
+     "dropper": null,
+     "deltas": [
+      -2,
+      -2,
+      4
+     ]
+    },
+    {
+     "n": 4,
+     "winner": 0,
+     "how": "stockOut",
+     "dropper": null,
+     "deltas": [
+      2,
+      -1,
+      -1
+     ]
+    },
+    {
+     "n": 5,
+     "winner": 2,
+     "how": "instant",
+     "dropper": null,
+     "deltas": [
+      -2,
+      -2,
+      4
+     ]
+    }
+   ],
+   "tonks": [
+    0,
+    0,
+    3
+   ],
+   "drops": [
+    0,
+    1,
+    1
+   ],
+   "caught": [
+    0,
+    0,
+    0
+   ]
+  }
+ }
+}
