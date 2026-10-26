@@ -1,4 +1,4 @@
-import { type Action, type GameState, type PlayerView, type Rng, type TableRules, applyAction, createRng, newGame, pendingTurn, viewFor } from '@spades/rules';
+import { type Action, type GameState, type PlayerView, type Rng, type TableRules, applyAction, createRng, newGame, pendingTurn, viewFor } from '@pp/rules';
 import { type BotLevel, chooseBid, wantsBlindNil } from './bidding';
 import type { PartnerHint } from './partnerTalk';
 import { chooseExchange, choosePlay } from './play';

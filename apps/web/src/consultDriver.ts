@@ -5,7 +5,7 @@
  * and Dee's post-hand acknowledgment — and holds bot bids for exactly
  * the beats the spec allows (§5.4 / §6.2), never the human's clock.
  *
- * Everything spoken is built by @spades/bots consultTalk from the same
+ * Everything spoken is built by @pp/bots consultTalk from the same
  * partnerBidIntent() number the bid coach shows and the placed bid is
  * drawn from — this driver never invents or adjusts a number. Delivery
  * is chat + the consultation voice path (talkPrefs.speakConsult: cast
@@ -16,13 +16,13 @@
  * no online source (§6.4 — online play is excluded in v1), and the
  * driver is inert without a partner seat (cutthroat, §5.5).
  */
-import { type GameState, nextBidder, viewFor } from '@spades/rules';
+import { type GameState, nextBidder, viewFor } from '@pp/rules';
 import {
   type BotLevel, type ConsultLine, type PersonaId,
   ackApplies, buildAck, buildConferLine, buildConsultation, buildCoverLine, buildIntroduction,
   buildSettle, decomposeClaim, newConsultTalkState, partnerBidIntent, personaForName,
   type ConsultTalkState,
-} from '@spades/bots';
+} from '@pp/bots';
 import { offlineTalk } from './offlineTalk';
 import { consultClipDurationMs, speakConsult } from './talkPrefs';
 import type { SeatPos } from './spatial';

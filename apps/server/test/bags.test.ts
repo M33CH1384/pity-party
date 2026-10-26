@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type GameState, makeRules, scoreHand } from '@spades/rules';
+import { type GameState, makeRules, scoreHand } from '@pp/rules';
 import { buildRecord } from '../src/stats/record';
 
 /** Minimal finished game whose history is whatever scoreHand produced. */

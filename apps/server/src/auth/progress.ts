@@ -4,7 +4,7 @@
  * per-pairing team names (owner, 2026-10-20: names belong to pairings — 'offline', 'user:<username>').
  * Sanitized and size-capped.
  */
-import { cleanTeamName } from '@spades/protocol';
+import { cleanTeamName } from '@pp/protocol';
 
 export interface ProgressBadge { id: string; earnedAt: number; context?: Record<string, unknown> }
 export interface Progress { v: 1; badges: ProgressBadge[]; series: unknown | null; teamName: string | null; teamNames: Record<string, string> }

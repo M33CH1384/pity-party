@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type Action, type Card, type GameState, type Play, makeRules, newGame } from '@spades/rules';
+import { type Action, type Card, type GameState, type Play, makeRules, newGame } from '@pp/rules';
 import {
   MALCOLM_CARD, REV_FIGURES, REV_FIGURE_BY_CARD, REV_MALCOLM_CUT_LINES, REV_TRIBUTE_TEXTS,
   lineById, newRevTributeState, revLineIdForText, revTributeCommit, revTributeDetect, type RevTributeState,

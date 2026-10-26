@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { type GameState, type HandRecord, type TableRules, bidLabel } from '@spades/rules';
+import { type GameState, type HandRecord, type TableRules, bidLabel } from '@pp/rules';
 import { HUMAN } from './useGame';
 
 /** Team names for the mounted table (local side order; null = default partner names). Set by Table each render. */

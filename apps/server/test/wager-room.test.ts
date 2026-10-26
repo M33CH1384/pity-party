@@ -1,9 +1,9 @@
 /** Big Bank Take Lil Bank (Phase 1): challenge tables in the Room — reserved seats, no bot-fill ever, LOCKED table controls, the noshow/abandoned/played challengeResult callbacks. */
 import { describe, expect, it } from 'vitest';
-import type { Card } from '@spades/rules';
-import { makeRules } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
-import type { GameAction } from '@spades/protocol';
+import type { Card } from '@pp/rules';
+import { makeRules } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
+import type { GameAction } from '@pp/protocol';
 import { FakeEnv } from './harness';
 import { DEFAULT_TIMING, type ChallengeSeat } from '../src/room';
 

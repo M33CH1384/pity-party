@@ -4,8 +4,8 @@
  * player with no unlocks in a plain offline game — the retired pair never
  * renders again, and earned animations are the only covers. Runs at 390px
  * WebKit + desktop Chromium. Screenshots: set-cover-{390,desktop} in BWM_SHOTS. */
-import { makeRules, newGame, applyAction, pendingTurn, viewFor, type GameState } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { makeRules, newGame, applyAction, pendingTurn, viewFor, type GameState } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { webkit, chromium, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 const SHOTS = process.env.BWM_SHOTS ?? '/opt/cursor/artifacts';

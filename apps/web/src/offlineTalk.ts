@@ -2,7 +2,7 @@
  * Offline trash talk: the same engine as the server, driven by the local game (useGame reports each step).
  * Table.tsx sets the table (names, team names) and the sink that posts lines to the chat.
  *
- * Revolutionaries tributes (revTributes.ts in @spades/bots) ride this driver:
+ * Revolutionaries tributes (revTributes.ts in @pp/bots) ride this driver:
  * while the history deck is the active deck, court plays and the Malcolm cut
  * are detected here, ahead of the generic moment engine — the signature
  * pre-empts the step's line, a regular tribute only speaks when the engine
@@ -11,7 +11,7 @@
  * the bot who threw the card speaks, and a human's card gets a bot witness.
  *
  * Speech density (2026-10-22) also lives here, on top of the engine's
- * per-class profiles (TALK_PROFILES in @spades/bots):
+ * per-class profiles (TALK_PROFILES in @pp/bots):
  * - MIX HIERARCHY: Table.tsx reports higher-priority speech (scripted scene
  *   beats, signature sets, tributes, rail, consultation) through
  *   noteHighPriority/noteConsult, stamping voiceBusyUntil. A generic line
@@ -36,8 +36,8 @@
  * - ANTI-REPEAT: the same text from two different speakers inside 60 s is
  *   suppressed (cross-speaker dedupe), on top of the engine's shuffle-bag.
  */
-import { type Action, type GameState, tricksStillRemaining } from '@spades/rules';
-import { type HistKind, type RevTributeEvent, type TalkEvent, type TalkLine, type TalkTable, REV_TRIBUTE, botTalk, collectionBanter, gapBucketForScores, historyTalk, leanBid, leanNil, momentsFor, newRevTributeState, newTalkState, noteTalkHand, personaForName, personaOf, prePlayLine, profileOf, revLineIdForText, revTributeCommit, revTributeDetect, setsBySideOf, sideOfSeat } from '@spades/bots';
+import { type Action, type GameState, tricksStillRemaining } from '@pp/rules';
+import { type HistKind, type RevTributeEvent, type TalkEvent, type TalkLine, type TalkTable, REV_TRIBUTE, botTalk, collectionBanter, gapBucketForScores, historyTalk, leanBid, leanNil, momentsFor, newRevTributeState, newTalkState, noteTalkHand, personaForName, personaOf, prePlayLine, profileOf, revLineIdForText, revTributeCommit, revTributeDetect, setsBySideOf, sideOfSeat } from '@pp/bots';
 import { getActiveDeck } from './decks';
 import { histViewsForSeats } from './personaHistory';
 import { spokenClipDurationMs, talkPrefs } from './talkPrefs';

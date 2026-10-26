@@ -3,7 +3,7 @@
  * - <BidOrder>: who bids when (non-dealing team first, back to back; then the dealer's partner; dealer last).
  * (Release 9 removed the one-tap partner-talk preset panel: partners talk out loud over open mics.)
  */
-import { type GameState, bidLabel, bidOrder, partnerOf } from '@spades/rules';
+import { type GameState, bidLabel, bidOrder, partnerOf } from '@pp/rules';
 
 /** Center strip: the whole auction, including the hand you bid first. Hidden only while the deal animation or a pause is up. */
 export function showCenterBidOrder(phase: string, pause: boolean, dealing: boolean): boolean {

@@ -4,7 +4,7 @@ import { sound, useSoundSettings } from './audio';
 import { speakerAriaLabel } from './audioSession';
 import { requestSettingsSheet } from './settingsSheet';
 import { tableIntensity, talkPrefs, useTalkPrefs } from './talkPrefs';
-import { TALK_INTENSITY_LABEL } from '@spades/bots';
+import { TALK_INTENSITY_LABEL } from '@pp/bots';
 import { type NukeIntensity, fx, useNukeIntensity, useReduceEffects, useTableNuke } from './fx';
 import { setVibration, useVibration } from './haptics';
 import { normalizeCategoryVolumes } from './spatial';

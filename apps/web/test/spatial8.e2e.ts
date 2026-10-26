@@ -1,7 +1,7 @@
 /** Phase 8: sound settings expose spatial toggle + quality (persisted). The room
  *  soundscape picker was retired 2026-10-20 — each venue's signature sounds are
  *  automatic — so this also asserts the picker stays gone. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 const dealt = newGame(makeRules('joker'), 'drag-13', { dealer: 3 });

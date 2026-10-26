@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { type Card, type Trick, cardLabel } from '@spades/rules';
+import { type Card, type Trick, cardLabel } from '@pp/rules';
 import { browsedTrick, stepTrickIndex, trickPositionLabel } from './lastTrickBrowse';
 
 /**

@@ -1,5 +1,5 @@
 {
-  "name": "@spades/server",
+  "name": "@pp/server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,9 +10,9 @@
   },
   "dependencies": {
     "@simplewebauthn/server": "^13.3.3",
-    "@spades/bots": "workspace:*",
-    "@spades/protocol": "workspace:*",
-    "@spades/rules": "workspace:*"
+    "@pp/bots": "workspace:*",
+    "@pp/protocol": "workspace:*",
+    "@pp/rules": "workspace:*"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260702.1"

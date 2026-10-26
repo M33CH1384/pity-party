@@ -1,4 +1,4 @@
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 const SHOTS = process.env.BWM_SHOTS ?? '/opt/cursor/artifacts';

@@ -10,7 +10,7 @@
  * every terminal transition runs inside the DO's serialized ops, so a result
  * reported twice can never pay twice.
  */
-import type { TableRules } from '@spades/rules';
+import type { TableRules } from '@pp/rules';
 import { balance } from '../cred/coins';
 import {
   wagerEnabled, wagerEscrow, wagerEscrowedCount, wagerForfeit, wagerLevelOk,

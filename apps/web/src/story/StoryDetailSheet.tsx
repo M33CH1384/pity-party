@@ -14,7 +14,7 @@
  * whose id resolves to no definition shows the card's own fallback line.
  */
 import { useState, type ReactNode } from 'react';
-import { STORY_SECRETS, storyEggById, type StoryBadge } from '@spades/bots';
+import { STORY_SECRETS, storyEggById, type StoryBadge } from '@pp/bots';
 import { setAnimForStop } from '../setAnims';
 import { useReduceEffects } from '../fx';
 import { useEscapeClose } from '../useEscapeClose';

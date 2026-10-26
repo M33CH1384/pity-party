@@ -32,7 +32,7 @@
  * leaving a scene does.
  */
 import { useEffect, useRef, useState } from 'react';
-import { personaForName } from '@spades/bots';
+import { personaForName } from '@pp/bots';
 import StoryFace from './StoryFace';
 import { fixedRevealMs, revealDurationMs } from './ScriptPlayer';
 import { setStoryVoiceScope, speakBot, spokenClipDurationMs, talkPrefs, useTalkPrefs } from '../talkPrefs';

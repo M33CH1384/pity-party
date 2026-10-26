@@ -1,6 +1,6 @@
 /** Plays N bot-only joker games with the real engine and prints a Series JSON (for screenshots / fixtures). */
-import { type Series, addSeriesGame, applyAction, makeRules, newGame, pendingTurn, seriesSides, summarizeGame, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { type Series, addSeriesGame, applyAction, makeRules, newGame, pendingTurn, seriesSides, summarizeGame, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 const n = Number(process.argv[2] ?? 3);
 const names = ['You', 'Keisha', 'Marcus', 'Dre'];
 const sideNames = ['Spade Gods 🔥', 'Book Bandits'];

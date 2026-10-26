@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { isNukeTrick } from '@spades/rules';
-import { NUKE_ALLOWANCE_MS } from '@spades/protocol';
+import { isNukeTrick } from '@pp/rules';
+import { NUKE_ALLOWANCE_MS } from '@pp/protocol';
 import { isIosWebKit, nukeClockStalled, nukeProfile } from '../src/three/nukeVisual';
 import { nextTrickPause, restingFlightWait } from '../src/trickTiming';
 

@@ -4,11 +4,11 @@
  * Speech density, web layer (offlineTalk): the mix hierarchy's drop rule,
  * consultation right of way, decision protection, cross-speaker dedupe,
  * answer chains and thinking-time murmurs. The talkPrefs module is mocked
- * so clip durations are exact; the engine (@spades/bots) is the real one.
+ * so clip durations are exact; the engine (@pp/bots) is the real one.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BOT_NAMES, personaForName, type TalkLine, type TalkTable } from '@spades/bots';
-import { applyAction, makeRules, newGame } from '@spades/rules';
+import { BOT_NAMES, personaForName, type TalkLine, type TalkTable } from '@pp/bots';
+import { applyAction, makeRules, newGame } from '@pp/rules';
 
 const dur = vi.hoisted(() => ({ value: 1000 as number | null }));
 vi.mock('../src/talkPrefs', () => ({

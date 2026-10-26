@@ -7,7 +7,7 @@
  */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { HUSTLER_NEWBIE_SPEED, PERSONAS, PERSONA_VOICES, type PersonaId, REV_MALCOLM_CUT_LINES, REV_TRIBUTE_TEXTS, speakableLines, spokenBidTake, spokenTake } from '@spades/bots';
+import { HUSTLER_NEWBIE_SPEED, PERSONAS, PERSONA_VOICES, type PersonaId, REV_MALCOLM_CUT_LINES, REV_TRIBUTE_TEXTS, speakableLines, spokenBidTake, spokenTake } from '@pp/bots';
 
 const ROOT = join(import.meta.dirname, '../..');
 const PUB = join(ROOT, 'apps/web/public/voices/v2');

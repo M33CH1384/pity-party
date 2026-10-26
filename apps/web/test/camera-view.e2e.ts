@@ -1,5 +1,5 @@
 /** Camera view at 390px WebKit: standing (Turn up ON) slow drag slams max; sitting V-gesture slams ONLY with Turn Up ON (OFF gates it); sitting straight slow drag gentle. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

@@ -1,4 +1,4 @@
-import { type Card, SUIT_SYMBOL, type Suit } from '@spades/rules';
+import { type Card, SUIT_SYMBOL, type Suit } from '@pp/rules';
 
 interface Props {
   card?: Card;

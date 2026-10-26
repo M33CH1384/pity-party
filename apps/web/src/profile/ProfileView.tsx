@@ -63,8 +63,8 @@
  * (profile/CardEditor.tsx), separate from the Edit profile stack.
  */
 import { useEffect, useRef, useState } from 'react';
-import { presenceLine } from '@spades/protocol';
-import { STORY_SECRETS } from '@spades/bots';
+import { presenceLine } from '@pp/protocol';
+import { STORY_SECRETS } from '@pp/bots';
 
 /** Story Mode collectibles (storySecrets) read by name here, not raw id. */
 const COLLECTIBLE_NAMES: Record<string, string> = Object.fromEntries(

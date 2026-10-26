@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { type GameState, type HandRecord, type TableRules, bidLabel } from '@spades/rules';
+import { type GameState, type HandRecord, type TableRules, bidLabel } from '@pp/rules';
 
 /** Number that counts up/down to its value (scorebug tick-ups). */
 export function TickNumber({ value, className = '' }: { value: number; className?: string }) {

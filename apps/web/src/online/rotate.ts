@@ -4,7 +4,7 @@
  * bags, hand results) rotate by side. Other players' hands are never sent; they're filled with placeholders of
  * the right length so the renderer can draw card backs.
  */
-import type { Card, GameResult, GameState, HandRecord, PlayerView, SideHandResult, TableRules, Trick } from '@spades/rules';
+import type { Card, GameResult, GameState, HandRecord, PlayerView, SideHandResult, TableRules, Trick } from '@pp/rules';
 
 export interface Rotation {
   n: number;

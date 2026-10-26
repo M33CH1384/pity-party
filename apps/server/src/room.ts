@@ -9,17 +9,17 @@
  */
 import {
   type Action, type GameHandLog, type GameState, type Series, addSeriesGame, emptySeries, seriesForGameStart, seriesMatches, seriesSides, summarizeGame, type PlayerView, type TableRules, RuleError, RulesConfigError, acceptRules, applyAction, canRunIt, runPlayout, type Seat, spectatorView, HandLogBuilder, isFreshDeal, isNukeTrick, nukeArmed, nextDealer, makeRules, newGameUndealt, dealFirstHand, pendingTurn, secureSeed, throwInOpen, viewFor, withCompleteNil,
-} from '@spades/rules';
-import { voiceGender } from '@spades/bots';
+} from '@pp/rules';
+import { voiceGender } from '@pp/bots';
 import { BUCKET_THIN } from './voice/writer';
-import { type TalkEvent, type TalkLine, type TalkState, type TalkTable, botTalk, chooseBotAction, loudLoser, parseHint, leanBid, botSkillFor, personaSkillFloor, seatSkill, leanNil, momentsFor, newTalkState, noteTalkHand, pickBotNames, platePersona, prePlayLine, activeCatalog, bucketFor } from '@spades/bots';
-import { GUIDE_FINALE, STORY_CHARACTERS, STORY_STOPS, STORY_TIER_SKILL, buzzMomentFor, deeSkillForStop, guideEventLine, guideFinaleLine, guideFinaleResolutionLine, guideFinaleStartLine, guideHandLine, mannerBandOf, newGuideState, storyFactsOf, storyPairTrackKey, storyRulesForStop, storyStopById, targetForStop, type AwarenessCase, type GuideFinaleFacts, type GuideState, type StoryBeat, type StoryBuzzInput, type StoryGameFacts, type StoryStop } from '@spades/bots';
+import { type TalkEvent, type TalkLine, type TalkState, type TalkTable, botTalk, chooseBotAction, loudLoser, parseHint, leanBid, botSkillFor, personaSkillFloor, seatSkill, leanNil, momentsFor, newTalkState, noteTalkHand, pickBotNames, platePersona, prePlayLine, activeCatalog, bucketFor } from '@pp/bots';
+import { GUIDE_FINALE, STORY_CHARACTERS, STORY_STOPS, STORY_TIER_SKILL, buzzMomentFor, deeSkillForStop, guideEventLine, guideFinaleLine, guideFinaleResolutionLine, guideFinaleStartLine, guideHandLine, mannerBandOf, newGuideState, storyFactsOf, storyPairTrackKey, storyRulesForStop, storyStopById, targetForStop, type AwarenessCase, type GuideFinaleFacts, type GuideState, type StoryBeat, type StoryBuzzInput, type StoryGameFacts, type StoryStop } from '@pp/bots';
 import {
   type BotLevel, type ChatLine, type ClientMsg, type HostMusic, type MediaState, type RoomInfo, type RoomPhase, type RunPlayback, type SeatInfo, type ServerMsg,
   DEFAULT_AFK_LIMIT, LIMITS, PROTOCOL_VERSION, parseClientMsg, toggleReaction,
   HAND_END_HOLD_MS, NUKE_ALLOWANCE_MS, handEndLeadMs, type NukeIntensity, type TalkIntensity, cleanTeamName, pickTeamName, type VenueChoice, type VenueId, isLockedVenue, rollVenue,
-} from '@spades/protocol';
-import type { OpenTable } from '@spades/protocol';
+} from '@pp/protocol';
+import type { OpenTable } from '@pp/protocol';
 import { blockLinks, cleanName, cleanText, maskProfanity } from './filter';
 import { extractMentionKeys } from './social/mentions';
 import { type GameRecord, type LiveStats, type SaveMeta, type SeatRef, abandonedRecord, buildRecord, isRated, newLiveStats, placementsOf } from './stats/record';
@@ -112,7 +112,7 @@ export interface RoomData {
   teamNames?: (string | null)[];
   /** trash-talk cooldown state (bot reveals etc.) */
   talk?: TalkState;
-  /** rematch series (see @spades/rules series) */
+  /** rematch series (see @pp/rules series) */
   series?: Series | null;
   /** per-seat member ids at the start of the current game (series composition) */
   seriesSeats?: string[];
@@ -253,7 +253,7 @@ export interface StorySeat {
   aware?: Record<string, AwarenessCase>;
   /** Dee's guide-layer match memory (spec §5.3): said set, spacing,
    *  once-only flags. Reset when a match starts; hers alone — the guide
-   *  layer's rolls and caps live in @spades/bots storyGuide. */
+   *  layer's rolls and caps live in @pp/bots storyGuide. */
   guide?: GuideState;
   /** Forward-buzz facts per stop (word travels fast): how the pair's
    *  latest game at the PREVIOUS stop went, computed by the story HTTP
@@ -2167,7 +2167,7 @@ export class Room {
    * driver evaluates in Table.tsx off its device save; a co-op table
    * has two clients and one truth, so the ROOM evaluates — at the same
    * moments (the sit-down, and hand ends no scripted beat took) with
-   * the same selector and pools (@spades/bots buzzMomentFor, unchanged)
+   * the same selector and pools (@pp/bots buzzMomentFor, unchanged)
    * and the same discipline (seeded per-attempt roll, cap one a match,
    * said-set no-repeat). The facts are the PAIR track's (s.buzz), the
    * cursor is the room's (s.buzzState), and the chosen line is pushed

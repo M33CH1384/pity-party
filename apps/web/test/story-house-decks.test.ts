@@ -10,8 +10,8 @@
  * never mutated and normal games keep dealing the player's own deck.
  */
 import { afterEach, describe, expect, it } from 'vitest';
-import { STORY_STOPS, storyStopById } from '@spades/bots';
-import { makeRules, newGame } from '@spades/rules';
+import { STORY_STOPS, storyStopById } from '@pp/bots';
+import { makeRules, newGame } from '@pp/rules';
 import { deckForStop } from '../src/decks';
 import { DEFAULT_SETTINGS, type Settings } from '../src/settings';
 import { storySettingsFor } from '../src/story/storySettings';

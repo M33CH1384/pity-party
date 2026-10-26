@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   type Card, type GameState, type TableRules, applyAction, bidOptions, buildDeck, createRng, makeRules, newGame, viewFor,
-} from '@spades/rules';
+} from '@pp/rules';
 import {
   type PersonaId, CONSULT_OWN, ackApplies, buildConsultation, buildSettle, chooseBotAction, decomposeClaim,
   newConsultTalkState, partnerBidIntent, sBucket, tBucket, wantsBlindNil, type BotLevel,

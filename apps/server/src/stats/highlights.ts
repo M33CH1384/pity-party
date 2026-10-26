@@ -19,7 +19,7 @@
  * counts as a Boston / Wheels matches the stats pipeline's definitions
  * exactly (see the wheels predicate in stats/record.ts).
  */
-import { type Card, type HandRecord, isNukeTrick } from '@spades/rules';
+import { type Card, type HandRecord, isNukeTrick } from '@pp/rules';
 
 export type HighlightType = 'nuke' | 'boston' | 'nil' | 'blindNil' | 'wheels';
 

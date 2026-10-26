@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { type HostMusic as HostMusicState, isMusicLink } from '@spades/protocol';
+import { type HostMusic as HostMusicState, isMusicLink } from '@pp/protocol';
 import { TRACKS } from '../audio';
 import { VolumeRow } from '../SoundControls';
 import { hostMusic, useHostMusic } from '../hostMusic';

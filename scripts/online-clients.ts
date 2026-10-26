@@ -10,9 +10,9 @@
  * Usage: npx tsx scripts/online-clients.ts [serverUrl=http://127.0.0.1:8787] [mode=joker]
  */
 import WebSocket from 'ws';
-import { chooseBotAction } from '@spades/bots';
-import { makeRules, type Card, type PlayerView } from '@spades/rules';
-import type { ClientMsg, GameAction, RoomInfo, ServerMsg } from '@spades/protocol';
+import { chooseBotAction } from '@pp/bots';
+import { makeRules, type Card, type PlayerView } from '@pp/rules';
+import type { ClientMsg, GameAction, RoomInfo, ServerMsg } from '@pp/protocol';
 
 const base = (process.argv[2] ?? 'http://127.0.0.1:8787').replace(/\/$/, '');
 const mode = process.argv[3] ?? 'joker';

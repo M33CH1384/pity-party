@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@spades/rules';
+import { type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@pp/rules';
 import { BOT_NAMES, COMMON, LINE_META, PERSONAS, botTalk, chooseBotAction, momentsFor, newTalkState, personaForName, prePlayLine, type TalkEvent, type TalkTable } from '../src';
 
 const nameFor = (p: string) => BOT_NAMES.find((n) => personaForName(n) === p)!;

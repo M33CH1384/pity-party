@@ -1,15 +1,15 @@
 import { SocialButton } from '../social/Social';
 import { VENUE_DEFS, VENUE_LIST, type VenueChoice, type VenueId, venueLabel } from '../venues';
 import { TeamNameField } from '../TeamName';
-import type { NukeIntensity } from '@spades/protocol';
+import type { NukeIntensity } from '@pp/protocol';
 import { type FormEvent, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { TrumpLadder } from '../trumpLadder';
-import { BOT_SKILL_SETTINGS, SKILL_SETTING_LABEL, TALK_INTENSITY_LABEL, type TalkIntensity, skillSettingOf } from '@spades/bots';
-import { TALK_INTENSITIES, type BotLevel } from '@spades/protocol';
+import { BOT_SKILL_SETTINGS, SKILL_SETTING_LABEL, TALK_INTENSITY_LABEL, type TalkIntensity, skillSettingOf } from '@pp/bots';
+import { TALK_INTENSITIES, type BotLevel } from '@pp/protocol';
 import { TALK_HINT } from '../MoreOptions';
 import { LockedRulesPanel } from '../LockedRules';
-import type { RoomInfo, SeatInfo } from '@spades/protocol';
+import type { RoomInfo, SeatInfo } from '@pp/protocol';
 import { type ModeKey, type Settings, MODES, modeTitle, rulesSummary, settingsToRules } from '../settings';
 import type { ConnState, TableConnection } from './connection';
 import { inviteLink } from './config';
@@ -481,7 +481,7 @@ function useWide(): boolean {
 }
 
 /** Release 9b: a tournament match table: seats are reserved, the match starts on its own */
-function TourBanner({ t }: { t: NonNullable<import('@spades/protocol').RoomInfo['tournament']> }) {
+function TourBanner({ t }: { t: NonNullable<import('@pp/protocol').RoomInfo['tournament']> }) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => { const i = window.setInterval(() => setNow(Date.now()), 1000); return () => window.clearInterval(i); }, []);
   const left = t.autostartAt ? Math.max(0, Math.ceil((t.autostartAt - now) / 1000)) : null;

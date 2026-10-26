@@ -6,7 +6,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { PERSONAS, buildStoryTape, storyStopById } from '@spades/bots';
+import { PERSONAS, buildStoryTape, storyStopById } from '@pp/bots';
 import {
   PAIR_HEADLINE_MIN_GAMES, VERSUS_CARD_STAGGER_MS, VERSUS_CUES, VERSUS_HOLD_MS, VERSUS_IMPACT_MS, VERSUS_RESOLVE_CUE, VERSUS_ROW_STAGGER_MS,
   VERSUS_STORY_MS, VERSUS_TAPE_MS,

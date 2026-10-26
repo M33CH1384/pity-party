@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { Card } from '@spades/rules';
+import type { Card } from '@pp/rules';
 import { COURT_FRAME_X, QUEEN_TAIL_EM, drawFace, queenTailReach } from '../src/cardArt';
 
 /**

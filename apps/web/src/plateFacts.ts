@@ -4,7 +4,7 @@
  * says who deals. The chip and the bid/took line are corrected here, in the
  * main tree, before the "X deals" note is allowed to paint.
  */
-import { type Bid, bidLabel } from '@spades/rules';
+import { type Bid, bidLabel } from '@pp/rules';
 
 export function bidChipText(bid: Bid | null, bidding: boolean): string {
   if (bid === 'books') return 'BOOKS';

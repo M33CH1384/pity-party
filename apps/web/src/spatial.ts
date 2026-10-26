@@ -2,7 +2,7 @@
  *  engine in audio.ts. No second engine, and trigger timing is untouched — spatial nodes only route
  *  gain/pan downstream of the existing impact-frame triggers (#169). */
 import type { VenueBed } from './audio';
-import { isLockedVenue, type VenueId } from '@spades/protocol';
+import { isLockedVenue, type VenueId } from '@pp/protocol';
 
 /** Seat directions mirrored from three/layout.ts seatDir (kept import-free: audio.ts loads on the
  *  first script, which must never statically pull in three). Keep in sync with layout.seatDir. */

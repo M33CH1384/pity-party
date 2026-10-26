@@ -2,8 +2,8 @@
  * Builds an offline save where it's your lead and 'Run it!' is guaranteed (for capture scripts / manual checks).
  * Usage: npx tsx scripts/runit-state.ts [mode=joker] [cards=3] > /tmp/runit-save.json
  */
-import { applyAction, canRunIt, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction, pickBotNames } from '@spades/bots';
+import { applyAction, canRunIt, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction, pickBotNames } from '@pp/bots';
 import { DEFAULT_SETTINGS, settingsToRules } from '../apps/web/src/settings';
 
 const mode = (process.argv[2] ?? 'joker') as typeof DEFAULT_SETTINGS.mode;

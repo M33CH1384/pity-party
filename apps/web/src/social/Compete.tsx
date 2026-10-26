@@ -1,6 +1,6 @@
 /** Release 9b: Leaderboards and Tournaments tabs of the Social panel. */
 import { type FormEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { type OpenTable, type PresenceEntry } from '@spades/protocol';
+import { type OpenTable, type PresenceEntry } from '@pp/protocol';
 import { CoinIcon } from '../RepBlock';
 import { noteDailyBonus } from '../dailyBonus';
 import { fetchWagerList, type WagerRow } from './wagerApi';

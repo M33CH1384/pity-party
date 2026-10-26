@@ -1,4 +1,4 @@
-import type { Card } from '@spades/rules';
+import type { Card } from '@pp/rules';
 import { getDeckImage } from './decks';
 
 /**

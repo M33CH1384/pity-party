@@ -18,7 +18,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { Trick } from '@spades/rules';
+import type { Trick } from '@pp/rules';
 import { RecapTrickReview, TrickBrowserPanel } from '../src/TrickBrowser';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;

@@ -25,7 +25,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   RUNDOWN_FIRST, RUNDOWN_KING_LEG2, RUNDOWN_RETURN_CLEAR, RUNDOWN_RETURN_LOSS,
   STORY_STOPS, rundownFor, storyStopById,
-} from '@spades/bots';
+} from '@pp/bots';
 import DeeRundownPanel from '../src/story/DeeRundown';
 import { fixedRevealMs } from '../src/story/ScriptPlayer';
 import StoryTape from '../src/story/StoryTape';

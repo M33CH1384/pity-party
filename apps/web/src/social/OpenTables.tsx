@@ -5,7 +5,7 @@
  * legacy 3-player cutthroat has no chip here (owner, 2026-10-20 lobby restructure).
  */
 import { useEffect, useState } from 'react';
-import type { OpenTable } from '@spades/protocol';
+import type { OpenTable } from '@pp/protocol';
 import { social, useSocial } from './store';
 import { navigate } from '../online/nav';
 import { type VenueChoice, venueLabel } from '../venues';

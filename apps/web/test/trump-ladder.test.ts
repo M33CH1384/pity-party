@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { CLASSIC_JOKER, cardLabel, makeRules, trumpOrder } from '@spades/rules';
+import { CLASSIC_JOKER, cardLabel, makeRules, trumpOrder } from '@pp/rules';
 import { MODES } from '../src/settings';
 import { TrumpLadder, promotedTrumpLabels, trumpLadder, trumpLadderText } from '../src/trumpLadder';
 import { topTrumps } from '../src/glossary';

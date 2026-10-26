@@ -1,7 +1,7 @@
 import {
   type Card, type PlayerView, type Play, type TableRules,
   buildDeck, cardPower, effectiveSuit, handSize, isBooksHand, isNilBid, isTrump, partnerOf, sideOf, trickWinner,
-} from '@spades/rules';
+} from '@pp/rules';
 
 /** Derived facts a bot uses for decisions; computed only from the seat's view (no peeking). */
 export interface Knowledge {

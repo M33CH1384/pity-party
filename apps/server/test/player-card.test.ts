@@ -9,7 +9,7 @@ import { cardRankForLevel } from '../src/cred/xp';
 import { badgeCompletionFor, badgeKey, cardFor, cleanCardShowcase, cleanCardStatus, cleanCardTags, earnedBadgesFor, type BadgeSummary, type PlayerCardData } from '../src/cred/card';
 import { bigJokerSeasonActive, seasonIdFor } from '../src/cred/bigJokerSeason';
 import { ACHIEVEMENTS } from '../src/cred/achievements';
-import { STORY_BADGE_DEFS, STORY_SECRETS } from '@spades/bots';
+import { STORY_BADGE_DEFS, STORY_SECRETS } from '@pp/bots';
 import { handleCredHttp } from '../src/cred/routes';
 import { ensureSeason } from '../src/cred/seasons';
 

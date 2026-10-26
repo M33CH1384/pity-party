@@ -5,7 +5,7 @@
  */
 import { useState } from 'react';
 import { useEscapeClose } from './useEscapeClose';
-import { type Series, seriesTally } from '@spades/rules';
+import { type Series, seriesTally } from '@pp/rules';
 
 const KEY = 'bwm.series.v1';
 export function loadSeries(): Series | null {

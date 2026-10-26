@@ -1,5 +1,5 @@
 /** Drop flight at 390px in WebKit: one clean flight, no wiggle (screen x moves one way, ±1px). a dragged card flies from the finger to its trick spot and never goes back to the hand. Slow drop vs flick. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

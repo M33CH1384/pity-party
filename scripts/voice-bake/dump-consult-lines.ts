@@ -36,7 +36,7 @@ import {
   CONSULT_OWN, CONSULT_SETTLE_COMMON, CONSULT_SETTLE_SILENT, DEE_ACK_MISCOUNT, DEE_ACK_UNDERREAD,
   DEE_FREE, DEE_SETTLE, DEE_SETTLE_HIGH, DEE_SETTLE_LOW, DEE_SETTLE_TRIM, INTRO_COMMON, INTRO_OWN,
   INTRO_SILENT, PERSONAS, type GridTemplate, type PersonaId,
-} from '@spades/bots';
+} from '@pp/bots';
 
 const ROOT = join(import.meta.dirname, '../..');
 const PUB = join(ROOT, 'apps/web/public/voices/v2');

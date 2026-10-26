@@ -22,7 +22,7 @@
  *
  * This module is the READ side plus the canonical types. It never writes.
  */
-import type { PersonaId } from '@spades/bots';
+import type { PersonaId } from '@pp/bots';
 
 export const PERSONA_LEDGER_KEY = 'bwm.personaLedger.v1';
 

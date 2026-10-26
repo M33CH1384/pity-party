@@ -18,8 +18,8 @@
  * engine's time-based cooldowns behave as they do at a live table).
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BOT_NAMES, personaForName, simulateGame, type TalkLine } from '@spades/bots';
-import { applyAction, makeRules, type GameState, type TableRules } from '@spades/rules';
+import { BOT_NAMES, personaForName, simulateGame, type TalkLine } from '@pp/bots';
+import { applyAction, makeRules, type GameState, type TableRules } from '@pp/rules';
 import { offlineTalk } from '../src/offlineTalk';
 
 /** mulberry32 — small seeded PRNG so the counts below are stable. */

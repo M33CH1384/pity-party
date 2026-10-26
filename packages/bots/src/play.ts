@@ -1,4 +1,4 @@
-import { type Card, type PlayerView, type Play, type Rng, createRng, legalPlaysFor, trickWinner, trumpOrder } from '@spades/rules';
+import { type Card, type PlayerView, type Play, type Rng, createRng, legalPlaysFor, trickWinner, trumpOrder } from '@pp/rules';
 import { type BotLevel, type BotSkill, skillOf } from './bidding';
 import {
   type Knowledge, byPowerAsc, currentWinner, highest, isBoss, know, lowest, power, suitLength, suitOf, trump, winsNow,

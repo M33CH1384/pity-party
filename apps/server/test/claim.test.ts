@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type GameState, makeRules, scoreHand } from '@spades/rules';
+import { type GameState, makeRules, scoreHand } from '@pp/rules';
 import { sha256b64 } from '../src/auth/providers';
 import { makeD1 } from './d1';
 import { OFFLINE_PER_HOUR, handleLocalStats } from '../src/stats/local';

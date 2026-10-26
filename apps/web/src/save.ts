@@ -3,7 +3,7 @@
  * (their choices derive from the visible state + a per-turn seed), so state + settings + chat is everything
  * needed to resume at exactly the same point.
  */
-import { type GameState, pendingTurn, viewFor } from '@spades/rules';
+import { type GameState, pendingTurn, viewFor } from '@pp/rules';
 import type { ChatMsg } from './overlay';
 import { DEFAULT_SETTINGS, type Settings } from './settings';
 

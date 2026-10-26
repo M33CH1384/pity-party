@@ -1,9 +1,9 @@
 import { minimumChip } from './polishText';
 import { DECK_IDS } from './decks';
 import { isValidSetAnimSetting } from './setAnims';
-import { type VenueChoice, isVenueChoice } from '@spades/protocol';
-import { CLASSIC_JOKER, cardLabel, hostMinimum, type Mode, type RulesOverrides, type TableRules, makeRules } from '@spades/rules';
-import { type BotSkillSetting, skillSettingOf } from '@spades/bots';
+import { type VenueChoice, isVenueChoice } from '@pp/protocol';
+import { CLASSIC_JOKER, cardLabel, hostMinimum, type Mode, type RulesOverrides, type TableRules, makeRules } from '@pp/rules';
+import { type BotSkillSetting, skillSettingOf } from '@pp/bots';
 import { trumpLadderText } from './trumpLadder';
 
 export type ModeKey = 'joker' | 'cutthroat4' | 'cutthroat3' | 'aceDown';

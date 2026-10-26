@@ -1,4 +1,4 @@
-import { type Card, type GameState, type Play, type TableRules, isBooksHand, isTrump, trickWinner } from '@spades/rules';
+import { type Card, type GameState, type Play, type TableRules, isBooksHand, isTrump, trickWinner } from '@pp/rules';
 
 /**
  * Landing cues for a played card: always 'play'; + 'cut' when trumping a non-trump lead; + 'broken' (bigger, wins) for

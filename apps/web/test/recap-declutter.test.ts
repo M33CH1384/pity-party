@@ -2,8 +2,8 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { Intermission } from '../src/Intermission';
 
 function toHandOver(rules: ReturnType<typeof makeRules>): GameState {

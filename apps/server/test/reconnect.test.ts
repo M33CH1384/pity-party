@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeRules, type GameState } from '@spades/rules';
+import { makeRules, type GameState } from '@pp/rules';
 import { dispatchTableMessage } from '../src/dispatch';
 import { FakeEnv } from './harness';
 

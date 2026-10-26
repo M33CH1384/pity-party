@@ -10,7 +10,7 @@ import {
   type Bid, type GameResult, type GameState, type HandRecord, type TableRules, type Trick,
   booksStillNeeded, isNilBid, isTrump, naturalSuit, partnerOf, sideCount, sideOf, sideSeats,
   trickWinner, tricksStillRemaining,
-} from '@spades/rules';
+} from '@pp/rules';
 import { wheelsMade } from '../landCue';
 
 /* ------------------------------------------------------------ thresholds */

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { type GameState, type HandRecord, applyAction, makeRules, newGame, pendingTurn, scoreHand, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { type GameState, type HandRecord, applyAction, makeRules, newGame, pendingTurn, scoreHand, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { ScorePad, rulesChips, rulesLine } from '../src/ScorePad';
 
 function playHands(n: number, rules = makeRules('joker', { targetScore: 250 })): GameState {

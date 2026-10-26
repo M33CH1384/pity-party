@@ -11,13 +11,13 @@
  * individual courts, so no per-card identities are claimed for them.
  *
  * Per-card facts come from exactly one source: the Revolutionaries deck's
- * figure table in @spades/bots (REV_FIGURE_BY_CARD) — the same name +
+ * figure table in @pp/bots (REV_FIGURE_BY_CARD) — the same name +
  * one-true-stroke tribute lines the table-talk engine speaks when those
  * cards are honored at the Barbershop. Every other deck returns no fact:
  * the close-up shows the card, never an invented story about it.
  */
-import { REV_FIGURE_BY_CARD } from '@spades/bots';
-import type { Card } from '@spades/rules';
+import { REV_FIGURE_BY_CARD } from '@pp/bots';
+import type { Card } from '@pp/rules';
 
 export interface DeckLore { tag: string; blurb: string }
 

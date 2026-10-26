@@ -6,7 +6,7 @@
  * no broken-image icon and no layout shift.
  */
 import { useState } from 'react';
-import { storyPortraitFor } from '@spades/bots';
+import { storyPortraitFor } from '@pp/bots';
 import './storyFace.css';
 
 export default function StoryFace({ characterId, name, className = '' }: { characterId: string; name: string; className?: string }) {

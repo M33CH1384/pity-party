@@ -1,5 +1,5 @@
 # Bid Wit Me audit for Pity Party (read-only)
-Snapshot: M33CH1384/bid-wit-me master @ 99cd6c5 (10/26/2026). pnpm monorepo: apps/web (Vite/React/three, Pages), apps/server (Worker + DOs + D1), packages/{rules,bots,protocol} (all named `@spades/*`).
+Snapshot: M33CH1384/bid-wit-me master @ 99cd6c5 (10/26/2026). pnpm monorepo: apps/web (Vite/React/three, Pages), apps/server (Worker + DOs + D1), packages/{rules,bots,protocol} (all named `@pp/*`).
 
 ## Size (TS/TSX only)
 | Area | Files | LOC |
@@ -38,7 +38,7 @@ Snapshot: M33CH1384/bid-wit-me master @ 99cd6c5 (10/26/2026). pnpm monorepo: app
 8. Migrations 0003/0004/0005/0016/0017/0019–0027/0029/0032/0033 embed game/story stats.
 
 ## Coupling
-- Server: **9 files** import `@spades/rules` (index.ts, room.ts, stats/{local,highlights,record}, tournament/{service,routes}, wager/{service,routes}).
-- Web: **101 files** import `@spades/*`; 56 import rules specifically; by dir: top-level 51, story 15, online 5, three 3, social 1, profile 1, account/push 0.
-- 66 `from '@spades/rules'` import statements total across server+web.
+- Server: **9 files** import `@pp/rules` (index.ts, room.ts, stats/{local,highlights,record}, tournament/{service,routes}, wager/{service,routes}).
+- Web: **101 files** import `@pp/*`; 56 import rules specifically; by dir: top-level 51, story 15, online 5, three 3, social 1, profile 1, account/push 0.
+- 66 `from '@pp/rules'` import statements total across server+web.
 - Verdict: shell is moderately coupled — server is concentrated (room.ts/index.ts), web is diffuse (top-level components). Social/auth/push/account are clean.

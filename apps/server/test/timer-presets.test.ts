@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeRules, type GameState } from '@spades/rules';
+import { makeRules, type GameState } from '@pp/rules';
 import { FakeEnv } from './harness';
 
 const FAST = { botMs: 10, trickPauseMs: 0, dealMs: 0, disconnectGraceMs: 5000, handOverMs: 3000 };

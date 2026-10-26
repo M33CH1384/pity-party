@@ -35,7 +35,7 @@
  * horizontal scrollers clipped by the scrollport. */
 import { chromium } from 'playwright-core';
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { makeRules, newGame } from '@spades/rules';
+import { makeRules, newGame } from '@pp/rules';
 import { DEFAULT_SETTINGS } from '../apps/web/src/settings.ts';
 
 const args = {};

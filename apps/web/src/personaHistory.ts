@@ -15,7 +15,7 @@
  * at zero on ship day and every number a persona cites was earned at
  * this table, on this device.
  *
- * The talk engine (@spades/bots historyTalk.ts) consumes the
+ * The talk engine (@pp/bots historyTalk.ts) consumes the
  * speaker's-eye view: histViewsForSeats below converts each persona's
  * ledger splits through histViewFromLedger (vs numbers invert — a
  * persona's "I'm up 7–4" is the viewer's 4–7; together numbers don't —
@@ -24,7 +24,7 @@
 import {
   type HistView, type PersonaId,
   histViewAny, histViewFromLedger, personaForName,
-} from '@spades/bots';
+} from '@pp/bots';
 import {
   PERSONA_LEDGER_KEY, parsePersonaLedger,
   type PersonaLedger, type PersonaLedgerEntry, type PersonaLedgerSplit,

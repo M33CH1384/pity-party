@@ -5,9 +5,9 @@
  * A body with claim: true is a retroactive claim of a guest game (see game_claims): same rebuild,
  * same validation, same rates — plus the one-account-ever registry for that game id.
  */
-import type { GameState } from '@spades/rules';
-import { sideCount } from '@spades/rules';
-import { cleanTeamName } from '@spades/protocol';
+import type { GameState } from '@pp/rules';
+import { sideCount } from '@pp/rules';
+import { cleanTeamName } from '@pp/protocol';
 import { type AuthEnv, currentUser, fromSite } from '../auth/routes';
 import { cleanName } from '../filter';
 import { type SeatRef, buildRecord, saveRecord } from './record';

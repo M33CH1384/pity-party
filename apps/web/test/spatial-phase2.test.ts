@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { VENUES } from '@spades/protocol';
+import { VENUES } from '@pp/protocol';
 import { cameraFor } from '../src/three/layout';
 import { DEFAULT_CATEGORY_VOLUMES, ROOM_STYLES, SOUNDSCAPE_ROOMS, styleForVenue, Spatializer, defaultAudioQuality, isVoiceMuted, listenerPose, normalizeCategoryVolumes, pannerCap, pickPanningModel, resolveSoundscape, roomName, seatPoint, withVoiceMuted, type SpatialCtxLike } from '../src/spatial';
 

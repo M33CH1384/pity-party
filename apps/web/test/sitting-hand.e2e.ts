@@ -1,5 +1,5 @@
 /** LIVE BUG: sitting camera cropped the hand. Assert all 13 hand cards + plate inside the viewport. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

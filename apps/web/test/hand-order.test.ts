@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type Card, makeRules, sortHand } from '@spades/rules';
+import { type Card, makeRules, sortHand } from '@pp/rules';
 import { departureSlot, handCardKey, handReactKey, retainHandOrder } from '../src/handOrder';
 
 const rules = makeRules('joker', { firstHandBidsItself: false });

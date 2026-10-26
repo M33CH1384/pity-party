@@ -1,6 +1,6 @@
 /**
  * Recorded bot voices (Kokoro-82M, Apache-2.0). Every persona has a female and a male voice; the bot's NAME picks
- * which (voiceGender in @spades/bots), so a female name never gets a male voice. All of a persona-gender's lines live
+ * which (voiceGender in @pp/bots), so a female name never gets a male voice. All of a persona-gender's lines live
  * in ONE audio sprite (/voices/v2/<persona>-<f|m>.(webm|m4a)) with a small JSON of [startMs, durMs] per raw line, so
  * a seated bot costs one fetch and nothing else is downloaded. Lines are matched by their raw (unfilled) template;
  * templated lines have a generic take ("SET! {opp} going backwards" → "Set! Y'all going backwards!"), and the
@@ -8,7 +8,7 @@
  * which talkPrefs fences off during live play — so at a table they are text-only (prevention pass, 2026-10-21).
  * Opus/WebM where the browser can play it, else AAC/M4A (Safari).
  */
-import { type PersonaId, lineById, storyCastForName, storyVoiceKey, voiceFor } from '@spades/bots';
+import { type PersonaId, lineById, storyCastForName, storyVoiceKey, voiceFor } from '@pp/bots';
 import { decodeAudioBuffer, sound } from '../audio';
 import { audioElementPool } from '../audioPool';
 import { VERSION } from '../version';

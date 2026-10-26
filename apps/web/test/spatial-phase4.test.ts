@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { IR_SPECS, ROOM_STYLES, irSpec, sessionRoom, surfaceHz } from '../src/spatial';
-import { VENUES } from '@spades/protocol';
+import { VENUES } from '@pp/protocol';
 
 describe('spatial phase 4: unified room (seen = heard = named)', () => {
   it('one style per room for all 11 venues, each with reverb + surface character', () => {

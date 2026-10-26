@@ -22,7 +22,7 @@
  * Delivery, per-type prefs, cooldown-free fan-out and dead-subscription
  * pruning are the push layer's (push/send.ts sendPushToUser).
  */
-import { STORY_CHARACTERS, STORY_STOPS } from '@spades/bots';
+import { STORY_CHARACTERS, STORY_STOPS } from '@pp/bots';
 import { sendPushToUser, type PushPayload } from '../push/send';
 import type { VapidKeys } from '../push/crypto';
 

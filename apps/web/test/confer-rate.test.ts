@@ -23,8 +23,8 @@
  *    tables — the claim at the speaker's plate via deps.callout.
  */
 import { describe, expect, it, vi } from 'vitest';
-import { applyAction, makeRules, newGame, nextBidder, pendingTurn, viewFor, type GameState } from '@spades/rules';
-import { botSkillFor, chooseBotAction, pickBotNames, platePersona } from '@spades/bots';
+import { applyAction, makeRules, newGame, nextBidder, pendingTurn, viewFor, type GameState } from '@pp/rules';
+import { botSkillFor, chooseBotAction, pickBotNames, platePersona } from '@pp/bots';
 
 vi.mock('../src/talkPrefs', () => ({
   talkPrefs: { get: () => ({ botTalk: true, hideBotTalk: false, voices: true, voiceVolume: 0.6, aiVoices: true }) },

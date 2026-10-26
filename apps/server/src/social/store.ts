@@ -1,5 +1,5 @@
 /** D1 access for the Social hub (friends, blocks, DMs, reports, settings, ratings). Pure async functions over D1. */
-import { isFriendActivity, type ChatReactions, type DmLine, type FriendActivity, type FriendRef, type FriendsState, type ReplyRef, type SocialSettings } from '@spades/protocol';
+import { isFriendActivity, type ChatReactions, type DmLine, type FriendActivity, type FriendRef, type FriendsState, type ReplyRef, type SocialSettings } from '@pp/protocol';
 import { usersByKeys } from './mentions';
 
 export const pair = (x: string, y: string): [string, string] => (x < y ? [x, y] : [y, x]);

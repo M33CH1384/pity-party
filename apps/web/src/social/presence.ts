@@ -1,4 +1,4 @@
-import { PRESENCE_STALE_MS, activityLabel, activityOf, statusLabel, type FriendRef, type OpenTable, type PresenceEntry, type PresenceStatus, stalePresence } from '@spades/protocol';
+import { PRESENCE_STALE_MS, activityLabel, activityOf, statusLabel, type FriendRef, type OpenTable, type PresenceEntry, type PresenceStatus, stalePresence } from '@pp/protocol';
 
 /**
  * The Friends-row "Last online …" label for a friend's last_seen stamp

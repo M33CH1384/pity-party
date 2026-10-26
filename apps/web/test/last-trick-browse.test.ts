@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { CLASSIC_JOKER, makeRules, type GameState, type Trick } from '@spades/rules';
-import { simulateGame } from '@spades/bots';
+import { CLASSIC_JOKER, makeRules, type GameState, type Trick } from '@pp/rules';
+import { simulateGame } from '@pp/bots';
 import { browsedTrick, resolveTrickIndex, stepTrickIndex, trickPositionLabel } from '../src/lastTrickBrowse';
 
 /**

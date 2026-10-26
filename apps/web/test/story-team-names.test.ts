@@ -14,8 +14,8 @@
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { STORY_CHARACTERS, STORY_STOPS } from '@spades/bots';
-import { TEAM_NAME_MAX, TEAM_NAME_POOL } from '@spades/protocol';
+import { STORY_CHARACTERS, STORY_STOPS } from '@pp/bots';
+import { TEAM_NAME_MAX, TEAM_NAME_POOL } from '@pp/protocol';
 import { storyPairLabel, storyTeamNames } from '../src/story/storySettings';
 
 const read = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');

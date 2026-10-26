@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { LIMITS, type RoomInfo, type SeatInfo } from '@spades/protocol';
+import { LIMITS, type RoomInfo, type SeatInfo } from '@pp/protocol';
 import { joinableSeats, spectatorsFull } from '../src/online/joinable';
 
 function room(over: Partial<RoomInfo> & { seats: SeatInfo[] }): RoomInfo {

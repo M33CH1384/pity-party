@@ -20,10 +20,10 @@
  * Status vs tagline: the tagline (0013) is the profile's longer line where
  * links WORK by design. The card status is the card's own shorter line
  * (cap 90). Both pass through the same shared hygiene helpers
- * (cleanText + maskProfanity from @spades/protocol, via ../filter) — the
+ * (cleanText + maskProfanity from @pp/protocol, via ../filter) — the
  * same treatment chat text gets; there is no second filter.
  */
-import { STORY_BADGE_DEFS, STORY_STOPS, storyBadgesFor, type StoryBadgeFacts } from '@spades/bots';
+import { STORY_BADGE_DEFS, STORY_STOPS, storyBadgesFor, type StoryBadgeFacts } from '@pp/bots';
 import { cleanText, maskProfanity } from '../filter';
 import { myStats, personalStats, type MyModeStats } from '../stats/boards';
 import { ACHIEVEMENTS, achievementStates } from './achievements';
@@ -76,7 +76,7 @@ export const badgeKey = (b: { kind: BadgeKind; id: string }): string => `${b.kin
  * EXACT set this derivation uses — auditable, owner-vetoable:
  *   - the Rep achievements: all 18 defs in cred/achievements.ts
  *     (ACHIEVEMENTS: first-dub … after-dark), AND
- *   - the story badges: all 13 defs in @spades/bots STORY_BADGE_DEFS
+ *   - the story badges: all 13 defs in @pp/bots STORY_BADGE_DEFS
  *     (porch-graduate … run-it-back).
  * Total earnable = 31. The third pool — synced progress badges
  * (progress.data, e.g. storm-chaser) — is deliberately EXCLUDED: it is an

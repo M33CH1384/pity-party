@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Action, Card, GameState, Play } from '@spades/rules';
+import type { Action, Card, GameState, Play } from '@pp/rules';
 
 const store = new Map<string, string>();
 const fakeStorage = { getItem: (k: string) => store.get(k) ?? null, setItem: (k: string, v: string) => void store.set(k, v), removeItem: (k: string) => void store.delete(k) };
 vi.stubGlobal('localStorage', fakeStorage);
 vi.stubGlobal('sessionStorage', fakeStorage);
 
-const { makeRules, newGame } = await import('@spades/rules');
-const { REV_MALCOLM_CUT_LINES } = await import('@spades/bots');
+const { makeRules, newGame } = await import('@pp/rules');
+const { REV_MALCOLM_CUT_LINES } = await import('@pp/bots');
 const { offlineTalk } = await import('../src/offlineTalk');
 const { setActiveDeck } = await import('../src/decks');
 const { talkPrefs } = await import('../src/talkPrefs');

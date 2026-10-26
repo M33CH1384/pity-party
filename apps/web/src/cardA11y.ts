@@ -1,4 +1,4 @@
-import { type Card, type Suit } from '@spades/rules';
+import { type Card, type Suit } from '@pp/rules';
 
 const RANK_NAME: Record<string, string> = {
   '2': 'Two', '3': 'Three', '4': 'Four', '5': 'Five', '6': 'Six', '7': 'Seven',

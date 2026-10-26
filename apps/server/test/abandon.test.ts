@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeRules } from '@spades/rules';
+import { makeRules } from '@pp/rules';
 import { FakeEnv } from './harness';
 import { makeD1 } from './d1';
 import { type GameRecord, leaverLoss, saveRecord } from '../src/stats/record';

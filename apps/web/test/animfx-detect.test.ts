@@ -5,7 +5,7 @@
  * Wheels readings of a scored hand record.
  */
 import { describe, expect, it } from 'vitest';
-import { makeRules, type HandRecord, type Trick } from '@spades/rules';
+import { makeRules, type HandRecord, type Trick } from '@pp/rules';
 import {
   FIRE_STREAK, HEAT_STREAK, PHOTO_FINISH_MARGIN, UPSET_GAP, bagBrinkSides,
   bagPenaltySides, bagsCrossed, bigJokerSeat, blindNilSeats, bostonSides,

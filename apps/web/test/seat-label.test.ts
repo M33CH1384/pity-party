@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { makeRules } from '@spades/rules';
-import type { RoomInfo } from '@spades/protocol';
+import { makeRules } from '@pp/rules';
+import type { RoomInfo } from '@pp/protocol';
 import { biddingNote, noticeTip, seatFacingName, seatInitial, trickTakenLine } from '../src/seatLabel';
 import { rotation } from '../src/online/rotate';
 import { chatUserLabel, localNames } from '../src/online/useOnline';

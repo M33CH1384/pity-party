@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@spades/rules';
+import { type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@pp/rules';
 const J = (o: Record<string, unknown> = {}) => makeRules('joker', o);
 import { chooseBotAction, loudLoser, momentsFor, type TalkEvent } from '../src';
 

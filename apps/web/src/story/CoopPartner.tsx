@@ -24,8 +24,8 @@
  * pair track payload — or it is not shown at all.
  */
 import { useEffect, useState } from 'react';
-import { STORY_STOPS, storyStopById } from '@spades/bots';
-import type { FriendRef } from '@spades/protocol';
+import { STORY_STOPS, storyStopById } from '@pp/bots';
+import type { FriendRef } from '@pp/protocol';
 import { social, useSocial } from '../social/store';
 import { friendPresenceView, type FriendPresenceView } from '../social/presence';
 import { AvatarCircle, accountUidOf, useAvatar } from '../avatar';

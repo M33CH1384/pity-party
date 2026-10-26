@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { STORY_CHARACTERS, STORY_VOICE_CAST } from '@spades/bots';
+import { STORY_CHARACTERS, STORY_VOICE_CAST } from '@pp/bots';
 import { VOICE_DEFER_MAX_WAIT_S, VOICE_DUCK_FACTOR, VOICE_MAX_OVERLAP_REMAINING_S, VOICE_TAIL_S, planVoiceArrival, voiceRoomWaitS, type ActiveVoiceInfo } from '../src/audio';
 
 /**

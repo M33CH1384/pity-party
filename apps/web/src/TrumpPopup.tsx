@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { type TableRules, trumpOrder } from '@spades/rules';
+import { type TableRules, trumpOrder } from '@pp/rules';
 import { TrumpLadder } from './trumpLadder';
 
 /**

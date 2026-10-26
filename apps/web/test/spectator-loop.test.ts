@@ -9,9 +9,9 @@ import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
-import { applyAction, makeRules, newGame, pendingTurn, spectatorView, viewFor, type GameState, type PlayerView } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
-import type { RoomInfo } from '@spades/protocol';
+import { applyAction, makeRules, newGame, pendingTurn, spectatorView, viewFor, type GameState, type PlayerView } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
+import type { RoomInfo } from '@pp/protocol';
 import Table from '../src/Table';
 
 vi.mock('../src/three/Scene', async () => {

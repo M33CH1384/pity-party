@@ -27,7 +27,7 @@
  * offline-game upload, /api/stats/local — offline games are rebuilt and
  * checked there; story stops are offline games, so progress writes are
  * unlock-checked and reward-capped here). Rewards are computed from the stop
- * number by @spades/bots storyReward — never from client-sent amounts.
+ * number by @pp/bots storyReward — never from client-sent amounts.
  * Idempotent per gameId: re-posting the same finished game returns the
  * stored outcome without re-crediting or re-counting the attempt.
  *
@@ -36,7 +36,7 @@
  * suppressed client-side so it can't be double-counted as a normal bot game.
  *
  * Tracks: Phase 1 writes the 'solo' track only. The track-key shape
- * ('pair:<uidA>:<uidB>', see storyPairTrackKey in @spades/bots) is validated
+ * ('pair:<uidA>:<uidB>', see storyPairTrackKey in @pp/bots) is validated
  * now so Phase 2 co-op writes land in the same tables unchanged.
  */
 import { type AuthEnv, currentUser } from '../auth/routes';
@@ -45,8 +45,8 @@ import {
   STORY_CHARACTERS, STORY_LOSS_REWARD, STORY_SECRETS, STORY_STOPS, STORY_SOLO_TRACK, awarenessCaseFor, mannerBandOf, storyClearReward, storyCurrentStop, storyEggById, storyEggEventMet,
   storyEndReasonOf, storyFeatMet, storyPairTrackKey, storyPairUids, storyReward, storyStopById, storyStopState, storyTrackKeyValid, targetForStop,
   type AwarenessCase, type StoryBuzzInput, type StoryEndReason, type StoryGameFacts, type StoryMatchEvent, type StoryStop,
-} from '@spades/bots';
-import { CODE_ALPHABET, CODE_LENGTH, isRoomCode, normalizeRoomCode } from '@spades/protocol';
+} from '@pp/bots';
+import { CODE_ALPHABET, CODE_LENGTH, isRoomCode, normalizeRoomCode } from '@pp/protocol';
 import { awardXp } from '../cred/xp';
 import { move } from '../cred/coins';
 import { grantUnlock } from '../cred/achievements';

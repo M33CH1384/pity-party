@@ -1,5 +1,5 @@
 /** Phase 4: loading screen names the unified room, stays >=3.0s, ambience bed starts before dismiss. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import type { HandHitCard } from '../src/three/handHit';

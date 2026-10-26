@@ -1,4 +1,4 @@
-import type { Trick } from '@spades/rules';
+import type { Trick } from '@pp/rules';
 
 /**
  * Browsing state for the last-trick readout (owner, 2026-10-23: "Last trick

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { PERSONAS, type BotSkill, type PersonaId, type StoryTape } from '@spades/bots';
+import { PERSONAS, type BotSkill, type PersonaId, type StoryTape } from '@pp/bots';
 import { AvatarCircle, useAvatar } from './avatar';
 import PersonaFace from './PersonaFace';
 import StoryFace from './story/StoryFace';

@@ -2,7 +2,7 @@
 -- see if a person is online playing a solo game, partner game, or story
 -- mode (solo or co-op) when they look at the Friends tab."
 -- One row per signed-in user: the last reported activity (the FriendActivity
--- enum in @spades/protocol: online | bot-game | online-match | story-solo |
+-- enum in @pp/protocol: online | bot-game | online-match | story-solo |
 -- story-coop) and when it was reported. Two writers, one upsert in
 -- SocialStore.stampPresence: the Social hub derives it from the socket's
 -- live status (on change, plus its ~1/min stamp cadence), and

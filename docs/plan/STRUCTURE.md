@@ -4,7 +4,7 @@
 ## Copy plan
 Keep: apps/server {auth, social, push, feedback, limits, filter, admin, cred (minus Spades bits), dispatch}, apps/web {online, social, account, profile, push, settings, audio engine, three shell + 2–3 venue rooms, transitions, PWA}, workflows, tsconfig/vitest/pnpm setup.
 Strip: packages/bots (keep names/pronounce), story/ (web+server+bots), voice/rundown assets, Spades UI files listed in AUDIT (a), tournaments + wagers (stub, return later), 526 MB public/ (copy only needed audio/venue art; new art from Desi).
-Stub: packages/rules → `packages/game` with placeholder engine; rename scope `@spades/*` → `@pp/*`.
+Stub: packages/rules → `packages/game` with placeholder engine; rename scope `@pp/*` → `@pp/*`.
 Migrations: squash generic tables into a fresh `0001_init.sql` (accounts, sessions, passkeys, social, dms, push, cred/coins, presence, mutes, player_card); new game tables later.
 
 ## Game interface = rule-set registry (packages/game)

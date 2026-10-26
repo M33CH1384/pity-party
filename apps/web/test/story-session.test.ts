@@ -8,7 +8,7 @@
  * player back to an unfinished game. Normal games never ping.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { makeRules, newGame } from '@spades/rules';
+import { makeRules, newGame } from '@pp/rules';
 import { clearStoryGame, loadStoryGame, saveStoryGame, type StorySavedGame } from '../src/story/storySave';
 import { resetStorySessionPings } from '../src/story/storyApi';
 import { saveGame } from '../src/save';

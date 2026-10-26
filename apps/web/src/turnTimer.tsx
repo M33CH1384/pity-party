@@ -1,4 +1,4 @@
-import type { TableRules } from '@spades/rules';
+import type { TableRules } from '@pp/rules';
 
 /**
  * Host presets. The play clock is never shorter than the bid clock: a trick takes longer

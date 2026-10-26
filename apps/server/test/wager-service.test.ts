@@ -1,6 +1,6 @@
 /** Big Bank Take Lil Bank (Phase 1): challenge lifecycle over a fake WIO — create/accept/decline/cancel/check-in/alarms and EVERY settlement branch, with real D1 coin balances as the assertion surface. */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { makeRules } from '@spades/rules';
+import { makeRules } from '@pp/rules';
 import { makeD1 } from './d1';
 import { balance, move } from '../src/cred/coins';
 import { awardXp, xpAtLevel } from '../src/cred/xp';

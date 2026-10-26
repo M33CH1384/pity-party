@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyAction, makeRules, newGame, viewFor, type GameState } from '@spades/rules';
+import { applyAction, makeRules, newGame, viewFor, type GameState } from '@pp/rules';
 import { MISDEAL_DEAL_SPEED, MISDEAL_REVEAL_DWELL_MS, MISDEAL_REVEAL_MS, MISDEAL_REVEAL_REDUCED_MS, misdealDealMs, misdealRevealKey, misdealRevealMs, misdealSequenceMs } from '../src/misdeal';
 import { dealTimeline } from '../src/three/dealTimeline';
 import { rotateView } from '../src/online/rotate';

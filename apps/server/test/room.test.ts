@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { type Card, type Seat, bidOrder, checkGameEnd, handSize, legalPlays, makeRules, scoreHand, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
-import type { GameAction } from '@spades/protocol';
-import { HAND_END_HOLD_MS } from '@spades/protocol';
-import { BOT_NAMES } from '@spades/bots';
+import { type Card, type Seat, bidOrder, checkGameEnd, handSize, legalPlays, makeRules, scoreHand, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
+import type { GameAction } from '@pp/protocol';
+import { HAND_END_HOLD_MS } from '@pp/protocol';
+import { BOT_NAMES } from '@pp/bots';
 import { BOT_WATCHDOG_MS, HOST_DISCONNECT_GRACE_MS } from '../src/room';
 import { FakeEnv } from './harness';
 
@@ -504,7 +504,7 @@ describe('game', () => {
     expect(env.persists).toBeGreaterThan(0);
     expect(result.finalScores).toHaveLength(2);
     expect(result.winners.length).toBeGreaterThan(0);
-    // Every legal way a completed game can end is GameResult.endReason (@spades/rules
+    // Every legal way a completed game can end is GameResult.endReason (@pp/rules
     // scoring): on the final hand the engine checks third-set, then shot-out, then
     // target/floor, so a bot-played game may legitimately end by any of the four. The old
     // else-branch assumed "not target/floor" meant shotOut and flaked whenever a side's
@@ -523,7 +523,7 @@ describe('game', () => {
     const { env } = fourHumans();
     env.send('a', { t: 'start' });
     for (let i = 0; i < 5000 && (env.room.data.game?.history.length ?? 0) < 2; i++) if (!playTurn(env, ['a', 'b', 'c', 'd'])) env.advance(100);
-    const states = env.raw.filter((m) => m.t === 'state' && m.view) as Extract<import('@spades/protocol').ServerMsg, { t: 'state' }>[];
+    const states = env.raw.filter((m) => m.t === 'state' && m.view) as Extract<import('@pp/protocol').ServerMsg, { t: 'state' }>[];
     const full = states.filter((m) => m.view!.history !== null).length;
     expect(full).toBeLessThan(states.length / 10);
     expect(env.last('a', 'state')!.view!.history).toHaveLength(env.room.data.game!.history.length);

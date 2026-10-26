@@ -1,4 +1,4 @@
-import { type Bid, type GameState, isFreshDeal } from '@spades/rules';
+import { type Bid, type GameState, isFreshDeal } from '@pp/rules';
 
 /** Bid and books as dealt for one hand, used to tell a new hand from a copied tally. */
 export interface HandTally {

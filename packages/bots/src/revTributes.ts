@@ -37,7 +37,7 @@
  * corpus under mrColeman/june, persona worklist under kind 'tribute'), which
  * is what lets the voice studio record them like any other line.
  */
-import { type Action, type Card, type GameState, isTrump, rulesForLive, sideOf, trickWinner } from '@spades/rules';
+import { type Action, type Card, type GameState, isTrump, rulesForLive, sideOf, trickWinner } from '@pp/rules';
 
 export interface RevFigure {
   card: Card;

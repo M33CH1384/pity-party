@@ -10,7 +10,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { makeD1 } from './d1';
 import { sha256b64 } from '../src/auth/providers';
 import { handleStoryHttp, personalHistoryFor } from '../src/story/routes';
-import { STORY_STOPS, storyPairTrackKey } from '@spades/bots';
+import { STORY_STOPS, storyPairTrackKey } from '@pp/bots';
 
 let db: D1Database;
 const NOW = 1_800_000_000_000;

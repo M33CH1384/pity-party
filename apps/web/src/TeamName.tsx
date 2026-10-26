@@ -1,7 +1,7 @@
 /** Team names: per-pairing names (owner, 2026-10-20), the retired global offline
  *  name it migrates from, and the name editors used at setup and online. */
 import { type FormEvent, useCallback, useEffect, useState, useSyncExternalStore } from 'react';
-import { TEAM_NAME_MAX, cleanTeamName } from '@spades/protocol';
+import { TEAM_NAME_MAX, cleanTeamName } from '@pp/protocol';
 
 const KEY = 'bwm.teamName';
 const subs = new Set<() => void>();

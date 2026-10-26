@@ -6,7 +6,7 @@
  *  rewards: each is matched to a Story Mode stop and unlocks when the player CLEARS
  *  that stop (derived from story progress — see storyDecks.ts). `locked` on a story
  *  deck means "gated by a stop", never purchasable (beta rule: no real-money sales). */
-import type { Card } from '@spades/rules';
+import type { Card } from '@pp/rules';
 import { noteDiag } from './diagnostics';
 
 export interface DeckDef {

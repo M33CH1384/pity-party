@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { SeatInfo } from '@spades/protocol';
+import type { SeatInfo } from '@pp/protocol';
 import { loserCaption, victoryHeadline, victoryIdentity } from '../src/online/victory';
 
 describe('game-over labels', () => {

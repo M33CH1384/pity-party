@@ -7,8 +7,8 @@
  *   mid: the trick is in the middle of the hand (2+ tricks to go after it); last: the hand's last trick
  * Prints the card you should play on the last line of stderr.
  */
-import { applyAction, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction, pickBotNames } from '@spades/bots';
+import { applyAction, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction, pickBotNames } from '@pp/bots';
 import { DEFAULT_SETTINGS, settingsToRules } from '../apps/web/src/settings';
 
 const order = process.argv[2] ?? 'lb';

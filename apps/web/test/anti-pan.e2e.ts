@@ -3,7 +3,7 @@
  * Drags that start on a card, in the gaps, on the plate and along the bottom edge must never scroll or pan
  * the page (scrollY and visualViewport.offsetTop stay 0), and a card drag still plays.
  */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { chromium, devices, webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

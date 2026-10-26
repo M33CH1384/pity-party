@@ -6,7 +6,7 @@
  * - Hustler persona plays dumb ('newbie' pool) until it pulls off a cut / lead-taking spade / set, then reveals once.
  */
 import { COMMON, LINE_META, PACK_OWNERS, PERSONA_PORTRAITS, PERSONAS, type LineFact, type LineMeta, type PersonaId, type TalkIntensity, type TalkKind, lineAllowed, lineFitsGender, personaForName, personaPortraitFor, personaSkillFloor } from './personas';
-import type { GameState } from '@spades/rules';
+import type { GameState } from '@pp/rules';
 import { banterContextFor } from './moments';
 import { REV_MALCOLM_CUT_LINES, REV_TRIBUTE_TEXTS } from './revTributes';
 import { possessive, voiceGender } from './names';

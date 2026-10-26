@@ -1,5 +1,5 @@
 /** Turn up toggle at 390px: visible under the YOU plate, OFF by default, flips ON and persists. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 const SHOTS = process.env.BWM_SHOTS ?? '/opt/cursor/artifacts';

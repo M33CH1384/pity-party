@@ -3,7 +3,7 @@
  *  state. No table is ever scored with invented ratings. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import type { OpenTable, PresenceEntry } from '@spades/protocol';
+import type { OpenTable, PresenceEntry } from '@pp/protocol';
 import { pickFeaturedTable } from '../src/social/Compete';
 
 const read = (rel: string) => readFileSync(new URL(rel, import.meta.url), 'utf8');

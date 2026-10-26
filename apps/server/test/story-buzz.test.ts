@@ -4,7 +4,7 @@
  * pair gossiping about how the pair handled the PREVIOUS stop — was
  * driven only by the solo table (Table.tsx, state in the device save).
  * In co-op the ROOM drives it: same selector and pools
- * (@spades/bots buzzMomentFor, unchanged), same moments (the sit-down,
+ * (@pp/bots buzzMomentFor, unchanged), same moments (the sit-down,
  * hand ends no scripted beat took), same discipline (seeded
  * per-attempt roll, cap one a match, said-set no-repeat) — with the
  * per-match cursor and the PAIR track's facts held in the room, so
@@ -17,12 +17,12 @@
  * the same expectations the room is then held to, verbatim.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createRng, type Card } from '@spades/rules';
+import { createRng, type Card } from '@pp/rules';
 import {
   STORY_BUZZ, buzzMomentFor, chooseBotAction, mannerBandOf, storyFactsOf, storyPairTrackKey, storyStopById, targetForStop,
   type BuzzFacts, type StoryBuzzInput,
-} from '@spades/bots';
-import type { ChatLine, GameAction } from '@spades/protocol';
+} from '@pp/bots';
+import type { ChatLine, GameAction } from '@pp/protocol';
 import { FakeEnv } from './harness';
 import { makeD1 } from './d1';
 import { buzzInputsFor } from '../src/story/routes';

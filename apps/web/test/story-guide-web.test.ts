@@ -23,7 +23,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   PAIR_AWARENESS_RUNDOWNS, PAIR_FIRST_RUNDOWNS, PAIR_RETURN_LOSS_RUNDOWNS,
   STORY_STOPS, coopRundownFor, storyRulesForStop,
-} from '@spades/bots';
+} from '@pp/bots';
 import type { ConnState } from '../src/online/connection';
 import { useOnlineChat } from '../src/online/useOnline';
 import { StoryRoomInner, GuidePlate } from '../src/story/StoryRoom';

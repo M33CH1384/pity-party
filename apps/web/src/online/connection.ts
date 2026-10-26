@@ -4,8 +4,8 @@
  * reconnect land back in the same seat.
  */
 import { TICKET_RETRY_MS, accountTicketState, clearAccountTicket } from '../social/store';
-import type { ChatLine, ClientMsg, GameAction, RoomInfo, RunPlayback, ServerMsg } from '@spades/protocol';
-import type { PlayerView } from '@spades/rules';
+import type { ChatLine, ClientMsg, GameAction, RoomInfo, RunPlayback, ServerMsg } from '@pp/protocol';
+import type { PlayerView } from '@pp/rules';
 import { playSendBlocked } from './playGuard';
 import { wsUrl } from './config';
 import { guestSessionId, saveToken, tokenFor } from './identity';

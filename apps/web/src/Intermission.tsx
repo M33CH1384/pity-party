@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
-import { type GameState, bidLabel, isNilBid, isShot, shotCovers, sideOf } from '@spades/rules';
+import { type GameState, bidLabel, isNilBid, isShot, shotCovers, sideOf } from '@pp/rules';
 import { resultChips, sideColor, signed } from './ScorePad';
 import { wheelsMade } from './landCue';
 import { HandsStrip, bostonSides } from './BoxScore';

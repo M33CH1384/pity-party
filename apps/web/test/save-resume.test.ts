@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeRules, newGame } from '@spades/rules';
+import { makeRules, newGame } from '@pp/rules';
 import { confirmReplaceSave, resumeOnLoad, type SavedGame } from '../src/save';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

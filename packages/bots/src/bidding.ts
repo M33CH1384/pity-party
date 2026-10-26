@@ -1,5 +1,5 @@
 import { type PartnerHint, applyHint } from './partnerTalk';
-import { type Card, type PlayerView, type Rng, bidOptions, blindNilRulesOf, createRng, effectiveSuit, hostMinimum, isNilBid, isTrump, nilRulesOf, partnerOf, sideOf, trumpOrder } from '@spades/rules';
+import { type Card, type PlayerView, type Rng, bidOptions, blindNilRulesOf, createRng, effectiveSuit, hostMinimum, isNilBid, isTrump, nilRulesOf, partnerOf, sideOf, trumpOrder } from '@pp/rules';
 
 /** One line of a hand's book count (shared by the bots' bidding and the player-facing bid coach). */
 export interface BookItem { cards: Card[]; value: number; note: string }

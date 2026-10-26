@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { type GameState, applyAction, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { type GameState, applyAction, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { SAVE_VERSION, parseSave, resumeOnLoad } from '../src/save';
 import { DEFAULT_SETTINGS, type Settings, settingsToRules } from '../src/settings';
 

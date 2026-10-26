@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { CLASSIC_JOKER, makeRules } from '@spades/rules';
+import { CLASSIC_JOKER, makeRules } from '@pp/rules';
 import { isPromoted, isWildDeuce } from '../src/cardFaces';
 import { DEFAULT_SETTINGS, settingsToRules } from '../src/settings';
 

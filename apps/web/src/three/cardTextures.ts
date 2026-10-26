@@ -1,5 +1,5 @@
 import { CanvasTexture, SRGBColorSpace, type Texture } from 'three';
-import type { Card } from '@spades/rules';
+import type { Card } from '@pp/rules';
 import { drawBack, paintFace, paintedFaceKeys, repaintFace, loadLogo, onLogoLoad } from '../cardArt';
 import { deckBackUrl, getActiveDeck, onDeckArtLoad } from '../decks';
 import { noteDiag } from '../diagnostics';

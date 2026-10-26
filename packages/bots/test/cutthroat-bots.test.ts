@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeRules } from '@spades/rules';
+import { makeRules } from '@pp/rules';
 import { simulateGame } from '../src';
 
 describe('bots in Cutthroat respect the table options', () => {

@@ -1,6 +1,6 @@
 /** Book piles on the rim: staged table after several completed tricks, shot at
  *  phone portrait + desktop, Sitting + Standing (BWM_VIEW / BWM_W / BWM_H). */
-import { applyAction, legalPlays, makeRules, newGame, type GameState } from '@spades/rules';
+import { applyAction, legalPlays, makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

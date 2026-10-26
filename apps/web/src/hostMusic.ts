@@ -8,7 +8,7 @@
  * Each player has their own "Host music" volume (localStorage), separate from game sounds and personal music.
  */
 import { useSyncExternalStore } from 'react';
-import type { HostMusic as HostMusicState } from '@spades/protocol';
+import type { HostMusic as HostMusicState } from '@pp/protocol';
 import { TRACKS, sound } from './audio';
 import { audioElementPool } from './audioPool';
 import { settleAudio } from './audioSession';

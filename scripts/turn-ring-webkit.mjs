@@ -13,7 +13,7 @@ mkdirSync(out, { recursive: true });
 
 let vite = null;
 if (!process.argv[2]) {
-  vite = spawn('pnpm', ['--filter', '@spades/web', 'dev', '--port', '5173', '--strictPort', '--host', '127.0.0.1'], {
+  vite = spawn('pnpm', ['--filter', '@pp/web', 'dev', '--port', '5173', '--strictPort', '--host', '127.0.0.1'], {
     stdio: ['ignore', 'pipe', 'pipe'],
     detached: true,
   });

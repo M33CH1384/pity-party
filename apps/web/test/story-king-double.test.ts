@@ -10,7 +10,7 @@ import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { STORY_STOPS, storyStopById, type StoryBeatFacts } from '@spades/bots';
+import { STORY_STOPS, storyStopById, type StoryBeatFacts } from '@pp/bots';
 import StoryHome from '../src/story/StoryHome';
 import StoryTape from '../src/story/StoryTape';
 

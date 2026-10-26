@@ -1,5 +1,5 @@
 import { type FormEvent, useEffect, useState } from 'react';
-import { CODE_LENGTH, isRoomCode, normalizeRoomCode, type PresenceStatus } from '@spades/protocol';
+import { CODE_LENGTH, isRoomCode, normalizeRoomCode, type PresenceStatus } from '@pp/protocol';
 import { NowPlaying } from '../SoundControls';
 import SettingsSheetHost from '../SettingsSheetHost';
 import { type TipsPref, loadTips } from '../tips';

@@ -1,4 +1,4 @@
-import { type Card, isNukeTrick } from '@spades/rules';
+import { type Card, isNukeTrick } from '@pp/rules';
 
 /**
  * How far a table card is carried, in world units, along its outward direction.

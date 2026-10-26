@@ -1,4 +1,4 @@
-import { type Card, type TableRules, sortHand } from '@spades/rules';
+import { type Card, type TableRules, sortHand } from '@pp/rules';
 
 /** Stable identity for a hand card: the card id is suit + rank (`AS`, `10H`, `BJ`). Never an array index. */
 export function handCardKey(card: Card): string {

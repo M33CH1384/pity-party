@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { applyAction, createRng, makeRules, newGame, viewFor } from '@spades/rules';
+import { applyAction, createRng, makeRules, newGame, viewFor } from '@pp/rules';
 import { PARTNER_TALK_PRESETS, applyHint, chooseBid, parseHint } from '../src';
 
 describe('partner talk (bidding)', () => {

@@ -4,7 +4,7 @@
  * keeps a visible strip (≥ MIN px wide) and stays at hand size (no table/flight scale leaking in).
  * Also reports the fan span (% of viewport), card px and the minimum strip.
  */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

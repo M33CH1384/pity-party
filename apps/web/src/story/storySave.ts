@@ -12,7 +12,7 @@
  * continuous conversation resumes its thread instead of replaying beats
  * or forgetting the events its callbacks reference.
  */
-import { STORY_CHARACTERS, storyStopById, type StoryStop } from '@spades/bots';
+import { STORY_CHARACTERS, storyStopById, type StoryStop } from '@pp/bots';
 import { parseSave, type SavedGame } from '../save';
 import { reportStorySession, type StoryProgress } from './storyApi';
 

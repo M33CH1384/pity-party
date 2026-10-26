@@ -17,7 +17,7 @@ CREATE TABLE story_tracks (
 CREATE TABLE story_progress (
   user_id TEXT NOT NULL REFERENCES users(id),
   track_key TEXT NOT NULL,
-  stop_id TEXT NOT NULL,             -- STORY_STOPS id from @spades/bots story.ts
+  stop_id TEXT NOT NULL,             -- STORY_STOPS id from @pp/bots story.ts
   attempts INTEGER NOT NULL DEFAULT 0,
   clears INTEGER NOT NULL DEFAULT 0,
   first_cleared_at INTEGER,

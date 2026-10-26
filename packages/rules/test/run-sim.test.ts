@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { applyAction, makeRules, runClearedHands, runPlayout, viewFor, type GameState } from '@spades/rules';
-import { simulateGame } from '@spades/bots';
+import { applyAction, makeRules, runClearedHands, runPlayout, viewFor, type GameState } from '@pp/rules';
+import { simulateGame } from '@pp/bots';
 
 const norm = (cs: readonly string[]) => [...cs].sort().join(',');
 
