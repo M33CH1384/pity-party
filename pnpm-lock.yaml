@@ -57,9 +57,6 @@ importers:
 
   apps/server:
     dependencies:
-      '@simplewebauthn/server':
-        specifier: ^13.3.3
-        version: 13.3.3
       '@pp/bots':
         specifier: workspace:*
         version: link:../../packages/bots
@@ -69,6 +66,9 @@ importers:
       '@pp/rules':
         specifier: workspace:*
         version: link:../../packages/rules
+      '@simplewebauthn/server':
+        specifier: ^13.3.3
+        version: 13.3.3
     devDependencies:
       '@cloudflare/workers-types':
         specifier: ^4.20260702.1
@@ -79,6 +79,15 @@ importers:
       '@fontsource/barlow-condensed':
         specifier: ^5.3.0
         version: 5.3.0
+      '@pp/bots':
+        specifier: workspace:*
+        version: link:../../packages/bots
+      '@pp/protocol':
+        specifier: workspace:*
+        version: link:../../packages/protocol
+      '@pp/rules':
+        specifier: workspace:*
+        version: link:../../packages/rules
       '@react-three/drei':
         specifier: ^10.7.9
         version: 10.7.9(@react-three/fiber@9.8.1(@types/react@19.3.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.180.0))(@types/react@19.3.0)(@types/three@0.180.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(three@0.180.0)
@@ -94,15 +103,6 @@ importers:
       '@simplewebauthn/browser':
         specifier: ^13.3.0
         version: 13.3.0
-      '@pp/bots':
-        specifier: workspace:*
-        version: link:../../packages/bots
-      '@pp/protocol':
-        specifier: workspace:*
-        version: link:../../packages/protocol
-      '@pp/rules':
-        specifier: workspace:*
-        version: link:../../packages/rules
       html-to-image:
         specifier: ^1.11.13
         version: 1.11.13
@@ -140,6 +140,8 @@ importers:
       '@pp/rules':
         specifier: workspace:*
         version: link:../rules
+
+  packages/game: {}
 
   packages/protocol:
     dependencies:
