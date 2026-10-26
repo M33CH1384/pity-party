@@ -237,7 +237,7 @@ function DeleteConfirm({ user, onClose, onDeleted }: { user: AccountUser; onClos
   const [busy, setBusy] = useState(false);
   return (
     <SheetFrame title="DELETE ACCOUNT" label="Delete account" onClose={onClose} testId="delete-sheet">
-      <p className="acct-lede">This permanently deletes your account, every linked sign-in, your passkeys and saved progress. It can't be undone. Badges on this device stay here.</p>
+      <p className="acct-lede">This permanently deletes your account, passkeys, coins, friends, messages and saved progress. It can't be undone. Badges on this device stay here.</p>
       <p className="acct-fine">Type <b>{word}</b> to confirm.</p>
       <input data-testid="delete-confirm-input" value={t} onChange={(e) => setT(e.target.value)} autoCapitalize="none" autoCorrect="off" spellCheck={false} aria-label="Confirm" />
       {err && <p className="err acct-err" role="alert">{err}</p>}
@@ -319,7 +319,7 @@ export function NotificationsSection() {
           {!isOn ? (
             <div className="acct-progress">
               <p className="acct-fine">
-                Get a ping when it&rsquo;s your turn, when friends invite you, and for rank ups and rewards —
+                Get a ping when it&rsquo;s your turn, when friends invite or message you, and when your daily coins are ready —
                 even with the app closed.
               </p>
               <p className="acct-fine"><b>On iPhone:</b> add Pity Party to your Home Screen first (Safari → Share → Add to Home Screen, iOS 16.4+), then launch the app from the Home Screen icon and enable here. Push will not work from inside Safari.</p>

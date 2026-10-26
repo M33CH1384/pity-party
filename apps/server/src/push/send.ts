@@ -6,13 +6,15 @@ import { encryptPushPayload, vapidAuthorization, type VapidKeys } from './crypto
 
 export type NotifType =
   | 'turn' | 'invite' | 'friend_online' | 'achievement'
-  | 'daily' | 'rankup' | 'challenge' | 'season' | 'wager' | 'story_callback'
+  | 'daily' | 'rankup' | 'challenge' | 'season' | 'wager'
   | 'dm' | 'mention';
 
-export const NOTIF_TYPES: NotifType[] = [
-  'turn', 'invite', 'friend_online', 'achievement', 'daily', 'rankup', 'challenge', 'season', 'wager', 'story_callback',
-  'dm', 'mention',
-];
+/**
+ * The notification types a Pity Party player can actually get, and so the only ones the prefs API reads/writes.
+ * TODO(rebuild): 'achievement' | 'challenge' | 'rankup' (cred push events, Spades rating) and 'wager' (Big Bank)
+ * keep their senders typed but never fire in Pity Party — see docs/plan/REBUILD.md P2. 'story_callback' is gone.
+ */
+export const NOTIF_TYPES: NotifType[] = ['turn', 'invite', 'friend_online', 'daily', 'season', 'dm', 'mention'];
 
 export const NOTIF_LABELS: Record<NotifType, string> = {
   turn: 'Your turn',
@@ -24,7 +26,6 @@ export const NOTIF_LABELS: Record<NotifType, string> = {
   challenge: 'Challenge complete',
   season: 'Season ending',
   wager: 'Big Bank challenges',
-  story_callback: 'Story table calls',
   dm: 'Messages',
   mention: 'Mentions',
 };
