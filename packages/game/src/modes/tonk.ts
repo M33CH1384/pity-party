@@ -21,6 +21,7 @@ import { type OptionValues, validateOptions } from '../options';
 import { type BotStrategy, type Results, type RuleSet, RuleError } from '../registry';
 import { deal, seededRng, shuffle } from '../rng';
 import { TONK_OPTIONS } from './schemas';
+import { bestMelds, minDeadwood } from './tonkSolver';
 
 export interface TkOptions {
   handSize: number;
@@ -508,25 +509,36 @@ export function tkRecap(s: TkState): TkRecap {
   };
 }
 
-/** Stand-in bot until milestone 9 (tiers): next hand; drop at count ≤ 5; spread the biggest meld; hit; slap; shed the highest card. Tell-free. */
+/**
+ * Stand-in bot until milestone 9 (tiers), solver-driven (tonkSolver): next hand; slap when it can; drop when the
+ * hand counts ≤ 5; take the top discard only if it lowers the best deadwood, else draw from the stock; lay the
+ * solver's spreads; hit; shed the card whose loss leaves the least deadwood (highest count on ties). Tell-free.
+ */
 export const tonkBot: BotStrategy<TkMove, TkView> = {
   modeId: 'tonk',
   choose(view, legalMoves, _tier, rng) {
     if (!legalMoves.length) throw new Error('no legal move');
-    const find = (t: TkMove['t']) => legalMoves.filter((m) => m.t === t);
+    const o = view.options;
+    const find = <T extends TkMove['t']>(t: T) => legalMoves.filter((m): m is Extract<TkMove, { t: T }> => m.t === t);
     const nh = find('nextHand')[0]; if (nh) return nh;
     const slap = find('slap')[0]; if (slap) return slap;
     if (find('drop').length && tkCount(view.hand) <= 5) return find('drop')[0]!;
-    const sp = find('spread') as Extract<TkMove, { t: 'spread' }>[];
-    if (sp.length) return sp.reduce((a, b) => (b.cardIds.length > a.cardIds.length ? b : a));
+    if (find('drawStock').length || find('drawDiscard').length) {
+      const top = view.discardTop;
+      if (top && find('drawDiscard').length && (!find('drawStock').length || minDeadwood([...view.hand, top], o) < minDeadwood(view.hand, o) + countValue(top))) return find('drawDiscard')[0]!;
+      return find('drawStock')[0] ?? find('drawDiscard')[0]!;
+    }
+    const plan = bestMelds(view.hand, o);
+    const key = (ids: string[]) => [...ids].sort().join();
+    const want = new Set(plan.melds.map(key));
+    const sp = find('spread').find((m) => want.has(key(m.cardIds)));
+    if (sp) return sp;
     const hit = find('hit')[0]; if (hit) return hit;
-    const draws = [...find('drawStock'), ...find('drawDiscard')];
-    if (draws.length) return find('drawStock')[0] ?? draws[0]!;
-    const dis = find('discard') as Extract<TkMove, { t: 'discard' }>[];
+    const dis = find('discard');
     if (dis.length) {
-      const val = (id: string) => countValue(view.hand.find((c) => c.id === id)!);
-      const top = Math.max(...dis.map((d) => val(d.cardId)));
-      const pool = dis.filter((d) => val(d.cardId) === top);
+      const score = (id: string) => minDeadwood(view.hand.filter((c) => c.id !== id), o) * 100 - countValue(view.hand.find((c) => c.id === id)!);
+      const lo = Math.min(...dis.map((d) => score(d.cardId)));
+      const pool = dis.filter((d) => score(d.cardId) === lo);
       return pool[Math.floor(rng() * pool.length)]!;
     }
     return legalMoves[0]!;

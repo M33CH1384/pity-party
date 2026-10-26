@@ -6,6 +6,7 @@ export * from './modes/placeholder';
 export * from './modes/schemas';
 export * from './modes/pittyPat';
 export * from './modes/tonk';
+export * from './modes/tonkSolver';
 export * from './names';
 
 import { registerMode } from './registry';
