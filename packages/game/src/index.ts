@@ -17,4 +17,4 @@ registerMode(placeholderRules, placeholderBot);
 // Mode A (milestones 6–7): engine, bot tiers and the web table are in, so Pitty Pat is listed and playable.
 registerMode(pittyPatRules, pittyPatBot);
 // Mode B engine (milestone 8): registered but unlisted until its table view + bots land (milestone 9).
-registerMode(tonkRules, tonkBot, { listed: false });
+registerMode(tonkRules, tonkBot);

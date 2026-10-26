@@ -4,6 +4,7 @@
  * Everything here comes from the seat's own view (own hand + public table), never another hand.
  */
 import { type Card, type PpEvent, type PpMove, type PpRecap, type PpView, rankLabel } from '@pp/game';
+import { ReshuffleBeat, useReshuffleBeat } from './reshuffle';
 import { type ModeRecapProps, type ModeTableProps, PlainCard, cardText } from './views';
 
 const who = (seat: number, mySeat: number | null, names: readonly string[]) => (seat === mySeat ? 'You' : names[seat] ?? `Seat ${seat + 1}`);
@@ -52,6 +53,7 @@ function moveLabel(m: PpMove, v: PpView, hand: Map<string, Card>): string {
 
 export function PittyPatTable({ view, legal, mySeat, names, onMove, busy }: ModeTableProps) {
   const v = view as PpView;
+  const reshuffling = useReshuffleBeat(v.phase);
   const moves = legal as PpMove[];
   const hand = new Map(v.hand.map((c) => [c.id, c]));
   const shed = new Set(moves.flatMap((m) => (m.t === 'discard' ? [m.cardId] : [])));
@@ -109,6 +111,7 @@ export function PittyPatTable({ view, legal, mySeat, names, onMove, busy }: Mode
             : <p className="pp-wait">Waiting for {who(v.turn ?? 0, mySeat, names)} to deal…</p>}
         </section>
       )}
+      <ReshuffleBeat on={reshuffling} />
       <p className="turn-line" data-testid="turn-line">{turnLine}</p>
       {buttons.length > 0 && (
         <div className="pp-actions" data-testid="pp-actions">

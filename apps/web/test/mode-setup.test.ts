@@ -8,18 +8,18 @@ import { ModeOptionsForm, ModeSetup } from '../src/modes/ModeSetup';
 const mem = () => { const m = new Map<string, string>(); return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v) }; };
 
 describe('mode catalog', () => {
-  it('lists Pitty Pat as playable (M7b), Tonk as coming soon, then the placeholder', () => {
+  it('lists Pitty Pat and Tonk as playable (M9b), then the placeholder', () => {
     const cat = modeCatalog();
-    expect(cat.map((m) => [m.modeId, m.available])).toEqual([['pitty-pat', true], ['tonk', false], ['placeholder', true]]);
+    expect(cat.map((m) => [m.modeId, m.available])).toEqual([['pitty-pat', true], ['tonk', true], ['placeholder', true]]);
     expect(cat[0]!.schema).toBe(PITTY_PAT_OPTIONS);
     expect(cat[2]!.schema).toBe(getRules('placeholder').optionsSchema);
   });
 
-  it('loads defaults, refuses a coming-soon mode, clamps saved options', () => {
+  it('loads defaults, restores a saved Tonk pick, clamps saved options', () => {
     const s = mem();
     expect(loadModeChoice(s)).toEqual(defaultChoice('pitty-pat'));
     s.setItem('pp.modeChoice', JSON.stringify({ modeId: 'tonk', options: {} }));
-    expect(loadModeChoice(s).modeId).toBe('pitty-pat');
+    expect(loadModeChoice(s)).toEqual(defaultChoice('tonk'));
     saveModeChoice({ modeId: 'placeholder', options: { handSize: 99, junk: 1 } }, s);
     expect(loadModeChoice(s).options).toEqual({ ...defaultChoice('placeholder').options, handSize: 5 });
     s.setItem('pp.modeChoice', '{not json');
@@ -28,11 +28,11 @@ describe('mode catalog', () => {
 });
 
 describe('Setup mode picker + generated options', () => {
-  it('renders every mode; Pitty Pat enabled, Tonk disabled with "Coming soon"', () => {
+  it('renders every mode; all enabled, none Coming soon', () => {
     const html = renderToStaticMarkup(createElement(ModeSetup, { value: defaultChoice('placeholder'), onChange: () => {} }));
     expect(html).not.toMatch(/data-testid="pick-pitty-pat"[^>]*disabled|disabled[^>]*data-testid="pick-pitty-pat"/);
-    expect(html).toMatch(/disabled[^>]*data-testid="pick-tonk"/);
-    expect(html).toContain('Coming soon');
+    expect(html).not.toMatch(/disabled[^>]*data-testid="pick-tonk"/);
+    expect(html).not.toContain('Coming soon');
     expect(html).toMatch(/aria-checked="true"[^>]*data-testid="pick-placeholder"/);
   });
 
