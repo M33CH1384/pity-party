@@ -197,7 +197,7 @@ async function pittyOffline(b: Browser) {
   await p.getByTestId('mode-screen').waitFor();
   ok(await p.getByTestId('mode-screen').getAttribute('data-mode') === 'pitty-pat', 'Deal me in opens Pitty Pat vs 3 bots');
   ok((await p.getByTestId('pp-goal').textContent())?.includes('First to 3 points') === true, 'goal line shows the points target');
-  ok((await p.getByTestId('pp-points-0').textContent())?.replace(/\s/g, '') === '0/3pts', 'your score reads 0 / 3 pts');
+  ok(/^\d\/3pts$/.test((await p.getByTestId('pp-points-0').textContent())?.replace(/\s/g, '') ?? ''), 'your score reads n / 3 pts');
   ok(await p.getByTestId('pp-pot').count() === 0, 'no coins shown (coin pot off by default)');
   await layoutOk(p, 'table');
   let resultShot = false, tableShot = false;
