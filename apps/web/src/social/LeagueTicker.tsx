@@ -36,6 +36,7 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { statusLabel } from '@pp/protocol';
+import { OFFERED_MODE_NAME } from '../offeredModes';
 import { fx, useReduceEffects } from '../fx';
 import { useSocial } from './store';
 
@@ -61,6 +62,7 @@ export interface LiveHighlight {
 }
 
 const pct = (n: number | null) => (n === null ? '—' : `${n}%`);
+// TODO(rebuild): Spades result names; registry results (mode_games) are not on the ticker yet (REBUILD.md S1)
 const RESULT_MODE: Record<string, string> = { joker: 'Joker', aceDown: 'Ace Down', cutthroat: 'Cutthroat', cutthroat4: 'Cutthroat' };
 
 /**
@@ -214,7 +216,7 @@ export function LeagueTicker({ variant, onHasLines }: { variant: 'bar' | 'panel'
 
   const online = useMemo<TickerOnline[]>(() => Object.values(s.users)
     .filter((u) => !u.guest)
-    .map((u) => ({ name: u.name, detail: statusLabel(u.status) }))
+    .map((u) => ({ name: u.name, detail: statusLabel(u.status, (m) => OFFERED_MODE_NAME[m as keyof typeof OFFERED_MODE_NAME] ?? m) }))
     .sort((a, b) => Number(a.detail === 'Online') - Number(b.detail === 'Online') || a.name.localeCompare(b.name)), [s.users]);
   const lines = useMemo(() => buildTickerLines({ kind, top, online, mine, power: powerTop, results, highlights }), [kind, top, online, mine, powerTop, results, highlights]);
   const reduced = reduceFx || osReduced;

@@ -33,7 +33,7 @@ export interface PresenceStatus {
    * Read before `kind` by activityOf: a story table is not a bot game.
    */
   story?: 'solo' | 'coop';
-  /** rules mode at the table / lobby (joker, aceDown, cutthroat) */
+  /** registry mode id at the table / lobby (placeholder, pitty-pat, tonk) */
   mode?: string;
   /** seats a new player could take (empty in the lobby; bot seats mid-game) */
   open?: number;
@@ -217,7 +217,7 @@ export type SocialClientMsg =
 export interface OpenTable {
   code: string;
   host: string;
-  /** rules mode: joker | cutthroat | aceDown */
+  /** registry mode id (placeholder | pitty-pat | tonk) */
   mode: string;
   playerCount: number;
   /** points to win */
@@ -272,18 +272,25 @@ const isInt = (v: unknown): v is number => typeof v === 'number' && Number.isInt
 const KINDS: readonly PresenceKind[] = ['online', 'lobby', 'table', 'tournament'];
 const FRIEND_OPS = ['request', 'accept', 'decline', 'remove', 'block', 'unblock'] as const;
 
+/** Registry mode ids a presence / invite may name (mirrors @pp/game ModeId; protocol stays dependency-free).
+ *  Anything else (old Spades ids such as joker / cutthroat / aceDown) is dropped, not trusted. */
+export const SOCIAL_MODE_IDS = ['placeholder', 'pitty-pat', 'tonk'] as const;
+const isModeId = (v: unknown): v is string => typeof v === 'string' && (SOCIAL_MODE_IDS as readonly string[]).includes(v);
+/** seats on a table (registry modes are 2–4 players) */
+const TABLE_SEATS = 4;
+
 function parseStatus(v: unknown): PresenceStatus | null {
   if (!v || typeof v !== 'object') return null;
   const s = v as Record<string, unknown>;
   if (!KINDS.includes(s.kind as PresenceKind)) return null;
   const out: PresenceStatus = { kind: s.kind as PresenceKind };
   if (s.story === 'solo' || s.story === 'coop') out.story = s.story;
-  if (isStr(s.mode, 20)) out.mode = s.mode;
-  if (isInt(s.open) && s.open >= 0 && s.open <= 8) out.open = s.open;
+  if (isModeId(s.mode)) out.mode = s.mode;
+  if (isInt(s.open) && s.open >= 0 && s.open <= TABLE_SEATS) out.open = s.open;
   if (isStr(s.code, 12) && /^[A-Z0-9]+$/.test(s.code)) out.code = s.code;
   if (s.offline === true) out.offline = true;
   if (isStr(s.name, 40)) out.name = s.name;
-  if (isInt(s.seat) && s.seat >= 0 && s.seat < 8) out.seat = s.seat;
+  if (isInt(s.seat) && s.seat >= 0 && s.seat < TABLE_SEATS) out.seat = s.seat;
   if (s.watchFull === true) out.watchFull = true;
   return out;
 }
@@ -322,7 +329,7 @@ export function parseSocialMsg(raw: unknown): SocialClientMsg | null {
     case 'read': return isId(m.with) ? { t: 'read', with: m.with } : null;
     case 'invite':
       if (!isId(m.to) || !isStr(m.code, 12) || !/^[A-Z0-9]+$/.test(m.code)) return null;
-      return { t: 'invite', to: m.to, code: m.code, ...(isStr(m.mode, 20) ? { mode: m.mode } : {}), ...(isInt(m.seat) && m.seat >= 0 && m.seat < 8 ? { seat: m.seat } : {}), ...(m.kind === 'story-coop' ? { kind: 'story-coop' as const } : {}), ...(isStr(m.stopId, 40) ? { stopId: m.stopId } : {}) };
+      return { t: 'invite', to: m.to, code: m.code, ...(isModeId(m.mode) ? { mode: m.mode } : {}), ...(isInt(m.seat) && m.seat >= 0 && m.seat < TABLE_SEATS ? { seat: m.seat } : {}), ...(m.kind === 'story-coop' ? { kind: 'story-coop' as const } : {}), ...(isStr(m.stopId, 40) ? { stopId: m.stopId } : {}) };
     case 'inviteReply': return isStr(m.id, 40) && typeof m.accept === 'boolean' ? { t: 'inviteReply', id: m.id, accept: m.accept } : null;
     case 'friend': return FRIEND_OPS.includes(m.op as never) && isId(m.to) ? { t: 'friend', op: m.op as (typeof FRIEND_OPS)[number], to: m.to } : null;
     case 'mute': return isId(m.to) && typeof m.on === 'boolean' ? { t: 'mute', to: m.to, on: m.on } : null;
@@ -334,14 +341,14 @@ export function parseSocialMsg(raw: unknown): SocialClientMsg | null {
   }
 }
 
-/** Short status line for the players list ("At a table · Cutthroat · 1 seat open"). */
+/** Short status line for the players list ("At a table · High Card · 1 seat open", "In lobby · Tonk · 2 seats open"). */
 export function statusLabel(s: PresenceStatus, modeName: (m: string) => string = (m) => m): string {
   // Story surfaces name themselves in every list: a story table is story
   // mode, not "At a table · vs bots" (owner, 2026-10-22).
   if (s.story) return activityLabel(activityOf(s));
   switch (s.kind) {
     case 'online': return 'Online';
-    case 'lobby': return `In lobby${s.open ? ` · ${s.open} seat${s.open > 1 ? 's' : ''} open` : ''}`;
+    case 'lobby': return ['In lobby', ...(s.mode ? [modeName(s.mode)] : []), ...(s.open ? [`${s.open} seat${s.open > 1 ? 's' : ''} open`] : [])].join(' · ');
     case 'tournament': return `In tournament${s.name ? ` · ${s.name}` : ''}`;
     case 'table': {
       const bits = ['At a table'];

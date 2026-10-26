@@ -120,9 +120,9 @@ describe('presence', () => {
     expect(gid).toMatch(/^g:/);
     expect(h.last('g1', 'hello')!.you.guest).toBe(true);
     expect(h.seen('a1')).toEqual([gid, 'u:ua', 'u:ub'].sort());
-    await h.send('b1', { t: 'status', status: { kind: 'table', mode: 'cutthroat', open: 1, code: 'ABCD' } });
+    await h.send('b1', { t: 'status', status: { kind: 'table', mode: 'tonk', open: 1, code: 'ABCD' } });
     const up = h.last('a1', 'pres')!.up![0]!;
-    expect(up).toMatchObject({ id: 'u:ub', status: { kind: 'table', mode: 'cutthroat', open: 1, code: 'ABCD' } });
+    expect(up).toMatchObject({ id: 'u:ub', status: { kind: 'table', mode: 'tonk', open: 1, code: 'ABCD' } });
     // second tab keeps the status; closing one tab keeps them online
     await h.hub.open('b2', { uid: 'ub', name: 'Bobby' });
     expect(h.last('b2', 'hello')!.you.status.kind).toBe('table');
@@ -174,10 +174,10 @@ describe('presence', () => {
   });
 
   it('parses the seat and watch-full fields, and drops a seat that cannot exist', () => {
-    expect(parseSocialMsg({ t: 'status', status: { kind: 'table', mode: 'joker', open: 1, code: 'ABCD', seat: 2, watchFull: true } }))
-      .toEqual({ t: 'status', status: { kind: 'table', mode: 'joker', open: 1, code: 'ABCD', seat: 2, watchFull: true } });
-    expect(parseSocialMsg({ t: 'status', status: { kind: 'table', mode: 'joker', offline: true, seat: 9, watchFull: false } }))
-      .toEqual({ t: 'status', status: { kind: 'table', mode: 'joker', offline: true } });
+    expect(parseSocialMsg({ t: 'status', status: { kind: 'table', mode: 'placeholder', open: 1, code: 'ABCD', seat: 2, watchFull: true } }))
+      .toEqual({ t: 'status', status: { kind: 'table', mode: 'placeholder', open: 1, code: 'ABCD', seat: 2, watchFull: true } });
+    expect(parseSocialMsg({ t: 'status', status: { kind: 'table', mode: 'placeholder', offline: true, seat: 9, watchFull: false } }))
+      .toEqual({ t: 'status', status: { kind: 'table', mode: 'placeholder', offline: true } });
     expect(uniqueGuestName('SWE GUEST', ['swe guest'])).toBe('SWE GUEST 2');
     expect(uniqueGuestName('Guest', [])).toBe('Guest');
   });
@@ -230,13 +230,17 @@ describe('invites', () => {
     await h.hub.open('a', { uid: 'ua', name: 'Alice' });
     await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
     await h.hub.open('g', { name: 'Kev' });
-    await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K', mode: 'joker', seat: 2 });
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K', mode: 'placeholder', seat: 2 });
     const inv = h.last('b', 'invite')!.invite;
-    expect(inv).toMatchObject({ from: 'u:ua', fromName: 'Alice', code: 'XY7K', seat: 2 });
+    expect(inv).toMatchObject({ from: 'u:ua', fromName: 'Alice', code: 'XY7K', mode: 'placeholder', seat: 2 });
     expect(inv.expiresAt - h.t).toBe(60_000);
     expect(h.last('a', 'inviteSent')!.to).toBe('u:ub');
     await h.send('b', { t: 'inviteReply', id: inv.id, accept: true });
     expect(h.last('a', 'inviteReply')).toMatchObject({ by: 'u:ub', accept: true });
+    // a Spades mode id / a seat past the 4-seat table never reaches the invitee
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K', mode: 'joker', seat: 6 });
+    expect(h.last('b', 'invite')!.invite).not.toHaveProperty('mode');
+    expect(h.last('b', 'invite')!.invite).not.toHaveProperty('seat');
     // decline
     await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K' });
     await h.send('b', { t: 'inviteReply', id: h.last('b', 'invite')!.invite.id, accept: false });
@@ -599,7 +603,7 @@ describe('profiles + recent players (from game records)', () => {
 });
 
 describe('open tables (Release 10)', () => {
-  const T = (code: string, over: Partial<import('@pp/protocol').OpenTable> = {}) => ({ code, host: 'Dee', mode: 'joker', playerCount: 4, target: 500, venue: 'classic', humans: 1, bots: 0, open: 3, status: 'waiting' as const, spectators: 0, at: h.t, ...over });
+  const T = (code: string, over: Partial<import('@pp/protocol').OpenTable> = {}) => ({ code, host: 'Dee', mode: 'placeholder', playerCount: 4, target: 500, venue: 'classic', humans: 1, bots: 0, open: 3, status: 'waiting' as const, spectators: 0, at: h.t, ...over });
   it('hello carries the list; updates and removals reach everyone; stale entries expire', async () => {
     h.hub.tableUpdate('AAAAA', T('AAAAA'));
     await h.hub.open('c1', { name: 'Guest' });
@@ -621,7 +625,7 @@ describe('open tables (Release 10)', () => {
 
 describe('stale presence rows', () => {
   const T = (code: string, over: Partial<import('@pp/protocol').OpenTable> = {}) => ({
-    code, host: 'SWE', mode: 'joker', playerCount: 4, target: 250, venue: 'classic', humans: 0, bots: 4, open: 4, status: 'playing' as const, spectators: 0, at: h.t, ...over,
+    code, host: 'SWE', mode: 'placeholder', playerCount: 4, target: 250, venue: 'classic', humans: 0, bots: 4, open: 4, status: 'playing' as const, spectators: 0, at: h.t, ...over,
   });
 
   it('hides the guest who is still announcing an ended table, next to the live session', async () => {

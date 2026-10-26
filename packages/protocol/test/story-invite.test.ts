@@ -21,8 +21,17 @@ describe('story-coop invite wire', () => {
     expect(m?.kind).toBeUndefined();
   });
 
-  it('regular invites are unchanged', () => {
-    expect(parseSocialMsg({ t: 'invite', to: 'u:abc', code: 'ABCDE', mode: 'joker', seat: 2 }))
-      .toEqual({ t: 'invite', to: 'u:abc', code: 'ABCDE', mode: 'joker', seat: 2 });
+  it('regular invites carry a registry mode + a seat on a 4-seat table; Spades ids and out-of-range seats are dropped', () => {
+    expect(parseSocialMsg({ t: 'invite', to: 'u:abc', code: 'ABCDE', mode: 'placeholder', seat: 2 }))
+      .toEqual({ t: 'invite', to: 'u:abc', code: 'ABCDE', mode: 'placeholder', seat: 2 });
+    expect(parseSocialMsg({ t: 'invite', to: 'u:abc', code: 'ABCDE', mode: 'joker', seat: 5 }))
+      .toEqual({ t: 'invite', to: 'u:abc', code: 'ABCDE' });
+  });
+
+  it('presence status keeps only registry modes and 4-seat limits', () => {
+    expect(parseSocialMsg({ t: 'status', status: { kind: 'table', mode: 'tonk', open: 2, code: 'ABCDE', seat: 3 } }))
+      .toEqual({ t: 'status', status: { kind: 'table', mode: 'tonk', open: 2, code: 'ABCDE', seat: 3 } });
+    expect(parseSocialMsg({ t: 'status', status: { kind: 'table', mode: 'cutthroat', open: 7, code: 'ABCDE', seat: 6 } }))
+      .toEqual({ t: 'status', status: { kind: 'table', code: 'ABCDE' } });
   });
 });

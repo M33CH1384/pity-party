@@ -75,11 +75,14 @@ export async function notifyMention(db: D1Database, vapid: VapidKeys, userId: st
   }, { ttl: 3600, urgency: 'normal' }, now);
 }
 
+/** Display names for the registry modes an invite may carry (unknown ids are left out of the text). */
+export const INVITE_MODE_NAME: Record<string, string> = { placeholder: 'High Card', 'pitty-pat': 'Pitty Pat', tonk: 'Tonk' };
+
 /** Someone invited you to a table. */
 export async function notifyInvite(db: D1Database, vapid: VapidKeys, userId: string, fromName: string, code: string, mode: string | null, now: number): Promise<number> {
   return guarded(db, vapid, userId, { kind: 'invite', key: `${fromName}:${code}`, ms: 2 * 60_000 }, {
     title: 'Game invite',
-    body: `${fromName} invited you to a table${mode ? ` (${mode})` : ''} — code ${code}`,
+    body: `${fromName} invited you to a table${mode && INVITE_MODE_NAME[mode] ? ` (${INVITE_MODE_NAME[mode]})` : ''} — code ${code}`,
     url: `/t/${code}`,
     tag: `invite-${code}`,
     type: 'invite',
