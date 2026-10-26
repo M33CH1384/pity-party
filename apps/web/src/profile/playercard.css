@@ -1,0 +1,547 @@
+/* The Player Card (owner-approved 2026-10-23): the flippable profile card.
+ * Self-contained sheet (the story.css precedent). Every selector for the
+ * card itself is scoped under .plcard — styles.css owns a DIFFERENT .pcard
+ * (the deck browser's painted mini faces), and the scoping keeps the two
+ * apart in the cascade no matter the load order. Theme parity: structure
+ * and layout are theme-shared; Neon only re-tints the glow (visual-only
+ * difference, per the parity law).
+ *
+ * The FRONT is a playing-card face (owner redesign, 2026-10-23: the first
+ * front "does not look like a playing card at all"): true 5:7 proportions,
+ * an ivory face in the game's own painted-card register, a double-line
+ * keyline frame, corner indices top-left and bottom-right (rotated), true
+ * pip layouts around a framed portrait window for number cards, the
+ * portrait as the framed figure for courts, a hero pip for the Ace, two
+ * for the Deuce, a full-figure dark field for the Jokers. The nameplate
+ * band across the frame's foot carries the name (light ink on a deep band
+ * — gold band, dark ink for the Big Joker — so the name can never vanish
+ * into the face) and the showcased badges as medal seals. Everything that
+ * isn't card anatomy lives BELOW the card. The BACK is a patterned card
+ * back with the stats as an ivory inset panel, same footprint.
+ *
+ * POLISH PASS (owner on-device verdict, 2026-10-23): three fixes. (1)
+ * CLASSIC SUIT INK — indices and pips print in the standard deck colors
+ * (hearts/diamonds red, clubs/spades black); the tier story survives only
+ * in the quiet face wash and frame accents. (2) REAL-CARD SCALE — corner
+ * indices and field pips sized in cqw (percent of the card's own width,
+ * container-typed on the card) so they hold real-card proportion at every
+ * size, the 192px card-up reveal included. (3) THE BOTTOM-RIGHT INDEX
+ * OWNS ITS CORNER — styles.css's deck-browser .pcard-corner rule sets
+ * top/left, which leaked into this card's .br corner (its rule never
+ * reset them), stretching the corner box across the whole face so the
+ * rotated glyphs landed mid-card on the nameplate; the corner rules now
+ * pin all four offsets explicitly, and the nameplate is inset as a plaque
+ * BETWEEN the bottom corners, clear of both corner zones.
+ *
+ * LAYOUT PASS v4 (owner on-device verdict, 2026-10-23): (1) STATUS UP
+ * TOP — the profile's tagline + presence row (.prof-above-card) and the
+ * card's own status (.pcard-above, statusPlacement="above") render ABOVE
+ * the card, centered in the first viewport, where the BWM ticker cannot
+ * cover them (the circled screenshot had them at the screen's bottom
+ * edge). (2) THE PORTRAIT GROWS — number windows are sized by pip
+ * density (sparse/dense/tight below), the Ace and Deuce windows grow,
+ * and court figures fill the field keyline to keyline. */
+
+/* Placement inside the profile header (a flex-wrap row): the card wrap and
+ * its satellites take the full line; RepBlock + the action row follow. */
+.soc-prof-head > .pcard-wrap { flex: 1 1 100%; min-width: 0; }
+.prof-under-card { flex: 1 1 100%; min-width: 0; }
+.soc-prof-head > .pcard-editor { flex: 1 1 100%; min-width: 0; }
+/* The above-card identity row (v4): tagline + presence, centered, the
+ * first thing a visitor reads. */
+.prof-above-card {
+  flex: 1 1 100%; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.prof-above-card .soc-tagline { font-size: 15px; }
+.prof-above-card .soc-online-status { margin-top: 3px; }
+
+.pcard-wrap {
+  --cardw: min(300px, 84vw, 100%);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.pcard-wrap[data-variant="deck"] { --cardw: min(272px, 76vw, 100%); }
+
+/* Suit color stories. --suit is the bright accent (dark grounds: the back
+ * pattern, below-card touches); --suit-deep prints the indices and pips on
+ * the ivory face — CLASSIC DECK INK (owner polish pass): hearts and
+ * diamonds in a rich printed red, clubs and spades in a rich printed
+ * black, never a tier color. The tier story survives only in the quiet
+ * accents: --suit-wash tints the face's crown (neutral for clubs, warm
+ * porcelain for diamonds, a blush for hearts, the elite violet whisper
+ * for spades) and --suit-line draws the keyline in the ink's own tint
+ * (spades additionally keep their gold hairline). The Joker stands in
+ * gold. */
+.plcard[data-suit="hearts"] { --suit: #ff647c; --suit-deep: #b91f32; --suit-wash: #fbe3e8; --suit-line: rgba(185, 31, 50, .5); }
+.plcard[data-suit="clubs"] { --suit: #57d992; --suit-deep: #191921; --suit-wash: #eff0ea; --suit-line: rgba(25, 25, 33, .48); }
+.plcard[data-suit="diamonds"] { --suit: #5bdfff; --suit-deep: #b91f32; --suit-wash: #f2ede6; --suit-line: rgba(185, 31, 50, .48); }
+.plcard[data-suit="spades"] { --suit: #b980ff; --suit-deep: #191921; --suit-wash: #e7dcf8; --suit-line: rgba(25, 25, 33, .5); }
+.plcard[data-suit="joker"] { --suit: var(--gold); --suit-deep: var(--gold); --suit-wash: rgba(var(--gold-rgb), .16); --suit-line: rgba(var(--gold-rgb), .55); }
+
+/* The card box itself. (Selector outranks styles.css's painted-face .pcard
+ * on every shared property — the two components never trade paint.) */
+.plcard.pcard {
+  position: relative; display: block; flex: none;
+  container-type: inline-size;
+  width: var(--cardw); height: auto; aspect-ratio: 5 / 7;
+  border-radius: 13px; overflow: visible;
+  background: transparent; color: var(--ink); font-size: 15px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .5);
+  perspective: 1400px; cursor: pointer;
+  --corner: var(--suit-deep);
+}
+.plcard[data-treatment="little-joker"] { --corner: #d9c8ff; }
+.plcard[data-treatment="big-joker"] { --corner: #ecc964; }
+html[data-theme="neon"] .plcard.pcard {
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .55), 0 0 22px rgba(var(--purple-rgb), .3);
+}
+
+/* ------------------------------------------------------------ the flip */
+/* FLIP CULLING FIX (owner on-device report, 2026-10-23): the settled
+ * flipped card on iOS painted the FRONT's children mirrored over the
+ * back — pips, portrait, corner indices, and the nameplate with its
+ * text reading backwards, montaged over the career line. The faces
+ * already carried backface-visibility (both spellings), and the face's
+ * own layer WAS culled — the back's lattice showed around its panel —
+ * but the subtree escaped: under preserve-3d, WebKit composites every
+ * child that forms its own layer (the in-plane-transformed pips, art
+ * window, corners, royal tab, joker word, and the positioned z-indexed
+ * field / keyline / plate) as an independent layer in the shared 3D
+ * context, and backface-visibility is evaluated per layer there, so
+ * the children kept the default `visible` and painted mirrored once
+ * the flipper passed 90°. Two guarantees now stack: (1) EVERY layer
+ * inside a face — descendants and the faces' keyline pseudos alike —
+ * carries backface culling in both spellings, so no child layer can
+ * show its back; (2) the settled states are deterministic: the
+ * turned-away face is visibility:hidden, swapped at the flip's
+ * midpoint (both faces edge-on at ~half the .55s turn), so no
+ * compositor behaviour can paint the wrong face at rest. In-plane 2D
+ * transforms (inverted pips, the rotated bottom corner) never change
+ * which way a layer faces, so they keep working untouched. Both faces
+ * share ONE box (the .pcard-face rule below), so the footprint is
+ * identical in both states — the lattice belongs to the back face's
+ * full outline, never to a smaller content box. */
+.plcard .pcard-inner {
+  display: grid; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform .55s cubic-bezier(.2, .7, .3, 1);
+}
+.plcard .pcard-inner.flipped { transform: rotateY(180deg); }
+.plcard .pcard-face {
+  grid-area: 1 / 1; width: 100%; height: 100%; min-width: 0;
+  position: relative; overflow: hidden; border-radius: 13px;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: visibility 0s linear .28s;
+}
+/* Every layer inside a face is culled with its face (fix note above). */
+.plcard .pcard-face *,
+.plcard .pcard-face::before,
+.plcard .pcard-face::after {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+/* The settled-state guarantee: the back starts unpainted, and the
+ * flipped class swaps both faces' visibility at the midpoint delay
+ * carried by the .pcard-face transition above. */
+.plcard .pcard-back { transform: rotateY(180deg); visibility: hidden; }
+.plcard .pcard-inner.flipped .pcard-front { visibility: hidden; }
+.plcard .pcard-inner.flipped .pcard-back { visibility: visible; }
+@media (prefers-reduced-motion: reduce) {
+  .plcard .pcard-inner { transition: none; }
+  .plcard .pcard-face { transition: none; }
+}
+
+/* ------------------------------------------------- front: the card face */
+.plcard .pcard-front {
+  background:
+    radial-gradient(115% 80% at 50% 0%, var(--suit-wash), rgba(255, 255, 255, 0) 62%),
+    linear-gradient(168deg, #fdfaf1, #eee5cf);
+  border: 1px solid rgba(24, 18, 44, .38);
+}
+/* The keyline: the classic thin inner frame line, in the suit's ink. */
+.plcard .pcard-front::before {
+  content: ''; position: absolute; inset: 6px; z-index: 4;
+  border-radius: 9px; border: 1.5px solid var(--suit-line);
+  pointer-events: none;
+}
+/* Spades (the elite suit) and the Ace draw a second, gold hairline. */
+.plcard[data-suit="spades"] .pcard-front::after,
+.plcard[data-treatment="ace"] .pcard-front::after {
+  content: ''; position: absolute; inset: 9.5px; z-index: 4;
+  border-radius: 7px; border: 1px solid rgba(var(--gold-rgb), .55);
+  pointer-events: none;
+}
+/* The Jokers leave the ivory system: dark fields, the game's own joker
+ * register (deep violet for the Little, black-and-gold for the Big). */
+.plcard[data-treatment="little-joker"] .pcard-front {
+  background:
+    radial-gradient(115% 80% at 50% 0%, rgba(155, 92, 255, .3), rgba(0, 0, 0, 0) 60%),
+    linear-gradient(165deg, #2a1845, #120a22);
+  border-color: rgba(185, 128, 255, .5);
+}
+.plcard[data-treatment="little-joker"] .pcard-front::before { border-color: rgba(203, 184, 255, .55); }
+.plcard[data-treatment="big-joker"] .pcard-front {
+  background:
+    radial-gradient(115% 80% at 50% 0%, rgba(var(--gold-rgb), .22), rgba(0, 0, 0, 0) 58%),
+    linear-gradient(165deg, #1d1507, #070509);
+  border-color: rgba(var(--gold-rgb), .8);
+}
+.plcard[data-treatment="big-joker"] .pcard-front::before { border: 2px solid rgba(var(--gold-rgb), .85); }
+html[data-theme="neon"] .plcard .pcard-front { border-color: rgba(var(--purple-rgb), .55); }
+html[data-theme="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-color: rgba(var(--gold-rgb), .8); }
+
+/* Corner indices: rank over suit, top-left and bottom-right rotated —
+ * exactly where a real card prints them, at real-card scale (sizes in
+ * cqw = percent of the card's width, so the proportion holds from the
+ * 300px header card down to the 192px reveal slot; the px value before
+ * each cqw is the fallback at header width). ALL FOUR offsets are pinned
+ * on every corner: styles.css's deck-browser .pcard-corner sets top/left,
+ * and an unpinned offset leaks through the cascade — that leak stretched
+ * the .br box across the whole face and dropped its rotated glyphs onto
+ * the nameplate (owner screenshot, 2026-10-23). */
+.plcard .pcard-corner {
+  position: absolute; z-index: 6;
+  top: auto; right: auto; bottom: auto; left: auto;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  line-height: 1; color: var(--corner); pointer-events: none;
+  font-family: var(--display);
+}
+.plcard .pcard-corner.tl { top: 2.4%; left: 3.5%; right: auto; bottom: auto; }
+.plcard .pcard-corner.br { bottom: 2.4%; right: 3.5%; top: auto; left: auto; transform: rotate(180deg); }
+.plcard .pcard-crank { font-size: 51px; font-size: 17cqw; font-weight: 800; }
+/* A two-digit rank (the 10) prints condensed, as real decks print it —
+ * keeps the corner's ink inside its corner zone. */
+.plcard .pcard-crank[data-two="1"] { font-size: 40px; font-size: 13cqw; letter-spacing: -.04em; }
+.plcard .pcard-csuit { font-size: 35px; font-size: 11.5cqw; }
+.plcard[data-treatment="little-joker"] .pcard-csuit,
+.plcard[data-treatment="big-joker"] .pcard-csuit { font-size: 8.5px; font-size: 2.8cqw; font-weight: 800; letter-spacing: .12em; }
+.plcard[data-treatment="big-joker"] .pcard-crank { font-size: 54px; font-size: 18cqw; }
+
+/* ------------------------------------------------------------- the field */
+.plcard .pcard-field {
+  position: absolute; z-index: 1;
+  top: 11.5%; bottom: 18%; left: 14%; right: 14%;
+}
+/* Court figures fill the field KEYLINE TO KEYLINE (v4): the court field
+ * stretches to the frame's inner edge on all four sides, so the portrait
+ * reads as a real court card's figure — dominant, not a framed photo
+ * floating in ivory. The nameplate plaque (z 5) sits over the figure's
+ * foot, and the corner indices keep ivory backing (below) so their ink
+ * stays readable over any photo. */
+.plcard[data-treatment="court"] .pcard-field { top: 3%; bottom: 3%; left: 3%; right: 3%; }
+.plcard[data-treatment="court"] .pcard-corner {
+  background: rgba(253, 250, 241, .92);
+  border-radius: 5px; padding: 3px 4px 4px;
+  box-shadow: 0 1px 5px rgba(23, 12, 44, .28);
+}
+/* Number pips, placed by PIP_LAYOUTS; lower-half pips print inverted.
+ * Classic pip scale: the glyph box is ~21% of the card's width (a fifth,
+ * as a real deck prints it), in classic suit ink. */
+.plcard .pcard-pipdot {
+  position: absolute; transform: translate(-50%, -50%);
+  font-size: 63px; font-size: 21cqw; line-height: 1; color: var(--suit-deep);
+  pointer-events: none;
+}
+.plcard .pcard-pipdot[data-inv="1"] { transform: translate(-50%, -50%) rotate(180deg); }
+/* Hero pips: the Ace's single oversized suit, the Deuce's stacked pair. */
+.plcard .pcard-heropip {
+  position: absolute; left: 50%; top: 54%; transform: translate(-50%, -50%);
+  font-size: 138px; font-size: 46cqw; line-height: 1; color: var(--suit-deep); opacity: .92;
+  pointer-events: none;
+}
+.plcard .pcard-field[data-field="deuce"] .pcard-heropip { font-size: 63px; font-size: 21cqw; }
+.plcard .pcard-field[data-field="deuce"] .pcard-heropip.top { top: 15%; }
+.plcard .pcard-field[data-field="deuce"] .pcard-heropip.bot { top: 85%; transform: translate(-50%, -50%) rotate(180deg); }
+/* The Ace's hero pip drops to the field's lower center (v4): the grown
+ * portrait window rides its upper field, and the pip's lower body stays
+ * visible under the window — the Ace keeps its one-big-pip identity. */
+.plcard .pcard-field[data-field="ace"] .pcard-heropip { top: 66%; }
+
+/* The portrait art window: a framed rectangle of card art. On number
+ * cards it owns the field's center (the classic center pip yields to it);
+ * on courts and Jokers it IS the field's figure. */
+.plcard .pcard-artwin {
+  position: absolute; z-index: 2; overflow: hidden; border-radius: 6px;
+  border: 2px solid var(--suit-deep);
+  background: linear-gradient(160deg, var(--suit-wash), #fdfaf1);
+  box-shadow: 0 3px 12px rgba(23, 12, 44, .28), inset 0 0 0 2px #fdfaf1, inset 0 0 0 3.5px rgba(var(--gold-rgb), .55);
+  display: flex; align-items: center; justify-content: center;
+}
+.plcard .pcard-artwin img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.plcard .pcard-artletter {
+  font-family: var(--display); font-weight: 800; font-size: 46px; font-size: 15cqw; color: var(--suit-deep);
+}
+/* THE PORTRAIT GROWS (v4 — owner: "the pic should be much larger").
+ * Number windows are sized by the pip geometry around them, in % of the
+ * FIELD (the field is 72% of the card's width; pip ink spans ~15% of
+ * the card's width around each PIP_LAYOUTS center):
+ *  - sparse (3/4/5): only corner/center-column pips, far from the
+ *    middle band — the window goes WIDE (68% of the field = ~49% of
+ *    the card) and tall; its edges clear every pip's ink vertically.
+ *  - dense (6/9/10): the mid row (6) / side rows (9) / offset pair
+ *    (10) fence the window to 46% of the field wide; at that width its
+ *    sides clear the side pips and its height fits between the 10's
+ *    offset center pips.
+ *  - tight (7/8): the offset center pips at y=26 (and y=74 on the 8)
+ *    cap the HEIGHT — same 46% width, shorter, so the window's top and
+ *    bottom edges clear those pips' ink. The 8 is the tightest rank
+ *    on the ladder; it still gains ~a third more window area.
+ * The Ace window grows to 56% of the field over its dropped hero pip;
+ * the Deuce window takes the dense size between its two hero pips.
+ *
+ * BACK FIT PASS (owner on-device verdict, 2026-10-23): the flipped
+ * card's frame read off and its stat table clipped — the WIN % header
+ * sheared at the panel's right edge and the GAMES column lived
+ * entirely outside it. Three fixes, all in the back's rules below.
+ * (1) THE TABLE FITS BY RULE — the stat table is fixed-layout over an
+ * explicit colgroup (29/18/18/18/17), so the five columns divide the
+ * panel's content box by proportion and cell content can never widen
+ * the table past its frame; and the back's whole box math — panel
+ * inset, panel padding, type — runs in cqw, one proportional system,
+ * so the fit computed at the 300px header card holds identically at
+ * the 272px deck card and the 192px reveal (the old sheet mixed
+ * fixed-px type with %-axis insets, and the table's min-content
+ * simply outgrew the panel). (2) ONE FRAME — the panel insets a
+ * uniform 4.5cqw on all four sides, so the lattice band is the same
+ * thickness in px top, bottom, left and right at every card size (the
+ * old 7%/6% insets resolved against different axes: measured on the
+ * owner's screenshot the band ran ~81 device px top/bottom against
+ * ~51 at the sides); the keyline rides at 2cqw with a radius
+ * concentric to the card's 13px edge, so border, keyline and panel
+ * edge read as one stepped frame, never near-parallel doubles.
+ * (3) RHYTHM — taller ruled rows and even panel gaps spread the
+ * career line through the panel's height instead of huddling at its
+ * top over a hollow mid-panel; the footnotes keep their anchored
+ * foot, and the no-games line centers in the space it owns. */
+.plcard .pcard-artwin.number { left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.plcard .pcard-artwin.number.sparse { width: 68%; aspect-ratio: 4 / 4.5; }
+.plcard .pcard-artwin.number.dense { width: 46%; aspect-ratio: 4 / 4.6; }
+.plcard .pcard-artwin.number.tight { width: 46%; aspect-ratio: 4 / 3.6; }
+.plcard .pcard-artwin.ace { left: 50%; top: 37%; transform: translate(-50%, -50%); width: 56%; aspect-ratio: 4 / 4.7; }
+.plcard .pcard-artwin.deuce { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 46%; aspect-ratio: 4 / 4.6; }
+.plcard .pcard-artwin.court { inset: 0; border-width: 2.5px; }
+.plcard .pcard-artwin.joker { top: 0; bottom: 0; right: 0; left: 9%; border-color: rgba(203, 184, 255, .7); background: linear-gradient(160deg, #3a2364, #170b2e); }
+.plcard[data-treatment="big-joker"] .pcard-artwin.joker { border-color: rgba(var(--gold-rgb), .85); background: linear-gradient(160deg, #2c1f08, #0a0705); }
+.plcard .pcard-artwin.joker .pcard-artletter { color: var(--corner); }
+/* The royal tab riding the court frame's top edge. */
+.plcard .pcard-royaltab {
+  position: absolute; z-index: 3; top: -12px; left: 50%; transform: translateX(-50%);
+  padding: 2px 11px 3px; border-radius: 999px;
+  background: linear-gradient(180deg, var(--gold-hi), var(--gold-deep));
+  color: #241a02; font-size: 15px; line-height: 1.1;
+  box-shadow: 0 2px 7px rgba(23, 12, 44, .35);
+}
+/* On the keyline-to-keyline court field (v4) the tab sits INSIDE the
+ * figure's top edge — at the old -12px it would ride off the card. */
+.plcard[data-treatment="court"] .pcard-royaltab { top: 10px; }
+/* JOKER lettered down the card's left edge, in the classic manner. */
+.plcard .pcard-jokerword {
+  position: absolute; z-index: 3; left: -9.5%; top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: .42em;
+  color: #cdbcf5; pointer-events: none;
+}
+.plcard[data-treatment="big-joker"] .pcard-jokerword { color: var(--gold-hi); }
+
+/* ------------------------------------------- nameplate band (in-frame) */
+/* A deep band worked into the frame's foot: light ink on near-black (gold
+ * band, dark ink for the Big Joker). The pairing is fixed HERE, in one
+ * place — the display name can never inherit its way into invisibility.
+ * The band is a PLAQUE BETWEEN THE CORNERS (owner polish pass): its right
+ * inset (24%) keeps it out of the bottom-right index's corner zone
+ * entirely — index ink, seals and band can never meet — and its left
+ * inset mirrors the reservation so the foot reads deliberate. */
+.plcard .pcard-plate {
+  position: absolute; z-index: 5; left: 9%; right: 24%; bottom: 3%;
+  display: flex; align-items: center; gap: 9px; gap: 3cqw;
+  padding: 8px 11px; padding: 2.7cqw 3.7cqw; border-radius: 8px;
+  background: linear-gradient(180deg, #201a3d, #131022);
+  box-shadow: inset 0 0 0 1px rgba(var(--gold-rgb), .5), 0 3px 10px rgba(15, 8, 34, .35);
+  color: #f7f1de;
+}
+.plcard[data-treatment="little-joker"] .pcard-plate {
+  box-shadow: inset 0 0 0 1px rgba(185, 128, 255, .55), 0 3px 10px rgba(15, 8, 34, .35);
+}
+.plcard[data-treatment="big-joker"] .pcard-plate {
+  background: linear-gradient(180deg, #f0d47a, #c49a2e);
+  box-shadow: inset 0 0 0 1px rgba(70, 50, 4, .55), 0 3px 10px rgba(0, 0, 0, .45);
+}
+.plcard .pcard-plate-id { min-width: 0; flex: 1; }
+.plcard .pcard-name {
+  margin: 0; font-family: var(--display); font-weight: 800;
+  font-size: 20px; font-size: 6.7cqw; line-height: 1.12; color: #f7f1de;
+  overflow-wrap: anywhere;
+}
+.plcard[data-treatment="big-joker"] .pcard-name { color: #171106; }
+.plcard .pcard-handle { margin: 1px 0 0; font-size: 11.5px; font-size: 3.8cqw; color: #bdb2dd; }
+.plcard[data-treatment="big-joker"] .pcard-handle { color: #54400c; }
+/* Showcased badges ride the band as medal seals — a glyph in a ringed
+ * disc, the badge's name on its title, never a text pill. */
+.plcard .pcard-seals { display: flex; gap: 5px; gap: 1.7cqw; flex: none; }
+.plcard .pcard-seal {
+  width: 27px; width: 9cqw; height: 27px; height: 9cqw; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 14px; font-size: 4.7cqw; line-height: 1;
+  background: radial-gradient(circle at 35% 30%, rgba(var(--gold-rgb), .5), rgba(var(--gold-rgb), .16));
+  border: 1.5px solid rgba(var(--gold-rgb), .85);
+}
+.plcard[data-treatment="big-joker"] .pcard-seal {
+  border-color: rgba(70, 50, 4, .7);
+  background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .55), rgba(70, 50, 4, .18));
+}
+
+/* ------------------------------------------- above the card (v4) */
+/* The card's status, when the header asks for it up top: centered over
+ * the card at the card's own width, in full ink — the player's voice,
+ * front and center, in the first viewport. */
+.pcard-above { width: var(--cardw); text-align: center; }
+.pcard-above .pcard-status {
+  font-size: 16.5px; font-weight: 600; color: var(--ink); text-align: center;
+}
+
+/* ------------------------------------------------ below the card (off-face) */
+.pcard-below {
+  width: var(--cardw);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.pcard-status { margin: 0; font-style: italic; color: var(--lav); font-size: 15px; overflow-wrap: anywhere; }
+.pcard-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.pcard-tag {
+  padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  color: var(--lav); border: 1px solid rgba(var(--purple-rgb), .65);
+  background: rgba(var(--purple-rgb), .14);
+}
+.pcard-ribbon { margin: 0; font-size: 13px; color: var(--muted); }
+.pcard-upkeep { margin: 0; font-size: 12.5px; font-weight: 700; color: var(--gold); }
+.pcard-actions { display: flex; align-items: center; gap: 10px; }
+.pcard-edit {
+  flex: none;
+  min-height: 44px; padding: 6px 11px; border-radius: 999px;
+  background: transparent; color: var(--gold);
+  border: 1px solid rgba(var(--gold-rgb), .55); font-size: 12.5px; font-weight: 600;
+  cursor: pointer;
+}
+.pcard-flipbtn {
+  /* Design audit D4 (2026-10-24): 32px → the 44px floor. The button sits
+   * BELOW the card in the .pcard-actions row (outside the cqw card box),
+   * so the growth adds 12px to the below-card stack and touches no part
+   * of the card's proportional budget; the card itself remains the
+   * primary flip target. */
+  margin-left: auto; min-height: 44px; padding: 5px 6px;
+  background: none; border: none; cursor: pointer;
+  color: var(--gold); font-size: 12.5px; font-weight: 700; letter-spacing: .02em;
+}
+
+/* -------------------------------------------------------------- the back */
+/* A patterned card back — a diamond lattice in the suit's tint over deep
+ * house violet, gold keyline — with the stats as an ivory inset panel. */
+.plcard .pcard-back {
+  background:
+    repeating-linear-gradient(45deg, rgba(185, 128, 255, .07) 0 2px, rgba(0, 0, 0, 0) 2px 15px),
+    repeating-linear-gradient(-45deg, rgba(185, 128, 255, .07) 0 2px, rgba(0, 0, 0, 0) 2px 15px),
+    linear-gradient(160deg, #1b1436, #0d0a1e);
+  background:
+    repeating-linear-gradient(45deg, color-mix(in srgb, var(--suit) 13%, transparent) 0 2px, rgba(0, 0, 0, 0) 2px 15px),
+    repeating-linear-gradient(-45deg, color-mix(in srgb, var(--suit) 13%, transparent) 0 2px, rgba(0, 0, 0, 0) 2px 15px),
+    linear-gradient(160deg, #1b1436, #0d0a1e);
+  border: 1px solid rgba(var(--gold-rgb), .5);
+}
+.plcard .pcard-back::before {
+  content: ''; position: absolute; inset: 6px; inset: 2cqw; z-index: 2;
+  border-radius: 9px; border-radius: calc(13px - 2cqw);
+  border: 1.5px solid rgba(var(--gold-rgb), .55);
+  pointer-events: none;
+}
+/* The panel's frame contract (back fit pass): ONE uniform inset in
+ * cqw on all four sides — cqw resolves against the card's width on
+ * every axis, so the lattice band between the card's edge and the
+ * panel is the same px thickness top, bottom, left and right at any
+ * card size — and the panel's padding and the back's type run in the
+ * same unit, so the whole back is one proportional system. */
+.plcard .pcard-back-panel {
+  position: absolute; inset: 7% 6%; inset: 4.5cqw; z-index: 1;
+  display: flex; flex-direction: column; gap: 8px; gap: 3.2cqw;
+  padding: 14px 15px; padding: 4.7cqw 4cqw; border-radius: 9px; overflow-y: auto;
+  background: linear-gradient(170deg, #faf4e0, #f0e7cd);
+  color: #1e1932;
+  box-shadow: inset 0 0 0 1px rgba(24, 18, 44, .22), 0 4px 14px rgba(0, 0, 0, .35);
+}
+.plcard .pcard-back-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.plcard .pcard-back-head b { font-size: 16.5px; font-size: 5.5cqw; overflow-wrap: anywhere; color: #1e1932; }
+.plcard .pcard-back-head span { color: #6a6284; font-size: 11px; font-size: 3.7cqw; text-transform: uppercase; letter-spacing: .09em; }
+/* The career line as a baseball-card stat table (owner, 2026-10-23):
+ * ONE aligned system in place of the old block grid + prose split
+ * lines — column headers, ruled rows, numbers right-aligned in
+ * straight tabular columns. The career line is the table's totals
+ * row; the streak rides its own ruled row in the same grid language.
+ * A mode with no games gets an honest "No games yet" row — its seeded
+ * rating never prints as if it were earned. */
+.plcard .pcard-stats { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; font-size: 4.05cqw; color: #1e1932; }
+/* The colgroup IS the fit contract (back fit pass): the five columns
+ * divide the panel's content box in fixed shares — Mode takes the
+ * widest share for its fixed vocabulary ("Partnership"), the value
+ * columns are sized to their widest honest shapes (a 4-digit rating,
+ * "38.8%", a 3-and-3 W–L) at the sheet's cqw type sizes, and the
+ * shares sum to exactly 100%. Under table-layout: fixed the table
+ * can never exceed the panel, at the header card, the deck card, or
+ * the reveal — content sizes against its column, never against the
+ * frame. */
+.plcard .pcard-stats col.pcard-col-mode { width: 29%; }
+.plcard .pcard-stats col.pcard-col-rating { width: 18%; }
+.plcard .pcard-stats col.pcard-col-wl { width: 18%; }
+.plcard .pcard-stats col.pcard-col-winpct { width: 18%; }
+.plcard .pcard-stats col.pcard-col-games { width: 17%; }
+.plcard .pcard-stats th, .plcard .pcard-stats td { padding: 4.5px 5px; padding: 4.8cqw .6cqw; }
+.plcard .pcard-stats thead th {
+  font-size: 9.5px; font-size: 2.8cqw; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: #6a6284; text-align: right; white-space: nowrap;
+  padding-top: 7px; padding-top: 2.6cqw; padding-bottom: 7px; padding-bottom: 2.6cqw;
+  border-bottom: 1.5px solid rgba(24, 18, 44, .35);
+}
+.plcard .pcard-stats thead th:first-child { text-align: left; }
+.plcard .pcard-stats tbody th { text-align: left; font-weight: 600; font-size: 12.5px; font-size: 3.95cqw; white-space: nowrap; }
+.plcard .pcard-stats tbody td { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.plcard .pcard-stats tbody tr > * { border-top: 1px solid rgba(24, 18, 44, .14); }
+.plcard .pcard-stats tbody tr:first-child > * { border-top: none; }
+.plcard .pcard-stats tbody tr.totals > * { border-top: 1.5px solid rgba(24, 18, 44, .35); font-weight: 700; }
+.plcard .pcard-stats td.pcard-nogames-cell { text-align: left; color: #6a6284; font-style: italic; font-weight: 400; }
+.plcard .pcard-stats tr.streakrow td { text-align: left; }
+.plcard .pcard-vs { margin: 2px 0 0; font-size: 13.5px; font-size: 4.5cqw; }
+.plcard .pcard-vs b { color: #8a5f06; }
+/* The empty line centers in the panel space it owns (its auto
+ * margins share the free height with the footnotes' anchor), instead
+ * of huddling under the head over the same hollow panel. */
+.plcard .pcard-nogames { margin: auto 0; text-align: center; color: #6a6284; font-style: italic; font-size: 14.5px; font-size: 4.8cqw; }
+.plcard .pcard-back-story { margin: auto 0 0; padding-top: 9px; padding-top: 3cqw; font-size: 12.5px; font-size: 4.2cqw; color: #6a6284; border-top: 1px dashed rgba(24, 18, 44, .3); }
+.plcard .pcard-since { margin: 0; color: #6a6284; font-size: 12px; font-size: 4cqw; }
+
+/* -------------------------------------------------------- deck size */
+/* Indices, pips, the nameplate and the whole back need no deck
+ * overrides: their cqw sizes scale with the card's own width, so the
+ * deck card (and the 192px card-up reveal slot) keeps the same
+ * real-card proportions — and the same clearances and table fit —
+ * automatically. A fixed-px stat font here would silently break the
+ * back's fit contract at deck width, so that override stays retired
+ * (pinned in the back fit tests). */
+.plcard[data-variant="deck"] .pcard-status { font-size: 14.5px; }
+
+/* ------------------------------------------------------------ editor */
+.pcard-editor {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 14px; border-radius: 14px;
+  background: var(--panel); border: 1px solid rgba(var(--edge-rgb), .35);
+}
+.pcard-editor-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.pcard-pickrow { display: flex; flex-wrap: wrap; gap: 6px; }
+.pcard-pick {
+  min-height: 44px; padding: 7px 12px; border-radius: 999px; cursor: pointer;
+  background: var(--field); color: var(--ink); font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(var(--edge-rgb), .4);
+}
+.pcard-pick.on {
+  background: rgba(var(--gold-rgb), .16); color: var(--gold-hi);
+  border-color: var(--gold);
+}
+.pcard-pool-label { color: var(--muted); text-transform: uppercase; letter-spacing: .07em; font-size: 11px; }

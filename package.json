@@ -1,0 +1,45 @@
+{
+  "name": "bid-wit-me",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "packageManager": "pnpm@10.34.6",
+  "scripts": {
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc -p packages/rules && tsc -p packages/bots && tsc -p packages/protocol && tsc -p apps/web --noEmit && tsc -p apps/server --noEmit",
+    "simulate": "tsx scripts/simulate.ts",
+    "dev": "pnpm --filter @spades/web dev",
+    "build": "pnpm --filter @spades/web build",
+    "preview": "pnpm --filter @spades/web preview",
+    "e2e": "node scripts/e2e.mjs",
+    "server:dev": "pnpm --filter @spades/server dev",
+    "e2e:online:clients": "tsx scripts/online-clients.ts",
+    "e2e:online:browser": "node scripts/online-browser.mjs",
+    "deploy:online": "bash scripts/deploy-online.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "@types/sql.js": "^1.4.11",
+    "@types/ws": "^8.18.2",
+    "@vitest/coverage-v8": "^3.2.7",
+    "fast-check": "^4.10.2",
+    "happy-dom": "21.0.1",
+    "node-turn": "^0.0.6",
+    "playwright-core": "^1.64.0",
+    "sql.js": "^1.14.2",
+    "tsx": "^4.23.15",
+    "typescript": "~5.8.3",
+    "vitest": "^3.2.7",
+    "ws": "^8.22.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "dependencies": {
+    "@spades/bots": "workspace:*",
+    "@spades/rules": "workspace:*"
+  }
+}

@@ -1,0 +1,1740 @@
+/* Story Mode (Phase 1): the route map + script player. One shared layout for
+   both themes (parity law) — Neon dressing, where it lands, is scoped color
+   only under html[data-theme="neon"], never different structure. */
+
+.story-shell {
+  max-width: 560px;
+  margin: 0 auto;
+  /* Top padding MUST clear the notch: the header used to sit inside the
+     iOS frosted status-bar zone and rendered blurred while everything
+     below the zone stayed sharp (owner screenshot, 2026-10-21). */
+  padding: calc(16px + env(safe-area-inset-top)) 16px 96px;
+  min-height: 100dvh;
+  box-sizing: border-box;
+}
+
+.story-topbar {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+/* The root SoundDock parks in a .dock-slot when the route offers one (the
+   home screen and tables do). Story offers one in every topbar so the dock
+   sits in the layout — in flow, aligned, no fixed corner float and no
+   stray outlined box under Neon. Sized to the dock's 46px (soundDock.css). */
+.story-topbar .dock-slot {
+  display: block;
+  width: 46px;
+  height: 46px;
+  flex: none;
+  align-self: flex-start;
+}
+
+.story-title-block { flex: 1; min-width: 0; }
+.story-title { margin: 0; font-size: 28px; line-height: 1.1; }
+.story-sub { margin: 4px 0 0; opacity: 0.8; }
+.story-crumb { margin: 0 0 2px; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; }
+
+.story-note {
+  border: 1px solid rgba(127, 127, 160, 0.35);
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 0 0 12px;
+}
+.story-note.story-done { border-color: #c9a227; font-weight: 600; }
+
+.story-dee-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid rgba(127, 127, 160, 0.35);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+.story-dee-name { margin: 0; font-weight: 700; }
+.story-dee-line { margin: 2px 0 0; opacity: 0.85; }
+
+/* ---- hero header: the current stop's place, behind the title ---- */
+.story-hero {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(127, 127, 160, 0.35);
+  padding: 14px 14px 12px;
+  margin-bottom: 14px;
+  background: #0b0b14;
+  color: #f5f4ff;
+}
+.story-hero-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0.45;
+}
+.story-hero-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(5, 5, 12, 0.35), rgba(5, 5, 12, 0.88));
+}
+.story-hero .story-topbar { position: relative; z-index: 2; margin-bottom: 0; }
+.story-hero-progress { margin: 6px 0 0; font-size: 12.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #e8c85a; }
+
+/* ---- the route: a thread of postcards, porch to the King ---- */
+.story-route {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+/* the road itself: a line running down the left, node to node */
+.story-route::before {
+  content: '';
+  position: absolute;
+  left: 17px; top: 18px; bottom: 18px;
+  width: 2px;
+  background: linear-gradient(180deg, #c9a227, rgba(127, 127, 160, 0.35) 55%, rgba(10, 10, 18, 0.9));
+}
+.story-stop {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding-left: 0;
+}
+.story-node {
+  flex: none;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-weight: 800; font-size: 14px;
+  background: #23233a; color: #f5f4ff;
+  border: 2px solid rgba(127, 127, 160, 0.5);
+  z-index: 1;
+  margin-top: 14px;
+}
+.story-stop.state-cleared .story-node { background: #2e7d46; border-color: #2e7d46; color: #fff; }
+.story-stop.state-current .story-node { background: #c9a227; border-color: #e8c85a; color: #14100a; box-shadow: 0 0 0 5px rgba(201, 162, 39, 0.25); }
+.story-card {
+  flex: 1; min-width: 0;
+  border: 1px solid rgba(127, 127, 160, 0.35);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(127, 127, 160, 0.07);
+}
+.story-stop.state-current .story-card { border-color: #c9a227; box-shadow: 0 4px 22px rgba(201, 162, 39, 0.18); }
+.story-stop.state-locked .story-card { opacity: 0.62; }
+.story-stop.is-king .story-card { background: #08080f; border-color: rgba(201, 162, 39, 0.45); }
+.story-card-art {
+  position: relative;
+  height: 92px;
+  background-size: cover; background-position: center;
+}
+.story-card-art::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(5, 5, 12, 0.05), rgba(5, 5, 12, 0.42));
+}
+.story-stop.state-locked .story-card-art { filter: grayscale(0.9); }
+.story-card-faces { position: absolute; left: 10px; bottom: 8px; z-index: 2; display: flex; }
+.story-card-faces .story-face { border: 2px solid rgba(245, 244, 255, 0.85); }
+.story-card-faces .story-face + .story-face { margin-left: -10px; }
+.story-card-state {
+  position: absolute; right: 10px; bottom: 8px; z-index: 2;
+  font-size: 11px; font-weight: 800; letter-spacing: 0.1em;
+  background: #2e7d46; color: #fff;
+  border-radius: 999px; padding: 4px 9px;
+}
+.story-card-state.here { background: #c9a227; color: #14100a; }
+.story-stop-body { padding: 10px 12px 4px; }
+.story-stop-name { margin: 0; font-weight: 700; font-size: 17px; }
+.story-tier { font-size: 12px; font-weight: 600; opacity: 0.75; text-transform: uppercase; letter-spacing: 0.06em; }
+.story-stop-pair { margin: 2px 0 0; font-weight: 600; }
+.story-stop-flavor { margin: 2px 0 0; opacity: 0.85; }
+.story-stop-twist { margin: 4px 0 0; font-size: 13px; opacity: 0.75; }
+.story-stop-facts { margin: 2px 0 0; font-size: 13px; opacity: 0.75; }
+.story-stop .story-stop-actions { padding: 8px 12px 12px; }
+.story-play { flex: none; align-self: center; }
+
+/* ---- script player ---- */
+.story-script { display: flex; flex-direction: column; gap: 12px; }
+.story-script-card {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  border: 1px solid rgba(127, 127, 160, 0.35);
+  border-radius: 16px;
+  padding: 18px;
+  cursor: pointer;
+}
+.story-script-face {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  font-weight: 800;
+  background: rgba(127, 127, 160, 0.25);
+}
+.story-script-body {
+  flex: 1; min-width: 0;
+  position: relative;
+  /* Layout reservation (owner, 2026-10-21: "as text is added the divs
+     just keep jumping in size rather than growing smoothly"):
+     ScriptPlayer measures the current beat's FULL text on the hidden
+     .story-script-sizer and pins this body's height to it before typing
+     starts — so while a line reveals, the box's height does not change
+     at all, and the Skip/Next row under the card never shifts. The
+     height may only change BETWEEN beats (a line that needs a taller
+     or shorter box), and then it glides on this transition instead of
+     snapping. Reduced motion keeps the same reservation, no glide. */
+  transition: height 0.2s ease;
+}
+.story-scene.reduce .story-script-body { transition: none; }
+.story-script-name { margin: 0; font-weight: 800; letter-spacing: 0.02em; }
+.story-script-line { margin: 6px 0 0; font-size: 17px; line-height: 1.45; }
+.story-script-hint { margin: 8px 0 0; font-size: 12px; opacity: 0.6; min-height: 1em; }
+/* The sizer: the whole beat (header + full line + hint slot) rendered
+   invisibly at the body's real width — its rendered height IS the
+   reservation. It never paints, never takes clicks, never enters flow. */
+.story-script-sizer {
+  position: absolute; left: 0; right: 0; top: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.story-script-actions { display: flex; justify-content: space-between; gap: 12px; }
+
+/* ---- owner-only lock screen ---- */
+.story-lock-card {
+  border: 1px solid rgba(127, 127, 160, 0.35);
+  border-radius: 16px;
+  padding: 28px 20px;
+  text-align: center;
+  margin-top: 24px;
+}
+.story-lock-icon { font-size: 40px; margin: 0 0 8px; }
+.story-lock-title { margin: 0; font-weight: 800; font-size: 20px; }
+.story-lock-line { margin: 8px auto 0; opacity: 0.85; max-width: 42ch; line-height: 1.5; }
+
+.story-reward-line {
+  border: 1px solid #c9a227;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 0 0 12px;
+}
+.story-retry { margin-top: 12px; width: 100%; }
+
+/* ---- secrets on the map card ---- */
+.story-stop-secret { margin: 6px 0 0; font-size: 13px; line-height: 1.45; }
+.story-stop-hint { margin: 6px 0 0; font-size: 13px; font-style: italic; opacity: 0.65; }
+.story-stop-feat { margin: 6px 0 0; font-size: 13px; opacity: 0.85; }
+.story-stop-feat.earned { opacity: 1; }
+.story-find-line { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.story-find-chip {
+  border: 1px solid #c9a227;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* ---- cinematic scene player (scene pass) ---- */
+.story-scene {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(127, 127, 160, 0.4);
+  background: #0b0b14;
+  color: #f5f4ff;
+}
+.story-scene-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0.4;
+}
+.story-scene-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(5, 5, 12, 0.55), rgba(5, 5, 12, 0.25) 40%, rgba(5, 5, 12, 0.75));
+}
+.story-bar {
+  position: absolute; left: 0; right: 0; height: 26px;
+  background: #000; z-index: 3;
+  transition: transform 0.6s ease;
+}
+.story-bar.top { top: 0; }
+.story-bar.bottom { bottom: 0; }
+.story-scene:not(.reduce) .story-bar.top { animation: story-bar-in-top 0.6s ease both; }
+.story-scene:not(.reduce) .story-bar.bottom { animation: story-bar-in-bottom 0.6s ease both; }
+@keyframes story-bar-in-top { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+@keyframes story-bar-in-bottom { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.story-scene-inner {
+  position: relative; z-index: 2;
+  padding: 44px 14px 46px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.story-cast { display: flex; gap: 8px; }
+.story-cast-one {
+  flex: 1 1 0; min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 10px 6px 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 244, 255, 0.25);
+  background: rgba(10, 10, 20, 0.66);
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  /* ONE uniform size for every cast card at every stop (layout-jump
+     fix, owner 2026-10-21): the height is a spec, never whichever card
+     is tallest today — padding 18 + border 2 + face 40 + gaps 6 +
+     name up to 2 lines (2 × 13 × 1.15 ≈ 30) + role up to 3 lines
+     (3 × 10.5 × 1.25 ≈ 39) = 135 → 136. Names and roles clamp to the
+     spec (below), so the strip is the same height at the Porch as at
+     the King, and the active treatment — border/glow/opacity only,
+     no geometry — moves nothing when the speaker changes. */
+  box-sizing: border-box;
+  height: 136px;
+  overflow: hidden;
+}
+.story-cast-one.dim { opacity: 0.45; }
+.story-cast-one.active {
+  opacity: 1;
+  border-color: #c9a227;
+  box-shadow: 0 0 0 1px #c9a227, 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+.story-cast-face {
+  width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 19px; font-weight: 800;
+  background: rgba(201, 162, 39, 0.3);
+  color: #f5f4ff;
+}
+.story-cast-one.active .story-cast-face { background: #c9a227; color: #191204; }
+.story-cast-name {
+  font-size: 13px; font-weight: 800; line-height: 1.15;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+  overflow: hidden; max-width: 100%;
+}
+.story-cast-role {
+  font-size: 10.5px; line-height: 1.25; opacity: 0.75;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+  overflow: hidden; max-width: 100%;
+}
+.story-script-role { font-weight: 400; opacity: 0.7; font-size: 13px; }
+.story-hotspot {
+  position: absolute; z-index: 4;
+  right: 10%; bottom: 24%;
+  width: 54px; height: 54px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 244, 255, 0.22);
+  background: radial-gradient(circle, rgba(245, 244, 255, 0.14), rgba(245, 244, 255, 0.02) 70%);
+  cursor: pointer;
+}
+html[data-theme="neon"] .story-scene { border-color: rgba(128, 84, 255, 0.55); }
+html[data-theme="neon"] .story-cast-one.active { border-color: #5bdfff; box-shadow: 0 0 0 1px #5bdfff, 0 6px 18px rgba(0, 0, 0, 0.45); }
+html[data-theme="neon"] .story-cast-one.active .story-cast-face { background: #5bdfff; color: #06121a; }
+
+/* ---- Living scene (sample at the Porch 2026-10-24; owner's pick
+   2026-10-25: EVERY stop's pre-match intro) ----
+   The pre-match scene staged alive: the shipped backdrop breathes under
+   a warm light glow and a slow drift of air, and the seated pair stand
+   LARGE in the frame with a gentle idle bob, the current speaker lit
+   and the other dimmed — the venue-effects register the Pj's ships,
+   pointed at the story scene. ScriptPlayer renders these layers ONLY
+   for the two intro call-site classes (solo intro + co-op scene phase)
+   and ONLY when neither Reduce effects nor the OS reduced-motion
+   setting is on; otherwise none of this markup exists and the scene is
+   the static staging, byte for byte. Every animation below runs on
+   transform/opacity alone (compositor) — no canvas, no per-frame
+   painting (transitions ban). All rules are scoped under
+   .story-scene.living so no non-living scene can pick any of it up.
+   ONE engine for the whole route: the pacing/light values are the
+   stop's MOOD, arriving as --lv-* custom properties from
+   storyLiving.ts. The var() fallbacks below ARE the Porch values, so
+   a living render carrying no mood is the shipped Porch staging,
+   value for value. */
+.story-scene.living .story-scene-bg { animation: story-living-bgscale var(--lv-breathe, 36s) ease-in-out infinite alternate; }
+@keyframes story-living-bgscale { from { transform: scale(1); } to { transform: scale(var(--lv-swell, 1.07)); } }
+.story-scene-glow {
+  position: absolute; z-index: 1; pointer-events: none;
+  left: 8%; right: 8%; top: -12%; height: 62%;
+  background: radial-gradient(ellipse 60% 55% at 50% 30%, var(--lv-glow-a, rgba(255, 186, 92, 0.34)), var(--lv-glow-b, rgba(255, 160, 64, 0.12)) 55%, transparent 75%);
+  animation: story-living-glow var(--lv-glow-dur, 7s) ease-in-out infinite alternate;
+}
+@keyframes story-living-glow { from { opacity: var(--lv-glow-lo, 0.55); transform: scale(1); } to { opacity: var(--lv-glow-hi, 1); transform: scale(1.05); } }
+.story-scene-haze {
+  position: absolute; z-index: 1; pointer-events: none;
+  left: -15%; right: -15%; top: 22%; height: 46%;
+  background:
+    radial-gradient(ellipse 45% 60% at 30% 50%, var(--lv-haze-a, rgba(255, 214, 150, 0.10)), transparent 70%),
+    radial-gradient(ellipse 40% 55% at 72% 45%, var(--lv-haze-b, rgba(255, 200, 130, 0.08)), transparent 70%);
+  animation: story-living-haze var(--lv-haze-dur, 26s) ease-in-out infinite alternate;
+}
+@keyframes story-living-haze { from { transform: translateX(-3.5%); } to { transform: translateX(3.5%); } }
+.story-stage {
+  position: absolute; z-index: 1; inset: 0;
+  pointer-events: none; overflow: hidden;
+}
+.story-stage-one {
+  position: absolute; bottom: 0; width: min(40%, 228px);
+  transition: opacity 0.45s ease, filter 0.45s ease;
+}
+.story-stage-one.left { left: 1.5%; animation: story-living-bob var(--lv-bob-l, 9s) ease-in-out infinite alternate; }
+.story-stage-one.right { right: 1.5%; animation: story-living-bob var(--lv-bob-r, 11s) ease-in-out infinite alternate-reverse; }
+@keyframes story-living-bob { from { transform: translateY(0); } to { transform: translateY(var(--lv-bob-amp, -7px)); } }
+.story-stage-one.dim { opacity: 0.48; filter: saturate(0.75) brightness(0.72); }
+.story-stage-one.active { opacity: 1; filter: none; }
+.story-stage-face {
+  position: relative; display: block; overflow: hidden;
+  width: 100%; aspect-ratio: 1 / 1.08;
+  border-radius: 14px 14px 0 0;
+  border: 1px solid rgba(245, 244, 255, 0.28); border-bottom: none;
+  background: rgba(127, 127, 160, 0.3);
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+  -webkit-mask-image: linear-gradient(180deg, #000 76%, transparent 99%);
+  mask-image: linear-gradient(180deg, #000 76%, transparent 99%);
+}
+.story-stage-one.active .story-stage-face {
+  border-color: rgba(201, 162, 39, 0.85);
+  box-shadow: 0 0 0 1px rgba(201, 162, 39, 0.65), 0 18px 44px rgba(0, 0, 0, 0.5);
+}
+html[data-theme="neon"] .story-stage-one.active .story-stage-face {
+  border-color: rgba(91, 223, 255, 0.85);
+  box-shadow: 0 0 0 1px rgba(91, 223, 255, 0.6), 0 18px 44px rgba(0, 0, 0, 0.5);
+}
+.story-stage-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
+.story-stage-initial { position: absolute; inset: 0; display: grid; place-items: center; font-size: 64px; font-weight: 800; }
+
+/* ---- Big-stop intro video (owner pick 2026-10-25: "video at the big
+   stops") ---- the silent clip layered OVER the living staging at the
+   King, the Legends' Table and the Pj's only. ScriptPlayer mounts it
+   solely under the living gate (never reduced-effects, never outros),
+   so this rule — like every living rule — is scoped under
+   .story-scene.living. It shares z-index 1 with the glow/haze/stage
+   layers and follows them in DOM order, so it paints above the living
+   base (which stays mounted beneath it: the clip's loading state and
+   its fallback whenever the clip can't play) and below the letterbox
+   bars (z 3) and the scene's inner content (z 2). Poster-first: the
+   poster paints instantly and the element fades in — opacity only,
+   compositor (transitions discipline) — only once it is actually
+   playing (.on); an error unmounts it and the living scene carries on
+   untouched. Cover-cropped like the backdrop panorama it replaces. */
+.story-scene.living .story-scene-video {
+  position: absolute; inset: 0; z-index: 1;
+  width: 100%; height: 100%;
+  object-fit: cover; object-position: 50% 32%;
+  pointer-events: none;
+  opacity: 0; transition: opacity 0.9s ease;
+}
+.story-scene.living .story-scene-video.on { opacity: 1; }
+
+/* ---- Tale of the Tape (narrative) ----
+   One type + spacing system (rework, owner 2026-10-21). The old rows were
+   a flowing paragraph per row: an inline-block label with a min-width but
+   NO gap between it and the value — so a label wider than the min
+   ("KNOWN FOR") collided with its value ("KNOWN FORShowing up."), narrower
+   labels left a hanging gap, and wrapped value lines ran back under the
+   label; on the owner's screen the lines rendered stretched flush-right.
+   Rows are now a fixed two-column grid (label column + left-aligned value
+   column, one constant gap). No justified text anywhere on this screen.
+   The card sits on an EVEN scrim over the stop's backdrop: the old build
+   reused the scene player's bg (opacity .4 under an uneven 3-stop
+   gradient) beneath translucent entries, so the backdrop photo's own
+   diagonal edges cut across the card as a visible band. The tape owns its
+   backdrop layer now (faint photo + one flat scrim) and the entries are
+   near-opaque. */
+.story-tape {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(127, 127, 160, 0.4);
+  background: #0b0b14;
+  color: #f5f4ff;
+  /* label column width: fits the longest label ("KNOWN FOR") at spec */
+  --tape-label-w: 86px;
+}
+.story-tape-bg {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  opacity: 0.32;
+}
+.story-tape-bg::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(5, 5, 11, 0.78);
+}
+.story-tape-inner {
+  position: relative; z-index: 2;
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 14px;
+  text-align: left;
+}
+.story-tape-title { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; opacity: 0.8; }
+.story-tape-stakes { margin: 0; font-size: 16px; line-height: 1.5; font-style: italic; }
+.story-tape-history {
+  margin: 0; font-size: 13px; font-weight: 600; line-height: 1.45;
+  color: #eec96a;
+  background: rgba(18, 13, 4, 0.76);
+  border: 1px solid rgba(238, 201, 106, 0.55);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+.story-tape-cols { display: flex; flex-direction: column; gap: 18px; }
+.story-tape-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.story-tape-side-title { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; opacity: 0.75; }
+.story-tape-entry {
+  border: 1px solid rgba(245, 244, 255, 0.22);
+  border-radius: 12px;
+  background: rgba(9, 9, 18, 0.9);
+  padding: 12px 14px;
+}
+.story-tape-head { display: flex; gap: 12px; align-items: center; margin-bottom: 10px; }
+.story-tape-name { margin: 0; font-weight: 800; font-size: 16px; }
+.story-tape-role { margin: 1px 0 0; font-size: 12px; opacity: 0.75; }
+.story-tape-rows { display: flex; flex-direction: column; gap: 6px; }
+.story-tape-row {
+  margin: 0;
+  display: grid;
+  grid-template-columns: var(--tape-label-w) minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: baseline;
+  font-size: 13.5px; line-height: 1.45;
+  text-align: left;
+}
+.story-tape-label { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.65; }
+.story-tape-value { text-align: left; }
+/* The player has no character portrait: a designed monogram medallion in
+   the cast medallion family (warm gold, dark ink), not a flat gray disc. */
+.story-you-face {
+  background: radial-gradient(circle at 32% 28%, #f0d089, #c39a3c 82%);
+  color: #241a05;
+  box-shadow: inset 0 0 0 2px rgba(255, 248, 222, 0.55), 0 0 0 1px rgba(201, 162, 39, 0.7);
+}
+.story-stop-actions { display: flex; flex-direction: row; gap: 8px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+@media (min-width: 520px) {
+  .story-tape-cols { flex-direction: row; }
+  .story-tape-side { flex: 1 1 0; }
+}
+
+/* ---- story badges ---- */
+.story-badges {
+  border: 1px solid rgba(127, 127, 160, 0.35);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+.story-badges-head { margin: 0 0 10px; display: flex; justify-content: space-between; align-items: baseline; }
+.story-badges-title { font-weight: 800; letter-spacing: 0.04em; }
+.story-badges-count { font-size: 13px; font-weight: 700; opacity: 0.85; }
+.story-badges-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.story-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid rgba(127, 127, 160, 0.4);
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: transparent;
+  color: inherit; font: inherit; font-size: 12.5px; font-weight: 600;
+  cursor: pointer;
+  position: relative;
+}
+.story-badge.locked { opacity: 0.42; filter: grayscale(0.8); }
+.story-badge.earned { border-color: #c9a227; opacity: 1; filter: none; }
+.story-badge.open { box-shadow: 0 0 0 2px rgba(201, 162, 39, 0.5); }
+.story-badge.new { border-color: #e8c85a; box-shadow: 0 0 0 2px rgba(232, 200, 90, 0.55); }
+.story-badge-icon { font-size: 15px; }
+.story-badge-new { font-size: 9.5px; font-weight: 800; letter-spacing: 0.08em; background: #c9a227; color: #14100a; border-radius: 6px; padding: 1px 5px; }
+/* the badge explanation's text lines — carried by the detail sheet
+   (StoryDetailSheet) since the tiles became doors (owner, 2026-10-25);
+   the sheet's header carries the medallion + name. */
+.story-badge-detail-about { margin: 0; font-size: 14.5px; line-height: 1.55; }
+.story-badge-detail-how { margin: 8px 0 0; font-size: 13.5px; line-height: 1.5; opacity: 0.88; }
+
+/* ---- the rail: background cast, present but never in the way ---- */
+.story-rail {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 10px;
+  opacity: 0.92;
+}
+.story-rail-label {
+  font-size: 10.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+  opacity: 0.75; flex: none;
+}
+.story-rail-faces { display: flex; flex-wrap: wrap; gap: 4px; }
+.story-rail-faces .story-face { border: 1.5px solid rgba(245, 244, 255, 0.4); }
+
+html[data-theme="neon"] .story-card,
+html[data-theme="neon"] .story-script-card,
+html[data-theme="neon"] .story-dee-card {
+  background: rgba(16, 18, 38, 0.72);
+  border-color: rgba(91, 223, 255, 0.35);
+}
+html[data-theme="neon"] .story-stop.state-current .story-card { border-color: #8054ff; }
+html[data-theme="neon"] .story-stop.is-king .story-card { background: rgba(7, 6, 18, 0.92); border-color: rgba(128, 84, 255, 0.6); }
+/* Color dressing only: the player's medallion takes the Neon cyan family. */
+html[data-theme="neon"] .story-you-face {
+  background: radial-gradient(circle at 32% 28%, #bfeffb, #3fa9cf 82%);
+  color: #06121a;
+  box-shadow: inset 0 0 0 2px rgba(233, 251, 255, 0.55), 0 0 0 1px rgba(91, 223, 255, 0.6);
+}
+
+/* ---- deck unlock notice on the outro (deck-unlocks integration) ---- */
+.story-deck-line {
+  border: 1px solid #c9a227;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 0 0 12px;
+  font-weight: 700;
+}
+
+/* ---- story design language (owner, 2026-10-21) ----
+   Story mode is the come-up: its surfaces speak the warm neighborhood
+   register, never the broadcast kit. The global button look (the chamfered
+   gold .primary block, condensed all-caps) belongs to the professional
+   chapter — inside .story-shell every button is ONE family instead:
+   rounded, sentence case, the reading font, 44px targets, and hierarchy
+   carried by fill alone (warm amber solid = go; quiet amber outline =
+   secondary), never by shape. Same family in both themes (parity law);
+   only color dressing may differ per theme, per the blocks above. */
+.story-shell .btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 10px 16px;
+  border: 1px solid transparent; border-radius: 12px;
+  clip-path: none;
+  background: none; box-shadow: none;
+  font-family: inherit; font-size: 15px; font-weight: 700;
+  letter-spacing: 0.01em; text-transform: none;
+  white-space: nowrap; touch-action: manipulation;
+}
+.story-shell .btn.primary {
+  background: linear-gradient(180deg, #eec96a, #cf9c2e);
+  border-color: rgba(120, 84, 10, 0.55);
+  color: #241a05;
+  box-shadow: 0 2px 12px rgba(201, 162, 39, 0.22), inset 0 1px 0 rgba(255, 248, 220, 0.5);
+}
+.story-shell .btn.ghost {
+  background: rgba(238, 201, 106, 0.06);
+  border-color: rgba(238, 201, 106, 0.38);
+  color: #f3ead2;
+}
+.story-shell .btn:disabled { opacity: 0.45; }
+
+/* The stop card's action row, rebuilt on fractions of the card: each
+   button takes its share (flex-basis 0, min-width 0, primary a touch
+   wider), so Meet them / Resume / Restart always fit inside the card at
+   phone widths — no content-sized button can be pushed past the edge
+   and clipped the way Restart was (owner screenshot, 2026-10-21). The
+   one designed wrap: when all three actions are present (a match in
+   progress — the only row with a Restart), the primary takes its own
+   full line at phone widths and the secondaries split the line below. */
+.story-stop-actions { justify-content: flex-start; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+.story-stop-actions .btn { flex: 1 1 0; min-width: 0; padding: 10px 8px; }
+.story-stop-actions .btn.primary { flex-grow: 1.4; }
+.story-stop-actions .story-play { align-self: stretch; }
+@media (max-width: 430px) {
+  .story-stop-actions:has(.story-restart) .btn.primary { flex: 1 1 100%; order: -1; }
+}
+
+/* Scene and tape action rows keep their left/right staging, in the family. */
+.story-script-actions .btn { min-width: 104px; }
+
+/* State chips over the card art: a quiet caption, not a broadcast bug —
+   translucent shade, a hairline in the state color, letterspaced small
+   caps. Cleared reads soft green; you-are-here / in-progress warm amber. */
+.story-card-state {
+  background: rgba(10, 12, 9, 0.74);
+  color: #a9d6ae;
+  border: 1px solid rgba(130, 195, 140, 0.5);
+  font-weight: 700; letter-spacing: 0.08em;
+}
+.story-card-state.here {
+  background: rgba(18, 13, 4, 0.76);
+  color: #eec96a;
+  border-color: rgba(238, 201, 106, 0.55);
+}
+
+/* The Running-with-Dee card wears the same warm paper as the route:
+   a soft amber wash and hairline instead of the neutral gray border. */
+.story-dee-card {
+  border-color: rgba(238, 201, 106, 0.38);
+  background: linear-gradient(180deg, rgba(238, 201, 106, 0.06), rgba(127, 127, 160, 0.05));
+}
+
+/* Owner-only stop reset (dev tool, rendered for dev accounts only): a
+   quiet row under the stop card's actions, same hairline family at a
+   smaller voice — it is a wrench, not a feature, and reads like one. */
+.story-reset { padding: 0 12px 12px; }
+.story-reset .btn { min-height: 36px; padding: 6px 12px; font-size: 13px; }
+.story-reset-copy { margin: 0 0 8px; font-size: 13px; line-height: 1.45; }
+.story-reset-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* The King's gun (double or nothing, between-legs scene): a table strip
+   under the cast, reserved from the scene's first beat whenever the scene
+   can stage the piece, so the piece being set down on its beat moves
+   nothing — it only appears, and stays for the scene. The strip is felt:
+   a dark green-black run with a gold hairline, the table surface in
+   miniature. The gun fades and settles in over about half a second; under
+   reduced motion it is simply there. Decorative only (aria-hidden). */
+.story-prop-strip {
+  flex: 0 0 auto;
+  height: 92px;
+  margin: 2px 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(238, 201, 106, 0.22);
+  background: linear-gradient(180deg, rgba(16, 26, 18, 0.88), rgba(7, 12, 8, 0.94));
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.story-prop-gun {
+  width: min(300px, 78%);
+  height: auto;
+  opacity: 0;
+  transform: translateY(-10px) rotate(-2deg);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.story-prop-strip.down .story-prop-gun { opacity: 1; transform: none; }
+.story-scene.reduce .story-prop-gun { transition: none; }
+
+/* Outro and intro exit rows (owner, 2026-10-21): the outro's actions sit
+   in ONE row under the scene — the primary (Retry / Run it back / To the
+   map on a win) a touch wider, the "To the map" secondary beside it in
+   the hairline voice — so a way off the screen is always on the screen.
+   The base .story-retry rule keeps its full-width solo meaning; inside
+   the row it takes its flex share instead. The intro's exit row is a
+   single quiet hairline button under the tape or the scene: leaving is
+   always possible, starting the game stays the loud act. */
+.story-outro-actions { display: flex; gap: 10px; margin-top: 12px; align-items: stretch; }
+.story-outro-actions .btn { flex: 1 1 0; min-width: 0; }
+.story-outro-actions .btn.primary { flex-grow: 1.4; }
+.story-outro-actions .story-retry { margin-top: 0; width: auto; }
+.story-intro-actions { display: flex; margin-top: 12px; }
+.story-intro-actions .btn { flex: 1 1 0; }
+
+/* ---- responsive tiers (owner, 2026-10-21: "we need to look at every
+   screen and make sure its optimized for mobile as well as large
+   screens") ----
+   The shell capped every story screen at 560px, so on a desktop the
+   map, tape, scenes and outros huddled in a phone column between wide
+   dead margins — and the tape's two sides engaged their row at 520px
+   of shell, leaving each entry a ~130px value column that wrapped a
+   dozen words into cards hundreds of pixels tall (the owner's Rec
+   Center screenshot). The tiers below step the shell up with the
+   viewport (760 at tablet width, 1120 on desktop) and give the tape,
+   scene and map room to match, while the 520–719 band (landscape
+   phones, small tablets) stacks the tape's sides full-width instead of
+   pinching them. Base rules above are untouched; everything here is
+   appended scope, exactly like the recap's ≥1024 pass. Same rules in
+   both themes (parity law). */
+
+/* The dock slot is designed as a 46px square (see .story-topbar
+   .dock-slot above), but the global .dock-slot rule forces
+   width: 40px !important outside portrait — so on landscape screens
+   the slot measured 40 wide × 46 tall and the parked speaker squared
+   itself down to 40px while portrait got 46 (the small boxed control
+   in the owner's screenshot). One size on story, every orientation. */
+.story-topbar .dock-slot { width: 46px !important; }
+
+/* Badge chips are buttons — a tap opens the badge's story — and at
+   ~29px tall they were the one story control under the family's 44px
+   target floor. The owner-only reset tool joins the same floor. */
+.story-badge { min-height: 44px; }
+.story-reset .btn { min-height: 44px; }
+
+/* The lock card is a notice, not a banner: when the shell runs wide it
+   caps at the old shell width and centers instead of stretching. */
+.story-lock-card { max-width: 560px; margin-left: auto; margin-right: auto; }
+
+/* The pinch band: the base tape rule engages its two-side row at
+   520px of shell, but until the shell steps up at 720 there is not
+   room for two honest value columns — stack the sides full-width. */
+@media (min-width: 520px) and (max-width: 719.98px) {
+  .story-tape-cols { flex-direction: column; }
+}
+
+/* Tablet step: a wider shell, a slightly wider tape label column,
+   and card art that keeps its proportion across the wider card. */
+@media (min-width: 720px) {
+  .story-shell { max-width: 760px; }
+  .story-tape { --tape-label-w: 96px; }
+  .story-card-art { height: 120px; }
+}
+
+/* Desktop step: the shell runs 1120 wide; the tape's sides finally
+   hold full value columns (~340px at 1440), the scene's cast and
+   dialogue step up one size as a UNIFORM tier (every cast card still
+   shares one spec height, so speaker changes still move nothing),
+   the map art keeps proportion, and the action rows stop stretching
+   their buttons across a thousand pixels — they cap and align to
+   the staging edge instead. */
+@media (min-width: 1100px) {
+  .story-shell { max-width: 1120px; padding-left: 32px; padding-right: 32px; }
+  .story-title { font-size: 34px; }
+  .story-hero { padding: 20px 22px 16px; }
+  .story-card-art { height: 152px; }
+  .story-route .story-card-faces .story-face { width: 46px; height: 46px; font-size: 20px; }
+  .story-stop-name { font-size: 19px; }
+  .story-tape { --tape-label-w: 104px; }
+  .story-tape-inner { padding: 22px 24px; }
+  .story-tape-stakes { font-size: 17.5px; }
+  .story-tape-entry { padding: 16px 18px; }
+  .story-tape-row { font-size: 14.5px; }
+  .story-scene-inner { padding: 52px 26px 54px; }
+  .story-cast-one { height: 152px; }
+  .story-cast-one .story-face.cast-face { width: 48px; height: 48px; font-size: 22px; }
+  .story-cast-name { font-size: 14.5px; }
+  .story-cast-role { font-size: 11.5px; }
+  .story-script-card { padding: 22px; }
+  .story-script-card .story-face.speaker-face { width: 64px; height: 64px; font-size: 28px; }
+  .story-script-face { width: 64px; height: 64px; font-size: 28px; }
+  .story-script-line { font-size: 18.5px; }
+  .story-dee-card .story-face.dee-face { width: 64px; height: 64px; font-size: 28px; }
+  .story-stop-actions { justify-content: flex-end; }
+  .story-stop-actions .btn { flex: 0 1 260px; }
+  .story-outro-actions { justify-content: center; }
+  .story-outro-actions .btn { flex: 0 1 360px; }
+  .story-intro-actions { justify-content: center; }
+  .story-intro-actions .btn { flex: 0 1 420px; }
+}
+
+/* ---- rewards presentation (owner, 2026-10-21, over the Rec Center
+   win outro: "we really need to make strides on user interface, this
+   is a game people need dopamine hits these achievements should have
+   a badge or something visible and visually stimulating this is dry
+   to say the least") ----
+   The outro's reward stack was a column of near-identical outlined
+   text pills, and the badge strip a pile of flat dim chips told apart
+   only by a hairline. Now the stack has a hierarchy and every element
+   carries art:
+   - the reward line is a gold HERO card, amounts set as big stats;
+   - a deck unlock shows the deck's REAL back art as a thumbnail;
+   - a set-animation unlock and the King's double cards wear an emblem
+     medallion; a found egg/feat wears a trophy medallion with the
+     find's own glyph;
+   - badges are MEDALLIONS — one designed medal (gold ring, dark disc,
+     the badge's glyph) in every state: earned lit, unearned the same
+     medal ghosted, so the strip reads as a trophy case with slots
+     still to hunt, on the outro and the map alike (one component).
+   The reveal is a stagger: cards pop in one after another on --i and
+   HOLD at the settled state; just-earned medals get a shine sweep.
+   Nothing overlays or darkens the information it celebrates, and
+   reduced motion collapses every animation to the settled state.
+   Same structure in both themes (parity law) — no theme selectors. */
+.story-rewards { display: flex; flex-direction: column; gap: 10px; margin: 0 0 12px; }
+.story-rewards .story-reward-line,
+.story-rewards .story-deck-line,
+.story-rewards .story-find-line,
+.story-rewards .story-badges { margin: 0; }
+.story-rewards .story-find-line { display: flex; flex-direction: column; gap: 10px; }
+
+/* the hero: the match's headline number, unmistakably */
+.story-reward-hero {
+  border: 1px solid rgba(238, 201, 106, 0.65);
+  border-radius: 16px;
+  padding: 16px 16px 14px;
+  text-align: center;
+  background:
+    radial-gradient(120% 170% at 50% 0%, rgba(238, 201, 106, 0.24), rgba(238, 201, 106, 0.05) 58%),
+    rgba(18, 13, 4, 0.66);
+  box-shadow: 0 6px 22px rgba(201, 162, 39, 0.14);
+}
+.story-reward-kicker { margin: 0; font-size: 21px; font-weight: 800; letter-spacing: 0.02em; color: #f3d47c; }
+.story-reward-stats { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 8px; flex-wrap: wrap; }
+.story-reward-stat { display: inline-flex; align-items: center; gap: 7px; }
+.story-reward-stat b { font-size: 27px; font-weight: 800; color: #eec96a; line-height: 1; }
+.story-reward-note { margin: 9px 0 0; font-size: 13.5px; line-height: 1.45; opacity: 0.88; }
+/* a loss is a consolation, not a celebration: same card, quiet voice */
+.story-reward-hero.consolation {
+  border-color: rgba(238, 201, 106, 0.35);
+  background: rgba(127, 127, 160, 0.06);
+  box-shadow: none;
+}
+.story-reward-hero.consolation .story-reward-stat b { font-size: 23px; }
+
+/* unlock cards: art on the left, the news on the right */
+.story-reward-card {
+  display: flex; gap: 14px; align-items: center;
+  border: 1px solid rgba(238, 201, 106, 0.45);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: rgba(20, 16, 6, 0.55);
+  text-align: left;
+}
+.story-reward-card.double { border-color: rgba(238, 201, 106, 0.32); background: rgba(10, 8, 16, 0.6); }
+.story-reward-card-body { flex: 1; min-width: 0; }
+.story-reward-card-title { margin: 0; font-weight: 800; font-size: 15.5px; line-height: 1.3; }
+.story-reward-card-sub { margin: 3px 0 0; font-size: 13px; line-height: 1.45; opacity: 0.82; }
+.story-reward-deckart {
+  width: 46px; height: 64px; flex: none;
+  object-fit: cover; border-radius: 6px;
+  box-shadow: 0 0 0 1px rgba(238, 201, 106, 0.55), 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+/* the deck unlock card is a door (owner, 2026-10-25): the whole card is a
+   button into the deck viewer. It keeps the card's exact settled look —
+   the rules below only strip the UA button chrome, blockify the text
+   spans the button carries, and add the look-through line. */
+.story-deck-tap { font: inherit; color: inherit; cursor: pointer; width: 100%; }
+.story-deck-tap .story-reward-card-title,
+.story-deck-tap .story-reward-card-sub { display: block; }
+.story-reward-card-view {
+  display: block; margin: 6px 0 0;
+  font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; color: #eec96a;
+}
+
+/* the rest of the unlock stack are doors too (owner, 2026-10-25: "These
+   should be tap able as well"): the set-animation card and the find cards
+   are buttons into their detail sheets, wearing the deck card's chrome
+   rules — the settled card look does not change. */
+.story-card-tap { font: inherit; color: inherit; cursor: pointer; width: 100%; }
+.story-card-tap .story-reward-card-title,
+.story-card-tap .story-reward-card-sub { display: block; }
+
+/* the medallion: one medal design for badges, finds and emblems —
+   a gold ring, a dark disc, the glyph lit on it. Earned is the base
+   state; the ghost lives under .story-badge.locked (unearned). */
+.story-medal {
+  --medal-size: 56px;
+  width: var(--medal-size); height: var(--medal-size);
+  flex: none; position: relative; overflow: hidden;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 34% 28%, #f4dc8e, #c9a227 58%, #8a6a14);
+  box-shadow: inset 0 0 0 2px rgba(255, 246, 214, 0.6), inset 0 -6px 10px rgba(90, 60, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.story-medal::before {
+  content: ''; position: absolute; inset: 5px; border-radius: 50%;
+  background: radial-gradient(circle at 38% 30%, #3a2c10, #191204 72%);
+  box-shadow: inset 0 0 0 1px rgba(238, 201, 106, 0.5);
+}
+.story-medal-glyph { position: relative; z-index: 1; font-size: 25px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.65)); }
+.story-medal.emblem { --medal-size: 46px; }
+.story-medal.emblem .story-medal-glyph { font-size: 19px; color: #f3d47c; filter: none; }
+/* unearned: the same medal, ghosted to a silhouette of itself */
+.story-badge.locked .story-medal { filter: grayscale(1) brightness(0.72); box-shadow: inset 0 0 0 2px rgba(220, 220, 235, 0.25), 0 2px 6px rgba(0, 0, 0, 0.35); }
+.story-badge.locked .story-medal::before { background: radial-gradient(circle at 38% 30%, #2c2c38, #101018 72%); box-shadow: inset 0 0 0 1px rgba(220, 220, 235, 0.22); }
+.story-badge.locked .story-medal-glyph { filter: grayscale(1) brightness(0.8); opacity: 0.75; }
+/* just earned: a shine sweep crosses the medal, twice, then rests */
+.story-badge.new .story-medal::after,
+.story-reward-card.find .story-medal::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; z-index: 2;
+  background: linear-gradient(115deg, transparent 32%, rgba(255, 255, 255, 0.55) 48%, transparent 64%);
+  transform: translateX(-130%);
+  animation: story-medal-shine 1.1s ease 0.4s 2 both;
+}
+@keyframes story-medal-shine { to { transform: translateX(130%); } }
+
+/* badge tiles: the case — medallion over name, earned warm, the NEW
+   tag pinned to the tile's corner */
+.story-badge {
+  flex-direction: column; justify-content: flex-start; gap: 6px;
+  min-width: 78px; padding: 10px 6px 9px;
+  border-radius: 14px;
+  background: rgba(127, 127, 160, 0.05);
+}
+.story-badge.earned { background: rgba(238, 201, 106, 0.08); }
+.story-badge-name {
+  font-size: 11.5px; font-weight: 700; line-height: 1.2; text-align: center;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+}
+.story-badge-new { position: absolute; top: -7px; right: -5px; }
+
+/* the staggered reveal: pop, hold, done — settled is the end state */
+.story-reveal {
+  animation: story-reward-in 0.5s cubic-bezier(0.2, 1.35, 0.4, 1) both;
+  animation-delay: calc(var(--i, 0) * 140ms);
+}
+.story-badges.celebrate .story-badge {
+  animation: story-reward-in 0.5s cubic-bezier(0.2, 1.35, 0.4, 1) both;
+  animation-delay: calc(200ms + var(--i, 0) * 55ms);
+}
+@keyframes story-reward-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-reveal,
+  .story-badges.celebrate .story-badge { animation: none; }
+  .story-badge.new .story-medal::after,
+  .story-reward-card.find .story-medal::after { animation: none; display: none; }
+}
+
+/* wide: the case breathes as a grid; medals and hero step up */
+@media (min-width: 720px) {
+  .story-badges-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); }
+  .story-badge { min-width: 0; }
+  .story-badge .story-medal { --medal-size: 64px; }
+  .story-badge .story-medal-glyph { font-size: 29px; }
+  .story-reward-kicker { font-size: 23px; }
+  .story-reward-stat b { font-size: 30px; }
+}
+
+/* ---------------------------------------------------------- outro detail
+   sheets (owner, 2026-10-25): the DeckViewer's overlay discipline in the
+   story register — the sheet holds the tapped item's own data (badge
+   explanation, the egg's tale, the feat's text, the set animation with a
+   live preview) and nothing else; the backdrop tap, ✕, Done and Escape
+   close it back onto the exact screen underneath. Same structure in both
+   themes; on a landscape phone the sheet takes the stage width. */
+.story-detail-backdrop { background: rgba(8, 5, 2, 0.62); }
+.story-detail-sheet {
+  width: min(560px, 94vw);
+  max-height: min(86dvh, 720px);
+  overflow-y: auto;
+  border: 1px solid rgba(238, 201, 106, 0.55);
+  border-radius: 16px;
+  padding: 16px;
+  background:
+    radial-gradient(120% 170% at 50% 0%, rgba(238, 201, 106, 0.16), rgba(238, 201, 106, 0.03) 58%),
+    #16110a;
+  color: #f5edd8;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.55);
+  text-align: left;
+}
+.story-detail-head { display: flex; align-items: center; gap: 12px; }
+.story-detail-titles { flex: 1; min-width: 0; }
+.story-detail-kicker {
+  margin: 0; font-size: 11px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #eec96a;
+}
+.story-detail-title { margin: 2px 0 0; font-size: 19px; font-weight: 800; line-height: 1.25; }
+.story-detail-close {
+  flex: none; width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(238, 201, 106, 0.4); border-radius: 12px;
+  background: transparent; color: inherit; font: inherit; font-size: 15px;
+  cursor: pointer;
+}
+.story-detail-body { margin-top: 14px; }
+.story-detail-line { margin: 0 0 10px; font-size: 14.5px; line-height: 1.55; }
+.story-detail-line:last-child { margin-bottom: 0; }
+.story-detail-foot { display: flex; justify-content: flex-end; margin-top: 16px; }
+/* a locked badge's medallion keeps its ghost in the sheet, as in the case */
+.story-detail-sheet.ghost .story-medal { filter: grayscale(1) brightness(0.72); box-shadow: inset 0 0 0 2px rgba(220, 220, 235, 0.25), 0 2px 6px rgba(0, 0, 0, 0.35); }
+.story-detail-sheet.ghost .story-medal::before { background: radial-gradient(circle at 38% 30%, #2c2c38, #101018 72%); box-shadow: inset 0 0 0 1px rgba(220, 220, 235, 0.22); }
+.story-detail-sheet.ghost .story-medal-glyph { filter: grayscale(1) brightness(0.8); opacity: 0.75; }
+
+/* ---------------------------------------------------------- the badge as
+   an object (owner, 2026-10-25: "I really want the badges to be 3d items
+   that take precent in the modal"). In the badge's popup the medallion
+   stops being a flat emblem in the header row and becomes the sheet's
+   hero: a thick CSS-3D coin, large and centered, the name and the
+   badge's own words beneath it. The coin is layered construction only —
+   two faces (front: the glyph embossed on a beveled gold field; back:
+   machined rings and the glyph ghosted), 48 edge segments for a reeded
+   rim wall, gradients for the metal, a cast shadow that breathes with
+   the turn. Motion (turntable rock, drag, momentum) is transform-driven
+   from BadgeMedal3D; under reduced effects the component rests it at a
+   still three-quarter angle — the .still state below — and there is no
+   flat fallback anywhere in this block. */
+.story-detail-sheet.has-hero { position: relative; }
+.story-detail-close-float { position: absolute; top: 12px; right: 12px; z-index: 6; }
+.story-detail-hero { display: flex; justify-content: center; }
+.story-detail-titles-hero { text-align: center; margin-top: 2px; }
+.story-detail-titles-hero .story-detail-title { font-size: 21px; }
+.story-detail-sheet.has-hero .story-detail-body { text-align: center; }
+
+.badge3d {
+  --coin: 218px;
+  position: relative;
+  width: 100%;
+  height: calc(var(--coin) + 64px);
+  perspective: 950px;
+  cursor: grab;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.badge3d:active { cursor: grabbing; }
+.badge3d.still { cursor: default; touch-action: auto; }
+.badge3d-coin {
+  position: absolute;
+  left: 50%; top: calc(var(--coin) / 2 + 4px);
+  width: var(--coin); height: var(--coin);
+  margin-left: calc(var(--coin) / -2); margin-top: calc(var(--coin) / -2);
+  transform-style: preserve-3d;
+  transform: rotateX(10deg) rotateY(-18deg);
+  will-change: transform;
+}
+.badge3d-shadow {
+  position: absolute; left: 50%; bottom: 12px;
+  width: calc(var(--coin) * 0.74); height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0) 68%);
+  transform: translateX(-50%);
+}
+.badge3d-face {
+  position: absolute; left: 50%; top: 50%;
+  width: var(--coin); height: var(--coin);
+  border-radius: 50%;
+  display: grid; place-items: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.badge3d-front {
+  transform: translate(-50%, -50%) translateZ(8px);
+  background:
+    radial-gradient(circle at calc(36% + var(--shine, 0) * 14%) 24%, rgba(255, 250, 220, 0.55), rgba(255, 250, 220, 0) 44%),
+    radial-gradient(circle at 50% 44%, #f7dc8d, #eec96a 30%, #c9a227 58%, #97700f 86%, #7c5a0a);
+}
+.badge3d-back {
+  transform: translate(-50%, -50%) rotateY(180deg) translateZ(8px);
+  background:
+    radial-gradient(circle at calc(64% - var(--shine, 0) * 14%) 24%, rgba(255, 250, 220, 0.5), rgba(255, 250, 220, 0) 50%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(122, 84, 4, 0.16) 0 2px, rgba(255, 240, 190, 0.1) 2px 4px),
+    radial-gradient(circle at 50% 44%, #e9cd72, #c9a227 55%, #97700f 92%);
+}
+/* the beveled rim: a conic metal ring masked to the coin's outer band */
+.badge3d-face::before {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  background: conic-gradient(from 215deg, #8a6a14, #ffe9a8 12%, #b98c1e 26%, #f7dc8d 40%, #8a6a14 55%, #ffe9a8 68%, #a87f16 82%, #8a6a14);
+  -webkit-mask: radial-gradient(closest-side, transparent 79%, #000 80%);
+  mask: radial-gradient(closest-side, transparent 79%, #000 80%);
+}
+/* the machined step where rim meets field */
+.badge3d-face::after {
+  content: ''; position: absolute; inset: calc(var(--coin) * 0.105); border-radius: 50%;
+  box-shadow: inset 0 2px 5px rgba(255, 246, 214, 0.55), inset 0 -5px 9px rgba(90, 60, 0, 0.45), inset 0 0 0 2px rgba(122, 84, 4, 0.45);
+}
+.badge3d-glyph {
+  position: relative; z-index: 2;
+  font-size: calc(var(--coin) * 0.42); line-height: 1;
+  filter: drop-shadow(0 2px 1px rgba(80, 52, 0, 0.55)) drop-shadow(0 -2px 2px rgba(255, 244, 200, 0.65)) drop-shadow(0 6px 10px rgba(60, 38, 0, 0.35));
+}
+.badge3d-back-glyph {
+  position: relative; z-index: 2;
+  font-size: calc(var(--coin) * 0.3); line-height: 1; opacity: 0.5;
+  filter: drop-shadow(0 1px 1px rgba(80, 52, 0, 0.6));
+}
+/* the reeded edge: 48 wall segments, alternate reeds shaded a step down */
+.badge3d-edge {
+  position: absolute; left: 50%; top: 50%;
+  width: 16px; height: calc(var(--coin) * 0.069);
+  transform: translate(-50%, -50%) rotateZ(var(--a)) translateX(calc(var(--coin) / 2)) rotateY(90deg);
+  background: linear-gradient(90deg, #7c5a0a, #e9c34d 42%, #f7dc8d 55%, #7c5a0a);
+}
+.badge3d-edge:nth-of-type(even) { filter: brightness(0.88); }
+.badge3d-hint {
+  position: absolute; left: 0; right: 0; bottom: -2px;
+  text-align: center;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: rgba(238, 201, 106, 0.55);
+}
+/* locked: the same coin, unlit — dark metal, the glyph a silhouette */
+.badge3d.locked .badge3d-front {
+  background:
+    radial-gradient(circle at calc(36% + var(--shine, 0) * 14%) 24%, rgba(210, 210, 225, 0.28), rgba(210, 210, 225, 0) 48%),
+    radial-gradient(circle at 50% 44%, #55555f, #33333d 46%, #1d1d26 82%, #121218);
+}
+.badge3d.locked .badge3d-back {
+  background:
+    radial-gradient(circle at calc(64% - var(--shine, 0) * 14%) 24%, rgba(210, 210, 225, 0.16), rgba(210, 210, 225, 0) 50%),
+    repeating-radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.28) 0 2px, rgba(210, 210, 225, 0.07) 2px 4px),
+    radial-gradient(circle at 50% 44%, #3d3d48, #23232c 60%, #141419);
+}
+.badge3d.locked .badge3d-face::before {
+  background: conic-gradient(from 215deg, #26262e, #5c5c68 12%, #33333d 26%, #4c4c58 40%, #26262e 55%, #5c5c68 68%, #3a3a44 82%, #26262e);
+}
+.badge3d.locked .badge3d-face::after {
+  box-shadow: inset 0 2px 5px rgba(200, 200, 215, 0.22), inset 0 -5px 9px rgba(0, 0, 0, 0.6), inset 0 0 0 2px rgba(0, 0, 0, 0.5);
+}
+.badge3d.locked .badge3d-glyph {
+  filter: grayscale(1) brightness(0.72) drop-shadow(0 2px 1px rgba(0, 0, 0, 0.7)) drop-shadow(0 -1px 1px rgba(200, 200, 215, 0.25));
+  opacity: 0.85;
+}
+.badge3d.locked .badge3d-back-glyph { filter: grayscale(1) brightness(0.6); opacity: 0.4; }
+.badge3d.locked .badge3d-edge { background: linear-gradient(90deg, #0e0e13, #43434f 50%, #0e0e13); }
+.badge3d.locked .badge3d-hint { color: rgba(210, 210, 225, 0.4); }
+/* Short landscape: the coin shrinks so the whole badge sheet — hero,
+   name, info, Done — stays on one screen (844×390 verified). */
+@media (orientation: landscape) and (max-height: 540px) {
+  .badge3d { --coin: 120px; height: calc(var(--coin) + 36px); }
+  .badge3d-shadow { bottom: 2px; }
+  .story-detail-sheet.has-hero .story-detail-header-hero { margin-bottom: 2px; }
+  .story-detail-sheet.has-hero .story-medal-title { font-size: 19px; }
+}
+
+/* the set-animation preview: the recap's own cover engine (SetCover)
+   mounted fresh per tier inside a stage that gives it the card face's
+   containment (positioned, clipped, its own stacking context) */
+.story-setanim-preview { display: grid; gap: 10px; margin-bottom: 12px; }
+.story-setanim-stage {
+  position: relative; z-index: 0; overflow: hidden;
+  border-radius: 12px; min-height: 132px; aspect-ratio: 2 / 1;
+  background: radial-gradient(120% 160% at 50% 0%, #2c2113, #171106 72%);
+  box-shadow: inset 0 0 0 1px rgba(238, 201, 106, 0.3);
+}
+.story-setanim-stage-tag {
+  position: absolute; left: 10px; bottom: 8px; z-index: 6;
+  padding: 2px 8px; border-radius: 999px;
+  background: rgba(0, 0, 0, 0.58); color: #ffe9a8;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase;
+}
+.story-setanim-replay { margin-bottom: 12px; min-height: 44px; }
+@media (min-width: 720px) {
+  .story-setanim-preview { grid-template-columns: 1fr 1fr; }
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  .story-detail-sheet { width: min(1080px, 97vw); }
+  .story-setanim-preview { grid-template-columns: 1fr 1fr; }
+}
+
+/* ---------------------------------------------------------- co-op (Phases 1–2)
+   The mode gate, the partner step, the pair map and the story room — all in
+   the story register (warm, rounded, 44px targets), shared by both themes. */
+.story-gate-lede { font-size: 19px; font-weight: 600; margin: 18px 0 12px; }
+.story-gate { display: grid; gap: 12px; }
+.story-gate-card {
+  display: block; width: 100%; text-align: left; cursor: pointer;
+  border: 1px solid rgba(127, 127, 160, 0.35); border-radius: 14px;
+  padding: 16px; min-height: 44px; background: transparent; color: inherit;
+}
+.story-gate-name { display: block; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.story-gate-line { display: block; opacity: 0.85; line-height: 1.4; }
+
+/* The gate's composition (owner, 2026-10-24 — "This screen is pretty
+   dry."): the front door borrows the map's own language — a stop
+   backdrop in a tall hero, portrait medallions on the choice cards, the
+   route as a thread of nodes along the bottom. The shell is a column
+   so the route rests low on a tall phone instead of the lower half
+   sitting empty; on a short phone it simply flows after the cards.
+   Still photography and type only: no motion over content. */
+.story-gate-shell { display: flex; flex-direction: column; }
+.story-gate-hero {
+  min-height: 188px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 16px;
+  margin-bottom: 4px;
+}
+.story-gate-hero .story-hero-bg { opacity: 0.55; }
+.story-gate-card { display: flex; gap: 14px; align-items: center; }
+.story-gate-faces { display: flex; align-items: center; flex: none; }
+.story-gate-seat-open {
+  width: 54px; height: 54px; border-radius: 50%; flex: none;
+  border: 2px dashed rgba(232, 200, 90, 0.7);
+  display: grid; place-items: center;
+  font-size: 24px; font-weight: 700; color: #e8c85a;
+  background: rgba(10, 10, 18, 0.85);
+  margin-left: -16px;
+}
+.story-gate-card-text { flex: 1; min-width: 0; }
+.story-gate-state {
+  display: block; margin-top: 7px;
+  font-size: 13.5px; font-weight: 600; line-height: 1.35;
+  color: #e8c85a;
+}
+.story-gate-route { margin-top: auto; padding-top: 30px; }
+.story-gate-thread { display: flex; align-items: center; }
+.story-gate-node {
+  flex: none; width: 22px; height: 22px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 10px; font-weight: 800;
+  background: #23233a; color: #f5f4ff;
+  border: 2px solid rgba(127, 127, 160, 0.5);
+}
+.story-gate-node.state-cleared { background: #2e7d46; border-color: #2e7d46; color: #fff; }
+.story-gate-node.state-current {
+  background: #c9a227; border-color: #e8c85a; color: #14100a;
+  box-shadow: 0 0 0 4px rgba(201, 162, 39, 0.25);
+}
+.story-gate-node.is-king { border-color: rgba(201, 162, 39, 0.75); }
+.story-gate-link {
+  flex: 1; height: 2px;
+  background: linear-gradient(90deg, rgba(201, 162, 39, 0.55), rgba(127, 127, 160, 0.35));
+}
+.story-gate-route-line { margin: 12px 0 0; text-align: center; font-size: 13.5px; opacity: 0.85; }
+.story-mode-toggle {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+.story-mode-current { font-weight: 600; }
+
+/* The partner step's composition (owner, 2026-10-24 — "This screen is
+   still trash but I like the next screen that stages the players"):
+   the gate's and the room lobby's language, one screen earlier — the
+   title in a hero over a stop backdrop (the dock parks in the hero's
+   topbar, over art, as on the gate and the map), Dee presenting the
+   run in her guide's voice instead of a wall of explainer text, rows
+   with real faces (a friend's picture, the stop pair's portraits on
+   the lobby's table), presence and pair standing read from the same
+   payloads the Friends tab uses, and the join code entered on the
+   lobby's dashed ticket. The shell is a column and the share section
+   rests in the bottom zone, so a short screen fills the phone instead
+   of ending in void; on a short phone everything simply flows.
+   Still photography and type only: no motion over content. */
+.story-coop-shell { display: flex; flex-direction: column; }
+.story-coop-hero {
+  min-height: 172px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 16px;
+  margin-bottom: 14px;
+}
+.story-coop-hero .story-hero-bg { opacity: 0.55; }
+.story-coop { display: flex; flex-direction: column; gap: 18px; flex: 1; }
+.story-coop-h { font-size: 16px; margin: 0 0 8px; }
+.story-coop-dee {
+  display: flex; gap: 12px; align-items: center;
+  border: 1px solid rgba(127, 127, 160, 0.35); border-radius: 14px;
+  padding: 12px;
+}
+.story-coop-dee-body { flex: 1; min-width: 0; }
+.story-coop-dee-name {
+  margin: 0; font-size: 12px; font-weight: 800;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #eec96a;
+}
+.story-coop-dee-line { margin: 3px 0 0; line-height: 1.45; opacity: 0.92; }
+.story-coop-dim { opacity: 0.75; margin: 0 0 8px; }
+.story-coop-err { border-color: #b3543f; }
+.story-coop-runs, .story-coop-friends, .story-coop-share { display: grid; gap: 8px; }
+.story-coop-share { margin-top: auto; padding-top: 6px; }
+.story-coop-run {
+  display: flex; justify-content: flex-start; align-items: center; gap: 12px;
+  width: 100%; text-align: left; cursor: pointer; min-height: 44px;
+  border: 1px solid rgba(127, 127, 160, 0.35); border-radius: 12px;
+  padding: 10px 12px; background: transparent; color: inherit;
+}
+.story-coop-run-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.story-coop-run-name { font-weight: 600; }
+.story-coop-run-facts { opacity: 0.8; font-size: 14px; }
+.story-coop-av {
+  width: 44px; height: 44px; border-radius: 50%; overflow: hidden;
+  display: grid; place-items: center; flex: none; box-sizing: border-box;
+  font-weight: 800; font-size: 19px;
+  background: rgba(127, 127, 160, 0.3);
+  border: 2px solid rgba(232, 200, 90, 0.75);
+}
+.story-coop-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.story-coop-friend {
+  display: flex; justify-content: flex-start; align-items: center; gap: 12px;
+  border: 1px solid rgba(127, 127, 160, 0.25); border-radius: 12px; padding: 10px 12px;
+}
+.story-coop-friend-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.story-coop-friend-name { font-weight: 600; display: flex; align-items: center; gap: 7px; }
+.story-coop-dot { width: 8px; height: 8px; border-radius: 50%; background: #3fae5a; flex: none; }
+.story-coop-friend-sub { font-size: 13px; opacity: 0.75; }
+.story-coop-friend-run { font-size: 13px; font-weight: 600; color: #e8c85a; }
+.story-coop-ticket {
+  display: flex; flex-direction: column; gap: 8px;
+  border: 1px dashed rgba(232, 200, 90, 0.55); border-radius: 14px;
+  padding: 10px 12px;
+  background: rgba(238, 201, 106, 0.05);
+}
+.story-coop-ticket-label {
+  font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #e8c85a;
+}
+.story-coop-share-row, .story-coop-join-row { display: flex; gap: 8px; align-items: center; }
+.story-coop-join-row input {
+  flex: 1; min-height: 44px; border-radius: 10px; padding: 8px 10px;
+  border: 1px solid rgba(127, 127, 160, 0.4); background: transparent; color: inherit;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+
+/* The room lobby's composition (owner, 2026-10-24 — "This screen
+   needs work"): the waiting room meets the gate's standard — the
+   stop's own backdrop in a hero over the header, the invite code set
+   as a ticket, the four seats composed as the table they'll play at
+   (own seat near, partner across, the stop's pair on the sides), the
+   awareness note as a line of the room's fiction instead of a form
+   box, and the route as the gate's thread instead of a wall of lock
+   pills: locked stops are road, not buttons; only the stops the pair
+   has unlocked render as chips the host can pick.
+   The stage restructure (owner, 2026-10-24 — "none of them are
+   clearly in view unless I scroll… restructure this screen so that
+   no scroll is needed"): the composition is kept, the sizing is
+   rebuilt — the shell is exactly the viewport and a size container,
+   every section is a share of it (cqh) or a fixed floor, and the
+   felt is the one elastic section, so hero, ticket, table, lines,
+   route and actions are all inside the first screen by
+   construction. The budget is pinned in
+   story-room-lobby-fit.test.ts.
+   The sound dock also parks in this topbar's slot like every story
+   surface — audited against the owner's screenshot: the dock WAS
+   slotted and sized correctly (46px on the slot); what read as a
+   broken partial gold frame was the playing state's gold ring +
+   chamfer floating on the glass button's near-invisible fill over
+   the flat void. Inside the hero it sits over the stop's art inside
+   a bordered card, exactly as on the gate and the map, and reads
+   whole. The dock itself is untouched. */
+.story-room-shell {
+  display: flex; flex-direction: column;
+  height: 100dvh; min-height: 0;
+  container-type: size;
+  padding-top: calc(10px + env(safe-area-inset-top));
+  padding-bottom: calc(10px + env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+/* Very short (landscape-class) heights: the stage yields back to
+   flow rather than clip the actions — cqh then reads the viewport. */
+@media (max-height: 560px) {
+  .story-room-shell { height: auto; min-height: 100dvh; overflow: visible; container-type: normal; }
+}
+.story-room-hero {
+  flex: none;
+  height: 16cqh; min-height: 100px; max-height: 150px;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding: 1.5cqh 14px;
+  margin-bottom: 1.2cqh;
+}
+.story-room-hero .story-hero-bg { opacity: 0.55; }
+.story-room-hero .story-crumb { font-size: 11px; }
+.story-room-hero .story-title { font-size: clamp(22px, 3.2cqh, 28px); }
+.story-room-hero .story-sub { font-size: clamp(12.5px, 1.8cqh, 14.5px); line-height: 1.3; }
+.story-room-share {
+  flex: none;
+  display: flex; align-items: stretch; gap: 10px;
+  height: 6.8cqh; min-height: 48px; max-height: 58px;
+  margin: 0 0 1.1cqh;
+}
+.story-room-ticket {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center; gap: 1px;
+  border: 1px dashed rgba(232, 200, 90, 0.55); border-radius: 14px;
+  padding: 5px 12px;
+  background: rgba(238, 201, 106, 0.05);
+}
+.story-room-ticket-label {
+  font-size: 10.5px; font-weight: 800; letter-spacing: 0.14em;
+  text-transform: uppercase; color: #e8c85a;
+}
+.story-room-code { font-size: clamp(19px, 2.9cqh, 24px); font-weight: 800; letter-spacing: 0.14em; line-height: 1.15; }
+.story-room-share .btn { display: inline-flex; align-items: center; justify-content: center; }
+.story-room-table {
+  /* The elastic section: it takes whatever height the fixed shares
+     leave, and it is itself a size container — inside it, cqh reads
+     the FELT's height, so faces and seat type scale with the room
+     they actually have (the lobby v7 / player-card pattern). Rows
+     are equal shares; a seat can never outgrow its row. */
+  flex: 1 1 auto; min-height: 240px;
+  container-type: size;
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: repeat(3, minmax(0, 1fr));
+  grid-template-areas: '. top .' 'left . right' '. bottom .';
+  align-items: center; justify-items: center;
+  gap: 4px;
+  border: 1px solid rgba(238, 201, 106, 0.35);
+  border-radius: 22px;
+  background:
+    radial-gradient(90% 120% at 50% 0%, rgba(238, 201, 106, 0.1), rgba(238, 201, 106, 0) 55%),
+    linear-gradient(180deg, #221a10, #150f08);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35), inset 0 0 44px rgba(0, 0, 0, 0.45);
+  padding: 8px;
+  margin: 0 0 1.1cqh;
+}
+.story-room-felt-mark {
+  grid-row: 2; grid-column: 2;
+  font-size: 20px; line-height: 1; color: rgba(232, 200, 90, 0.4);
+}
+.story-room-seat {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center; gap: 2px;
+  min-width: 0; max-width: 132px;
+}
+.story-room-seat.pos-top { grid-area: top; }
+.story-room-seat.pos-left { grid-area: left; }
+.story-room-seat.pos-right { grid-area: right; }
+.story-room-seat.pos-bottom { grid-area: bottom; }
+.story-room-seat.away .story-room-av,
+.story-room-seat.away .story-face { opacity: 0.45; filter: grayscale(0.6); }
+.story-room-table .story-face.room-face,
+.story-room-table .story-room-av,
+.story-room-table .story-room-seat-none {
+  width: clamp(38px, 16.5cqh, 56px); height: clamp(38px, 16.5cqh, 56px);
+}
+.story-face.room-face {
+  font-size: clamp(17px, 7.5cqh, 23px);
+  border: 2px solid rgba(245, 244, 255, 0.8);
+}
+.story-room-av {
+  border-radius: 50%; overflow: hidden;
+  display: grid; place-items: center; flex: none; box-sizing: border-box;
+  font-weight: 800; font-size: clamp(17px, 7.5cqh, 23px);
+  background: rgba(127, 127, 160, 0.3);
+  border: 2px solid rgba(232, 200, 90, 0.75);
+}
+.story-room-av img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.story-room-seat-open {
+  width: clamp(30px, 11cqh, 38px); height: clamp(30px, 11cqh, 38px);
+  border-radius: 50%; box-sizing: border-box; flex: none;
+  border: 2px dashed rgba(232, 200, 90, 0.7);
+  display: grid; place-items: center;
+  font-size: 19px; font-weight: 700; color: #e8c85a;
+  background: rgba(10, 10, 18, 0.6);
+}
+.story-room-seat-none {
+  border-radius: 50%; box-sizing: border-box;
+  display: grid; place-items: center;
+  font-size: 18px; opacity: 0.5;
+  background: rgba(127, 127, 160, 0.25);
+}
+/* The open seat is one compact horizontal line, not a stacked block. */
+.story-room-seat.is-open {
+  flex-direction: row; gap: 8px;
+  max-width: 252px; text-align: left;
+}
+.story-room-seat-openline { min-width: 0; }
+.story-room-seat-openline .story-room-seat-name { margin-top: 0; }
+.story-room-seat-openline .story-room-seat-status::before { content: ' — '; }
+.story-room-seat-name {
+  margin-top: 2px;
+  font-weight: 700; font-size: clamp(12.5px, 4.4cqh, 14.5px); line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+.story-room-seat-role {
+  font-size: clamp(9.5px, 3.3cqh, 10.5px); font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; opacity: 0.65; line-height: 1.2;
+}
+.story-room-seat-status { font-size: 12px; font-style: italic; opacity: 0.85; }
+/* The ready tick rides the seat's name line — no pill row of its own. */
+.story-room-seat-ready {
+  display: inline-block; vertical-align: 2px;
+  margin-left: 6px;
+  font-size: 9.5px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  color: #14100a; background: #c9a227;
+  border-radius: 999px; padding: 1px 6px;
+}
+.story-room-line {
+  flex: none;
+  margin: 0 0 1.1cqh;
+  text-align: center; font-style: italic;
+  font-size: clamp(12.5px, 1.9cqh, 15px); line-height: 1.35; opacity: 0.92;
+}
+.story-room-stops { flex: none; margin: 0 0 1cqh; }
+.story-room-stops .story-coop-h { font-size: 14px; margin: 0 0 4px; }
+.story-room-stops .story-gate-node { width: clamp(22px, 3.2cqh, 26px); height: clamp(22px, 3.2cqh, 26px); }
+.story-gate-node.is-here { outline: 2px solid #f5f4ff; outline-offset: 2px; }
+.story-room-route-line {
+  margin: 5px 0 0; text-align: center;
+  font-size: clamp(11.5px, 1.75cqh, 13.5px); line-height: 1.3; opacity: 0.85;
+}
+/* The chips are ONE row at any progress level — a veteran pair's
+   eleven replay picks scroll sideways inside the row instead of
+   wrapping into rows that push the actions off the stage. */
+.story-room-stoprow {
+  display: flex; flex-wrap: nowrap; overflow-x: auto;
+  gap: 8px; margin-top: 8px; padding-bottom: 2px;
+}
+.story-room-stoprow .btn { flex: none; }
+.story-room-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.story-room-shell .story-room-actions {
+  flex: none; margin-top: auto; padding-top: 4px; align-items: center;
+}
+/* The ready STATUS (lobby, once you're ready): words, not a button —
+   no fill, no border, nothing that invites a tap. */
+.story-room-status {
+  margin: 0;
+  font-size: 14.5px; font-weight: 700; font-style: italic; color: #e8c85a;
+}
+@media (min-width: 720px) {
+  .story-room-table .story-face.room-face,
+  .story-room-table .story-room-av,
+  .story-room-table .story-room-seat-none { width: clamp(44px, 16.5cqh, 64px); height: clamp(44px, 16.5cqh, 64px); }
+  .story-face.room-face { font-size: 27px; }
+  .story-room-av { font-size: 27px; }
+}
+
+/* ---- the landscape stage (design audit D7, 2026-10-24) ----
+   In phone landscape the column stage's fixed shares (hero min 100 +
+   share min 48 + stops ~89 + chips + actions) exceed the 355–389px
+   content heights BEFORE the felt's 240px floor — the felt computed
+   to −19…+19px and the ≤560px flow fallback took over, leaving
+   ~236–288px of scroll with Ready/Leave ~290px below the fold on a
+   screen whose whole design goal is "no scroll needed".
+   At short heights on a wide-enough viewport the stage therefore
+   composes as a two-pane grid instead of a column: a 280px rail
+   (hero, share ticket, the room's line) beside the felt, which spans
+   the stage's full main height; the stops become ONE horizontal bar
+   (heading · thread · route caption · the host's chips scrolling
+   sideways inside their share) and the actions stay pinned in the
+   stage flow on the last row. The felt's floor drops to 180px and
+   its seats step down with it (smaller face clamp, tighter seat
+   type) so a seat block still fits its row. The narrow-short flow
+   fallback above still covers short heights under 600px wide.
+   Same cqh budget idiom, same container structure; portrait,
+   tablet and desktop never enter this query (their heights clear
+   560px), so their budgets close exactly as before. The arithmetic
+   is pinned in story-room-lobby-fit.test.ts. Layout only — the
+   Neon story overrides stay color-only, as everywhere in story. */
+@media (max-height: 560px) and (min-width: 600px) {
+  .story-room-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+    grid-template-rows: auto auto auto minmax(0, 1fr) auto auto;
+    gap: 4px 10px;
+    max-width: none;
+    padding-left: 12px; padding-right: 12px;
+    height: 100dvh; min-height: 0;
+    container-type: size;
+    overflow: hidden;
+  }
+  .story-room-hero {
+    grid-column: 1; grid-row: 1;
+    height: auto; min-height: 0; max-height: none;
+    padding: 4px 14px;
+    margin-bottom: 0;
+  }
+  .story-room-hero .story-crumb { font-size: 10.5px; }
+  .story-room-hero .story-title { font-size: 19px; }
+  .story-room-hero .story-sub { font-size: 11.5px; }
+  .story-room-share {
+    grid-column: 1; grid-row: 2;
+    height: auto; min-height: 46px; max-height: none;
+    margin: 0;
+  }
+  .story-room-code { font-size: 18px; }
+  .story-room-line {
+    grid-column: 1; grid-row: 3;
+    margin: 0;
+    text-align: left;
+    font-size: 12px;
+  }
+  /* Waiting and awareness lines never co-fire in the shipped states
+     (awareness needs a bound pair's context; the waiting line shows
+     only before a partner binds) — if both ever rendered, the second
+     line offsets inside the same rail row instead of overlapping the
+     first line's glyphs. */
+  .story-room-shell > .story-room-line:nth-of-type(2) { margin-top: 20px; }
+  .story-room-table {
+    grid-column: 2; grid-row: 1 / 5;
+    min-height: 180px;
+    margin: 0;
+    padding: 6px;
+  }
+  .story-room-table .story-face.room-face,
+  .story-room-table .story-room-av,
+  .story-room-table .story-room-seat-none { width: clamp(32px, 16.5cqh, 56px); height: clamp(32px, 16.5cqh, 56px); }
+  .story-room-seat-name { font-size: clamp(11.5px, 4.4cqh, 13px); }
+  .story-room-seat-role { font-size: clamp(9px, 3.3cqh, 10px); }
+  .story-room-stops {
+    grid-column: 1 / -1; grid-row: 5;
+    display: flex; align-items: center; gap: 10px;
+    margin: 0;
+  }
+  .story-room-stops .story-coop-h { flex: none; margin: 0; font-size: 13px; }
+  .story-room-stops .story-gate-thread { flex: 1 0 auto; min-width: 0; }
+  .story-room-route-line { flex: 0 1 250px; margin: 0; text-align: left; font-size: 10.5px; }
+  .story-room-stoprow { flex: 1 1 140px; min-width: 72px; margin-top: 0; padding-bottom: 0; }
+  .story-room-shell .story-room-actions {
+    grid-column: 1 / -1; grid-row: 6;
+    margin-top: 0; padding-top: 4px;
+  }
+}
+
+/* ---- tap-target floor (design audit D4, story.css portion) ----
+   The story button family already floors at 44px inside .story-shell,
+   but several story controls reached that floor only by inheritance —
+   and one host sits outside the shell entirely (the in-game concede
+   cluster on .story-room-game, whose buttons are the global .btn).
+   These pins make the floor explicit on every story action the census
+   flagged, so a future family edit can't silently drop one below
+   44px. All of these controls live in flow rows or in the room
+   stage's share row (48px portrait / 46px landscape — both still
+   clear the 44px buttons inside them), so no budget re-opens. */
+.story-topbar .btn,
+.story-script-actions .btn,
+.story-outro-actions .btn,
+.story-intro-actions .btn,
+.story-mode-toggle .btn,
+.story-room-share .btn,
+.story-room-stoprow .btn,
+.story-room-actions .btn,
+.story-room-concede .btn,
+.story-coop-share-row .btn,
+.story-coop-friend .btn,
+.story-finale-choice .btn { min-height: 44px; }
+.story-hotspot { min-width: 44px; min-height: 44px; }
+
+/* The King's proposal choice (Phase 4): the terms stated plainly, the
+   pair's standing answers under them. Warm story register, like the
+   rest of the room — no broadcast chrome. */
+.story-finale-choice { max-width: 560px; margin: 18px auto 0; text-align: left; }
+.story-finale-terms { margin: 12px 0 4px; padding-left: 20px; display: grid; gap: 7px; font-size: 14px; line-height: 1.5; opacity: 0.92; }
+.story-room-game { position: relative; }
+.story-room-concede {
+  position: absolute; top: 8px; right: 8px; z-index: 5;
+  display: flex; align-items: center; gap: 8px;
+  background: rgba(20, 14, 8, 0.72); border-radius: 10px; padding: 6px 8px;
+  color: #f5ead6; font-size: 14px;
+}
+
+/* Dee's Rundown panel (co-op Phase 3): inside the tape, between the
+   history block and the two columns — story family only (rounded,
+   hairline, warm), never broadcast chrome. */
+.dee-rundown {
+  display: flex; gap: 12px; align-items: flex-start;
+  border: 1px solid rgba(238, 201, 106, 0.45); border-radius: 12px;
+  background: rgba(18, 13, 4, 0.76); padding: 12px 14px;
+}
+.dee-rundown-body { min-width: 0; flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.dee-rundown-head { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.16em; color: #eec96a; }
+.dee-rundown-byline { letter-spacing: 0.02em; text-transform: none; font-weight: 600; opacity: 0.85; }
+.dee-rundown-textwrap { position: relative; }
+/* The sizer is IN FLOW and the revealed text overlays it: the wrap — and
+   so the panel and the page — is full-height from first paint and never
+   grows while the reveal runs. It was the other way round (revealed
+   text in flow, sizer absolute), so the panel grew by the whole script
+   over the course of a reading — post-mount page growth on a screen the
+   owner had already caught opening displaced once (2026-10-22 scroll
+   regression). A revealed prefix wraps at the same points it takes in
+   the full text at this width, so the overlay lines up line for line. */
+.dee-rundown-text { margin: 0; font-size: 15px; line-height: 1.55; position: absolute; inset: 0; }
+.dee-rundown-sizer { margin: 0; font-size: 15px; line-height: 1.55; visibility: hidden; }
+.dee-rundown-controls { display: flex; gap: 8px; }
+.dee-rundown-controls .btn { min-height: 44px; }
+
+/* Dee's guide plate (co-op Phase 3, spec §5.5): pinned to the rail edge
+   of the table — bottom-left above the chat strip on phones; she is
+   visibly not a seat (no cards, no bid chip, no score). The plate
+   lifts while she speaks; it dims while she covers a partner's seat. */
+.guide-plate {
+  position: absolute; left: 8px; bottom: 8px; z-index: 5;
+  display: flex; align-items: center; gap: 10px; max-width: min(340px, 72vw);
+  background: rgba(20, 14, 8, 0.78); border: 1px solid rgba(238, 201, 106, 0.35);
+  border-radius: 12px; padding: 6px 10px 6px 6px; color: #f5ead6;
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+.guide-plate.speaking { transform: translateY(-3px); border-color: rgba(238, 201, 106, 0.8); }
+.guide-plate.covering { opacity: 0.45; }
+.guide-plate-body { min-width: 0; }
+.guide-plate-name { margin: 0; font-size: 12px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: #eec96a; }
+.guide-plate-line {
+  margin: 0; font-size: 13px; line-height: 1.35; opacity: 0.92;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+@media (min-width: 1024px) {
+  .guide-plate { left: 14px; bottom: 14px; }
+}
+
+/* Dee's closing line on the co-op outro (spec §5.5). */
+.story-guide-outro { margin: 14px 0 0; font-size: 15px; line-height: 1.5; font-style: italic; }
+.story-guide-byline {
+  display: block; font-style: normal; font-size: 12px; font-weight: 800;
+  letter-spacing: 0.12em; text-transform: uppercase; color: #eec96a; margin-bottom: 2px;
+}
+
+/* Dee's Rundown, static mode (solo rundown spec §4): voices off,
+   sound off, or Dee muted — no clip can sound, so her full words
+   carry it framed as a quote under the header, signed, no controls. */
+.dee-rundown.static .dee-rundown-textwrap { border-left: 2px solid rgba(238, 201, 106, 0.45); padding-left: 10px; }
+.dee-rundown-sign { margin: 2px 0 0; font-size: 13.5px; font-style: italic; opacity: 0.85; }
+
+/* Dee's Rundown FILM (first-visit solo rundowns): a 16:9 letterboxed
+   frame that never exceeds the screen — width-led in portrait, height-led
+   in landscape (the frame's height is capped, its width follows the
+   ratio) — so the film and its controls are on screen without scrolling. */
+.dee-rundown.has-video .dee-rundown-body { align-items: center; }
+.dee-rundown.has-video .dee-rundown-head { align-self: stretch; }
+.dee-video { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.dee-video-frame { position: relative; width: min(100%, calc((100dvh - 150px) * 16 / 9)); aspect-ratio: 16 / 9; background: #000; border-radius: 10px; overflow: hidden; }
+.dee-video-el { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; display: block; }
+.dee-video-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 50%; border: 0; background: rgba(238, 201, 106, 0.92); color: #1c1206; font-size: 24px; display: grid; place-items: center; cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5); }
+.dee-video-play:focus-visible { outline: 2px solid #ffe48a; outline-offset: 3px; }
+.dee-video .dee-rundown-controls .btn { min-width: 88px; }
+@media (orientation: landscape) and (max-height: 540px) {
+  .dee-video-frame { width: min(100%, calc((100dvh - 120px) * 16 / 9)); }
+}

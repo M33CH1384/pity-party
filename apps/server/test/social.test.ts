@@ -1,0 +1,1096 @@
+import { beforeEach, describe, expect, it } from 'vitest';
+import { parseSocialMsg, PRESENCE_TTL_MS, type SocialChatLine, type SocialServerMsg } from '@spades/protocol';
+import { type ConnAtt, type GlobalLog, Hub, maskChat, uniqueGuestName } from '../src/social/hub';
+import { SocialStore } from '../src/social/store';
+import { resetTicketKey, signTicket, verifyTicket } from '../src/social/ticket';
+import { coarseRegion, isAdmin, profileFor, recentPlayers } from '../src/social/routes';
+import { makeD1 } from './d1';
+
+class Harness {
+  t = 1_800_000_000_000;
+  out = new Map<string, SocialServerMsg[]>();
+  atts = new Map<string, ConnAtt>();
+  timers: { at: number; f: () => void }[] = [];
+  lines: SocialChatLine[] = [];
+  seq = 1;
+  ids = 0;
+  hub: Hub;
+  tables = new Map<string, import('@spades/protocol').OpenTable>();
+  /** when set, prune treats a socket outside this predicate as disconnected */
+  live: ((cid: string) => boolean) | null = null;
+  /** when set, prune asks this instead of a table DO */
+  phases: ((code: string) => 'live' | 'over' | 'gone' | null) | null = null;
+  dropped: string[] = [];
+  /** push hooks fired by the hub (recipient had no live socket) */
+  dmPushes: { to: string; from: string; name: string; text: string }[] = [];
+  mentionPushes: { to: string; from: string; name: string; text: string }[] = [];
+  constructor(public db: D1Database) {
+    const global: GlobalLog = {
+      add: (l) => { const line = { id: this.seq++, ...l }; this.lines.push(line); if (this.lines.length > 200) this.lines.shift(); return line; },
+      list: (n) => this.lines.slice(-n),
+      get: (id) => this.lines.find((l) => l.id === id) ?? null,
+      setReactions: (id, reactions) => { const l = this.lines.find((x) => x.id === id); if (!l) return false; l.reactions = reactions; return true; },
+      del: (id) => { const i = this.lines.findIndex((l) => l.id === id); if (i < 0) return false; this.lines.splice(i, 1); return true; },
+    };
+    this.hub = new Hub({
+      now: () => this.t,
+      send: (cid, m) => { this.out.set(cid, [...(this.out.get(cid) ?? []), m]); },
+      save: (cid, a) => this.atts.set(cid, { ...a }),
+      global,
+      tables: {
+        put: (t) => { this.tables.set(t.code, t); },
+        del: (c) => { this.tables.delete(c); },
+        list: () => [...this.tables.values()],
+      },
+      later: (ms, f) => this.timers.push({ at: this.t + ms, f }),
+      randomId: () => `id${++this.ids}xxxxxxxxxxxxxxxx`,
+      connected: (cid) => (this.live ? this.live(cid) : true),
+      drop: (cid) => { this.dropped.push(cid); },
+      tablePhase: async (code) => (this.phases ? this.phases(code) : null),
+      onDm: (to, from, name, text) => { this.dmPushes.push({ to, from, name, text }); },
+      onMention: (to, from, name, text) => { this.mentionPushes.push({ to, from, name, text }); },
+    }, db);
+  }
+  advance(ms: number) { this.t += ms; const due = this.timers.filter((x) => x.at <= this.t); this.timers = this.timers.filter((x) => x.at > this.t); due.forEach((x) => x.f()); }
+  msgs(cid: string) { return this.out.get(cid) ?? []; }
+  last<T extends SocialServerMsg['t']>(cid: string, t: T) { return [...this.msgs(cid)].reverse().find((m) => m.t === t) as Extract<SocialServerMsg, { t: T }> | undefined; }
+  all<T extends SocialServerMsg['t']>(cid: string, t: T) { return this.msgs(cid).filter((m) => m.t === t) as Extract<SocialServerMsg, { t: T }>[]; }
+  send(cid: string, m: unknown) { return this.hub.message(cid, JSON.stringify(m)); }
+  /** visible players for cid, tracked from hello + pres diffs */
+  seen(cid: string): string[] {
+    const set = new Map<string, true>();
+    for (const m of this.msgs(cid)) {
+      if (m.t === 'hello') { set.clear(); m.users.forEach((u) => set.set(u.id, true)); }
+      if (m.t === 'pres') { m.up?.forEach((u) => set.set(u.id, true)); m.gone?.forEach((g) => set.delete(g)); }
+    }
+    return [...set.keys()].sort();
+  }
+}
+
+async function addUser(db: D1Database, id: string, username: string) {
+  await db.prepare('INSERT INTO users (id, username, username_key, created_at) VALUES (?, ?, ?, ?)').bind(id, username, username.toLowerCase(), 1_700_000_000_000).run();
+}
+
+/**
+ * Make two users confirmed friends with a direct row (DMs are friends-only;
+ * the DM-mechanics suites below predate the gate, so their setup befriends
+ * the pair without disturbing the socket flow they assert on).
+ */
+async function befriendDb(x: string, y: string) {
+  const [a, b] = x < y ? [x, y] : [y, x];
+  await db.prepare("INSERT OR REPLACE INTO friends (a, b, status, requested_by, created_at) VALUES (?, ?, 'friends', ?, 1)").bind(a, b, x).run();
+}
+
+let db: D1Database;
+let h: Harness;
+beforeEach(async () => {
+  db = await makeD1();
+  resetTicketKey();
+  for (const [id, n] of [['ua', 'Alice'], ['ub', 'Bobby'], ['uc', 'Cee'], ['ud', 'Demetrius']]) await addUser(db, id!, n!);
+  h = new Harness(db);
+});
+
+describe('account tickets', () => {
+  it('sign/verify, expiry, tamper', async () => {
+    const t = await signTicket(db, { uid: 'ua', name: 'Alice', exp: 2000 });
+    expect(await verifyTicket(db, t, 1000)).toEqual({ uid: 'ua', name: 'Alice', exp: 2000 });
+    expect(await verifyTicket(db, t, 3000)).toBeNull();
+    expect(await verifyTicket(db, t.slice(0, -2) + 'AA', 1000)).toBeNull();
+    const [body, sig] = t.split('.');
+    const forged = btoa(JSON.stringify({ u: 'ud', n: 'Demetrius', e: 2000 })).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    expect(await verifyTicket(db, `${forged}.${sig}`, 1000)).toBeNull();
+    expect(body).toBeTruthy();
+  });
+  it('admin config + coarse region', () => {
+    expect(isAdmin({ ADMIN_USERNAMES: 'demetrius, other' }, 'x', 'Demetrius')).toBe(true);
+    expect(isAdmin({ ADMIN_USER_IDS: 'ud' }, 'ud', null)).toBe(true);
+    expect(isAdmin({}, 'ud', 'Demetrius')).toBe(false);
+    expect(coarseRegion({ country: 'US', regionCode: 'GA', city: 'Atlanta' })).toBe('US-GA');
+    expect(coarseRegion({ country: 'GB', regionCode: 'ENG' })).toBe('GB');
+    expect(coarseRegion({})).toBeNull();
+  });
+});
+
+describe('presence', () => {
+  it('users + guests, statuses, multi-tab, appear offline, leave', async () => {
+    await h.hub.open('a1', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('g1', { name: 'Kev' });
+    await h.hub.open('b1', { uid: 'ub', name: 'Bobby' });
+    const gid = h.last('g1', 'hello')!.you.id;
+    expect(gid).toMatch(/^g:/);
+    expect(h.last('g1', 'hello')!.you.guest).toBe(true);
+    expect(h.seen('a1')).toEqual([gid, 'u:ua', 'u:ub'].sort());
+    await h.send('b1', { t: 'status', status: { kind: 'table', mode: 'cutthroat', open: 1, code: 'ABCD' } });
+    const up = h.last('a1', 'pres')!.up![0]!;
+    expect(up).toMatchObject({ id: 'u:ub', status: { kind: 'table', mode: 'cutthroat', open: 1, code: 'ABCD' } });
+    // second tab keeps the status; closing one tab keeps them online
+    await h.hub.open('b2', { uid: 'ub', name: 'Bobby' });
+    expect(h.last('b2', 'hello')!.you.status.kind).toBe('table');
+    h.hub.close('b2');
+    expect(h.seen('a1')).toContain('u:ub');
+    // appear offline: others stop seeing Bobby, Bobby still sees himself
+    await h.send('b1', { t: 'settings', settings: { appearOffline: true } });
+    expect(h.seen('a1')).not.toContain('u:ub');
+    expect(h.seen('g1')).not.toContain('u:ub');
+    expect(h.last('b1', 'settings')!.settings.appearOffline).toBe(true);
+    await h.hub.open('a2', { uid: 'ua', name: 'Alice' });
+    expect(h.seen('a2')).not.toContain('u:ub');
+    await h.send('b1', { t: 'settings', settings: { appearOffline: false } });
+    expect(h.seen('a1')).toContain('u:ub');
+    h.hub.close('b1');
+    expect(h.seen('a1')).not.toContain('u:ub');
+  });
+
+  it('one guest session is one player; the same display name gets a distinct label', async () => {
+    await h.hub.open('a1', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('g1', { name: 'SWE GUEST', gid: 'swe-guest-session' });
+    await h.hub.open('g2', { name: 'SWE GUEST', gid: 'swe-guest-session' });
+    const id = h.last('g1', 'hello')!.you.id;
+    expect(id).toBe('g:swe-guest-session');
+    expect(h.last('g2', 'hello')!.you.id).toBe(id);
+    expect(h.seen('a1').filter((x) => x.startsWith('g:'))).toEqual([id]);
+    expect(h.last('g2', 'hello')!.you.name).toBe('SWE GUEST');
+    // closing one tab keeps the session online
+    h.hub.close('g1');
+    expect(h.seen('a1')).toContain(id);
+    // a different browser with the same name is a second player, labeled apart
+    await h.hub.open('g3', { name: 'SWE GUEST', gid: 'other-guest-session' });
+    expect(h.last('g3', 'hello')!.you.name).toBe('SWE GUEST 2');
+    expect(h.seen('a1').filter((x) => x.startsWith('g:')).sort()).toEqual([id, 'g:other-guest-session'].sort());
+    // a guest may share an account's name; the Guest tag tells them apart
+    await h.hub.open('g4', { name: 'Alice', gid: 'alice-the-guest' });
+    expect(h.last('g4', 'hello')!.you.name).toBe('Alice');
+    // a bad session id cannot impersonate an account, and still won't stack the same name
+    await h.hub.open('g5', { name: 'SWE GUEST', gid: 'u:ua' });
+    await h.hub.open('g6', { name: 'SWE GUEST', gid: 'nope' });
+    expect(h.last('g5', 'hello')!.you.id).toMatch(/^g:/);
+    expect(h.last('g5', 'hello')!.you.id).not.toBe('u:ua');
+    expect(h.last('g6', 'hello')!.you.id).not.toBe(h.last('g5', 'hello')!.you.id);
+    const names = [h.last('g5', 'hello')!.you.name, h.last('g6', 'hello')!.you.name];
+    expect(new Set(names).size).toBe(2);
+    expect(names.every((n) => n.startsWith('SWE GUEST'))).toBe(true);
+    h.hub.close('g2');
+    expect(h.seen('a1')).not.toContain(id);
+  });
+
+  it('parses the seat and watch-full fields, and drops a seat that cannot exist', () => {
+    expect(parseSocialMsg({ t: 'status', status: { kind: 'table', mode: 'joker', open: 1, code: 'ABCD', seat: 2, watchFull: true } }))
+      .toEqual({ t: 'status', status: { kind: 'table', mode: 'joker', open: 1, code: 'ABCD', seat: 2, watchFull: true } });
+    expect(parseSocialMsg({ t: 'status', status: { kind: 'table', mode: 'joker', offline: true, seat: 9, watchFull: false } }))
+      .toEqual({ t: 'status', status: { kind: 'table', mode: 'joker', offline: true } });
+    expect(uniqueGuestName('SWE GUEST', ['swe guest'])).toBe('SWE GUEST 2');
+    expect(uniqueGuestName('Guest', [])).toBe('Guest');
+  });
+});
+
+describe('friends + block', () => {
+  it('request → accept, decline, remove; block hides presence, chat, DMs, invites', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'friend', op: 'request', to: 'u:ub' });
+    expect(h.last('b', 'friends')!.friends.incoming.map((f) => f.name)).toEqual(['Alice']);
+    expect(h.last('a', 'friends')!.friends.outgoing.map((f) => f.name)).toEqual(['Bobby']);
+    await h.send('b', { t: 'friend', op: 'accept', to: 'u:ua' });
+    expect(h.last('a', 'friends')!.friends.friends.map((f) => f.name)).toEqual(['Bobby']);
+    await h.send('a', { t: 'friend', op: 'remove', to: 'u:ub' });
+    expect(h.last('b', 'friends')!.friends.friends).toEqual([]);
+    // mutual request auto-accepts
+    await h.send('a', { t: 'friend', op: 'request', to: 'u:ub' });
+    await h.send('b', { t: 'friend', op: 'request', to: 'u:ua' });
+    expect(h.last('b', 'friends')!.friends.friends.map((f) => f.name)).toEqual(['Alice']);
+    // guests can't be friended
+    await h.hub.open('g', { name: 'Guesty' });
+    await h.send('a', { t: 'friend', op: 'request', to: h.last('g', 'hello')!.you.id });
+    expect(h.last('a', 'error')!.code).toBe('BAD_TARGET');
+
+    // block
+    await h.send('b', { t: 'friend', op: 'block', to: 'u:ua' });
+    expect(h.last('b', 'friends')!.friends.blocked.map((f) => f.name)).toEqual(['Alice']);
+    expect(h.last('b', 'friends')!.friends.friends).toEqual([]);
+    expect(h.seen('a')).not.toContain('u:ub');
+    expect(h.seen('b')).not.toContain('u:ua');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'hey' });
+    expect(h.last('a', 'error')!.code).toBe('BLOCKED');
+    expect(h.last('b', 'dm')).toBeUndefined();
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'ABCD' });
+    expect(h.last('a', 'error')!.code).toBe('OFFLINE');
+    await h.send('a', { t: 'chat', text: 'can you see me' });
+    expect(h.last('b', 'chat')).toBeUndefined();
+    expect(h.last('g', 'chat')!.line.text).toBe('can you see me');
+    // a blocked user's past global lines are hidden on (re)connect
+    await h.hub.open('b2', { uid: 'ub', name: 'Bobby' });
+    expect(h.last('b2', 'hello')!.global).toEqual([]);
+    await h.send('b', { t: 'friend', op: 'unblock', to: 'u:ua' });
+    expect(h.seen('a')).toContain('u:ub');
+  });
+});
+
+describe('invites', () => {
+  it('toast payload, accept/decline, 60 s expiry, friends-only, guests cannot send, rate limit', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('g', { name: 'Kev' });
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K', mode: 'joker', seat: 2 });
+    const inv = h.last('b', 'invite')!.invite;
+    expect(inv).toMatchObject({ from: 'u:ua', fromName: 'Alice', code: 'XY7K', seat: 2 });
+    expect(inv.expiresAt - h.t).toBe(60_000);
+    expect(h.last('a', 'inviteSent')!.to).toBe('u:ub');
+    await h.send('b', { t: 'inviteReply', id: inv.id, accept: true });
+    expect(h.last('a', 'inviteReply')).toMatchObject({ by: 'u:ub', accept: true });
+    // decline
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K' });
+    await h.send('b', { t: 'inviteReply', id: h.last('b', 'invite')!.invite.id, accept: false });
+    expect(h.last('a', 'inviteReply')!.accept).toBe(false);
+    // expiry
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K' });
+    const id3 = h.last('b', 'invite')!.invite.id;
+    h.advance(61_000);
+    expect(h.last('b', 'inviteGone')).toMatchObject({ id: id3, reason: 'expired' });
+    await h.send('b', { t: 'inviteReply', id: id3, accept: true });
+    expect(h.last('b', 'error')!.code).toBe('INVITE_GONE');
+    // guests can receive but not send
+    await h.send('a', { t: 'invite', to: h.last('g', 'hello')!.you.id, code: 'XY7K' });
+    expect(h.last('g', 'invite')!.invite.fromName).toBe('Alice');
+    await h.send('g', { t: 'invite', to: 'u:ua', code: 'XY7K' });
+    expect(h.last('g', 'error')!.code).toBe('SIGN_IN');
+    // friends only
+    await h.send('b', { t: 'settings', settings: { friendsOnlyInvites: true } });
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K' });
+    expect(h.last('a', 'error')!.code).toBe('FRIENDS_ONLY');
+    await h.send('a', { t: 'friend', op: 'request', to: 'u:ub' });
+    await h.send('b', { t: 'friend', op: 'accept', to: 'u:ua' });
+    const before = h.all('b', 'invite').length;
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K' });
+    expect(h.all('b', 'invite').length).toBe(before + 1);
+    // rate limit: 6 per minute
+    h.advance(61_000);
+    for (let i = 0; i < 8; i++) await h.send('a', { t: 'invite', to: 'u:ub', code: 'XY7K' });
+    expect(h.last('a', 'error')!.code).toBe('SLOW_DOWN');
+  });
+
+  it('story-coop invites carry kind + stopId — live, and offline via the stored row', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'invite', to: 'u:ub', code: 'STY42', kind: 'story-coop', stopId: 'cookout' });
+    expect(h.last('b', 'invite')!.invite).toMatchObject({ code: 'STY42', kind: 'story-coop', stopId: 'cookout' });
+    // offline: Cee is not connected — the invite is stored and delivered on open, kind intact
+    await h.send('a', { t: 'invite', to: 'u:uc', code: 'STY43', kind: 'story-coop', stopId: 'porch' });
+    const stored = await db.prepare('SELECT kind, stop_id AS stopId FROM offline_invites WHERE to_uid = ?').bind('uc').first<{ kind: string; stopId: string }>();
+    expect(stored).toMatchObject({ kind: 'story-coop', stopId: 'porch' });
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    expect(h.last('c', 'invite')!.invite).toMatchObject({ code: 'STY43', kind: 'story-coop', stopId: 'porch' });
+  });
+});
+
+describe('global chat + DMs', () => {
+  it('guests read but cannot post; masking; length cap; rate limit; report; admin delete; 200 kept', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('g', { name: 'Kev' });
+    await h.hub.open('d', { uid: 'ud', name: 'Demetrius', admin: true });
+    expect(h.last('d', 'hello')!.admin).toBe(true);
+    await h.send('g', { t: 'chat', text: 'hi' });
+    expect(h.last('g', 'error')!.code).toBe('SIGN_IN');
+    await h.send('a', { t: 'chat', text: 'what the fuck, n1gga www.spam.com ' + 'x'.repeat(400) });
+    const l = h.last('g', 'chat')!.line;
+    expect(l.text).not.toMatch(/fuck|n1gga|spam\.com/);
+    expect(l.text).toContain('[link]');
+    expect(l.text.length).toBeLessThanOrEqual(300);
+    expect(maskChat('Classic grape scunthorpe pass')).toMatch(/^Classic grape s\*+ pass$/);
+    for (let i = 0; i < 6; i++) await h.send('a', { t: 'chat', text: `msg ${i}` });
+    expect(h.last('a', 'error')!.code).toBe('SLOW_DOWN');
+    // report + admin delete
+    await h.send('d', { t: 'report', kind: 'global', id: l.id, reason: 'slurs' });
+    expect(h.last('d', 'ok')!.what).toBe('report');
+    const rep = await db.prepare('SELECT * FROM reports').first<{ target_user: string; text: string; reason: string }>();
+    expect(rep).toMatchObject({ target_user: 'ua', reason: 'slurs' });
+    await h.send('a', { t: 'del', id: l.id });
+    expect(h.last('a', 'error')!.code).toBe('FORBIDDEN');
+    await h.send('d', { t: 'del', id: l.id });
+    expect(h.last('g', 'deleted')!.id).toBe(l.id);
+    expect(h.lines.some((x) => x.id === l.id)).toBe(false);
+    for (let i = 0; i < 250; i++) { h.advance(13_000); await h.send('a', { t: 'chat', text: `line ${i}` }); }
+    expect(h.lines.length).toBe(200);
+    await h.hub.open('g2', { name: 'Late' });
+    expect(h.last('g2', 'hello')!.global.length).toBe(50);
+  });
+
+  it('DMs: delivered live + stored, unread counts, history, read, guests cannot DM, report a DM', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await befriendDb('ua', 'ub');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'you around?' });
+    expect(h.last('a', 'dm')!.line).toMatchObject({ from: 'u:ua', to: 'u:ub', text: 'you around?' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    expect(h.last('b', 'hello')!.unread).toEqual({ 'u:ua': 1 });
+    h.advance(3000);
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'spades tonight' });
+    expect(h.last('b', 'dm')).toMatchObject({ name: 'Alice', line: { text: 'spades tonight' } });
+    await h.send('b', { t: 'dmHistory', with: 'u:ua' });
+    expect(h.last('b', 'dmHistory')!.lines.map((x) => x.text)).toEqual(['you around?', 'spades tonight']);
+    await h.send('b', { t: 'read', with: 'u:ua' });
+    await h.hub.open('b2', { uid: 'ub', name: 'Bobby' });
+    expect(h.last('b2', 'hello')!.unread).toEqual({});
+    await h.hub.open('g', { name: 'Kev' });
+    await h.send('g', { t: 'dm', to: 'u:ua', text: 'yo' });
+    expect(h.last('g', 'error')!.code).toBe('SIGN_IN');
+    await h.send('b', { t: 'report', kind: 'dm', id: h.last('b', 'dm')!.line.id });
+    expect(await db.prepare("SELECT text FROM reports WHERE kind = 'dm'").first<{ text: string }>()).toEqual({ text: 'spades tonight' });
+  });
+});
+
+describe('chat reactions', () => {
+  it('toggle, broadcast to everyone, guests rejected, bad input dropped, persisted for late joiners', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('g', { name: 'Kev' });
+    await h.send('a', { t: 'chat', text: 'nice hand' });
+    const line = h.last('b', 'chat')!.line;
+    // guests can read global chat but (like posting) can't react
+    await h.send('g', { t: 'react', id: line.id, emoji: '🔥' });
+    expect(h.last('g', 'error')!.code).toBe('SIGN_IN');
+    expect(h.all('b', 'chatReact').length).toBe(0);
+    // b reacts: everyone (incl. sender and guests) gets the new map
+    await h.send('b', { t: 'react', id: line.id, emoji: '🔥' });
+    expect(h.last('a', 'chatReact')).toEqual({ t: 'chatReact', id: line.id, reactions: { '🔥': ['u:ub'] } });
+    expect(h.last('g', 'chatReact')).toEqual({ t: 'chatReact', id: line.id, reactions: { '🔥': ['u:ub'] } });
+    // a joins the 🔥 chip and adds a 😂 one
+    await h.send('a', { t: 'react', id: line.id, emoji: '🔥' });
+    await h.send('a', { t: 'react', id: line.id, emoji: '😂' });
+    expect(h.last('b', 'chatReact')!.reactions).toEqual({ '🔥': ['u:ub', 'u:ua'], '😂': ['u:ua'] });
+    // b toggles off: empty slot drops out of the map
+    await h.send('b', { t: 'react', id: line.id, emoji: '🔥' });
+    expect(h.last('a', 'chatReact')!.reactions).toEqual({ '🔥': ['u:ua'], '😂': ['u:ua'] });
+    const n = h.all('a', 'chatReact').length;
+    // unknown line: silent no-op; non-palette emoji: dropped at validation
+    await h.send('b', { t: 'react', id: 99999, emoji: '🔥' });
+    await h.send('b', { t: 'react', id: line.id, emoji: '🖕' });
+    expect(h.all('a', 'chatReact').length).toBe(n);
+    // a palette extra (from the popover's "+" grid) reacts and persists like the six
+    await h.send('b', { t: 'react', id: line.id, emoji: '💯' });
+    expect(h.last('a', 'chatReact')!.reactions).toEqual({ '🔥': ['u:ua'], '😂': ['u:ua'], '💯': ['u:ub'] });
+    // persisted in the log: a late joiner's hello snapshot carries the map
+    await h.hub.open('late', { name: 'Late' });
+    expect(h.last('late', 'hello')!.global.find((l) => l.id === line.id)?.reactions).toEqual({ '🔥': ['u:ua'], '😂': ['u:ua'], '💯': ['u:ub'] });
+  });
+
+  it('reactions are rate limited', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'chat', text: 'hi' });
+    const line = h.last('b', 'chat')!.line;
+    for (let i = 0; i < 31; i++) await h.send('b', { t: 'react', id: line.id, emoji: '👍' });
+    expect(h.last('b', 'error')!.code).toBe('SLOW_DOWN');
+  });
+});
+
+describe('global chat replies', () => {
+  it('a reply carries a post-time snapshot and is broadcast to everyone, guests included', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('g', { name: 'Kev' });
+    await h.send('a', { t: 'chat', text: 'bid 4 and pray' });
+    const orig = h.last('b', 'chat')!.line;
+    h.advance(11_000);
+    await h.send('b', { t: 'chat', text: 'pray harder', replyTo: orig.id });
+    const want = { id: orig.id, from: 'Alice', fromId: 'u:ua', text: 'bid 4 and pray' };
+    expect(h.last('a', 'chat')!.line).toMatchObject({ text: 'pray harder', reply: want });
+    expect(h.last('g', 'chat')!.line.reply).toEqual(want);
+    expect(h.last('b', 'chat')!.line.reply).toEqual(want);
+    // the snapshot is stored on the line, so a late joiner's hello carries it too
+    await h.hub.open('late', { name: 'Late' });
+    expect(h.last('late', 'hello')!.global.find((l) => l.text === 'pray harder')?.reply).toEqual(want);
+  });
+
+  it('the snapshot truncates the quoted text at 80 characters', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'chat', text: 'y'.repeat(200) });
+    const orig = h.last('b', 'chat')!.line;
+    h.advance(11_000);
+    await h.send('b', { t: 'chat', text: 'tl;dr', replyTo: orig.id });
+    const reply = h.last('a', 'chat')!.line.reply!;
+    expect(reply.text).toHaveLength(80);
+    expect(reply.text).toBe('y'.repeat(80));
+  });
+
+  it('an unresolved replyTo posts the message clean, without a reference', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'chat', text: 'still lands', replyTo: 99999 });
+    const line = h.last('b', 'chat')!.line;
+    expect(line.text).toBe('still lands');
+    expect(line.reply).toBeUndefined();
+  });
+
+  it('guests cannot reply (same rule as posting)', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('g', { name: 'Kev' });
+    await h.send('a', { t: 'chat', text: 'hello room' });
+    const orig = h.last('g', 'chat')!.line;
+    await h.send('g', { t: 'chat', text: 'me too', replyTo: orig.id });
+    expect(h.last('g', 'error')!.code).toBe('SIGN_IN');
+    expect(h.all('a', 'chat').filter((m) => m.line.text === 'me too')).toEqual([]);
+  });
+
+  it("a blocked author's quote is stripped, live and in history; everyone else keeps it", async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    await h.hub.open('g', { name: 'Kev' });
+    await h.send('a', { t: 'chat', text: 'hot take' });
+    const orig = h.last('c', 'chat')!.line;
+    await h.send('b', { t: 'friend', op: 'block', to: 'u:ua' });
+    h.advance(11_000);
+    await h.send('c', { t: 'chat', text: 'quoting you', replyTo: orig.id });
+    // b blocked Alice: Cee's reply arrives, but the quote (Alice's words) does not
+    const forB = h.last('b', 'chat')!.line;
+    expect(forB.text).toBe('quoting you');
+    expect(forB.reply).toBeUndefined();
+    // a guest still sees the full quote
+    expect(h.last('g', 'chat')!.line.reply).toEqual({ id: orig.id, from: 'Alice', fromId: 'u:ua', text: 'hot take' });
+    // and on reconnect, history applies the same rule: Alice's line is gone entirely,
+    // Cee's reply is there with the quote stripped
+    await h.hub.open('b2', { uid: 'ub', name: 'Bobby' });
+    const hist = h.last('b2', 'hello')!.global;
+    expect(hist.some((l) => l.id === orig.id)).toBe(false);
+    expect(hist.find((l) => l.text === 'quoting you')?.reply).toBeUndefined();
+  });
+});
+
+describe('DM reactions', () => {
+  it('toggle, live to both participants only, guests rejected, non-participants get nothing, persisted in history', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    await h.hub.open('g', { name: 'Kev' });
+    await befriendDb('ua', 'ub');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'spades tonight' });
+    const line = h.last('b', 'dm')!.line;
+    // guests can't react (same rule as posting)
+    await h.send('g', { t: 'dmReact', id: line.id, emoji: '🔥' });
+    expect(h.last('g', 'error')!.code).toBe('SIGN_IN');
+    expect(h.all('a', 'dmReact').length).toBe(0);
+    // b reacts: both participants get the new map, each with their own thread key; nobody else sees anything
+    await h.send('b', { t: 'dmReact', id: line.id, emoji: '🔥' });
+    expect(h.last('a', 'dmReact')).toEqual({ t: 'dmReact', id: line.id, with: 'u:ub', reactions: { '🔥': ['u:ub'] } });
+    expect(h.last('b', 'dmReact')).toEqual({ t: 'dmReact', id: line.id, with: 'u:ua', reactions: { '🔥': ['u:ub'] } });
+    expect(h.all('c', 'dmReact').length).toBe(0);
+    expect(h.all('g', 'dmReact').length).toBe(0);
+    // a joins the 🔥 chip and adds a 😂 one
+    await h.send('a', { t: 'dmReact', id: line.id, emoji: '🔥' });
+    await h.send('a', { t: 'dmReact', id: line.id, emoji: '😂' });
+    expect(h.last('b', 'dmReact')!.reactions).toEqual({ '🔥': ['u:ub', 'u:ua'], '😂': ['u:ua'] });
+    // a third party reacting to the id is a silent no-op (indistinguishable from a nonexistent line)
+    const n = h.all('a', 'dmReact').length;
+    await h.send('c', { t: 'dmReact', id: line.id, emoji: '👏' });
+    expect(h.last('c', 'error')).toBeUndefined();
+    expect(h.all('a', 'dmReact').length).toBe(n);
+    expect(h.all('b', 'dmReact').length).toBe(n);
+    // unknown line: silent no-op; non-palette emoji: dropped at validation
+    await h.send('b', { t: 'dmReact', id: 99999, emoji: '🔥' });
+    await h.send('b', { t: 'dmReact', id: line.id, emoji: '🖕' });
+    expect(h.all('a', 'dmReact').length).toBe(n);
+    // a palette extra reacts in DMs too, delivered to both participants only
+    await h.send('b', { t: 'dmReact', id: line.id, emoji: '🫡' });
+    expect(h.last('a', 'dmReact')!.reactions).toEqual({ '🔥': ['u:ub', 'u:ua'], '😂': ['u:ua'], '🫡': ['u:ub'] });
+    expect(h.all('c', 'dmReact').length).toBe(0);
+    // b toggles off: empty slot drops out of the map
+    await h.send('b', { t: 'dmReact', id: line.id, emoji: '🔥' });
+    expect(h.last('a', 'dmReact')!.reactions).toEqual({ '🔥': ['u:ua'], '😂': ['u:ua'], '🫡': ['u:ub'] });
+    // persisted in D1: history carries the map (refresh / late load sees it)
+    await h.send('b', { t: 'dmHistory', with: 'u:ua' });
+    expect(h.last('b', 'dmHistory')!.lines.find((l) => l.id === line.id)?.reactions).toEqual({ '🔥': ['u:ua'], '😂': ['u:ua'], '🫡': ['u:ub'] });
+  });
+
+  it('DM reactions are rate limited (shared reaction budget)', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await befriendDb('ua', 'ub');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'hi' });
+    const line = h.last('b', 'dm')!.line;
+    for (let i = 0; i < 31; i++) await h.send('b', { t: 'dmReact', id: line.id, emoji: '👍' });
+    expect(h.last('b', 'error')!.code).toBe('SLOW_DOWN');
+  });
+});
+
+describe('DM replies', () => {
+  it('a reply carries a post-time snapshot, delivered to both participants only, persisted in history', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    await befriendDb('ua', 'ub');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'spades tonight' });
+    const orig = h.last('b', 'dm')!.line;
+    const want = { id: orig.id, from: 'Alice', fromId: 'u:ua', text: 'spades tonight' };
+    // b replies: the snapshot rides the delivered line to BOTH participants, identically
+    await h.send('b', { t: 'dm', to: 'u:ua', text: 'deal', replyTo: orig.id });
+    expect(h.last('a', 'dm')!.line).toMatchObject({ text: 'deal', reply: want });
+    expect(h.last('b', 'dm')!.line).toMatchObject({ text: 'deal', reply: want });
+    // a third party never sees DM traffic at all, replies included
+    expect(h.all('c', 'dm').length).toBe(0);
+    // replying to your own line works too (snapshot names yourself)
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'bring cards', replyTo: orig.id });
+    expect(h.last('b', 'dm')!.line.reply).toEqual(want);
+    // persisted in D1: history carries the snapshot (refresh / restore sees the quote)
+    await h.send('b', { t: 'dmHistory', with: 'u:ua' });
+    const hist = h.last('b', 'dmHistory')!.lines;
+    expect(hist.find((l) => l.text === 'deal')?.reply).toEqual(want);
+    expect(hist.find((l) => l.text === 'spades tonight')?.reply).toBeUndefined();
+  });
+
+  it('the quoted snippet is truncated at the reply limit', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await befriendDb('ua', 'ub');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'y'.repeat(200) });
+    const orig = h.last('b', 'dm')!.line;
+    await h.send('b', { t: 'dm', to: 'u:ua', text: 'tl;dr', replyTo: orig.id });
+    const reply = h.last('a', 'dm')!.line.reply!;
+    expect(reply.text).toHaveLength(80);
+    expect(reply.text).toBe('y'.repeat(80));
+  });
+
+  it('an unresolved or foreign-conversation replyTo posts the DM clean, without a reference', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    await befriendDb('ua', 'ub');
+    await befriendDb('ua', 'uc');
+    // a line in the a↔c conversation...
+    await h.send('a', { t: 'dm', to: 'u:uc', text: 'different thread' });
+    const foreign = h.last('c', 'dm')!.line;
+    // ...is not quotable from the a↔b conversation (the pair must match)
+    await h.send('b', { t: 'dm', to: 'u:ua', text: 'quoting across threads', replyTo: foreign.id });
+    expect(h.last('a', 'dm')!.line.text).toBe('quoting across threads');
+    expect(h.last('a', 'dm')!.line.reply).toBeUndefined();
+    // a nonexistent id posts clean too
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'still lands', replyTo: 99999 });
+    expect(h.last('b', 'dm')!.line.reply).toBeUndefined();
+  });
+});
+
+describe('profiles + recent players (from game records)', () => {
+  it('h2h, totals, team names, recent', async () => {
+    const { saveRecord } = await import('../src/stats/record');
+    const st = { won: true, hands: 5, bids: 0, bidSum: 0, made: 0, set: 0, bags: 0, nilBids: 0, nilMade: 0, books: 0, shotsTaken: 0, shotsGiven: 0, wheels: 0, bjWins: 0, bidMs: 0, bidN: 0, playMs: 0, playN: 0 };
+    for (let i = 0; i < 3; i++) {
+      const aliceWins = i < 2;
+      await saveRecord(db, {
+        id: `g${i}`, room: 'ROOM', mode: 'joker', kind: 'team', endedAt: 1_800_000_000_000 + i, hands: 5, final: [500, 300], winners: [aliceWins ? 0 : 1], names: ['Book Bandits', 'B'],
+        seats: [{ name: 'Alice', side: 0, kind: 'user', uid: 'ua' }, { name: 'Bobby', side: 1, kind: 'user', uid: 'ub' }, { name: 'Cee', side: 0, kind: 'user', uid: 'uc' }, { name: 'Bot', side: 1, kind: 'bot' }],
+        players: [
+          { seat: 0, uid: 'ua', side: 0, won: aliceWins, partner: 'uc', teamName: 'Book Bandits', stats: { ...st, won: aliceWins } },
+          { seat: 1, uid: 'ub', side: 1, won: !aliceWins, partner: null, teamName: null, stats: { ...st, won: !aliceWins } },
+          { seat: 2, uid: 'uc', side: 0, won: aliceWins, partner: 'ua', teamName: 'Book Bandits', stats: { ...st, won: aliceWins } },
+        ],
+      }, true);
+    }
+    const p = (await profileFor(db, 'alice', 'ub'))!;
+    expect(p.username).toBe('Alice');
+    expect(p.totals).toEqual({ games: 3, wins: 2 });
+    expect(p.teamNames).toEqual(['Book Bandits']);
+    expect(p.h2h).toEqual([{ id: 'u:ub', name: 'Bobby', games: 3, wins: 2, losses: 1 }]);
+    expect(p.vsYou).toEqual({ games: 3, wins: 1, losses: 2 });
+    expect(p.ratings.team).toBeGreaterThan(1200);
+    expect((await profileFor(db, 'bobby', null))!.ratings.team).toBeLessThan(1200);
+    expect(await profileFor(db, 'nobody', null)).toBeNull();
+    const recent = await recentPlayers(db, 'ua');
+    expect(recent.map((r) => [r.name, r.games, r.partner])).toEqual(expect.arrayContaining([['Bobby', 3, false], ['Cee', 3, true]]));
+  });
+});
+
+describe('open tables (Release 10)', () => {
+  const T = (code: string, over: Partial<import('@spades/protocol').OpenTable> = {}) => ({ code, host: 'Dee', mode: 'joker', playerCount: 4, target: 500, venue: 'classic', humans: 1, bots: 0, open: 3, status: 'waiting' as const, spectators: 0, at: h.t, ...over });
+  it('hello carries the list; updates and removals reach everyone; stale entries expire', async () => {
+    h.hub.tableUpdate('AAAAA', T('AAAAA'));
+    await h.hub.open('c1', { name: 'Guest' });
+    expect(h.last('c1', 'hello')!.tables!.map((t) => t.code)).toEqual(['AAAAA']);
+    h.hub.tableUpdate('BBBBB', T('BBBBB', { status: 'playing', hand: 3, open: 1 }));
+    expect(h.last('c1', 'tables')!.up![0]).toMatchObject({ code: 'BBBBB', hand: 3 });
+    h.hub.tableUpdate('AAAAA', null);
+    expect(h.last('c1', 'tables')!.gone).toEqual(['AAAAA']);
+    expect(h.hub.openTables().map((t) => t.code)).toEqual(['BBBBB']);
+    h.t += 4 * 3600_000;
+    expect(h.hub.openTables()).toEqual([]);
+  });
+  it('waiting tables sort first', () => {
+    h.hub.tableUpdate('PPPPP', T('PPPPP', { status: 'playing', open: 2 }));
+    h.hub.tableUpdate('WWWWW', T('WWWWW', { status: 'waiting', open: 1 }));
+    expect(h.hub.openTables().map((t) => t.code)).toEqual(['WWWWW', 'PPPPP']);
+  });
+});
+
+describe('stale presence rows', () => {
+  const T = (code: string, over: Partial<import('@spades/protocol').OpenTable> = {}) => ({
+    code, host: 'SWE', mode: 'joker', playerCount: 4, target: 250, venue: 'classic', humans: 0, bots: 4, open: 4, status: 'playing' as const, spectators: 0, at: h.t, ...over,
+  });
+
+  it('hides the guest who is still announcing an ended table, next to the live session', async () => {
+    await h.hub.open('live', { name: 'SWE 2', gid: 'swe-live-session' });
+    await h.hub.open('ghost', { name: 'SWE', gid: 'swe-old-session1' });
+    h.hub.tableUpdate('6SAQ2', T('6SAQ2'));
+    await h.send('ghost', { t: 'status', status: { kind: 'table', mode: 'joker', open: 4, code: '6SAQ2' } });
+    expect(h.seen('live')).toContain('g:swe-old-session1');
+    h.hub.tableUpdate('6SAQ2', T('6SAQ2', { status: 'over', open: 4 }));
+    expect(h.seen('live')).not.toContain('g:swe-old-session1');
+    // the frozen page keeps saying it is at that table; the row stays gone
+    await h.send('ghost', { t: 'status', status: { kind: 'table', mode: 'joker', open: 4, code: '6SAQ2' } });
+    expect(h.seen('live')).not.toContain('g:swe-old-session1');
+    await h.send('ghost', { t: 'status', status: { kind: 'online' } });
+    expect(h.seen('live')).toContain('g:swe-old-session1');
+    expect(h.last('live', 'pres')!.up![0]).toMatchObject({ id: 'g:swe-old-session1', status: { kind: 'online' } });
+  });
+
+  it('drops presence when a listed table disappears, and leaves a private table alone', async () => {
+    await h.hub.open('watch', { name: 'Watch', gid: 'watcher-session1' });
+    await h.hub.open('pub', { name: 'SWE', gid: 'swe-old-session1' });
+    await h.hub.open('priv', { name: 'Nia', gid: 'private-guest-ses' });
+    h.hub.tableUpdate('6SAQ2', T('6SAQ2'));
+    await h.send('pub', { t: 'status', status: { kind: 'table', mode: 'joker', open: 4, code: '6SAQ2' } });
+    await h.send('priv', { t: 'status', status: { kind: 'table', mode: 'joker', open: 2, code: 'PRIV8' } });
+    h.hub.tableUpdate('PRIV8', null);
+    h.hub.tableUpdate('6SAQ2', null);
+    expect(h.seen('watch')).not.toContain('g:swe-old-session1');
+    expect(h.seen('watch')).toContain('g:private-guest-ses');
+  });
+
+  it('asks the room about a code that is already unlisted and drops a gone table', async () => {
+    await h.hub.open('watch', { name: 'SWE 2', gid: 'swe-live-session' });
+    await h.hub.open('ghost', { name: 'SWE', gid: 'swe-old-session1' });
+    await h.send('ghost', { t: 'status', status: { kind: 'table', mode: 'joker', open: 4, code: '6SAQ2' } });
+    h.phases = (code) => (code === '6SAQ2' ? 'gone' : 'live');
+    await h.hub.prune(true);
+    expect(h.seen('watch')).not.toContain('g:swe-old-session1');
+    expect(h.seen('watch')).toContain('g:swe-live-session');
+  });
+
+  it('keeps a private table the room still calls live', async () => {
+    await h.hub.open('watch', { name: 'Watch', gid: 'watcher-session1' });
+    await h.hub.open('priv', { name: 'Nia', gid: 'private-guest-ses' });
+    await h.send('priv', { t: 'status', status: { kind: 'lobby', mode: 'joker', open: 3, code: 'PRIV8' } });
+    h.phases = () => 'live';
+    await h.hub.prune(true);
+    expect(h.seen('watch')).toContain('g:private-guest-ses');
+  });
+
+  it('drops a disconnected socket and a session that has gone quiet', async () => {
+    await h.hub.open('ghost', { name: 'SWE', gid: 'swe-old-session1' });
+    await h.hub.open('live', { name: 'SWE 2', gid: 'swe-live-session' });
+    h.live = (cid) => cid !== 'ghost';
+    await h.hub.prune(false);
+    expect(h.dropped).toContain('ghost');
+    expect(h.seen('live')).not.toContain('g:swe-old-session1');
+    expect(h.seen('live')).toContain('g:swe-live-session');
+
+    h.live = null;
+    await h.hub.open('old', { name: 'Old', gid: 'old-guest-session1' });
+    h.t += PRESENCE_TTL_MS + 1;
+    await h.hub.open('fresh', { name: 'Fresh', gid: 'fresh-guest-session' });
+    expect(h.last('fresh', 'hello')!.users.map((u) => u.id)).not.toContain('g:old-guest-session1');
+    expect(h.last('fresh', 'hello')!.users.map((u) => u.id)).toContain('g:fresh-guest-session');
+    expect(h.dropped).toContain('old');
+  });
+
+  it('keeps an offline vs-bots row when some other table ends', async () => {
+    await h.hub.open('watch', { name: 'Watch', gid: 'watcher-session1' });
+    await h.hub.open('bot', { name: 'Guest', gid: 'offline-guest-sess' });
+    await h.send('bot', { t: 'status', status: { kind: 'table', mode: 'joker', offline: true } });
+    h.hub.tableUpdate('6SAQ2', T('6SAQ2', { status: 'over' }));
+    expect(h.seen('watch')).toContain('g:offline-guest-sess');
+  });
+});
+
+describe('presence heartbeat expiry (~60s)', () => {
+  it('heartbeats keep a row alive; silence + a dead socket expire it on prune', async () => {
+    await h.hub.open('watch', { name: 'Watch', gid: 'watcher-session1' });
+    await h.hub.open('p1', { name: 'Pia', gid: 'pia-guest-session' });
+    // heartbeating every 25s of fake time: still listed well past 60s
+    for (let i = 0; i < 6; i++) { h.t += 25_000; await h.send('p1', { t: 'heartbeat' }); await h.send('watch', { t: 'heartbeat' }); }
+    await h.hub.prune(false);
+    expect(h.seen('watch')).toContain('g:pia-guest-session');
+    // tab closed / socket dead AND no heartbeat for >60s: expired + dropped
+    h.live = (cid) => cid !== 'p1';
+    h.t += PRESENCE_TTL_MS + 1;
+    await h.send('watch', { t: 'heartbeat' });
+    await h.hub.prune(false);
+    expect(h.dropped).toContain('p1');
+    expect(h.seen('watch')).not.toContain('g:pia-guest-session');
+  });
+  it('parseSocialMsg accepts a heartbeat and rejects junk', () => {
+    expect(parseSocialMsg('{"t":"heartbeat"}')).toEqual({ t: 'heartbeat' });
+    expect(parseSocialMsg('{"t":"nope"}')).toBeNull();
+  });
+});
+
+describe('league wire (item 7)', () => {
+  it('posts a stored system line and broadcasts it to everyone; late joiners see it in history', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    expect(h.hub.postWire('TBL1:7:boston:0', '🚨 BREAKING — Dee + Kim just ran a Boston in Hand 7 at Table TBL1')).toBe(true);
+    const line = h.lines.at(-1)!;
+    expect(line).toMatchObject({ from: 'wire', name: 'BWM LEAGUE WIRE', wire: true });
+    expect(h.last('a', 'chat')!.line.id).toBe(line.id);
+    expect(h.last('b', 'chat')!.line.text).toContain('BREAKING');
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    expect(h.last('c', 'hello')!.global.some((l) => l.wire)).toBe(true);
+  });
+
+  it('dedupes by event id and caps the cadence at one wire line per 10s (drops, never queues)', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    expect(h.hub.postWire('e1', 'one')).toBe(true);
+    expect(h.hub.postWire('e1', 'one again')).toBe(false); // the same event twice
+    expect(h.hub.postWire('e2', 'two')).toBe(false); // a new event inside the gap is dropped
+    h.advance(10_001);
+    expect(h.hub.postWire('e2', 'two')).toBe(true);
+    expect(h.lines.filter((l) => l.wire)).toHaveLength(2);
+  });
+
+  it('wire lines take no reactions and carry no reply snapshot when replied to', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    h.hub.postWire('e1', 'news');
+    const wire = h.lines.at(-1)!;
+    await h.send('a', { t: 'react', id: wire.id, emoji: '🔥' });
+    expect(h.lines.find((l) => l.id === wire.id)!.reactions).toBeUndefined();
+    await h.send('a', { t: 'chat', text: 'replying to the wire', replyTo: wire.id });
+    const reply = h.lines.at(-1)!;
+    expect(reply.text).toBe('replying to the wire');
+    expect(reply.reply).toBeUndefined();
+  });
+});
+
+describe('last seen (friends-only last online)', () => {
+  const seenRow = async (uid: string) =>
+    (await db.prepare('SELECT at FROM last_seen WHERE user_id = ?').bind(uid).first<{ at: number }>())?.at;
+
+  const befriend = async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'friend', op: 'request', to: 'u:ub' });
+    await h.send('b', { t: 'friend', op: 'accept', to: 'u:ua' });
+  };
+
+  it('connecting stamps last_seen, and a confirmed friend receives it on their friends payload', async () => {
+    await befriend();
+    expect(await seenRow('ub')).toBe(h.t);
+    const st = h.last('a', 'friends')!.friends;
+    expect(st.friends).toHaveLength(1);
+    expect(st.friends[0]).toMatchObject({ id: 'u:ub', name: 'Bobby', lastSeen: h.t });
+  });
+
+  it('writes are throttled to ~one a minute; later traffic refreshes the stamp', async () => {
+    await befriend();
+    const t0 = h.t;
+    h.t += 30_000;
+    await h.send('b', { t: 'heartbeat' });
+    expect(await seenRow('ub')).toBe(t0); // inside the window: no new write
+    h.t += 31_000;
+    await h.send('b', { t: 'heartbeat' });
+    expect(await seenRow('ub')).toBe(t0 + 61_000); // traffic past the window stamps again
+  });
+
+  it('appear-offline users are never stamped (the stamp freezes at their last visible activity)', async () => {
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    expect(await seenRow('ub')).toBe(h.t);
+    await h.send('b', { t: 'settings', settings: { appearOffline: true } });
+    const frozen = await seenRow('ub');
+    h.t += 10 * 60_000;
+    await h.send('b', { t: 'heartbeat' });
+    await h.send('b', { t: 'status', status: { kind: 'table', mode: 'joker' } });
+    await h.send('b', { t: 'chat', text: 'still here, quietly' });
+    expect(await seenRow('ub')).toBe(frozen);
+  });
+
+  it('pending refs never carry lastSeen, and a non-friend receives nothing', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    expect(await seenRow('ub')).toBe(h.t); // Bobby IS stamped server-side…
+    await h.send('a', { t: 'friend', op: 'request', to: 'u:ub' });
+    // …but while the request is only pending, neither side's ref carries it
+    const bIn = h.last('b', 'friends')!.friends.incoming[0]!;
+    expect(bIn.id).toBe('u:ua');
+    expect(bIn.lastSeen).toBeUndefined();
+    const aOut = h.last('a', 'friends')!.friends.outgoing[0]!;
+    expect(aOut.id).toBe('u:ub');
+    expect(aOut.lastSeen).toBeUndefined();
+    // a third user with no relation at all: no ref, no stamp, anywhere in their payload
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    const cHello = h.last('c', 'hello')!;
+    expect(cHello.friends!.friends).toEqual([]);
+    expect(JSON.stringify(cHello.friends)).not.toContain('lastSeen');
+    expect(JSON.stringify(cHello.users)).not.toContain('lastSeen');
+  });
+
+  it('cold start: a friend never seen since tracking began carries no lastSeen (never fabricated)', async () => {
+    await db.prepare("INSERT INTO friends (a, b, status, requested_by, created_at) VALUES ('ua', 'ud', 'friends', 'ua', 1)").run();
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    const st = h.last('a', 'hello')!.friends!;
+    expect(st.friends).toHaveLength(1);
+    expect(st.friends[0]!.name).toBe('Demetrius');
+    expect(st.friends[0]!.lastSeen).toBeUndefined();
+    expect(await seenRow('ud')).toBeUndefined();
+  });
+});
+
+describe('friend activity presence (migration 0028)', () => {
+  const presenceRow = async (uid: string) =>
+    await db.prepare('SELECT activity, at FROM presence WHERE user_id = ?').bind(uid).first<{ activity: string; at: number }>();
+
+  const befriend = async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'friend', op: 'request', to: 'u:ub' });
+    await h.send('b', { t: 'friend', op: 'accept', to: 'u:ua' });
+  };
+
+  it('connecting stamps the presence row, and a confirmed friend receives it on their friends payload', async () => {
+    await befriend();
+    expect(await presenceRow('ub')).toEqual({ activity: 'online', at: h.t });
+    const st = h.last('a', 'friends')!.friends;
+    expect(st.friends).toHaveLength(1);
+    expect(st.friends[0]).toMatchObject({ id: 'u:ub', name: 'Bobby', presence: { activity: 'online', at: h.t } });
+  });
+
+  it('a status change re-stamps immediately with the derived activity (bot game, story solo/co-op, match)', async () => {
+    await befriend();
+    await h.send('b', { t: 'status', status: { kind: 'table', mode: 'joker', offline: true } });
+    expect(await presenceRow('ub')).toMatchObject({ activity: 'bot-game' });
+    await h.send('b', { t: 'status', status: { kind: 'table', offline: true, story: 'solo' } });
+    expect(await presenceRow('ub')).toMatchObject({ activity: 'story-solo' });
+    await h.send('b', { t: 'status', status: { kind: 'table', story: 'coop' } });
+    expect(await presenceRow('ub')).toMatchObject({ activity: 'story-coop' });
+    await h.send('b', { t: 'status', status: { kind: 'table', mode: 'joker', open: 1, code: 'ABCD' } });
+    expect(await presenceRow('ub')).toMatchObject({ activity: 'online-match' });
+    await h.send('b', { t: 'status', status: { kind: 'online' } });
+    expect(await presenceRow('ub')).toMatchObject({ activity: 'online' });
+  });
+
+  it('same-activity traffic inside the stamp window does not rewrite; past it, the row refreshes', async () => {
+    await befriend();
+    const t0 = h.t;
+    h.t += 30_000;
+    await h.send('b', { t: 'heartbeat' });
+    expect((await presenceRow('ub'))!.at).toBe(t0);
+    h.t += 31_000;
+    await h.send('b', { t: 'heartbeat' });
+    expect((await presenceRow('ub'))!.at).toBe(t0 + 61_000);
+  });
+
+  it('appear-offline users are never presence-stamped (their activity must not leak to friends)', async () => {
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    expect(await presenceRow('ub')).toEqual({ activity: 'online', at: h.t });
+    await h.send('b', { t: 'settings', settings: { appearOffline: true } });
+    h.t += 10 * 60_000;
+    await h.send('b', { t: 'status', status: { kind: 'table', offline: true } });
+    await h.send('b', { t: 'heartbeat' });
+    expect((await presenceRow('ub'))!.activity).toBe('online');
+  });
+
+  it('pending refs never carry presence, and a non-friend receives nothing', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    expect((await presenceRow('ub'))!.activity).toBe('online'); // stamped server-side…
+    await h.send('a', { t: 'friend', op: 'request', to: 'u:ub' });
+    // …but while the request is only pending, neither side's ref carries it
+    const bIn = h.last('b', 'friends')!.friends.incoming[0]!;
+    expect(bIn.presence).toBeUndefined();
+    const aOut = h.last('a', 'friends')!.friends.outgoing[0]!;
+    expect(aOut.presence).toBeUndefined();
+    // a third user with no relation at all: no presence anywhere in their payload
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    const cHello = h.last('c', 'hello')!;
+    expect(JSON.stringify(cHello.friends)).not.toContain('presence');
+    expect(JSON.stringify(cHello.users)).not.toContain('presence');
+  });
+
+  it('a presence row with an unparseable activity attaches nothing (never rendered as junk)', async () => {
+    await befriend();
+    await db.prepare("UPDATE presence SET activity = 'bogus' WHERE user_id = 'ub'").run();
+    const st = await new SocialStore(db).friendsState('ua');
+    expect(st.friends[0]!.presence).toBeUndefined();
+  });
+});
+
+describe('friend-gated DMs', () => {
+  it('a stranger DM is rejected with NOT_FRIENDS and nothing is stored or delivered', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'hello stranger' });
+    expect(h.last('a', 'error')!.code).toBe('NOT_FRIENDS');
+    expect(h.all('b', 'dm')).toEqual([]);
+    expect(await db.prepare('SELECT COUNT(*) AS n FROM dms').first<{ n: number }>()).toEqual({ n: 0 });
+    // a pending request is not a friendship
+    await h.send('a', { t: 'friend', op: 'request', to: 'u:ub' });
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'how about now' });
+    expect(h.last('a', 'error')!.code).toBe('NOT_FRIENDS');
+    // accepting opens the gate
+    await h.send('b', { t: 'friend', op: 'accept', to: 'u:ua' });
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'finally' });
+    expect(h.last('b', 'dm')!.line.text).toBe('finally');
+  });
+
+  it('unfriending mid-thread stops sends; the history stays fully readable', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await befriendDb('ua', 'ub');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'first' });
+    await h.send('b', { t: 'dm', to: 'u:ua', text: 'second' });
+    await h.send('a', { t: 'friend', op: 'remove', to: 'u:ub' });
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'still there?' });
+    expect(h.last('a', 'error')!.code).toBe('NOT_FRIENDS');
+    await h.send('b', { t: 'dm', to: 'u:ua', text: 'me neither' });
+    expect(h.last('b', 'error')!.code).toBe('NOT_FRIENDS');
+    await h.send('b', { t: 'dmHistory', with: 'u:ua' });
+    expect(h.last('b', 'dmHistory')!.lines.map((l) => l.text)).toEqual(['first', 'second']);
+    await h.send('a', { t: 'dmHistory', with: 'u:ub' });
+    expect(h.last('a', 'dmHistory')!.lines.map((l) => l.text)).toEqual(['first', 'second']);
+  });
+});
+
+describe('@mentions (global chat)', () => {
+  it('resolves accounts case-insensitively; self-mentions and unknown names drop', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    await h.send('a', { t: 'chat', text: 'gg @Bobby and @cee — @Alice was here, @Nobody too' });
+    const line = h.last('b', 'chat')!.line;
+    expect(line.mentions).toEqual(['u:ub', 'u:uc']);
+    expect(h.last('c', 'chat')!.line.mentions).toEqual(['u:ub', 'u:uc']);
+    // a plain line carries no mentions field at all
+    await h.send('a', { t: 'chat', text: 'no tags here' });
+    expect(h.last('b', 'chat')!.line.mentions).toBeUndefined();
+  });
+
+  it('an @ inside a word (email-style) never tags, and a guest name resolves nobody', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('g', { name: 'Kev' });
+    await h.send('a', { t: 'chat', text: 'mail me at a@bobby.com sometime' });
+    expect(h.last('b', 'chat')!.line.mentions).toBeUndefined();
+    await h.send('a', { t: 'chat', text: 'hey @Kev you around' });
+    expect(h.last('b', 'chat')!.line.mentions).toBeUndefined();
+  });
+
+  it('a mentioned player in a block relationship with the author is silently excluded', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    await h.send('b', { t: 'friend', op: 'block', to: 'u:ua' });
+    await h.send('a', { t: 'chat', text: '@Bobby can you hear me' });
+    // Bobby is blocked from Alice: he gets no line at all, and the line an
+    // uninvolved reader sees carries no mention of him
+    expect(h.last('b', 'chat')).toBeUndefined();
+    expect(h.last('c', 'chat')!.line.mentions).toBeUndefined();
+    expect(h.mentionPushes).toEqual([]);
+  });
+
+  it('an offline mentioned user fires the mention push hook; an online one does not', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.send('a', { t: 'chat', text: '@Bobby you up?' });
+    expect(h.mentionPushes).toEqual([{ to: 'ub', from: 'ua', name: 'Alice', text: '@Bobby you up?' }]);
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.send('a', { t: 'chat', text: '@Bobby again' });
+    expect(h.mentionPushes).toHaveLength(1);
+    // history carries the mentions too (a late joiner sees the tag), and the
+    // live line Bobby just received carries it as well
+    expect(h.last('b', 'hello')!.global.find((l) => l.text === '@Bobby you up?')!.mentions).toEqual(['u:ub']);
+    expect(h.last('b', 'chat')!.line.mentions).toEqual(['u:ub']);
+  });
+});
+
+describe('DM push hook', () => {
+  it('fires only when the recipient has no live socket', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await befriendDb('ua', 'ub');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'live one' });
+    expect(h.dmPushes).toEqual([]);
+    h.hub.close('b');
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'offline one' });
+    expect(h.dmPushes).toEqual([{ to: 'ub', from: 'ua', name: 'Alice', text: 'offline one' }]);
+  });
+});
+
+describe('mute', () => {
+  it('the mute op validates and parses; a bad payload is dropped as malformed', async () => {
+    expect(parseSocialMsg(JSON.stringify({ t: 'mute', to: 'u:ub', on: true }))).toEqual({ t: 'mute', to: 'u:ub', on: true });
+    expect(parseSocialMsg(JSON.stringify({ t: 'mute', to: 'u:ub', on: 'yes' }))).toBeNull();
+    expect(parseSocialMsg(JSON.stringify({ t: 'mute', to: 'nobody', on: true }))).toBeNull();
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.send('a', { t: 'mute', to: 'u:ua', on: true });
+    expect(h.last('a', 'error')!.message).toBe("That's you.");
+    await h.send('a', { t: 'mute', to: 'u:uz', on: true });
+    expect(h.last('a', 'error')!.message).toBe('No such player.');
+  });
+
+  it("hides the muted author's global lines for the muter only — live and in hello history; unmute restores", async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await h.hub.open('c', { uid: 'uc', name: 'Cee' });
+    await h.send('b', { t: 'mute', to: 'u:ua', on: true });
+    expect(h.last('b', 'ok')!.what).toBe('mute');
+    expect(h.last('b', 'friends')!.friends.muted.map((f) => f.name)).toEqual(['Alice']);
+    // presence is NOT hidden (mute is not block)
+    expect(h.seen('b')).toContain('u:ua');
+    await h.send('a', { t: 'chat', text: 'can anyone hear me' });
+    expect(h.all('b', 'chat')).toEqual([]);
+    expect(h.last('c', 'chat')!.line.text).toBe('can anyone hear me');
+    expect(h.last('a', 'chat')!.line.text).toBe('can anyone hear me');
+    // a fresh socket's history is filtered the same way
+    await h.hub.open('b2', { uid: 'ub', name: 'Bobby' });
+    expect(h.last('b2', 'hello')!.global.map((l) => l.text)).not.toContain('can anyone hear me');
+    expect(h.last('b2', 'hello')!.friends!.muted.map((f) => f.name)).toEqual(['Alice']);
+    // unmute restores everything
+    await h.send('b', { t: 'mute', to: 'u:ua', on: false });
+    expect(h.last('b', 'friends')!.friends.muted).toEqual([]);
+    await h.send('a', { t: 'chat', text: 'and now' });
+    expect(h.last('b', 'chat')!.line.text).toBe('and now');
+  });
+
+  it('is private: the muted player receives nothing and their own state never shows it', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    const before = h.msgs('a').length;
+    await h.send('b', { t: 'mute', to: 'u:ua', on: true });
+    expect(h.msgs('a').length).toBe(before);
+    expect(h.last('a', 'friends')?.friends.muted ?? []).toEqual([]);
+  });
+
+  it('a muted friend: no mention push, no DM push, DM arrives with zero unread, sends still work both ways, friendship intact', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await befriendDb('ua', 'ub');
+    await h.send('b', { t: 'mute', to: 'u:ua', on: true });
+    h.hub.close('b');
+    await h.send('a', { t: 'chat', text: '@Bobby psst' });
+    expect(h.mentionPushes).toEqual([]);
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'quiet hello' });
+    expect(h.dmPushes).toEqual([]);
+    // Bobby reconnects: the DM is in history, contributes no unread
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    expect(h.last('b', 'hello')!.unread).toEqual({});
+    expect(h.last('b', 'hello')!.friends!.friends.map((f) => f.name)).toEqual(['Alice']);
+    await h.send('b', { t: 'dmHistory', with: 'u:ua' });
+    expect(h.last('b', 'dmHistory')!.lines.map((l) => l.text)).toEqual(['quiet hello']);
+    // the muter's own sends behave normally (and reach Alice with a push path intact)
+    await h.send('b', { t: 'dm', to: 'u:ua', text: 'I can still talk' });
+    expect(h.last('a', 'dm')!.line.text).toBe('I can still talk');
+    // and the muted player's sends still ARRIVE live for the muter — silently
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'live but silent' });
+    expect(h.last('b', 'dm')!.line.text).toBe('live but silent');
+    expect(await new SocialStore(db).unread('ub')).toEqual({});
+  });
+
+  it('block after mute behaves exactly as block does today', async () => {
+    await h.hub.open('a', { uid: 'ua', name: 'Alice' });
+    await h.hub.open('b', { uid: 'ub', name: 'Bobby' });
+    await befriendDb('ua', 'ub');
+    await h.send('b', { t: 'mute', to: 'u:ua', on: true });
+    await h.send('b', { t: 'friend', op: 'block', to: 'u:ua' });
+    expect(h.last('b', 'friends')!.friends.blocked.map((f) => f.name)).toEqual(['Alice']);
+    expect(h.last('b', 'friends')!.friends.friends).toEqual([]);
+    await h.send('a', { t: 'dm', to: 'u:ub', text: 'hey' });
+    expect(h.last('a', 'error')!.code).toBe('BLOCKED');
+    expect(h.seen('a')).not.toContain('u:ub');
+    await h.send('a', { t: 'chat', text: 'anyone home' });
+    expect(h.all('b', 'chat')).toEqual([]);
+  });
+});

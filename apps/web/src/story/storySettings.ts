@@ -1,0 +1,76 @@
+/**
+ * Story Mode: turn a stop definition into the Settings snapshot + TableRules
+ * the offline table already understands. Twists ride the existing
+ * settings/house-rules machinery (mode, target, blind-nil availability);
+ * the parts with no Settings knob (nil value, blind-nil value, per-stop
+ * timers) are applied as scoped rules overrides for THIS game only — the
+ * player's saved settings are never touched, and no global rule changes.
+ *
+ * The house deck rides the same scoped snapshot: a story table deals the
+ * stop's OWN matched deck (storyDecks' stop→deck map), not the player's
+ * selected deck — it's the house's deck on their turf. Table activates
+ * whatever deck its settings snapshot carries, so backs and faces match
+ * for all four seats. Clearing the stop is what lets the player take the
+ * deck home in the picker; playing AT the stop never required owning it.
+ */
+import { makeRules, type RulesOverrides, type TableRules } from '@spades/rules';
+import { DEE, STORY_CHARACTERS, type StoryStop } from '@spades/bots';
+import { deckForStop } from '../decks';
+import { type Settings, settingsToRules } from '../settings';
+import type { VenueChoice } from '../venues';
+
+export function storySettingsFor(stop: StoryStop, base: Settings): Settings {
+  const t = stop.twist;
+  return {
+    ...base,
+    deck: deckForStop(stop.id)?.id ?? base.deck,
+    mode: t.mode ?? 'joker',
+    targetScore: t.targetScore ?? 'default',
+    venue: stop.venueId as VenueChoice,
+    blindNil: t.blindNil ? (t.blindNil.availability === 'always' ? 'always' : 'behind100') : base.blindNil,
+  };
+}
+
+export function storyRulesFor(stop: StoryStop, base: Settings): TableRules {
+  const r = settingsToRules(storySettingsFor(stop, base));
+  const o: RulesOverrides = { ...r, nil: { ...r.nil }, blindNil: { ...r.blindNil }, turnTimerSec: { ...r.turnTimerSec } };
+  if (stop.twist.nilValue !== undefined) o.nil = { ...o.nil, value: stop.twist.nilValue };
+  if (stop.twist.blindNil?.value !== undefined) o.blindNil = { ...o.blindNil, value: stop.twist.blindNil.value };
+  if (stop.twist.bidTimerSec !== undefined || stop.twist.playTimerSec !== undefined) {
+    o.turnTimerSec = {
+      bid: stop.twist.bidTimerSec ?? r.turnTimerSec.bid,
+      play: stop.twist.playTimerSec ?? r.turnTimerSec.play,
+    };
+  }
+  return makeRules(r.mode, o);
+}
+
+/** Seat names for a solo stop game: you, adversary 1, Dee (your partner, seat 2), adversary 2. */
+export function storySeatNames(stop: StoryStop, pairNames: [string, string]): string[] {
+  return ['You', pairNames[0], 'Dee', pairNames[1]];
+}
+
+/** A character's team-label name: the short form where the story data defines
+ *  one (the full name would overflow the team-name width), else the name. */
+const labelName = (id: string): string => {
+  const c = STORY_CHARACTERS[id];
+  return c ? (c.shortName ?? c.name) : id;
+};
+
+/** The seated pair's team label at a stop ("Uncle Ray & Pat") — the pair's own
+ *  names from the story data, for all 11 stops. Never a generic pool name:
+ *  story tables are billed as the people actually sitting at them. */
+export function storyPairLabel(stop: StoryStop): string {
+  return `${labelName(stop.pair[0])} & ${labelName(stop.pair[1])}`;
+}
+
+/**
+ * Team names for a story match: [your side, the stop's side]. Your side is
+ * "You & Dee" — the same pairing the seat names and versus labels already
+ * render (the player's seat is honestly "You" on every story surface).
+ * Derived from the stop alone, so a resumed story game re-derives the exact
+ * same names — nothing is stored, nothing can drift.
+ */
+export function storyTeamNames(stop: StoryStop): [string, string] {
+  return [`You & ${DEE.name}`, storyPairLabel(stop)];
+}

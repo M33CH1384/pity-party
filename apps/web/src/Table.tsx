@@ -1,0 +1,2940 @@
+import { deliverBotLine } from './voices/aiVoice';
+import { musicTension } from './musicTension';
+import { clearTableChatOpen, loadTableChatOpen, saveTableChatOpen } from './chatView';
+import { browsedTrick, stepTrickIndex, trickPositionLabel } from './lastTrickBrowse';
+import { RecapTrickReview } from './TrickBrowser';
+import { enterTable, quitGame, silenceGame, suspendGame } from './gameSession';
+import { cardControlLabel } from './cardA11y';
+import type { HandHitCard } from './three/handHit';
+import { FIRST_FRAME_FALLBACK_MS, dealGateOpen } from './three/dealFlight';
+import { useEscapeClose } from './useEscapeClose';
+import { AvatarCircle, useAvatar } from './avatar';
+import { useAccount } from './account/api';
+import { type FlyingPlay, confirmPlay, feltClearsSelection, flyPlay, flyingCard, ignorePlayTap, playTrickOf, type PlayTrick } from './online/playGuard';
+import { actingSeat, localSeatOfServerTurn, turnView, type TurnBadge } from './turnState';
+import { retainHandOrder } from './handOrder';
+import { winHeadline } from './headline';
+import { type VenueId, VENUE_DEFS, AFTER_DARK_VENUE, fetchVenueUnlocks, venueUnlocked } from './venues';
+import { type FormEvent, Fragment, type ReactNode, Suspense, lazy, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import {
+  type Card, type GameState, type PlayerView, type Play, type TableRules, viewFor, hostMinimum, isFreshDeal, isNukeTrick, nukeArmed, hasBothJokers, nextDealer, bidLabel, booksHand, cardLabel, isJoker, isNilBid, isTrump, newlyOneTrickFromShot, nilBustsJustResolved, partnerOf, sideOf, sortHand, liveSeats } from '@spades/rules';
+import { ScorePad, setTeamNames, sideName } from './Modals';
+import { LockedRulesPanel } from './LockedRules';
+import { booksBanner, teamMinNote } from './polishText';
+import { type Series, addSeriesGame, seriesForGameStart, seriesSides, summarizeGame } from '@spades/rules';
+import { SeriesChip, SeriesSheet, loadSeries, saveSeries } from './Series';
+import PersonaFace from './PersonaFace';
+import StoryFace from './story/StoryFace';
+import { useMyTeamName } from './TeamName';
+import { offlineTalk } from './offlineTalk';
+import { ConsultDriver, hasMetPartner } from './consultDriver';
+import { recordPersonaResults } from './personaHistory';
+import { storyEvents, storyFactsOf, storyMilestones, storySnap, type StorySnap } from './story/storyScene';
+import { storyTeamNames } from './story/storySettings';
+import { storyBackdropUrl } from './story/storyBackdrop';
+import { BidOrder, BidSummary, showCenterBidOrder } from './PartnerTalk';
+import { guardTouches, lockBody } from './antiPan';
+import { TrumpLadder } from './trumpLadder';
+import { TrumpPopup, ackTrumpPopup, trumpPopupSeen, trumpSeenKey } from './TrumpPopup';
+import { landingMode } from './three/landing';
+import { SocialButton } from './social/Social';
+import { TableProfileModal } from './social/ProfileModal';
+import { social as socialApi } from './social/store';
+import { applyMention, mentionQueryAt, rankMentionCandidates, splitMentionText } from './social/mentions';
+import { closeTableProfile, openPlayerProfile, profileTargetOf, setTableProfileHost, useTableProfileTarget } from './profileTap';
+import { recordOfflineGame } from './offlineStats';
+import { setStoryVoiceScope, setTableIntensity, showLine, speakBot, spokenClipDurationMs, talkPrefs as talkStore, useTalkPrefs } from './talkPrefs';
+import { chatStickToBottom } from './chatScroll';
+import { setActiveDeck } from './decks';
+import { pickTeamName, toggleReaction } from '@spades/protocol';
+import { Intermission, calloutsFor } from './Intermission';
+import { BoxScore } from './BoxScore';
+import Hype from './Hype';
+import AnimFxLayer from './animfx/AnimFxLayer';
+import { landCueFor, wheelsFor, wheelsMade, wheelsTenth, wheelsTenthBooks } from './landCue';
+import Feedback from './Feedback';
+import { setFeedbackGame } from './feedbackContext';
+import { loadTipJar, openTip, saveTipJar, tipNudgeDue } from './support';
+import { OfflineMediaBar } from './online/Media';
+import { fireCue, fx, useReduceEffects } from './fx';
+import { useDealtSlots } from './dealtSlots';
+import { FeltHand } from './FeltHand';
+import { feltHandVisible } from './three/cardFace';
+import { clientSeesNuke } from './three/blastSweep';
+import { loadScene } from './three/preload';
+import { TableLoading, type LoadingSeat } from './TableLoading';
+import { VersusIntro, markVersusShown, versusDismissReady, versusEligible, type VersusMember, type VersusModel } from './VersusIntro';
+import { buildPostgame, clearPinnedBefore, computeRewardsSettled, resolveBeforeSnapshot, type RewardsProfile } from './GameOverRewards';
+import { stashRewards } from './RewardsPage';
+import { flushLocalGames, localGameId } from './localStats';
+import { tableStillLoading, warmTableEffects } from './effects/warm';
+import { THIRD_SET_HEADLINE, endReasonText, onNoticeSides, shotChatLines } from './shotOut';
+import { type Sfx, sound } from './audio';
+import { sessionRoom } from './spatial';
+import { HAPTIC, haptic } from './haptics';
+import { type ChatMsg, LINES, SEAT_COLORS, TALK_LINES, type Toast, TickNumber, USER_COLORS, pick, toastsFor } from './overlay';
+import { ReactionChips, ReactionPicker } from './reactions';
+import { type Settings, modeTitle } from './settings';
+import type { SeatPos } from './three/layout';
+import { HUMAN, useGame } from './useGame';
+import { DealerPopup } from './DealerPopup';
+import { dealerAnnouncement, dealerFromServer, withCurrentDealerLine } from './dealerName';
+import { plateTally, rememberHandTally, type HandTally } from './plateStats';
+import { BOOK_GATHER_MS, landedTook, shownTook } from './tookDisplay';
+import { bidChipText, dealerChipMatches, plateTookText, popPlateTook, syncPlateFacts, type SeatFact } from './plateFacts';
+import { leaveChoice, leaveMenuAction, type LeaveGesture } from './leaveMenu';
+import { biddingNote, noticeTip, seatFacingName, seatInitial, trickTakenLine } from './seatLabel';
+import { MinBidLine, bidChoices, minBidNote } from './minBid';
+import { type SavedGame, clearGame, saveGame } from './save';
+import { clearStoryGame, saveStoryGame } from './story/storySave';
+import { beatStartOffsets, scheduleStoryBeats, REPLY_TAIL_RIDE_MS } from './story/beatPacing';
+
+import { useViewport } from './viewport';
+import { tapPlaySlamIntensity } from './slam';
+import { effectiveView, handStarted, initialHandView, userToggledView, type HandViewState } from './handView';
+import { Coach, LedSuitChip } from './Coach';
+import { type TipsPref, bumpTip, loadTips, saveTips, tipCount } from './tips';
+import { BidCoach } from './BidCoach';
+import { MEGA_RUN_FX_MS, RUN_FX_MS } from '@spades/protocol';
+import { RUN_SHOW_MS, RUN_SLAM_MS, RUN_IT_CALLOUTS, RUN_TORNADO_AFTER_MS, RUN_ZOOM_MS, RUN_MEGA_DETONATE_MS, RUN_MEGA_SHOW_EXTRA_MS, RUN_MEGA_TORNADO_AFTER_MS } from './runIt';
+import { pickRunShow, scoreOpened } from './runPlayback';
+import type { RunPlayback } from '@spades/protocol';
+import { RunItReview, RunZoom, faceUrl, runReviewOverTable } from './RunZoom';
+import { TrashTalkButton } from './TrashTalk';
+import { isWildDeuce } from './cardFaces';
+import { MISDEAL_DEAL_SPEED, MISDEAL_REVEAL_DWELL_MS, heldHandForThrowIn, misdealDealMs, misdealFanHand, misdealRevealKey, misdealRevealMs } from './misdeal';
+import { QUICK_TRASH_SET } from './quickTrash';
+import { BADGES, award, runItTipDue, runItTipShown, runItUsed, useBadges } from './badges';
+import { STORY_CHARACTERS, STORY_STOPS, STOP_DENSITY_CLASS, TALK_PROFILES, type BotLevel, type StoryBeat, type StoryBeatFacts, type StoryGameFacts, type StoryStop, type TalkIntensity, botSkillFor, buildStoryTape, buzzMomentFor, callbackFor, midSceneFor, parseHint, partnerBidIntent, personaForName, platePersona, pickBotNames, playBeatFor, railCastForAttempt, railMomentFor, resumeLineFor, skillOf, tableExchangeFor } from '@spades/bots';
+import { preloadVoice } from './voices/voices';
+import { signalTableReady } from './transitions';
+const Scene = lazy(loadScene);
+
+/**
+ * "X TAKES IT": placed just above the trick (measured from the 3D layout), or below it when there's no room —
+ * never over the cards. Brief: fades out on its own.
+ */
+function TrickBanner({ text }: { text: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState<{ top: number } | null>(null);
+  useLayoutEffect(() => {
+    let raf = 0;
+    const place = () => {
+      const L = (window as unknown as { __bwmLayout?: { trick: { x: number; y: number; w: number; h: number }[]; hand: { x: number; y: number; w: number; h: number }[]; h: number } }).__bwmLayout;
+      const el = ref.current;
+      if (!L || !L.trick.length || !el) { setPos({ top: window.innerHeight * 0.44 }); return; }
+      const top = Math.min(...L.trick.map((t) => t.y)), bottom = Math.max(...L.trick.map((t) => t.y + t.h));
+      const bh = el.offsetHeight || 28, bw = el.offsetWidth || 160;
+      const x0 = (window.innerWidth - bw) / 2;
+      const obstacles = [...document.querySelectorAll('.scorebug > :not(.dock-slot), .badge-layer .plate, .me-plate, .last-trick, .ctl-cluster, .bid-panel')]
+        .map((e) => e.getBoundingClientRect()).filter((r) => r.width > 0 && r.height > 0)
+        .concat((L.hand ?? []).map((c) => ({ left: c.x, right: c.x + c.w, top: c.y, bottom: c.y + c.h }) as DOMRect));
+      const free = (y: number) => y >= 0 && y + bh <= window.innerHeight && obstacles.every((r) => r.right <= x0 || r.left >= x0 + bw || r.bottom <= y || r.top >= y + bh);
+      // nearest free slot just above the trick, else just below it, else the old centre spot
+      for (let d = 0; d < 160; d += 4) {
+        if (free(top - bh - 6 - d)) { setPos({ top: top - bh - 6 - d }); return; }
+        if (free(bottom + 6 + d)) { setPos({ top: bottom + 6 + d }); return; }
+      }
+      setPos({ top: top - bh - 6 });
+    };
+    raf = requestAnimationFrame(() => { raf = requestAnimationFrame(place); });
+    return () => cancelAnimationFrame(raf);
+  }, []);
+  return (
+    <div className="trick-banner-wrap" style={{ top: pos?.top ?? -999, visibility: pos ? 'visible' : 'hidden' }}>
+      <div ref={ref} className="center-note win">{text}</div>
+    </div>
+  );
+}
+
+/** Online play: the table renders server state through the same UI (see online/OnlineTable.tsx). */
+export interface OnlineBinding {
+  /** shape-compatible with useGame()'s result */
+  source: ReturnType<typeof useGame> & { locked?: boolean; playGate?: number };
+  /** local-seat names (0 = you) */
+  names: string[];
+  chat: { msgs: ChatMsg[]; push: (user: string, text: string) => void; /** emoji reaction to a line (online: sent to the server; offline: local) */ react?: (id: number, emoji: string) => void; /** reactor id for highlighting your own reactions (server pid / 'you' offline) */ youId?: string | null };
+  /** video bubble / timer chip etc. inside a seat's name plate (local seat index) */
+  seatExtra: (seat: number) => ReactNode;
+  /** scorebug label for a (local) side */
+  sideLabel: (side: number) => string;
+  /** Extra buttons for the bottom-right control cluster (camera / mic). */
+  controls?: ReactNode;
+  /** Table Talk (between hands): countdown, who's ready, and the enlarged video / avatar tile per local seat */
+  /** tips on → ask the server for longer turn timers for this player */
+  setLearning?: (on: boolean) => void;
+  talk?: { secs: number | null; ready: { mine: boolean; count: number; of: number }; tile: (seat: number) => ReactNode };
+  /** per local side: custom team name (null = partner names) */
+  teamNames?: (string | null)[];
+  /** rename my team (server-validated) */
+  setTeamName?: (name: string) => void;
+  /** the table's rematch series + which of its sides is mine */
+  series?: { series: Series | null; mine: number };
+  /** local seats held by bots */
+  botSeats?: number[];
+  /** the host's trash-talk intensity */
+  talkIntensity?: TalkIntensity;
+  /** victory spotlight (game over): winners' / losers' local seats + the winning side's name */
+  victory?: (winners: number[], losers: number[], title: string, sub?: string) => ReactNode;
+  /** the venue this online game is played in (everyone sees the same) */
+  venue?: VenueId;
+  /** uid of the human holding a local seat (Demetrius 2026-10-19: profile pics on name plates) */
+  seatUid?: (local: number) => string | undefined;
+  /** Story co-op finale (Phase 4): the LOCAL seat the King's revolver lies
+   *  beside during the cutthroat — the same felt prop as the solo decider,
+   *  keyed to the room's finale-game phase instead of the solo story prop.
+   *  Null/absent = no gun. */
+  kingGunSeat?: number | null;
+  /** Story co-op: the pair's narrative line for this stop (attempts/clears from
+   *  the pair context), shown as the viewer side's headline on the versus card. */
+  versusPairNote?: string | null;
+  /** Release 10: watching, not playing. Seat 0 is a real player (names[0] is their name): no hand, no controls. */
+  spectator?: boolean;
+  /**
+   * Current hand's dealer, from one `dealerFromServer` result: the engine seat's occupant
+   * and that seat after the table rotates the viewer to the bottom. Offline leaves these
+   * unset and derives both from the engine seat.
+   */
+  dealerName?: string;
+  /** Local seat for `dealerName`. Same call, so the DEALER chip and the popup cannot name two bots. */
+  dealerSeat?: number;
+  /** Server's current-turn seat, before the table rotates the viewer to the bottom. */
+  serverTurn?: number | null;
+  /** Viewer's server seat. Null while spectating: the view is already anchored. */
+  viewerSeat?: number | null;
+  /** Resolved Run it! in local seats. Present for every viewer until the next hand, including the one who did not claim. */
+  run?: RunPlayback | null;
+  /** Release 10: spectator banner / take-seat prompt / watchers chip, drawn over the table */
+  overlay?: ReactNode;
+  /** True once this client's loader is gone and the table can take a bid or a play. */
+  onInteractive?: (on: boolean) => void;
+  /** Pre-deal setup window: client-epoch ms when the room deals this game's first
+   *  hand (skew-corrected like the turn deadline); null once dealt / not applicable. */
+  dealAt?: number | null;
+  /** Big Bank pot for this table when the client knows it (its wager row); the
+   *  versus tape shows a Pot line only when this is set. */
+  pot?: number | null;
+}
+
+/** Name-plate face (Demetrius 2026-10-19): a human seat's uploaded picture, else the initial.
+ *  Story seats (art pass, 2026-10-21) show the character's portrait, with the
+ *  initial medallion as its built-in fallback. Bot seats (faces pass,
+ *  2026-10-23) show their persona portrait, same built-in fallback. */
+function PlateFace({ uid, name, color, storyId, bot }: { uid?: string; name: string; color: string; storyId?: string; bot?: boolean }) {
+  const pic = useAvatar(uid);
+  if (storyId) return <StoryFace characterId={storyId} name={name} className="plate-avatar" />;
+  if (bot) return <PersonaFace name={name} className="plate-avatar" />;
+  return <AvatarCircle pic={pic} name={name} className="plate-avatar" style={{ ['--uc' as string]: color }} />;
+}
+
+/** Own name-plate face: the signed-in player's own uploaded picture, else the initial. */
+function MyPlateFace({ name, color }: { name: string; color: string }) {
+  const { user } = useAccount();
+  return <AvatarCircle pic={user?.avatar} name={name} className="plate-avatar" style={{ ['--uc' as string]: color }} />;
+}
+
+interface Props {
+  rules: TableRules;
+  seed: string;
+  settings: Settings;
+  onExit: () => void;
+  /** Rematch: the next game continues the deal rotation from `dealer`. */
+  onRematch: (dealer: number) => void;
+  /** offline rematch: first dealer of this game (undefined = random) */
+  startDealer?: number;
+  onQuality: (q: Settings['quality']) => void;
+  onView?: (v: Settings['view']) => void;
+  onTurnUp?: (on: boolean) => void;
+  /** A saved in-progress game to resume at exactly the same point. */
+  resume?: SavedGame;
+  /** Rematch or resume: keep the series tally. A new game leaves this unset and starts at 0–0. */
+  continueSeries?: boolean;
+  online?: OnlineBinding;
+  /** Game over → straight to the splash screen (offline: the finished save is cleared; online: leaves the table). */
+  onMainMenu?: () => void;
+  /** Offline: back to the menu keeping the save (Resume on the start screen). */
+  onSuspend?: () => void;
+  /** Story Mode (solo): fixed seat names + per-seat bot skill + a game-over hook.
+   *  Story games never write the offline save, the series tally, or the local
+   *  game upload — the story result endpoint is their only record. */
+  story?: {
+    names: string[];
+    levelFor: (seat: number) => BotLevel;
+    onGameOver: (won: boolean, facts: StoryGameFacts) => void;
+    /** Scene pass: the stop + stored facts, so the scene runs continuously
+     *  through the game (sit-down, bid/play reactions, milestone beats,
+     *  between-hands exchanges, recorded-event callbacks). Story games only.
+     *  doublePending rides along (buildStoryTape's facts shape): the live
+     *  King double-or-nothing state, read by kingGunSeatFor below. */
+    scene?: { stop: StoryStop; facts: StoryBeatFacts & { doublePending?: boolean } };
+    /** Story save slot (own key, never the normal save): the attempt context
+     *  this match started under + the dialogue session restored on resume. */
+    saveCtx?: {
+      attemptsAtStart: number;
+      clearsAtStart: number;
+      resumed: boolean;
+      /** fresh games: this attempt's drawn rail cast (railCastForAttempt) */
+      railCast?: string[];
+      initialSession?: { fired: string[]; memory: string[]; satDown: boolean; railFired?: number; lastRailHand?: number; railCast?: string[]; railChecks?: number; railExchanges?: number; railSaid?: string[]; buzzChecks?: number; buzzFired?: number; buzzSaid?: string[] };
+    };
+  };
+}
+
+/** Offline bot names: random per game (derived from the game seed), never your own online name; kept in the save. */
+function offlineNames(n: number, seed: string): string[] {
+  let mine = '';
+  try { mine = (localStorage.getItem('bwm.online.name') ?? '').replace(/^"|"$/g, ''); } catch { /* ignore */ }
+  return ['You', ...pickBotNames(n - 1, mine ? [mine, 'You'] : ['You'], seed, platePersona)];
+}
+
+function positions(n: number): SeatPos[] {
+  return n === 4 ? ['bottom', 'left', 'top', 'right'] : ['bottom', 'left', 'right'];
+}
+
+/* -------------------------------------------------------------- chat feed */
+const talkOn = () => { try { return JSON.parse(localStorage.getItem('bwm.talk.v1') ?? '{}').botTalk !== false; } catch { return true; } };
+function useChat(st: GameState, names: string[], initial?: ChatMsg[]) {
+  const [msgs, setMsgs] = useState<ChatMsg[]>(() => initial ?? []);
+  const prev = useRef<GameState | null>(initial ? st : null);
+  const idRef = useRef(initial && initial.length ? Math.max(...initial.map((m) => m.id)) + 1 : 1);
+  const timers = useRef<number[]>([]);
+  const namesRef = useRef(names);
+  namesRef.current = names;
+  const push = useCallback((user: string, text: string, system = false, delay = 0, bot = false, hint = false) => {
+    const add = () => setMsgs((m) => [...m.slice(-60), { id: idRef.current++, user, text, system, color: USER_COLORS[user] ?? SEAT_COLORS[namesRef.current.indexOf(user)] ?? '#ddd', ...(bot ? { bot: true } : {}), ...(hint ? { hint: true } : {}) }]);
+    if (delay) timers.current.push(window.setTimeout(add, delay));
+    else add();
+  }, []);
+  /** offline reactions are local only (bots don't react): toggle under the 'you' id */
+  const react = useCallback((id: number, emoji: string) => {
+    setMsgs((xs) => xs.map((m) => (m.id === id ? { ...m, reactions: toggleReaction(m.reactions, emoji, 'you') } : m)));
+  }, []);
+  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  const bots = names.slice(1);
+  const n = names.length;
+
+  useEffect(() => {
+    const p = prev.current;
+    prev.current = st;
+    const r = st.rules;
+    if (!p) {
+      push('System', `Table open · ${modeTitle(r)} · first to ${r.targetScore}`, true);
+      if (st.tricks.length === 0 && st.trick.plays.length === 0) push('System', offlineDealerLine(st, names), true);
+      if (talkOn()) {
+        push(pick(bots), pick(LINES.start), false, 900);
+        push(pick(bots), pick(['yo', 'what up', '👋', 'ready']), false, 1700);
+      }
+      return;
+    }
+    if (st.handNo !== p.handNo) push('System', offlineDealerLine(st, names), true);
+    // bids
+    st.bids.forEach((b, s) => {
+      if (b !== null && p.bids[s] === null && p.handNo === st.handNo) {
+        push('System', `${names[s]} bid ${bidLabel(b)}`, true);
+        if (isNilBid(b) && s !== HUMAN && talkOn() && Math.random() < 0.6) push(names[s]!, pick(['going nil 🤫', 'nil. cover me', 'trust me 😏']), false, 500);
+      }
+    });
+    // wheels: a team's combined bid hits 10+ (team games only, once both partners have bid)
+    if (p.handNo === st.handNo) {
+      const before = new Set(wheelsFor(r, p.bids).map((w) => w.side));
+      for (const w of wheelsFor(r, st.bids)) {
+        if (before.has(w.side)) continue;
+        const who = sideName(r, w.side, names);
+        push('System', `🛞 Wheels! ${who} bid ${w.total} books together`, true);
+        window.setTimeout(() => fx.emit('wheels', { sub: `${who} · ${w.total} books` }), 250);
+      }
+    }
+    // Cutthroat wheels: your 10th book of the hand (once per hand per player)
+    const runWait = st.tricks.slice(p.tricks.length).some((t) => t.plays.some((q) => q.run)) ? runWaitMs(st) : 0;
+    if (st.handNo === p.handNo) for (const s of wheelsTenth(r, p.tricksWon, st.tricksWon)) {
+      push('System', `🏎 Wheels! ${names[s]} took a 10th book`, true);
+      window.setTimeout(() => fx.emit('wheelsCar', { text: `${names[s]} · 10 books` }), 900 + runWait);
+    }
+    // first hand (books bid themselves, so no bids): a team's 10th book of the hand → the same celebration
+    if (st.handNo === p.handNo) for (const side of wheelsTenthBooks(r, st.bids, p.tricksWon, st.tricksWon)) {
+      const who = sideName(r, side, names);
+      push('System', `🏎 Wheels! ${who} took 10 books`, true);
+      window.setTimeout(() => fx.emit('wheelsCar', { text: `${who} · 10 books` }), 900 + runWait);
+    }
+    // ☢ a nuke arming (second Joker down, trick still open — any trick) is announced once, on the way in
+    if (st.handNo === p.handNo && nukeArmed(st) && !nukeArmed(p)) push('System', '☢ Nuke armed — ready to blow', true);
+    // tricks
+    if (st.tricks.length > p.tricks.length && st.handNo === p.handNo) {
+      const t = st.tricks[st.tricks.length - 1]!;
+      const winCard = t.plays.find((x) => x.seat === t.winner)!.card;
+      const led = t.plays[0]!.card;
+      void winCard; void led; // bot reactions to plays come from the trash-talk engine (offlineTalk)
+      const ran = st.tricks.slice(p.tricks.length).filter((x) => x.plays.some((q) => q.run));
+      if (ran.length) {
+        const claimer = ran.at(-1)!.winner!;
+        // ☢☢ a both-Jokers run gets the mega line instead of the run line — never both.
+        // The claimer's run cards are their hand at the claim: the same fact runPlayout stamps.
+        const runCards = ran.flatMap((x) => x.plays.filter((q) => q.run && q.seat === claimer).map((q) => q.card));
+        if (hasBothJokers(runCards)) push('System', `☢☢ TOTAL ANNIHILATION — ${names[claimer]} ran it with both Jokers (+${ran.length} books)`, true);
+        else push('System', `🌪 ${names[claimer]} ran the board (+${ran.length} books)`, true);
+      }
+      else if (isNukeTrick(t.plays)) push('System', '☢ Nuked', true);
+    }
+    // hand scored
+    if (st.history.length > p.history.length) {
+      const rec = st.history[st.history.length - 1]!;
+      push('System', `Hand ${rec.handNo}: ${rec.sides.map((s) => `${sideName(r, s.side, names)} ${s.points >= 0 ? '+' : ''}${s.points}`).join(' · ')}`, true);
+      for (const w of wheelsMade(r, rec)) push('System', `🏎 Wheels made! ${sideName(r, w.side, names)} bid ${w.bid} and took ${w.books}`, true);
+      for (const t of shotChatLines(r, rec, st, (side) => sideName(r, side, names))) push('System', t, true);
+      const mySide = sideOf(HUMAN, r);
+      void mySide;
+    }
+    if (st.history.length > p.history.length && st.phase === 'handOver' && talkOn()) {
+      // Table Talk banter between hands
+      const rec = st.history[st.history.length - 1]!;
+      const top = Math.max(...rec.sides.map((s) => s.points));
+      for (const [i, b] of bots.entries()) {
+        if (Math.random() < 0.45 && i < 2) continue;
+        const side = sideOf(names.indexOf(b), r);
+        const pts = rec.sides[side]!.points;
+        const pool = rec.sides.every((s) => s.points === top) ? TALK_LINES.even : pts === top ? TALK_LINES.won : TALK_LINES.lost;
+        push(b, pick(pool), false, 2200 + i * 1400);
+      }
+    }
+    if (st.phase === 'gameOver' && p.phase !== 'gameOver') {
+      push('System', 'Game over', true);
+    }
+  }, [st, names, bots, n, push]);
+
+  // The line above is written once per hand. If that seat's occupant changes later, point it at the current name.
+  useEffect(() => {
+    const line = offlineDealerLine(st, names);
+    setMsgs((xs) => {
+      const texts = withCurrentDealerLine(xs.map((m) => m.text), st.handNo, line);
+      if (!texts) return xs;
+      return xs.map((m, i) => (m.text === texts[i] ? m : { ...m, text: texts[i]! }));
+    });
+  }, [st.handNo, st.dealer, names]);
+
+  return { msgs, push, react, youId: 'you' };
+}
+
+/** Offline: the viewer is engine seat 0, so that seat's dealer name is "You" and every other seat is its current name. */
+function offlineDealerLine(st: GameState, names: readonly string[]): string {
+  const name = dealerFromServer({
+    serverDealer: st.dealer,
+    occupants: names.map((nm) => ({ name: nm, kind: 'human' as const })),
+    viewerSeat: 0,
+  }).name;
+  return dealerAnnouncement(st.handNo, name);
+}
+
+/**
+ * Table-chat text with its server-resolved @mentions highlighted. Only
+ * tokens the server resolved (the line's `mentions`, mapped pid → the name
+ * that pid speaks under in this chat) light up. Your own label here is
+ * "You", so a token tagging you may stay plain — the line itself still
+ * gets the mentions-me treatment.
+ */
+function TableMentionText({ text, mentions, msgs }: { text: string; mentions?: string[]; msgs: ChatMsg[] }) {
+  if (!mentions?.length) return <>{text}</>;
+  const keys = new Set<string>();
+  for (const pid of mentions) {
+    const m = msgs.find((x) => x.from === pid);
+    if (m && m.user !== 'You') keys.add(m.user.toLowerCase());
+  }
+  if (!keys.size) return <>{text}</>;
+  const segs = splitMentionText(text, (k) => keys.has(k));
+  return <>{segs.map((sg, i) => (sg.mention ? <b key={i} className="chat-mention">{sg.text}</b> : <Fragment key={i}>{sg.text}</Fragment>))}</>;
+}
+
+function ChatPanel({ msgs, open, onToggle, onSend, unread, scope = 'local only', extra, trash, overRecap = false, onReact, myId = null, mentionCandidates }: { msgs: ChatMsg[]; open: boolean; onToggle: () => void; onSend: (t: string) => void; unread: number; scope?: string; extra?: ReactNode; trash?: ReactNode; /** hand recap: the log is a sheet, opened from the corner button on that screen */ overRecap?: boolean; /** emoji reaction to a line (undefined = reactions unavailable here) */ onReact?: (id: number, emoji: string) => void; /** my reactor id (server pid / 'you'), for chip highlighting */ myId?: string | null; /** @ completion candidates, best-first (friends → online → table roster); omit = no completion (offline) */ mentionCandidates?: readonly { name: string }[] }) {
+  const listRef = useRef<HTMLDivElement>(null);
+  const [text, setText] = useState('');
+  const [caret, setCaret] = useState(0);
+  const [pick, setPick] = useState(0);
+  const [dismissedAt, setDismissedAt] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mQuery = mentionCandidates ? mentionQueryAt(text, caret) : null;
+  const mOptions = mQuery && mQuery.start !== dismissedAt ? rankMentionCandidates(mentionCandidates!, mQuery.query) : [];
+  useEffect(() => { setPick(0); }, [mQuery?.query, mQuery?.start]);
+  const chooseMention = (name: string) => {
+    if (!mQuery) return;
+    const r = applyMention(text, mQuery, caret, name);
+    setText(r.text);
+    setCaret(r.caret);
+    requestAnimationFrame(() => { const el = inputRef.current; if (el) { el.focus(); el.setSelectionRange(r.caret, r.caret); } });
+  };
+  /** which message's emoji picker is open (one at a time) */
+  const [pickFor, setPickFor] = useState<number | null>(null);
+  // Auto-scroll: stick to the bottom while the user is at/near it (opening always re-sticks);
+  // scrolling up to read history releases the stick. Direct scrollTop assignment — the old
+  // scrollTo({behavior:'smooth'}) got perpetually restarted by streaming lines on iOS
+  // Safari, so an open chat sat frozen on old messages until it was closed and reopened.
+  const stickRef = useRef(true);
+  useEffect(() => { if (open) stickRef.current = true; }, [open ]);
+  useEffect(() => {
+    const el = listRef.current;
+    if (el && open && stickRef.current) el.scrollTop = el.scrollHeight;
+  }, [msgs, open]);
+  const last = msgs.filter((m) => !m.system).slice(-1)[0];
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (!text.trim()) return;
+    onSend(text.trim().slice(0, 200));
+    setText('');
+  };
+  return (
+    <>
+      {open && (
+        <div
+          className={`chat-backdrop${overRecap ? ' recap' : ''}`}
+          onClick={onToggle}
+          aria-hidden
+          data-testid="chat-backdrop"
+        />
+      )}
+      {!overRecap && (
+        /* The table-controls rail: chat, camera and mic are separate, always-visible
+           controls stacked on the right edge — a new player can see what lives here
+           without opening anything (owner 2026-10-20: the old single 💬⋯ tray toggle
+           hid the camera/mic behind a chat-looking button). */
+        <div className="ctl-cluster ctl-rail" role="group" aria-label="Table controls: chat, camera, mic" data-testid="ctl-rail">
+          <button type="button" className={`chat-toggle ${open ? 'open' : ''}`} onClick={onToggle} aria-label={open ? 'Hide chat' : 'Show chat'}>
+            💬<small>CHAT</small>{!open && unread > 0 && <span className="unread" data-testid="rail-unread">{unread}</span>}
+          </button>
+          {extra}
+          {trash}
+        </div>
+      )}
+      {!overRecap && !open && last && <div key={last.id} className="chat-ticker"><b style={{ color: last.color }}>{last.user}</b> {last.text}</div>}
+      <aside className={`chat glass slant ${open ? 'open' : ''}${overRecap ? ' recap-chat' : ''}`} aria-label="Table chat">
+        <header><span className="live-dot" /> {overRecap ? 'TABLE TALK' : 'LIVE CHAT'} <small>{scope}</small>{overRecap && <button type="button" className="sheet-x" aria-label="Close chat" onClick={onToggle}>✕</button>}</header>
+        <div className="chat-list" ref={listRef} onScroll={(e) => { stickRef.current = chatStickToBottom(e.currentTarget); }}>
+          {msgs.map((m) => (
+            <div key={m.id} className={`chat-line ${m.system ? 'system' : ''}${m.mentions?.includes(myId ?? '') ? ' mentions-me' : ''}`}>
+              {m.system ? <span>{m.text}</span> : <><b style={{ color: m.color }}>{m.user}</b>{m.badge && <em className="chat-tag" data-testid="chat-tag">{m.badge}</em>}<span><TableMentionText text={m.text} mentions={m.mentions} msgs={msgs} /></span>
+                {onReact && <button type="button" className="rx-add" aria-label={`React to ${m.user}'s message`} aria-expanded={pickFor === m.id} data-testid="rx-add" onClick={() => setPickFor(pickFor === m.id ? null : m.id)}>☺</button>}
+                {onReact && pickFor === m.id && <ReactionPicker onPick={(e) => { onReact(m.id, e); setPickFor(null); }} />}
+                {onReact && <ReactionChips reactions={m.reactions} myId={myId} onToggle={(e) => onReact(m.id, e)} />}
+              </>}
+            </div>
+          ))}
+        </div>
+        <form onSubmit={submit} className="chat-input">
+          {mOptions.length > 0 && (
+            <ul className="chat-mention-pop" role="listbox" aria-label="Mention a player" data-testid="chat-mention-pop">
+              {mOptions.map((o, i) => (
+                <li key={o.name}>
+                  <button type="button" role="option" aria-selected={i === pick} className={i === pick ? 'on' : ''}
+                    data-testid={`chat-mention-${o.name}`}
+                    onMouseDown={(e) => { e.preventDefault(); chooseMention(o.name); }}
+                    onMouseEnter={() => setPick(i)}>@{o.name}</button>
+                </li>
+              ))}
+            </ul>
+          )}
+          <input ref={inputRef} value={text}
+            onChange={(e) => { setText(e.target.value); setCaret(e.target.selectionStart ?? e.target.value.length); setDismissedAt(-1); }}
+            onSelect={(e) => setCaret(e.currentTarget.selectionStart ?? 0)}
+            onKeyDown={(e) => {
+              if (!mOptions.length) return;
+              if (e.key === 'ArrowDown') { e.preventDefault(); setPick((p) => (p + 1) % mOptions.length); }
+              else if (e.key === 'ArrowUp') { e.preventDefault(); setPick((p) => (p - 1 + mOptions.length) % mOptions.length); }
+              else if (e.key === 'Enter' || e.key === 'Tab') { e.preventDefault(); chooseMention(mOptions[pick]!.name); }
+              else if (e.key === 'Escape') { e.preventDefault(); setDismissedAt(mQuery!.start); }
+            }}
+            placeholder="Say something…" maxLength={200} aria-label="Chat message" />
+          <button type="submit" aria-label="Send">➤</button>
+        </form>
+        <div className="emotes">
+          {['🔥', '😂', '😤', '🃏', 'gg'].map((e) => <button key={e} type="button" onClick={() => onSend(e)}>{e}</button>)}
+        </div>
+      </aside>
+    </>
+  );
+}
+
+/* ------------------------------------------------------------------ table */
+/* -------------------------------------------------------------- sound cues */
+function useGameSounds(st: GameState, myTurn: boolean, mySide: number, msgs: ChatMsg[]) {
+  const prev = useRef<{ st: GameState; myTurn: boolean; msgs: number } | null>(null);
+  useEffect(() => {
+    const p = prev.current;
+    prev.current = { st, myTurn, msgs: msgs.length };
+    // card sounds (shuffle, deal, play/cut/broken, sweep) are fired by the 3D animations themselves — see Scene/Card3D
+    if (!p) return;
+    st.bids.forEach((b, s) => { if (b !== null && p.st.bids[s] === null && p.st.handNo === st.handNo) sound.play(s === HUMAN ? 'bid' : 'bidSoft'); });
+    if (myTurn && !p.myTurn && (st.phase === 'playing' || st.phase === 'bidding')) sound.play('turn', { delay: 0.05 });
+    if (msgs.length > p.msgs) { const m = msgs[msgs.length - 1]!; if (!m.system && m.user !== 'You') sound.play('pop'); }
+    if (st.phase === 'gameOver' && p.st.phase !== 'gameOver' && st.result) sound.play(st.result.winners.includes(mySide) ? 'win' : 'lose', { delay: 0.3 + (runPlays(st).length && runPlays(p.st).length === 0 ? runWaitMs(st) / 1000 : 0) });
+  }, [st, myTurn, mySide, msgs]);
+}
+
+export { landCueFor } from './landCue';
+
+/** The plays of this hand recorded by 'Run it!' (empty if nobody ran it). */
+function runPlays(st: GameState): Play[] { return st.tricks.flatMap((t) => t.plays.filter((p) => p.run)); }
+
+/**
+ * ☢☢ Was this hand's Run it! a MEGA — the claimer's run cards hold both Jokers?
+ * (Their run cards are their hand at the claim: the same fact runPlayout stamps server-side.)
+ */
+function megaRun(st: GameState): boolean {
+  const bySeat = new Map<number, Card[]>();
+  for (const p of runPlays(st)) bySeat.set(p.seat, [...(bySeat.get(p.seat) ?? []), p.card]);
+  for (const cards of bySeat.values()) if (hasBothJokers(cards)) return true;
+  return false;
+}
+
+/** How long the celebrations after a run hand wait out the show (the mega show runs longer). */
+function runWaitMs(st: GameState): number { return megaRun(st) ? MEGA_RUN_FX_MS : RUN_FX_MS; }
+
+/** Local seat that claimed 'Run it!' (they win every trick the claim played out). */
+function runClaimerSeat(st: GameState): number | null {
+  for (let i = st.tricks.length - 1; i >= 0; i--) {
+    const t = st.tricks[i]!;
+    if (t.winner !== null && t.plays.some((p) => p.run)) return t.winner;
+  }
+  return null;
+}
+
+/**
+ * 'Run it!': the glowing button above your hand (only ever shown when the engine has proven every remaining book is yours).
+ * The first few times it appears, a one-time spotlight tip points at it (shown even with tips off).
+ */
+function RunItButton({ onRun, tip, onDismissTip }: { onRun: () => void; tip: boolean; onDismissTip: () => void }) {
+  const escTip = useEscapeClose(onDismissTip);
+  const [bottom, setBottom] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const place = () => {
+      const L = (window as unknown as { __bwmLayout?: { hand: { y: number }[] } }).__bwmLayout;
+      // above your hand, and never down among the plates / last-trick strip in the bottom corners (phones)
+      if (L?.hand?.length) setBottom(Math.round(Math.max(window.innerHeight - Math.min(...L.hand.map((q) => q.y)) + 10, window.innerHeight * (window.innerWidth < 700 ? 0.33 : 0.3))));
+    };
+    place();
+    const iv = window.setInterval(place, 400);
+    return () => clearInterval(iv);
+  }, []);
+  return (
+    <div className="run-it-wrap" style={{ bottom: bottom ?? undefined }}>
+      {tip && (
+        <div ref={escTip} className="run-it-tip glass slant" role="dialog" aria-label="Run it tip" data-testid="run-it-tip">
+          <span>You've got the rest locked. Tap <b>Run it!</b> to take every remaining book.</span>
+          <button type="button" className="link" onClick={onDismissTip} aria-label="Dismiss tip">Got it</button>
+        </div>
+      )}
+      <button type="button" className={`run-it-btn${tip ? ' attention' : ''}`} data-testid="run-it" onClick={onRun}>Run it! 🌪</button>
+    </div>
+  );
+}
+
+/**
+ * 'Call misdeal': shown only while the engine says this seat may call (spade-less hand, seen, not yet bid).
+ * Bidding instead is the decline — the engine closes the offer the moment this seat bids.
+ */
+function MisdealButton({ onCall }: { onCall: () => void }) {
+  return (
+    <div className="misdeal-wrap">
+      <button type="button" className="misdeal-btn" data-testid="misdeal" onClick={onCall}>Call misdeal — no spades</button>
+    </div>
+  );
+}
+
+/**
+ * The announcement: a misdeal is CALLED, out loud — who called it and why (no spades), and who
+ * the deal passes to — with the caller's whole hand face up as the whole table's proof. It rides
+ * the gather beat while every hand slides across to the incoming dealer's deck spot; the shuffle
+ * + deal flight then take over from that seat (see misdeal.ts). The panel itself outlives the
+ * sequence: it holds for MISDEAL_REVEAL_DWELL_MS or until the player taps it away (onDismiss).
+ */
+function MisdealReveal({ title, passTo, bidsVoided, cards, rules, onDismiss }: { title: string; passTo: string; bidsVoided: boolean; cards: Card[]; rules: TableRules; onDismiss: () => void }) {
+  const spread = sortHand(cards, rules);
+  const perRow = Math.ceil(spread.length / 2);
+  return (
+    <div className="misdeal-reveal" data-testid="misdeal-reveal" role="status" aria-label={`Misdeal — ${title}. Deal passes to ${passTo}`}>
+      <div className="misdeal-panel glass" onClick={onDismiss} title="Tap to dismiss">
+        <div className="misdeal-head">Misdeal</div>
+        <div className="misdeal-sub">{title}</div>
+        <div className="misdeal-pass">Deal passes to {passTo}</div>
+        <div className="misdeal-spread" style={{ '--per-row': perRow } as React.CSSProperties}>
+          {spread.map((c, i) => (
+            <img key={c} src={faceUrl(c, isWildDeuce(c, rules))} alt={c} className="misdeal-card" style={{ '--i': i } as React.CSSProperties} />
+          ))}
+        </div>
+        <div className="misdeal-foot">{bidsVoided ? 'Bids are off — gathering the cards for a fresh deal…' : 'Gathering the cards for a fresh deal…'}</div>
+        <div className="misdeal-dismiss">Tap to dismiss</div>
+      </div>
+    </div>
+  );
+}
+
+/** the stand-in table wears the chosen venue's colours (felt, rail, floor, backdrop) so loading never flashes classic green.
+ *  A story table passes its stop's own backdrop (storyBackdropUrl) as bgUrl — the borrowed venue's panorama
+ *  depicts the venue's place, not the stop's; without an override this is exactly the venue behaviour. */
+export function placeholderStyle(venue: VenueId, bgUrl?: string): React.CSSProperties {
+  const d = VENUE_DEFS[venue];
+  const vars: Record<string, string> = {
+    '--tp-felt': d.felt, '--tp-rail': d.railTint, '--tp-apron': d.apron, '--tp-clear': d.clear, '--tp-floor': d.floorTint, '--tp-rim': d.rim,
+    '--tp-bg': bgUrl ? `url(${bgUrl})` : venue === 'classic' ? 'none' : `url(/assets/venues/${venue}/bg.jpg)`,
+    '--tp-floor-tex': d.floorTex ? `url(/assets/venues/tex/${d.floorTex}_512.jpg)` : 'none',
+  };
+  return vars as React.CSSProperties;
+}
+
+/** The one turn badge, painted over an opponent plate from the main tree so a stale canvas plate cannot keep the previous seat's label. */
+function SeatBadge({ badge }: { badge: TurnBadge }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    let raf = 0;
+    const place = () => {
+      const plate = document.querySelector(`[data-testid="seat-${badge.seat}"]`);
+      const el = ref.current;
+      if (plate && el) {
+        const r = plate.getBoundingClientRect();
+        el.style.left = `${r.left + 30}px`;
+        el.style.top = `${r.top - 16}px`;
+        el.hidden = r.width <= 0;
+      }
+      raf = requestAnimationFrame(place);
+    };
+    place();
+    return () => cancelAnimationFrame(raf);
+  }, [badge.seat, badge.text]);
+  return createPortal(
+    <div ref={ref} className="plate-turn acting-badge" data-testid={badge.testId} hidden style={{ position: 'fixed', zIndex: 4, pointerEvents: 'none' }}>{badge.text}</div>,
+    document.body,
+  );
+}
+
+
+/** Cop drive-by light flash: subtle red/blue edge glow when the siren passes (Demetrius 2026-10-19). */
+function DrivebyLights() {
+  const [active, setActive] = useState(false);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const onDriveby = () => {
+      setActive(true);
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => setActive(false), 7000); // match the siren sweep
+    };
+    window.addEventListener('pj-driveby', onDriveby);
+    return () => { window.removeEventListener('pj-driveby', onDriveby); if (timer) clearTimeout(timer); };
+  }, []);
+  if (!active) return null;
+  return <div className="driveby-lights" aria-hidden data-testid="driveby-lights" />;
+}
+
+/**
+ * The King's double or nothing — the gun on the table. While a leg-2 match
+ * is live, the King's revolver (set down in the between-legs beat) lies on
+ * the felt beside his seat: seat 1, the first opponent seat, where the
+ * stop's pair leads. The gate is the LIVE double-pending fact the scene
+ * facts carry from the server's progress row — true for a fresh leg 2, the
+ * between-legs run-back, and a resume into the decider alike (the spoken
+ * beat need not replay for the gun to be there), and false in leg 1, at
+ * every other stop, and in post-completion replays, when the double is
+ * resolved and gone. Null = no gun.
+ */
+export function kingGunSeatFor(story: Props['story']): number | null {
+  return story?.scene?.stop.id === 'king' && story.scene.facts.doublePending ? 1 : null;
+}
+
+export default function Table({ rules: initialRules, seed, settings, onExit, onSuspend, onRematch, onQuality, onView, onTurnUp, resume, continueSeries, online, onMainMenu, startDealer, story }: Props) {
+  useEffect(() => { setActiveDeck(settings.deck); }, [settings.deck]);
+  // Tappable faces (Demetrius 2026-10-20): while a table is mounted, avatar taps anywhere
+  // open the over-table profile modal instead of the Social panel. Leaving the table
+  // restores panel mode and never leaves a modal behind.
+  const profileTarget = useTableProfileTarget();
+  const { user: acctUser } = useAccount();
+  useEffect(() => {
+    setTableProfileHost(true);
+    return () => { setTableProfileHost(false); closeTableProfile(); };
+  }, []);
+  // `online` never changes for a mounted Table, so this is always the same hook path per instance
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const vp = useViewport();
+  // "Learning mode": while tips are on the game runs at Slow (unless the player already picked Slow / tests use turbo),
+  // and an open tip holds the bots + trick sweep until it's dismissed. Tips off → back to the chosen speed.
+  const [tips, setTips] = useState<TipsPref>(loadTips);
+  const [tipsSkipped, setTipsSkipped] = useState(false);
+  // Anti-pan: lock the page while this table is up, and stop touch pans on the table itself.
+  useEffect(() => lockBody(), []);
+  useEffect(() => { const el = screenRef.current; return el ? guardTouches(el) : undefined; }, []);
+  const learning = tips.on && !tipsSkipped;
+  const [tipOpen, setTipOpen] = useState(false);
+  const speed = learning && settings.speed !== 'turbo' ? 'slow' : settings.speed;
+  const n0 = (resume?.state.rules ?? initialRules).playerCount;
+  const [botNames] = useState(() => (story?.names.length === n0 ? story.names : resume?.names?.length === n0 ? resume.names : offlineNames(n0, seed)));
+  // bot skill per seat: the table setting (Mixed = a hidden, seeded roll per seat) + persona floors (the Hustler is Pro+).
+  // Story games override per seat instead: Dee scales with the stop, the pair plays the stop's tier.
+  const levelFor = useCallback((seat: number) => (story ? story.levelFor(seat) : botSkillFor(settings.botLevel, seed, seat, botNames[seat] ?? '')), [story, settings.botLevel, seed, botNames]);
+  const partnerHint = useRef<{ hand: number; text: string } | null>(null);
+  const localReport = useRef<{ names: string[]; teamNames: (string | null)[] | null }>({ names: botNames, teamNames: null });
+  // The deal starts once the loader is gone. Behind it, hand 1 was already dealt when the felt showed.
+  const [dealReady, setDealReady] = useState(false);
+  const [sceneDealt, setSceneDealt] = useState<number | null>(null);
+  const onDealDone = useCallback((h: number) => setSceneDealt(h), []);
+  // The deal also waits for the scene's first presented frame, so the intro flight is seen
+  // instead of expiring behind shader compile on a heavy first load.
+  const [sceneFirstFrame, setSceneFirstFrame] = useState(false);
+  const [gateMountedAt] = useState(() => Date.now());
+  const onSceneFirstFrame = useCallback(() => setSceneFirstFrame(true), []);
+  const { st, view, pause, error, apply, introHand, dealing, k } = online ? online.source : useGame(initialRules, seed, levelFor, speed, resume?.state, learning && tipOpen, startDealer, partnerHint, localReport, dealReady, sceneDealt, !!story);
+  useEffect(() => { online?.setLearning?.(learning); }, [learning]); // eslint-disable-line react-hooks/exhaustive-deps
+  const r = st.rules;
+  const n = r.playerCount;
+  const names = online?.names ?? botNames;
+  const pos = useMemo(() => positions(n), [n]);
+  const [selected, setSelected] = useState<Card | null>(null);
+  const playArmed = useRef(false);
+  const [exchangePick, setExchangePick] = useState<Card[]>([]);
+  const [showPad, setShowPad] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [ltOpen, setLtOpen] = useState(false);
+  // Last-trick browser: an absolute index into this hand's completed tricks,
+  // or null while pinned to the newest (see lastTrickBrowse.ts). The pill
+  // always opens on the newest trick; a new hand clears the selection so the
+  // previous hand's tricks never leak into this hand's browser.
+  const [ltIdx, setLtIdx] = useState<number | null>(null);
+  const toggleLt = useCallback(() => { setLtOpen((v) => !v); setLtIdx(null); }, []);
+  const [clearedOpen, setClearedOpen] = useState(false);
+  useEffect(() => { setClearedOpen(false); }, [st.handNo]);
+  useEffect(() => { setLtIdx(null); }, [st.handNo]);
+  // One-time trump-order popup for Joker modes (replaces the old persistent strip).
+  const trumpKey = trumpSeenKey(r);
+  const [trumpAcked, setTrumpAcked] = useState<boolean>(() => trumpPopupSeen(trumpKey));
+  const dismissTrumpPopup = useCallback(() => { ackTrumpPopup(trumpKey); setTrumpAcked(true); }, [trumpKey]);
+  const showTrumpPopup = trumpKey !== null && st.handNo === 1 && !trumpAcked;
+  // Refresh restores the chat as it was (session-scoped; leaving the table clears it — see chatView.ts).
+  const [chatOpen, setChatOpen] = useState(() => loadTableChatOpen(window.innerWidth >= 900 && window.innerHeight > 600));
+  useEffect(() => { saveTableChatOpen(chatOpen); }, [chatOpen]);
+  const [seenMsgs, setSeenMsgs] = useState(0);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const localChat = useChat(st, names, resume?.chat);
+  const { msgs: rawMsgs, push } = online ? online.chat : localChat;
+  // partner talk presets (team games, bidding): plain PUBLIC table chat — everyone sees it, opponents included.
+  const partnerSeat = r.partnerships ? (HUMAN + 2) % n : -1;
+  // (Release 9: no Partner talk preset panel and no typed bot-partner hints: partners talk out loud over open mics)
+  const talkPrefs = useTalkPrefs();
+  // trash-talk intensity is a table setting (offline: More options; online: the host); Family Friendly masks cursing
+  const intensity = online ? (online.talkIntensity ?? 'cookout') : settings.talkIntensity;
+  setTableIntensity(intensity);
+  // bot trash talk: hidden entirely with 'Hide bot trash talk' (local preference)
+  const msgs = useMemo(() => (talkPrefs.hideBotTalk ? rawMsgs.filter((m) => !m.bot) : rawMsgs.map((m) => (m.bot ? { ...m, text: showLine(m.text) } : m))), [rawMsgs, talkPrefs.hideBotTalk, intensity]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // team names (team modes): yours from More options offline, the bots' a random fun one (kept in the save).
+  // Story games override BOTH sides with the stop's own names — you & Dee against the seated pair —
+  // so the generic defaults (the retired global name, a seeded pool pick) never bill a story table.
+  const myName = useMyTeamName();
+  const [botTeam] = useState(() => resume?.teamNames?.[1] ?? pickTeamName(Math.abs([...seed].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7))));
+  const storyTeams = story?.scene ? storyTeamNames(story.scene.stop) : null;
+  const teamNames: (string | null)[] | null = !r.partnerships ? null : online ? (online.teamNames ?? [null, null]) : storyTeams ?? [myName || null, botTeam];
+  localReport.current = { names, teamNames };
+  setTeamNames(teamNames); // sideName() everywhere (scorebug, results, Table Talk, Victory, score pad) uses these
+  useEffect(() => () => setTeamNames(null), []);
+
+  // offline: the nuke level is locked for the game at its start (a resumed game keeps the one it started with)
+  useEffect(() => {
+    if (online) return;
+    fx.tableNuke = resume?.nuke ?? fx.prefs.nuke;
+    return () => { fx.tableNuke = null; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // offline trash talk: same engine as the server
+  useEffect(() => {
+    if (online) return;
+    // Speech density (2026-10-22): story tables run their stop's class; the
+    // King shifts to its second gear at hand 5 or once a side is within 300
+    // of the 750 target. Regular offline tables run the lively party profile
+    // (owner: "the dry moments gone… live like a party"). Online tables
+    // never reach this effect — the server's talk stays standard.
+    const densityCls = story?.scene ? STOP_DENSITY_CLASS[story.scene.stop.id] : undefined;
+    const kingLate = densityCls === 'climax' && (st.handNo >= 5 || Math.max(...st.scores) >= 450);
+    offlineTalk.table = { seats: names.map((nm, i) => ({ name: nm, bot: i !== HUMAN })), partnerships: r.partnerships, teamNames: Array.from({ length: st.scores.length }, (_, i) => sideName(r, i, names)), intensity, jokers: r.deck === 'joker54', aiTalk: !!settings.aiTalk, profile: densityCls ? (kingLate ? 'climaxLate' : densityCls) : 'lively' };
+    // Revolutionaries tributes: at the Barbershop story table Coleman & June
+    // carry them (Coleman is the stop's historian); anywhere else the bot who
+    // threw the honoured card speaks.
+    offlineTalk.revShop = !!story?.scene && story.scene.stop.id === 'barbershop';
+  });
+  useEffect(() => {
+    if (online) return;
+    if (!resume) offlineTalk.newGame();
+    offlineTalk.sink = (l) => {
+      // Voice Phase 3: a catalog line plays with its own text; anything that misses is the canned line, as before.
+      const tp = talkStore.get();
+      const seatIx = names.findIndex((nm) => nm === l.name);
+      const seatPos = seatIx >= 0 ? pos[seatIx] : undefined;
+      const muted = sound.voiceMuted(l.name);
+      // Story tables never take the AI catalog voice for a seat (one-timbre
+      // rule, 2026-10-21): catalog clips are persona-bucket recordings, a
+      // second voice for a story character. Story seats get the canned path,
+      // which speakBot then renders as cast recording or text only.
+      void deliverBotLine(l, { aiVoices: tp.aiVoices && !muted && !story?.scene, voices: tp.voices, soundOn: sound.settings.on && sound.settings.volume > 0, gain: tp.voiceVolume * 0.9 },
+        (text) => localChat.push(l.name, text, false, 0, true),
+        muted ? () => {} : () => speakBot(l.name, l.text, l.persona, l.line, l.bid, seatPos, n),
+        undefined,
+        // An AI-catalog rendition is the same chatter line in another
+        // voice, so it takes the same no-cut arrival policy as the
+        // canned path (cross-talk over tails; defer or drop rather than
+        // replacing a playing line mid-sentence). A drop reports false
+        // and deliverBotLine falls back to the canned line, which then
+        // arrives under the same policy through speakBot.
+        (b, gain) => sound.playVoiceCrossTalk(b, gain, [0, b.duration], seatPos, n, l.name, { defer: true }));
+      if (l.reveal) fx.emit('hustled', { text: `${l.name} was never new` });
+    };
+    return () => { offlineTalk.sink = null; offlineTalk.table = null; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // rematch series: online from the server. Offline, a new game opens at 0–0. Rematch and resume keep the tally.
+  const [offSeries, setOffSeries] = useState<Series | null>(() => {
+    if (online) return null;
+    const kept = seriesForGameStart(loadSeries(), !!resume || !!continueSeries);
+    if (!kept) saveSeries(null);
+    return kept;
+  });
+  const series = online ? online.series?.series ?? null : offSeries;
+  const seriesMine = online ? online.series?.mine ?? 0 : sideOf(HUMAN, r);
+  const [seriesOpen, setSeriesOpen] = useState(false);
+  const seriesRecorded = useRef(false);
+  useEffect(() => {
+    if (online || story || st.phase !== 'gameOver' || !st.result || seriesRecorded.current) return;
+    seriesRecorded.current = true;
+    recordOfflineGame(r.mode, st.result.winners.includes(sideOf(HUMAN, r)));
+    // Persona memory (owner, 2026-10-23): the same completed game folds
+    // into every seated persona's entry in the persona ledger
+    // (personaLedger.ts — the writer half lives in personaHistory.ts) —
+    // opponents on the vs split, the partner on the together split, all
+    // from the viewer's side per the ledger contract. This effect is the
+    // only writer: offline, non-story, finished games only, so abandoned
+    // games never count. Cutthroat has no sides to win: a meeting enters
+    // the vs split only when it's decisive (the persona finished ahead
+    // of the player, or behind them) — level scores are nobody's win and
+    // stay unrecorded.
+    const humanSide = sideOf(HUMAN, r);
+    const viewerWon = st.result.winners.includes(humanSide);
+    recordPersonaResults(names.flatMap((nm, i) => {
+      if (i === HUMAN) return [];
+      if (!r.partnerships) {
+        const mine = st.scores[HUMAN] ?? 0, theirs = st.scores[i] ?? 0;
+        if (mine === theirs) return [];
+        return [{ persona: personaForName(nm), role: 'opp' as const, viewerWon: mine > theirs }];
+      }
+      return [{ persona: personaForName(nm), role: (sideOf(i, r) === humanSide ? 'partner' : 'opp') as 'partner' | 'opp', viewerWon }];
+    }));
+    // …and an opponent gets the last word on the record that game just
+    // wrote (the finale beat), unless a new match has already taken the
+    // table (gameSeq moves on) by the time it would land.
+    const seq = offlineTalk.gameSeq;
+    window.setTimeout(() => { if (offlineTalk.gameSeq === seq) offlineTalk.historyBeat('histFinale'); }, 2600);
+    const ids = names.map((_, i) => (i === HUMAN ? 'you' : `bot:${i}`));
+    const sideNames = Array.from({ length: st.scores.length }, (_, i) => sideName(r, i, names));
+    // Record onto the series this game opened with, not whatever localStorage holds now.
+    // A late write from the previous game must not turn a fresh result into Series 0–2.
+    const prevS = offSeries;
+    const next = addSeriesGame(prevS, r.mode, seriesSides(st, ids, sideNames), summarizeGame(st, sideNames, (prevS?.games.length ?? 0) + 1, Date.now()));
+    saveSeries(next);
+    setOffSeries(next);
+  }, [st.phase]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // a rematch (Play again keeps the series): the bots talk about it
+    if (!online && !resume && (loadSeries()?.games.length ?? 0) > 0) window.setTimeout(() => offlineTalk.moment({ kind: 'rematch' }), 2500);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // Persona memory (owner, 2026-10-23): at a fresh regular table, a
+    // returning opponent may cite the series record, and a returning
+    // partner the together record. First meetings stay silent — a
+    // persona with no record has no eligible lines, by gate — and the
+    // partner beat additionally yields to the first-meet introduction:
+    // a partner name the player has never met is the introduction's
+    // stage, even if the persona (another name, same character) holds a
+    // together record. Regular offline tables only: story seats are the
+    // cast, with their own memory systems, and online seats are people.
+    if (online || story || resume) return;
+    const tm = window.setTimeout(() => {
+      offlineTalk.historyBeat('histSeries');
+      const pSeat = r.partnerships ? (HUMAN + 2) % names.length : -1;
+      if (pSeat >= 0 && hasMetPartner(names[pSeat]!)) offlineTalk.historyBeat('histTogether');
+    }, 1700);
+    return () => window.clearTimeout(tm);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const seriesChip = (cls = '') => <SeriesChip series={series} onOpen={() => setSeriesOpen(true)} className={cls} />;
+  const [confirmLeave, setConfirmLeave] = useState(false);
+  const [feedback, setFeedback] = useState(false);
+  // the Victory screen's tip-jar line: at most once every few finished games, never during play
+  const [tipNudge, setTipNudge] = useState(false);
+  const gameOverSeen = useRef(false);
+  useEffect(() => {
+    if (st.phase !== 'gameOver' || gameOverSeen.current) return;
+    gameOverSeen.current = true;
+    const s = loadTipJar(); const next = { ...s, games: s.games + 1 };
+    const due = tipNudgeDue(next);
+    saveTipJar(due ? { ...next, shownAt: next.games } : next);
+    setTipNudge(due);
+  }, [st.phase]);
+  useEffect(() => { if (st.phase !== 'gameOver') gameOverSeen.current = false; }, [st.phase]);
+  // feedback reports carry a short summary of this game
+  useEffect(() => {
+    setFeedbackGame({ mode: r.mode, players: r.playerCount, phase: st.phase, hand: st.handNo, scores: st.scores, bids: st.bids.map((b) => (b === null ? '-' : String(b))), books: st.tricksWon, online: !!online });
+  }, [r.mode, r.playerCount, st.phase, st.handNo, st.scores, st.bids, st.tricksWon, online]);
+  useEffect(() => () => setFeedbackGame(null), []);
+
+  const shownTrick = pause ? st.tricks[st.tricks.length - 1]! : st.trick;
+  const piles = pause ? st.tricks.slice(0, -1) : st.tricks;
+  // online: `locked` while our move is in flight (until the server acks it), so it can't be sent twice
+  const spectating = !!online?.spectator;
+  const face = (seat: number) => seatFacingName(names, seat, spectating);
+  // One identity for the chip and the popup. Online passes the engine seat's occupant (and its
+  // local seat) from dealerFromServer. Offline: the viewer sits at engine seat 0.
+  const offlineDealer = dealerFromServer({
+    serverDealer: st.dealer,
+    occupants: names.map((name) => ({ name, kind: 'human' as const })),
+    viewerSeat: spectating ? null : 0,
+  });
+  const dealerLabel = online?.dealerName || offlineDealer.name;
+  const dealerSeat = online?.dealerSeat != null ? online.dealerSeat : offlineDealer.localSeat;
+  const showDealer = !!dealerLabel && (dealing || isFreshDeal(st));
+  const turnLocked = !!online?.source.locked;
+  const localTurn = !online || online.serverTurn == null
+    ? st.turn
+    : localSeatOfServerTurn(online.serverTurn, spectating || online.viewerSeat == null ? null : online.viewerSeat, n);
+  // The badge keeps naming this seat while the play is in flight. The hand itself stays locked
+  // so a second tap cannot send another card before the server answers.
+  const myTurn = actingSeat({ turn: localTurn, phase: st.phase, pause, dealing, locked: false, covered: false }) === HUMAN && !spectating && !turnLocked;
+  // Decision protection (density pass): while the human has a pending bid
+  // or play, the talk layer starts no long generic line on their clock.
+  useEffect(() => {
+    offlineTalk.humanDeciding = !online && myTurn && (st.phase === 'bidding' || st.phase === 'playing');
+    return () => { offlineTalk.humanDeciding = false; };
+  }, [myTurn, st.phase, online]);
+  // Partner consultation (CONSULT_SPEC): the driver schedules and delivers
+  // the partner's spoken count each hand, the settle line, opponent
+  // conferral, the one-time first-meet introduction, and Dee's post-hand
+  // acknowledgment. Offline tables only — online play is excluded in v1
+  // (§6.4). Presentation-only: it holds BOT bids for its beats through
+  // offlineTalk's bid-delay hook and never touches the human's bid clock.
+  // (`dealing` here is useGame's busy flag — it already includes the
+  // misdeal-reveal window, so no beat fires while a reveal is on screen.)
+  const kRef = useRef(k);
+  kRef.current = k;
+  /** opponent conferral claims surface at the speaker's plate (the
+   * callout state lives further down; the driver calls through this
+   * ref so its construction here never reaches forward) */
+  const conferCallout = useRef<((seat: number, text: string) => void) | null>(null);
+  const consultRef = useRef<ConsultDriver | null>(null);
+  if (!consultRef.current && !online) {
+    consultRef.current = new ConsultDriver({
+      story: !!story?.scene,
+      names,
+      partnerSeat,
+      humanSeat: HUMAN,
+      levelFor,
+      k: () => kRef.current,
+      push: (name, text) => localChat.push(name, text, false, 0, true),
+      callout: (seat, text) => conferCallout.current?.(seat, text),
+      seatPos: (seat) => pos[seat],
+      kingLeg2: () => story?.scene?.stop.id === 'king' && !!story.scene.facts.doublePending,
+      humanHinted: (handNo) => partnerHint.current?.hand === handNo,
+      humanNilAnnounced: (handNo) => partnerHint.current?.hand === handNo && !!parseHint(partnerHint.current.text)?.nil,
+    });
+  }
+  useEffect(() => {
+    const d = consultRef.current;
+    if (!d) return;
+    d.attach();
+    return () => d.dispose();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    consultRef.current?.onState(st, { dealing, misdealShowing: false });
+  });
+  // Thinking-time murmurs (density pass, story tables): when the room has
+  // been silent for the stop class's threshold on the human's clock, one
+  // bot breathes a short line; a second, from a different seat, only on a
+  // very long deliberation. Never more than two per turn, cancelled the
+  // moment the human acts (the effect's key turns over on any state change
+  // that ends or interrupts the turn).
+  const murmurTurn = useRef<{ key: string; fired: number; seat?: number }>({ key: '', fired: 0 });
+  useEffect(() => {
+    if (online || !story?.scene) return;
+    const prof = TALK_PROFILES[STOP_DENSITY_CLASS[story.scene.stop.id] ?? 'standard'];
+    if (!prof || prof.murmurMs <= 0) return;
+    if (!myTurn || (st.phase !== 'bidding' && st.phase !== 'playing')) return;
+    const key = `${st.handNo}:${st.phase}:${st.tricks.length}:${st.trick.plays.length}:${st.bids.map((b) => String(b)).join(',')}`;
+    if (murmurTurn.current.key !== key) murmurTurn.current = { key, fired: 0 };
+    const M = murmurTurn.current;
+    const arm = (atMs: number, nth: number) => window.setTimeout(() => {
+      if (M.fired >= nth) return;
+      // the room really has been quiet for the class threshold
+      if (performance.now() - offlineTalk.lastSpeechAt < prof.murmurMs - 250) return;
+      void offlineTalk.murmur(nth === 2 ? M.seat : undefined).then((seat) => {
+        if (seat !== false) { M.fired = nth; M.seat = seat; }
+      });
+    }, atMs);
+    const t1 = arm(prof.murmurMs, 1);
+    const t2 = arm(prof.murmurMs * 2 + 4000, 2);
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
+  }, [myTurn, st, online, story]);
+  // Sort once when the hand is dealt. A play only removes a card; re-sorting here is what made the fan look shuffled.
+  const handOrder = useRef<{ handNo: number; cards: Card[] } | null>(null);
+  const hand = useMemo(() => {
+    if (!view.hand) return null;
+    const prev = handOrder.current?.handNo === view.handNo ? handOrder.current.cards : null;
+    const next = retainHandOrder(prev, view.hand, r);
+    handOrder.current = { handNo: view.handNo, cards: next };
+    return next;
+  }, [view.hand, view.handNo, r]);
+  // cards stay face-down only while Blind Nil is actually on offer; otherwise just turn them over (no button)
+  const autoReveal = myTurn && !dealing && st.phase === 'bidding' && view.hand === null && !!view.bidOptions && !view.bidOptions.blindNil;
+  useEffect(() => { if (autoReveal) apply({ type: 'reveal', seat: HUMAN }); }, [autoReveal]); // eslint-disable-line react-hooks/exhaustive-deps
+  // 🃏 Last-card throw-in (Demetrius 2026-10-19): on the hand's final trick every live seat
+  // holds exactly one card, so the player can throw theirs in out of turn — mirroring the
+  // engine's throwInOpen window (hand counts are public). Until then, only the turn seat plays.
+  const throwInOpenView = st.phase === 'playing' && !spectating
+    && (hand ?? []).length === 1
+    && view.handCounts.every((c) => c <= 1)
+    && view.trick.plays.every((p) => p.seat !== HUMAN);
+  const legal = (myTurn || throwInOpenView) && st.phase === 'playing' ? view.legal.filter((c) => (hand ?? []).includes(c)) : [];
+  const exchangeStep = st.phase === 'exchange' ? st.exchange[0] : undefined;
+  const humanExchanging = myTurn && exchangeStep?.from === HUMAN;
+  const mySide = sideOf(HUMAN, r);
+  // ---- 'Run it!': on a run, the table keeps showing the moment before it while the claimer's cards slam down and
+  // the tornado rips every hand + the table into the funnel; then the (finished) hand shows with an empty table.
+  type RunFx = { id: number; before: { st: GameState; view: PlayerView }; claimer: number; cards: Card[]; others: { seat: number; card: Card }[]; books: number; phase: 'zoom' | 'slam'; at: number; /** ☢☢ both Jokers in the run: the mega detonation replaces the ordinary show's middle */ mega: boolean };
+  const [seen, setSeen] = useState<{ st: GameState; view: PlayerView }>(() => ({ st, view }));
+  // Seated at the start of every hand: a saved Standing preference decides the first hand of
+  // this table, each new hand seats the player again, and a manual toggle rules until the
+  // hand ends (see handView.ts). The saved preference itself is never rewritten by a reset.
+  const [handView, setHandView] = useState<HandViewState>(initialHandView);
+  useEffect(() => { setHandView((hv) => handStarted(hv, st.handNo)); }, [st.handNo]);
+  const effView = effectiveView(settings.view, handView);
+  const turnUp = settings.turnUp === true;
+  const toggleTurnUp = () => onTurnUp?.(!turnUp);
+  const toggleView = () => { setHandView((hv) => userToggledView(hv)); onView?.(effView === 'sitting' ? 'standing' : 'sitting'); };
+  const [runFx, setRunFx] = useState<RunFx | null>(null);
+  /** Server playback seq already started, so a later state for the same claim does not replay it. */
+  const [playedSeq, setPlayedSeq] = useState<number | null>(null);
+  const [tableReady, setTableReady] = useState(false);
+  const [dressed, setDressed] = useState(false);
+  const [effectsWarm, setEffectsWarm] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0.08);
+  const [loadGiveUp, setLoadGiveUp] = useState(false);
+  const [loadGone, setLoadGone] = useState(false);
+  // Versus intro (boxing match card on the loader): eligibility is decided once, at
+  // mount — a fresh game start that hasn't shown the intro for this match seed yet.
+  // A mid-game refresh reuses the seed (and `resume` offline / a started game online),
+  // so the intro never replays; a rematch is a new seed and plays again.
+  const [versusActive] = useState(() => {
+    // Online, the game must be untouched (undealt in the pre-deal window, or a fresh
+    // first hand): joining or taking a seat mid-hand never triggers the intro.
+    const ok = versusEligible({ seed, resume: !!resume }) && !(online && !isFreshDeal(st));
+    if (ok) markVersusShown(seed);
+    return ok;
+  });
+  const [versusStoryDone, setVersusStoryDone] = useState(false);
+  const [webglHand, setWebglHand] = useState(false);
+  const onTableReady = useCallback(() => { setTableReady(true); setLoadProgress((p) => Math.max(p, 0.72)); }, []);
+  const onTableDressed = useCallback(() => { setDressed(true); setLoadProgress((p) => Math.max(p, 0.86)); }, []);
+  const onHandLive = useCallback((live: boolean) => setWebglHand(live), []);
+  // The scene chunk is the long download. Bump the bar when it arrives, ahead of the first frame.
+  useEffect(() => {
+    let alive = true;
+    loadScene().then(() => { if (alive) setLoadProgress((p) => Math.max(p, 0.42)); }).catch(() => undefined);
+    return () => { alive = false; };
+  }, []);
+  // WebGL that never starts, or a texture that never settles, must not trap the player on the loader.
+  useEffect(() => {
+    const t = window.setTimeout(() => setLoadGiveUp(true), 40000);
+    return () => window.clearTimeout(t);
+  }, []);
+  // Shot, sheet, and tornado assets warm during this screen. A stalled shader compile gives up
+  // after 12s; the timer above still lifts the loader if a download never finishes.
+  useEffect(() => {
+    let alive = true;
+    warmTableEffects().then(() => { if (alive) setEffectsWarm(true); }).catch(() => { if (alive) setEffectsWarm(true); });
+    return () => { alive = false; };
+  }, []);
+  useEffect(() => { if (dressed && effectsWarm) setLoadProgress(1); }, [dressed, effectsWarm]);
+  const loading = tableStillLoading(dressed, effectsWarm, loadGiveUp);
+  useEffect(() => {
+    if (dealReady) return;
+    // Cards never deal behind the versus intro: the deal waits for the story to
+    // finish AND the loader to lift (online, the room's pre-deal window is the
+    // real gate — the first hand doesn't exist until it ends).
+    if (versusActive && !versusStoryDone) return;
+    if (dealGateOpen({ tableReady, loading, firstFrame: sceneFirstFrame, mountedAt: gateMountedAt, now: Date.now() })) { setDealReady(true); return; }
+    if (tableReady && !loading && !sceneFirstFrame) {
+      // No frame yet: lift the gate at the fallback so a starved canvas cannot hold the deal.
+      const t = window.setTimeout(() => setDealReady(true), Math.max(0, gateMountedAt + FIRST_FRAME_FALLBACK_MS - Date.now()));
+      return () => window.clearTimeout(t);
+    }
+  }, [tableReady, loading, sceneFirstFrame, dealReady, gateMountedAt, versusActive, versusStoryDone]);
+  const loadShownAt = useRef(performance.now());
+  useEffect(() => { (window as unknown as { __bwmLoading?: unknown }).__bwmLoading = { shownAt: loadShownAt.current, room: sound.roomStyle?.name ?? null }; }, []);
+  useEffect(() => {
+    if (loading) return;
+    const markGone = () => { (window as unknown as { __bwmLoading?: { goneAt?: number } }).__bwmLoading && ((window as unknown as { __bwmLoading: { goneAt?: number } }).__bwmLoading.goneAt = performance.now()); setLoadGone(true); };
+    if (versusActive) {
+      // Versus intro: dismissal = story fully played AND table ready — never on
+      // assets-loaded alone (the story floor). Story done → the short fade out.
+      if (!versusDismissReady({ storyComplete: versusStoryDone, tableReady: !loading })) return;
+      const t = window.setTimeout(markGone, 380);
+      return () => window.clearTimeout(t);
+    }
+    // Loading screen minimum 3.0s: long enough to read the room name while its ambience fades in.
+    const wait = Math.max(380, 3000 - (performance.now() - loadShownAt.current));
+    const t = window.setTimeout(markGone, wait);
+    return () => window.clearTimeout(t);
+  }, [loading, versusActive, versusStoryDone]);
+  const reportInteractive = online?.onInteractive;
+  useEffect(() => {
+    reportInteractive?.(loadGone && !loading);
+  }, [loadGone, loading, reportInteractive]);
+  // The Deal (transitions.ts): the seats hold lifting IS this table's
+  // readiness — signal it so a covering deal can lift (a no-op unless
+  // a deal is up; the readiness cap covers any missed signal).
+  useEffect(() => { if (loadGone) signalTableReady(); }, [loadGone]);
+  // The saved game is already in memory. The flat hand is playable on the first paint; the 3D scene catches up.
+  useEffect(() => {
+    const w = window as unknown as { __bwmPlayableAt?: number };
+    const id = requestAnimationFrame(() => { w.__bwmPlayableAt ??= performance.now(); });
+    return () => cancelAnimationFrame(id);
+  }, []);
+  const playback = online?.run ?? null;
+  // Playback (every online viewer) or a jump that hides the run behind an ordinary trick (offline, bundled bot claim).
+  if (seen.st !== st || (playback !== null && playback.handNo === st.handNo && playback.seq !== playedSeq)) {
+    const show = pickRunShow(seen.st, st, playback, playedSeq);
+    if (show) {
+      setRunFx({
+        id: show.fromServer ? show.id : Date.now(),
+        before: seen.st.handNo === st.handNo ? seen : { st, view },
+        claimer: show.claimer, books: show.books, phase: 'zoom', at: performance.now(),
+        cards: show.cards, others: show.others, mega: show.mega,
+      });
+      if (show.fromServer) setPlayedSeq(show.id);
+    } else if (playback && playback.handNo === st.handNo && playback.seq !== playedSeq) {
+      setPlayedSeq(playback.seq);
+    }
+    if (seen.st !== st) setSeen({ st, view });
+  }
+  const [badgeToast, setBadgeToast] = useState<string | null>(null);
+  const endRun = useCallback(() => { fx.tornado = null; sound.stopTornado(); setRunFx(null); }, []);
+  // the claimer's line for the zoom's speech bubble: their latest chat line (bot persona line / a human's callout)
+  const lastLine = useRef<Record<number, { text: string; at: number }>>({});
+  const [runLine, setRunLine] = useState<string | null>(null);
+  const seenMsgCount = useRef(rawMsgs.length);
+  useEffect(() => {
+    const fresh = rawMsgs.slice(seenMsgCount.current);
+    seenMsgCount.current = rawMsgs.length;
+    for (const m of fresh) {
+      if (m.system) continue;
+      const seat = m.user === 'You' ? HUMAN : names.indexOf(m.user);
+      if (seat < 0) continue;
+      lastLine.current[seat] = { text: m.text, at: performance.now() };
+      if (runFx && runFx.phase === 'zoom' && seat === runFx.claimer) setRunLine(showLine(m.text));
+      if (QUICK_TRASH_SET.has(m.text)) setCallout({ seat, text: m.text, id: m.id });
+    }
+  }, [rawMsgs]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [callout, setCallout] = useState<{ seat: number; text: string; id: number } | null>(null);
+  useEffect(() => { if (!callout) return; const t = window.setTimeout(() => setCallout(null), 3200); return () => clearTimeout(t); }, [callout]);
+  // Confer claims take the same callout (ids above the chat-message id
+  // space, so the two callout sources never collide on the render key).
+  const conferCalloutId = useRef(1_000_000);
+  conferCallout.current = (seat, text) => setCallout({ seat, text, id: ++conferCalloutId.current });
+  const runId = runFx?.id;
+  useEffect(() => {
+    if (!runFx) { setRunLine(null); return; }
+    // 1) zoom: the claimer's cards big + face up at the centre while they talk their talk
+    const recent = lastLine.current[runFx.claimer];
+    if (recent && performance.now() - recent.at < 1800) setRunLine(showLine(recent.text));
+    else if (runFx.claimer === HUMAN && !spectating) {
+      const line = pick(RUN_IT_CALLOUTS as string[]);
+      push('You', line);
+    } else setRunLine(null);
+    const zoom = RUN_ZOOM_MS / 1000;
+    // ☢☢ mega: the tornado starts later than an ordinary run's — the blast blows the felt clear first
+    const tornadoAfter = runFx.mega ? RUN_MEGA_TORNADO_AFTER_MS : RUN_TORNADO_AFTER_MS;
+    const tornadoAt = zoom + tornadoAfter / 1000;
+    const who = face(runFx.claimer);
+    // 2) the claimer's cards slam down together in SLOW MOTION (heavy impact: shake + bass hit)
+    // 3) the tornado snatches everything else at once — every hand + whatever is on the table. No trick-by-trick play.
+    // No scheduled runSlam: the last dropped card fires it (and the pile thump) on its landing frame.
+    sound.play('tornado', { delay: Math.max(0, tornadoAt - 0.3) });
+    let toMega = 0;
+    const toSlam = window.setTimeout(() => {
+      setRunFx((f) => (f && f.id === runFx.id ? { ...f, phase: 'slam' } : f));
+      // the tornado is timed from the slam (not the claim), so a late zoom timer can't let it sweep the table early
+      fx.tornado = { start: performance.now() + tornadoAfter, reduced: fx.reduced };
+      if (runFx.mega) {
+        // ☢☢ the detonation's pin-point starts mid-slam so the white flash lands on the cards'
+        // impact. The mega banner + boom ride this emit; the ordinary RAN IT! pop steps aside.
+        toMega = window.setTimeout(() => fx.emit('mega'), RUN_MEGA_DETONATE_MS);
+      } else {
+        fx.emit('ranIt', { text: 'RAN IT!', sub: `${who} · +${runFx.books} book${runFx.books === 1 ? '' : 's'}`, silent: true });
+      }
+    }, RUN_ZOOM_MS);
+    // (capture scripts set __bwmHoldRun to step the tornado frame by frame via fx.warp)
+    const hold = !!(window as unknown as { __bwmHoldRun?: boolean }).__bwmHoldRun;
+    const timers = hold ? [] : [window.setTimeout(endRun, RUN_SHOW_MS + (runFx.mega ? RUN_MEGA_SHOW_EXTRA_MS : 0))];
+    (window as unknown as { __bwmEndRun?: () => void }).__bwmEndRun = endRun;
+    if (runFx.claimer === HUMAN && !spectating) {
+      runItUsed();
+      if (award('storm-chaser', { mode: r.mode, online: !!online, hand: runFx.before.st.handNo, books: runFx.books })) pendingBadge.current = 'storm-chaser';
+    }
+    return () => { clearTimeout(toSlam); clearTimeout(toMega); timers.forEach(clearTimeout); fx.tornado = null; };
+  }, [runId]); // eslint-disable-line react-hooks/exhaustive-deps
+  // a badge earned by the run unlocks once the tornado is over (or skipped)
+  const pendingBadge = useRef<string | null>(null);
+  useEffect(() => {
+    if (runFx || !pendingBadge.current) return;
+    setBadgeToast(pendingBadge.current); pendingBadge.current = null; sound.play('made');
+    const t = window.setTimeout(() => setBadgeToast(null), 3800);
+    return () => clearTimeout(t);
+  }, [runFx]);
+  const ranHand = useMemo(() => runPlays(st).length > 0, [st]);
+  // Cleared hands arrive on the view only after the claim resolves. Hold them back during the tornado.
+  const runHands = !runFx ? view.runHands : undefined;
+  const runClaimer = runHands ? runClaimerSeat(st) : null;
+  const runOpenKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (runFx || !view.runHands) {
+      if (!view.runHands && runOpenKey.current) { runOpenKey.current = null; setLtOpen(false); }
+      return;
+    }
+    // Table Talk / game over are full-screen. The cleared-hands portal is another full-screen
+    // scrim on document.body (z-index above both), so auto-opening it here swallows every
+    // tap and slide on the recap. The hands render inside Table Talk instead.
+    if (!runReviewOverTable(st.phase)) { setLtOpen(false); return; }
+    const key = `${st.handNo}:${st.tricks.length}`;
+    if (runOpenKey.current === key) return;
+    runOpenKey.current = key;
+    setLtOpen(true);
+  }, [runFx, view.runHands, st.handNo, st.tricks.length, st.phase]);
+  // Scores hold the pre-run numbers until the tornado is over. A new hand never keeps that snapshot:
+  // the plates would still show the last hand's bid and books.
+  const sb = runFx && runFx.before.st.handNo === st.handNo ? runFx.before.st : st;
+  const platePrev = useRef<HandTally | null>(null);
+  const plates = plateTally(sb, platePrev.current, dealing && sb.handNo === st.handNo);
+  platePrev.current = rememberHandTally(platePrev.current, st);
+  // TOOK display timing (owner 2026-10-22): a plate's number ticks only when the
+  // won cards have landed in that player's pile — the gather flight that starts
+  // when the finished trick leaves the felt (`piles` grows) and runs
+  // BOOK_GATHER_MS. `landedBooks` counts this hand's piled tricks whose flight
+  // has finished; the plates render shownTook (landed tally, capped by the true
+  // tally). A hand that arrives whole — first mount, refresh/resume, a swapped-in
+  // save — starts with every piled trick already stacked, so it shows the true
+  // count at once and never replays flights.
+  const [landedBooks, setLandedBooks] = useState(() => piles.length);
+  const pilesLenRef = useRef(piles.length);
+  pilesLenRef.current = piles.length;
+  const landTimers = useRef<number[]>([]);
+  const landSync = useRef({ handNo: st.handNo, scheduled: piles.length });
+  const clearLandTimers = () => {
+    landTimers.current.forEach((t) => window.clearTimeout(t));
+    landTimers.current = [];
+  };
+  useEffect(() => {
+    const sync = landSync.current;
+    if (sync.handNo !== st.handNo || piles.length < landedBooks) {
+      // New hand, or the piles shrank under the count (misdeal redeal): resync
+      // to what is actually stacked, instantly, and drop any pending landings.
+      sync.handNo = st.handNo;
+      sync.scheduled = piles.length;
+      clearLandTimers();
+      if (landedBooks !== piles.length) setLandedBooks(piles.length);
+      return;
+    }
+    for (let i = sync.scheduled; i < piles.length; i++) {
+      const t = window.setTimeout(() => {
+        landTimers.current = landTimers.current.filter((x) => x !== t);
+        setLandedBooks((c) => Math.min(c + 1, pilesLenRef.current));
+      }, BOOK_GATHER_MS);
+      landTimers.current.push(t);
+    }
+    sync.scheduled = Math.max(sync.scheduled, piles.length);
+  }, [piles.length, landedBooks, st.handNo]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => clearLandTimers, []);
+  const tookShown = shownTook(landedTook(st.tricks, landedBooks, plates.books.length), plates.books);
+  // The plate pop rides the tick itself: when a seat's shown count rises through
+  // a landing, pop every copy of that plate. Hand changes never pop — a swapped-in
+  // hand shows its true count silently.
+  const shownKey = tookShown.join('.');
+  const prevShown = useRef(tookShown);
+  const prevPopHand = useRef(st.handNo);
+  useEffect(() => {
+    if (prevPopHand.current !== st.handNo) {
+      prevPopHand.current = st.handNo;
+      prevShown.current = tookShown;
+      return;
+    }
+    if (!fx.osReducedMotion && typeof document !== 'undefined') {
+      const screen = document.querySelector('.table-screen');
+      if (screen) {
+        tookShown.forEach((v, s) => {
+          if (v > (prevShown.current[s] ?? 0)) popPlateTook(screen, s);
+        });
+      }
+    }
+    prevShown.current = tookShown;
+  }, [shownKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  const winnerSeat = pause && !ranHand ? shownTrick.winner : null;
+  // the Run it! button + its one-time spotlight tip
+  const canRun = !spectating && !dealing && st.phase === 'playing' && !!view.canRunIt && !runFx;
+  // Misdeal: offered only while the engine allows it (this seat has not bid yet — other seats
+  // bidding never closes the call). A landed call runs the redeal sequence below.
+  const canMisdeal = !spectating && !dealing && st.phase === 'bidding' && !!view.canMisdeal;
+  // When the human's bid panel is up, the misdeal call lives INSIDE that panel (impossible to miss);
+  // the floating button only covers the window while other seats are still bidding.
+  const bidPanelShowing = myTurn && !dealing && st.phase === 'bidding' && !!view.bidOptions && !autoReveal;
+  // The redeal sequence (see misdeal.ts): a fresh thrown-hand key runs announce + gather — the
+  // announcement names the caller and who the deal passes to, every hand glides across to the
+  // incoming dealer's deck spot (the state already carries the new dealer) — then the redeal
+  // deals out of that seat (the card layer remounts on a new deal epoch) and bidding opens. The sources hold play for
+  // the whole sequence; this machine only drives what the table shows. Reduced motion collapses
+  // it to the announcement, then the hand simply swaps. Bids placed before the call are captured
+  // from the previous state, so the announcement can say they died with the hand.
+  const revealKey = misdealRevealKey(view.handNo, view.misdealReveal);
+  const bidsBeforeCall = useRef<typeof st.bids>([]);
+  useEffect(() => { bidsBeforeCall.current = st.bids; }, [st.bids]);
+  // The fan's hand as last committed (kept in step below, once `display` exists). The render
+  // that first carries a reveal reads it BEFORE that commit's update lands, so it still holds
+  // the hand being thrown in — the state itself has already swapped to the redealt hand, and
+  // the fan must not show that hand until the deal flight deals it (see misdeal.ts).
+  const fanHandCommitted = useRef<{ handNo: number; cards: Card[] } | null>(null);
+  const [redeal, setRedeal] = useState<{ key: string; phase: 'gather' | 'deal'; bidsVoided: boolean; heldHand: Card[] | null } | null>(null);
+  const [dealEpoch, setDealEpoch] = useState(0);
+  // Detection runs in the render pass itself (the derived-state pattern): a new thrown-hand key
+  // starts the sequence on the very render that presents it — no effect ordering to lose it —
+  // and the seen key resets when the reveal clears, so a later call always replays the moment.
+  const [redealKeySeen, setRedealKeySeen] = useState<string | null>(null);
+  // The announcement's on-screen hold (owner, 2026-10-25: the shown cards "flash
+  // too quick"). The presentation is SNAPSHOTTED when the call lands and stays up
+  // for MISDEAL_REVEAL_DWELL_MS: the redeal sequence finishing underneath does
+  // not clear it, flow transitions don't clear it — only the dwell floor or a tap
+  // on the panel does. Presentation state only; the sequence above is untouched.
+  const [revealHold, setRevealHold] = useState<{ key: string; title: string; passTo: string; bidsVoided: boolean; cards: Card[] } | null>(null);
+  if (revealKey !== redealKeySeen) {
+    setRedealKeySeen(revealKey);
+    if (revealKey && view.misdealReveal) {
+      const bidsVoided = bidsBeforeCall.current.some((b) => b !== null);
+      setRedeal({ key: revealKey, phase: 'gather', bidsVoided, heldHand: heldHandForThrowIn(fanHandCommitted.current, view.handNo) });
+      setRevealHold({
+        key: revealKey,
+        title: view.misdealReveal.seat === HUMAN && !spectating ? 'You called it · no spades' : `${names[view.misdealReveal.seat] ?? 'A player'} called it · no spades`,
+        passTo: view.dealer === HUMAN && !spectating ? 'you' : names[view.dealer] ?? 'the next dealer',
+        bidsVoided,
+        cards: [...view.misdealReveal.cards],
+      });
+    }
+  }
+  useEffect(() => {
+    if (!revealHold) return;
+    const key = revealHold.key;
+    const tm = setTimeout(() => setRevealHold((cur) => (cur?.key === key ? null : cur)), MISDEAL_REVEAL_DWELL_MS);
+    return () => clearTimeout(tm);
+  }, [revealHold?.key]);
+  useEffect(() => {
+    if (!redeal) return;
+    if (redeal.phase === 'gather') {
+      const tm = setTimeout(() => {
+        if (fx.osReducedMotion) { setRedeal((cur) => (cur?.key === redeal.key ? null : cur)); return; }
+        setDealEpoch((e) => e + 1);
+        setRedeal((cur) => (cur?.key === redeal.key ? { ...cur, phase: 'deal' } : cur));
+      }, misdealRevealMs());
+      return () => clearTimeout(tm);
+    }
+    const cards = st.hands.reduce((a, h) => a + h.length, 0);
+    const tm = setTimeout(() => setRedeal((cur) => (cur?.key === redeal.key ? null : cur)), misdealDealMs(k, r.playerCount, cards));
+    return () => clearTimeout(tm);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [redeal?.key, redeal?.phase]);
+  const [runTip, setRunTip] = useState(false);
+  const runTipKey = useRef<string | null>(null);
+  useEffect(() => {
+    if (!canRun) { setRunTip(false); return; }
+    const key = `${st.seed}:${st.handNo}`;
+    if (runTipKey.current === key) return;
+    runTipKey.current = key;
+    if (runItTipDue()) { runItTipShown(); setRunTip(true); }
+  }, [canRun]); // eslint-disable-line react-hooks/exhaustive-deps
+  const myBadges = useBadges();
+  // The card the player just tapped, shown on the table before the server's state arrives.
+  // It belongs to the hand (and trick) it was played in: a card from the last hand that is dealt to you again must
+  // never be drawn on the table (offline nothing else ever cleared it).
+  const [flyingPlay, setFlyingPlay] = useState<FlyingPlay | null>(null);
+  const flying = flyingCard(flyingPlay, st.handNo, st.phase, st.tricks.length);
+  const setFlying = (c: Card | null) => setFlyingPlay(c ? { card: c, handNo: st.handNo, trickNo: st.tricks.length } : null);
+  useEffect(() => { setFlyingPlay(null); }, [st.handNo]);
+  // what the 3D table shows (see above)
+  const display = (() => {
+    if (runFx) {
+      const b = runFx.before;
+      const bh = b.view.hand ? sortHand(b.view.hand, r) : null;
+      // zoom: the table as it was (the claimer's cards are shown big in the overlay)
+      if (runFx.phase === 'zoom') return { hand: bh, counts: b.view.handCounts, trick: b.st.trick.plays, piles: b.st.tricks, slam: null };
+      // only the claimer's cards leave their hand (slow-mo slam); everyone else's stay in hand for the tornado to snatch
+      const gone = new Set(runFx.cards);
+      return {
+        hand: bh?.filter((c) => !gone.has(c)) ?? null,
+        counts: b.view.handCounts.map((c, i) => (i === runFx.claimer ? 0 : c)),
+        trick: b.st.trick.plays, piles: b.st.tricks, slam: { seat: runFx.claimer, cards: runFx.cards, others: [] },
+      };
+    }
+    const baseTrick = ranHand && shownTrick.plays.some((p) => p.run) ? [] : shownTrick.plays;
+    const flown = flyPlay(hand, baseTrick, flying);
+    const trick = flown.card ? [...baseTrick, { seat: HUMAN, card: flown.card }] : baseTrick;
+    if (ranHand) return { hand: flown.hand, counts: view.handCounts, trick, piles: [] as typeof piles, slam: null };
+    return { hand: flown.hand, counts: view.handCounts, trick, piles, slam: null };
+  })();
+  // Keep the fan's committed hand in step (see fanHandCommitted above): after every commit
+  // this holds the hand the fan is actually showing, ready for a misdeal call to throw in.
+  useEffect(() => {
+    if (display.hand) fanHandCommitted.current = { handNo: st.handNo, cards: [...display.hand] };
+  });
+  useGameSounds(st, myTurn, mySide, msgs);
+  const landCue = useCallback((c: Card) => landCueFor(st, c), [st]);
+  // "Learn as you play": coach marks across hands until the player turns tips off (local to this player, online too)
+  const [help, setHelp] = useState(false);
+  const [tipMarked, setTipMarked] = useState<Card[]>([]);
+  const coachOn = tips.on && !tipsSkipped && st.phase !== 'gameOver';
+  const hintLegal = coachOn;
+  const tipsOff = () => { const t = { on: false, asked: true }; saveTips(t); setTips(loadTips()); };
+  // bid coach: inside the bid panel while tips are on (open the first couple of times), or on request ("?")
+  const bidTurn = myTurn && !dealing && st.phase === 'bidding' && !!view.bidOptions && !!view.hand;
+  const coachBid = bidTurn && (coachOn || help);
+  const raisedMin = view.bidOptions ? minBidNote(view.bidOptions, r, partnerSeat >= 0 ? st.bids[partnerSeat] ?? null : null) : null;
+  // Bot partner communication (offline only; online views hide other hands, so no estimate is
+  // computed there — an online bot who already bid shows that real bid in the same BIDS row, and
+  // a bot bidding second self-caps in the engine). This is the partner bot's own intended bid
+  // from chooseBid on its own hand (partnerBidIntent), not a read of anything else: "thinks N"
+  // is what it intends to bid for its own books before the human's bid caps it.
+  const partnerEstimate = !online && !spectating && r.partnerships && partnerSeat >= 0 && st.phase === 'bidding' && st.bids[partnerSeat] === null && partnerSeat !== HUMAN
+    ? partnerBidIntent(viewFor(st, partnerSeat), levelFor(partnerSeat))
+    : null;
+  const wheelSides = new Set(st.phase === 'bidding' || st.phase === 'playing' ? wheelsFor(r, st.bids).map((w) => w.side) : []);
+  // The bid panel (and the floating "count your books" coach) never grows past the top bar: its max height is the room
+  // between its (bottom-anchored) bottom edge and the scorebug / trump strip; the coach body scrolls inside.
+  useLayoutEffect(() => {
+    const fit = () => {
+      const tops = [...document.querySelectorAll('.scorebug')].map((e) => e.getBoundingClientRect()).filter((r) => r.height > 0 && r.top < window.innerHeight / 2);
+      const limit = Math.max(0, ...tops.map((r) => r.bottom)) + 6;
+      for (const el of document.querySelectorAll<HTMLElement>('.me > .bid-panel, .bid-coach-float')) {
+        const r = el.getBoundingClientRect();
+        const room = el.classList.contains('bid-coach-float') ? window.innerHeight - r.top - 8 : r.bottom - limit;
+        const v = `${Math.max(120, Math.floor(room))}px`;
+        if (el.style.maxHeight !== v) el.style.maxHeight = v;
+        el.classList.toggle('tight', room < 420);
+        if (el.classList.contains('bid-coach-float')) continue;
+        // keep clear of an open chat panel: narrow the (centred) panel if that leaves enough room, else sit above the chat
+        const chat = document.querySelector('.chat.open')?.getBoundingClientRect();
+        const hits = !!chat && chat.width > 0 && chat.left < innerWidth / 2 + 300 && chat.top < r.bottom && chat.bottom > r.top - 200;
+        const w = chat ? Math.floor(2 * (chat.left - 10 - innerWidth / 2)) : 0;
+        const mw = hits && w >= 340 ? `${w}px` : '';
+        if (el.style.maxWidth !== mw) el.style.maxWidth = mw;
+        el.parentElement?.classList.toggle('over-chat', hits && w < 340);
+      }
+    };
+    fitRef.current = fit;
+    fit();
+  });
+  // the lower third moves after resizes / hand re-measures (sometimes a beat later), so keep re-fitting while a panel is up
+  const fitRef = useRef<() => void>(() => {});
+  useEffect(() => {
+    if (!bidTurn && !help && !humanExchanging) return;
+    const run = () => fitRef.current();
+    const iv = window.setInterval(run, 250);
+    window.addEventListener('resize', run);
+    window.visualViewport?.addEventListener('resize', run);
+    return () => { clearInterval(iv); window.removeEventListener('resize', run); window.visualViewport?.removeEventListener('resize', run); };
+  }, [bidTurn, help, humanExchanging]);
+  const bcKey = `${st.seed}:${st.handNo}`;
+  const bcOpen = false; void tipCount;
+  const bcCounted = useRef<string | null>(null);
+  useEffect(() => { if (coachBid && coachOn && bcCounted.current !== bcKey) { bcCounted.current = bcKey; bumpTip('bidcoach'); } }, [coachBid, coachOn, bcKey]);
+
+  // Story Mode: tell the story host the result, exactly once per game.
+  const storyFired = useRef(false);
+  useEffect(() => {
+    if (!story || online || st.phase !== 'gameOver' || !st.result || storyFired.current) return;
+    storyFired.current = true;
+    story.onGameOver(st.result.winners.includes(sideOf(HUMAN, r)), storyFactsOf(st));
+  }, [st.phase]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Story Mode scene channel (scene pass): the conversation runs from the
+  // deal to the final whistle. Beats surface through the table chat (never
+  // over the felt, never blocking a decision), each milestone/event fires
+  // at most once per game, and endgame callbacks reference only events
+  // recorded earlier in THIS match. Story games only — every other game
+  // takes the exact same code path as before (this effect no-ops).
+  const storySceneRef = useRef<{ prev: StorySnap | null; fired: Set<string>; memory: Set<string>; satDown: boolean; welcomed: boolean; railFired: number; lastRailHand: number; railCast: string[]; railChecks: number; railExchanges: number; railSaid: string[]; buzzChecks: number; buzzFired: number; buzzSaid: string[] }>(
+    {
+      prev: null,
+      fired: new Set(story?.saveCtx?.initialSession?.fired ?? []),
+      memory: new Set(story?.saveCtx?.initialSession?.memory ?? []),
+      satDown: story?.saveCtx?.initialSession?.satDown ?? false,
+      welcomed: false,
+      railFired: story?.saveCtx?.initialSession?.railFired ?? 0,
+      lastRailHand: story?.saveCtx?.initialSession?.lastRailHand ?? 0,
+      // The attempt's drawn rail cast: a resumed match's saved cast wins
+      // (the exact faces it started with); a fresh game takes the cast
+      // StoryHome drew for this attempt; the local draw is the fallback
+      // for saves written before the draw existed.
+      railCast: story?.saveCtx?.initialSession?.railCast ?? story?.saveCtx?.railCast
+        ?? (story?.scene ? railCastForAttempt(story.scene.stop.id, (story.saveCtx?.attemptsAtStart ?? story.scene.facts.attempts) + 1) : []),
+      railChecks: story?.saveCtx?.initialSession?.railChecks ?? 0,
+      railExchanges: story?.saveCtx?.initialSession?.railExchanges ?? 0,
+      railSaid: [...(story?.saveCtx?.initialSession?.railSaid ?? [])],
+      buzzChecks: story?.saveCtx?.initialSession?.buzzChecks ?? 0,
+      buzzFired: story?.saveCtx?.initialSession?.buzzFired ?? 0,
+      buzzSaid: [...(story?.saveCtx?.initialSession?.buzzSaid ?? [])],
+    });
+  useEffect(() => {
+    const scene = story?.scene;
+    if (!scene || online) return;
+    const { stop, facts } = scene;
+    const S = storySceneRef.current;
+    const snap = storySnap(st);
+    // Paced by each line's real clip duration (story/beatPacing.ts): the
+    // old fixed stagger (base + ix · gap) started later beats while an
+    // earlier line's voice was still mid-sentence, and the engine cut
+    // it — story lines ran 3.3–8.2 s against 1.4–1.7 s staggers (owner:
+    // lines "cut short", 2026-10-22). A beat with no clip keeps its
+    // legacy stagger slot, so text-only sequences pace as they always did.
+    // And a REPLY rides the opener's tail (tailRideMs — owner, 2026-10-22
+    // 21:59, the Cookout twins STILL slow after the rail/chain/banter
+    // rides shipped): this channel IS the twins' in-match exchange
+    // channel — sit-downs, play reacts, the between-hands exchanges, the
+    // milestone/signature sets are authored as call-and-response (the
+    // twins literally split sentences at an em-dash), and measured on
+    // the shipped durations every voiced reply here landed the full
+    // gapMs — 1400/1700 ms of dead air — after the opener's voice ended.
+    // The reply now starts in the opener's last second and the
+    // cross-talk policy arbitrates, exactly as rail exchanges already
+    // do. ScriptPlayer scene dialogue (intros/outros/meet-them) is a
+    // different channel and keeps the full duration + gap handoff.
+    const deliver = (beats: StoryBeat[], baseMs = 500, gapMs = 1500) => {
+      const nameOf = (bt: StoryBeat) => (bt.speaker === 'you' ? 'You' : (STORY_CHARACTERS[bt.speaker]?.name ?? bt.speaker));
+      void scheduleStoryBeats(beats, {
+        baseMs, gapMs, nameOf, tailRideMs: REPLY_TAIL_RIDE_MS,
+        audible: (bt) => bt.speaker !== 'you' && names.indexOf(nameOf(bt)) >= 0 && !sound.voiceMuted(nameOf(bt)),
+      }, (bt, delayMs) => {
+        const name = nameOf(bt);
+        const seatIx = names.indexOf(name);
+        // Mix hierarchy (density pass): a scripted line owns the room
+        // while it plays — generic talk may only tail-overlap its last
+        // 3 s, never replace it (offlineTalk's voiceBusyUntil drop rule).
+        if (bt.speaker !== 'you' && seatIx >= 0 && !sound.voiceMuted(name)) {
+          void spokenClipDurationMs(name, bt.line)
+            .then((d) => { if (d) offlineTalk.noteHighPriority(performance.now() + delayMs, d); })
+            .catch(() => { /* a lookup miss just leaves the room unmarked */ });
+        }
+        window.setTimeout(() => {
+          push(name, showLine(bt.line), false, 0, true);
+          if (bt.speaker !== 'you' && seatIx >= 0 && !sound.voiceMuted(name)) {
+            speakBot(name, bt.line, undefined, undefined, undefined, pos[seatIx], n);
+          }
+        }, delayMs);
+      });
+    };
+    // FORWARD BUZZ (word travels fast, owner 2026-10-24): the seated
+    // pair may remark — relay voice, secondhand — on how the player
+    // handled the PREVIOUS stop. One seeded evaluation per eligible
+    // moment (buzzMomentFor): the sit-down sizing-up, or a hand end no
+    // scripted beat took. Capped at one a match, never a repeat, and
+    // silent when no recorded result exists at the previous stop.
+    const buzzAt = (moment: 'sitDown' | 'handEnd'): boolean => {
+      const checks = S.buzzChecks;
+      S.buzzChecks++;
+      const beats = buzzMomentFor(stop, moment, {
+        attempts: facts.attempts, checks, fired: S.buzzFired, said: S.buzzSaid,
+        prevWon: facts.prevWon, prevBand: facts.prevBand,
+        prevStopName: facts.prevStopName, prevPairNames: facts.prevPairNames,
+      });
+      if (!beats) return false;
+      S.buzzFired++;
+      for (const bt of beats) S.buzzSaid.push(bt.line);
+      deliver(beats, 2600, 1500);
+      return true;
+    };
+    if (story?.saveCtx?.resumed && !S.welcomed) {
+      // A resumed match skips the intro and the sit-down beat — one line
+      // puts the table back in the room, then the thread continues.
+      S.welcomed = true;
+      deliver(resumeLineFor(stop), 900, 1500);
+    }
+    if (!S.satDown && snap.historyLen === 0 && snap.phase !== 'gameOver') {
+      S.satDown = true;
+      deliver(playBeatFor(stop, 'sitDown'), 900, 1700);
+      buzzAt('sitDown');
+    }
+    if (S.prev) {
+      let beatFired = false;
+      const evs = storyEvents(S.prev, snap);
+      for (const ev of evs) {
+        if (S.memory.has(ev)) continue;
+        S.memory.add(ev);
+        if (ev === 'bigBid') { deliver(playBeatFor(stop, 'bigBid'), 400, 1400); beatFired = true; }
+        else if (ev === 'jokerDropped') { deliver(playBeatFor(stop, 'joker'), 400, 1400); beatFired = true; }
+        else if (ev === 'cutMade') { deliver(playBeatFor(stop, 'cut'), 400, 1400); beatFired = true; }
+        // nilMade / nilBusted / deeNilMade are memory for the endgame callbacks, not lines of their own
+      }
+      let finalHandNow = false;
+      if (snap.historyLen > S.prev.historyLen && snap.lastHand) {
+        const handNo = snap.historyLen;
+        // living level between hands: the stop's own exchange, early hands
+        // always, later hands every other — short, and never over a decision
+        if (handNo <= 3 || handNo % 2 === 1) {
+          deliver(tableExchangeFor(stop, snap.lastHand.myPoints >= snap.lastHand.theirPoints), 700, 1400);
+          beatFired = true;
+        }
+        for (const m of storyMilestones(S.prev, snap)) {
+          if (S.fired.has(m.milestone)) continue;
+          S.fired.add(m.milestone);
+          let beats = midSceneFor(stop, m.milestone, m.ahead, facts);
+          if (m.milestone === 'finalHand') {
+            finalHandNow = true;
+            if (S.memory.has('nilBusted')) beats = [...beats, ...callbackFor(stop, 'nilBusted')];
+            if (S.memory.has('bigSwing')) beats = [...beats, ...callbackFor(stop, 'bigSwing')];
+            if (S.memory.has('deeNilMade')) beats = [...beats, ...callbackFor(stop, 'deeNilMade')];
+          }
+          deliver(beats, 3400, 1700);
+          beatFired = true;
+        }
+        // FORWARD BUZZ at this hand end: only when no scripted beat
+        // took it (the rail's own discipline, below) — a set just
+        // landed resolves here too, so the talk rides real moments.
+        if (!beatFired && buzzAt('handEnd')) beatFired = true;
+      }
+      // RAILBIRDS: this attempt's drawn background cast, chiming in from
+      // the rail — sparse, event-keyed, rate-capped (storyRail.ts), and
+      // NEVER stacked on a scripted beat from this same state change.
+      // Each eligible moment is ONE seeded evaluation (railMomentFor):
+      // it may pass in silence, land as a solo chime-in, or open a short
+      // exchange with the table (rail speaks, a seated player answers,
+      // the rail may get one comeback — then it dies). One exception: at
+      // the King, the rail's finalHand witness line lands after the scene
+      // beat — the whole neighborhood watching is the point of the finale.
+      const railEvent = (['jokerDropped', 'cutMade', 'nilMade', 'nilBusted', 'bigSwing'] as const).find((e) => evs.includes(e));
+      const wantRail = finalHandNow && stop.id === 'king' ? 'finalHand' as const : (!beatFired ? railEvent : undefined);
+      if (wantRail && snap.handNo > S.lastRailHand) {
+        const checks = S.railChecks;
+        S.railChecks++;
+        const moment = railMomentFor(stop.id, wantRail, {
+          cast: S.railCast,
+          attemptNo: (story?.saveCtx?.attemptsAtStart ?? facts.attempts) + 1,
+          checks,
+          fired: S.railFired,
+          exchangesFired: S.railExchanges,
+          said: S.railSaid,
+          handNo: snap.handNo,
+          stopsCleared: facts.clearedStopIds?.length ?? 0,
+          attemptsAtOwnStop: (facts as { attemptsAtPorch?: number }).attemptsAtPorch ?? 0,
+        });
+        if (moment) {
+          S.railFired++;
+          if (moment.kind === 'exchange') S.railExchanges++;
+          S.lastRailHand = snap.handNo;
+          const lines = moment.kind === 'solo' ? [moment.line] : moment.lines;
+          for (const l of lines) S.railSaid.push(l.line);
+          const baseDelay = finalHandNow && stop.id === 'king' ? 7200 : 1100;
+          // Same pacing rule as deliver() (story/beatPacing.ts): an
+          // exchange's reply used to land a fixed 1700 ms after the
+          // opener — mid-sentence for any opener over ~1.7 s of voice,
+          // and the engine cut it. Paced by real durations now; a
+          // text-only line keeps its legacy 1700 ms slot. And a reply
+          // RIDES the opener's tail (tailRideMs — owner, 2026-10-22:
+          // the second voice took too long to answer): it starts in
+          // the opener's last second and the cross-talk policy decides
+          // the overlap, instead of waiting out the full clip + gap.
+          void scheduleStoryBeats(lines, {
+            baseMs: baseDelay, gapMs: 1700, tailRideMs: REPLY_TAIL_RIDE_MS,
+            nameOf: (l) => STORY_CHARACTERS[l.speaker]?.name ?? l.speaker,
+            audible: (l) => !sound.voiceMuted(STORY_CHARACTERS[l.speaker]?.name ?? l.speaker),
+          }, (l, delayMs, ix) => {
+            // Attribution: a solo line is the rail's; in an exchange the
+            // opener and the comeback are the rail's, the middle line is
+            // the seated player's answer (their own name, their seat).
+            const railSide = moment.kind === 'solo' || ix !== 1;
+            const name = STORY_CHARACTERS[l.speaker]?.name ?? l.speaker;
+            // Rail speech is higher-priority than generic talk (mix
+            // hierarchy): mark its window so chatter can't replace it.
+            if (!sound.voiceMuted(name)) {
+              void spokenClipDurationMs(name, l.line)
+                .then((d) => { if (d) offlineTalk.noteHighPriority(performance.now() + delayMs, d); })
+                .catch(() => { /* a lookup miss just leaves the room unmarked */ });
+            }
+            window.setTimeout(() => {
+              if (railSide) {
+                push(`${name} · rail`, showLine(l.line), false, 0, true);
+                if (!sound.voiceMuted(name)) speakBot(name, l.line, undefined, undefined, undefined, undefined, n);
+              } else {
+                push(name, showLine(l.line), false, 0, true);
+                const seatIx = names.indexOf(name);
+                if (seatIx >= 0 && !sound.voiceMuted(name)) speakBot(name, l.line, undefined, undefined, undefined, pos[seatIx], n);
+              }
+            }, delayMs);
+          });
+        }
+      }
+    }
+    S.prev = snap;
+  }, [st]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // persist after every action (and chat line); a finished game clears the save
+  useEffect(() => {
+    if (online) return; // online games live on the server
+    if (story) {
+      // Story games save to their OWN slot (storySave.ts) — the normal
+      // offline save is never touched, and this slot carries the story
+      // wrapper + dialogue session so a swipe-away resumes the exact match
+      // AND its conversation thread. Written on every state change, like
+      // the normal save (iOS may never deliver a polite exit event).
+      if (!story.scene || !story.saveCtx) return;
+      if (st.phase === 'gameOver') clearStoryGame();
+      else {
+        const S = storySceneRef.current;
+        saveStoryGame(
+          { seed, settings, state: st, chat: rawMsgs, names, teamNames: [null, botTeam], nuke: fx.tableNuke ?? fx.prefs.nuke },
+          {
+            stopId: story.scene.stop.id, track: 'solo',
+            attemptsAtStart: story.saveCtx.attemptsAtStart, clearsAtStart: story.saveCtx.clearsAtStart,
+            session: { fired: [...S.fired], memory: [...S.memory], satDown: S.satDown, railFired: S.railFired, lastRailHand: S.lastRailHand, railCast: [...S.railCast], railChecks: S.railChecks, railExchanges: S.railExchanges, railSaid: [...S.railSaid], buzzChecks: S.buzzChecks, buzzFired: S.buzzFired, buzzSaid: [...S.buzzSaid] },
+          },
+        );
+      }
+      return;
+    }
+    if (st.phase === 'gameOver') clearGame();
+    else saveGame({ seed, settings, state: st, chat: rawMsgs, names, teamNames: [null, botTeam], nuke: fx.tableNuke ?? fx.prefs.nuke });
+  }, [st, rawMsgs, seed, settings, online]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Game sound only while this table is on screen; any way off it (menu, Leave, Save & quit, online leave) silences it.
+  useEffect(() => { enterTable(); return silenceGame; }, []);
+  // "Resuming your game…" toast
+  useEffect(() => {
+    if (!resume) return;
+    setToasts([{ id: -1, text: 'RESUMING YOUR GAME…', kind: 'info', sub: `Hand ${resume.state.handNo}` }]);
+    const t = setTimeout(() => setToasts((ts) => ts.filter((x) => x.id !== -1)), 2600);
+    return () => clearTimeout(t);
+  }, [resume]);
+  // Online Leave goes home. onExit only opens the table lobby, so one Leave used to stop there.
+  const leave = () => {
+    if (!online) { quitGame(); onExit(); return; }
+    (onMainMenu ?? onExit)();
+  };
+  // A tap that starts on Leave always leaves, even when WebKit delivers the click to the scrim.
+  const leaveGesture = useRef<LeaveGesture>({ armed: false, actedAt: 0 });
+  const escMenu = useEscapeClose(() => { leaveGesture.current = { armed: false, actedAt: 0 }; setMenuOpen(false); });
+  const escLeave = useEscapeClose(() => setConfirmLeave(false));
+  const runLeaveMenu = (e: { type: string; pointerType?: string }, where: 'leave' | 'scrim') => {
+    const now = performance.now();
+    const action = leaveMenuAction({ type: e.type as 'pointerdown' | 'pointerup' | 'click', pointerType: e.pointerType }, where, leaveGesture.current, now);
+    if (action === 'arm') { leaveGesture.current = { ...leaveGesture.current, armed: true }; return; }
+    if (action === 'disarm') { leaveGesture.current = { ...leaveGesture.current, armed: false }; return; }
+    if (action === 'ignore') return;
+    if (action === 'close') { leaveGesture.current = { armed: false, actedAt: 0 }; setMenuOpen(false); return; }
+    leaveGesture.current = { armed: false, actedAt: now };
+    setMenuOpen(false);
+    if (leaveChoice(!!online, st.phase) === 'leave') leave();
+    else setConfirmLeave(true);
+  };
+  // Game-over rewards page (Demetrius 2026-10-19): after the player chooses to leave a
+  // finished match, compute the XP/coins/Elo/achievement breakdown, stash it, and ROUTE to
+  // the dedicated opaque /rewards screen — no modal overlay (it kept rendering blurry on iOS).
+  const profileBefore = useRef<RewardsProfile | null>(null);
+  const gameStartAt = useRef<number>(Date.now());
+  // Capture the "before" snapshot ONCE per match, pinned by the game seed: a
+  // mid-game remount (inactivity bounce, refresh-resume) reuses the pinned
+  // snapshot instead of retaking it after the server's credit may have landed
+  // (a retake made earned XP/coins read as +0 — LovleyT714, 2026-10-20).
+  const matchSeed = String(st.seed ?? '');
+  useEffect(() => {
+    let live = true;
+    void resolveBeforeSnapshot(matchSeed).then((p) => { if (live) profileBefore.current = p; });
+    return () => { live = false; };
+  }, [matchSeed]);
+  const [rewardsBusy, setRewardsBusy] = useState(false);
+  const openRewards = useCallback((where: 'home' | 'leave') => {
+    if (rewardsBusy) return;
+    setRewardsBusy(true);
+    (async () => {
+      try { await flushLocalGames(); } catch { /* best-effort */ }
+      const won = !!st.result?.winners.includes(mySide);
+      const head = won
+        ? (st.result!.winners.length > 1 ? 'YOU TIED FOR FIRST!' : 'VICTORY!')
+        : winHeadline(st.result!.winners.map((w) => sideName(r, w, names)), r.partnerships).toUpperCase();
+      // Online credits land asynchronously server-side: if the first "after"
+      // snapshot still diffs to zero, retry briefly (~2s) before believing it.
+      const data = await computeRewardsSettled(profileBefore.current, {
+        won,
+        headline: head,
+        sub: `${st.history.length} hand${st.history.length === 1 ? '' : 's'} played`,
+        kind: r.partnerships ? 'team' : 'cutthroat',
+      }, { online: !!online });
+      // Postgame Report (league P-D): your line vs the other sides + best
+      // moments, from the finished game's hand history.
+      if (st.result) {
+        data.postgame = buildPostgame({
+          history: st.history,
+          finalScores: st.result.finalScores,
+          sideLabels: st.result.finalScores.map((_, side) => sideName(r, side, names)),
+          seatLabels: names,
+          mySeat: HUMAN,
+          mySide,
+        });
+      }
+      clearPinnedBefore(); // the pinned "before" is consumed — the next match captures fresh
+      if (!online) quitGame();
+      // A story match carries its stop identity into the rewards stash, so
+      // the rewards screen's Rematch returns to the same stop (story-scoped)
+      // instead of a generic autostart game from the saved settings.
+      stashRewards({ data, online: !!online, homePath: online && where === 'leave' ? '/online' : '/', storyStopId: story?.scene?.stop.id, gameId: online ? undefined : localGameId(matchSeed) });
+      clearTableChatOpen(); // the match is over: the next table must not inherit this chat state
+      location.href = '/rewards';
+    })().finally(() => setRewardsBusy(false));
+  }, [rewardsBusy, st.result, st.history.length, mySide, r, names, online, story]);
+  const isBooks = booksHand(st);
+  // "First hand: books bid themselves" — announce it once the deal lands
+  const booksAnnounced = useRef<string | null>(null);
+  useEffect(() => {
+    const key = `${st.seed}:${st.handNo}`;
+    if (!isBooks || dealing || resume || booksAnnounced.current === key || st.tricks.length > 0) return;
+    booksAnnounced.current = key;
+    setToasts([{ id: -2, text: 'FIRST HAND: BOOKS BID THEMSELVES', kind: 'info', sub: 'No bidding · every book you take = 10 points' }]);
+    const t = setTimeout(() => setToasts((ts) => ts.filter((x) => x.id !== -2)), 3400);
+    return () => clearTimeout(t);
+  }, [isBooks, dealing, st.seed, st.handNo, st.tricks.length, resume]);
+
+  useEffect(() => { setSelected(null); playArmed.current = false; }, [st.turn, st.handNo]);
+  // Pump and the Nil-bust shotgun both come from the shared state, so every online client hears each once.
+  // The pump is one book from a shot: a contract on the edge, or a Nil bidder still sitting at zero books.
+  // The shotgun plays when the trick that gives that Nil bidder their first book resolves. Mute and volume are the bus.
+  const pumpPrev = useRef<GameState | null>(null);
+  const pumpedSides = useRef<Set<number>>(new Set());
+  const nilBusted = useRef<Set<number>>(new Set());
+  const pumpHand = useRef('');
+  useEffect(() => {
+    const key = `${st.seed}:${st.handNo}`;
+    if (pumpHand.current !== key) { pumpHand.current = key; pumpedSides.current = new Set(); nilBusted.current = new Set(); }
+    const prev = pumpPrev.current;
+    pumpPrev.current = st;
+    newlyOneTrickFromShot(prev, st, pumpedSides.current).forEach((side, i) => {
+      pumpedSides.current.add(side);
+      sound.play('pump', i ? { delay: i * 0.16 } : {});
+    });
+    nilBustsJustResolved(prev, st, nilBusted.current).forEach((seat, i) => {
+      nilBusted.current.add(seat);
+      sound.play('shotgun', i ? { delay: i * 0.12 } : {});
+    });
+  }, [st]);
+  useEffect(() => { setExchangePick([]); }, [st.phase, st.turn]);
+  useEffect(() => { if (chatOpen) setSeenMsgs(msgs.length); }, [chatOpen, msgs.length]);
+
+  // BID MADE / SET / NIL! toasts
+  const lastHist = useRef(st.history.length);
+  const [histTick, setHistTick] = useState(0);
+  const ranWaited = useRef(-1);
+  useEffect(() => {
+    // scoring toasts + hype still wait until the last trick has been shown (incl. a nuke or Run it!), so they
+    // don't pile on the blast. They no longer hold the score screen — that opens when the trick hold ends.
+    if (pause && st.history.length > lastHist.current) return;
+    if (st.history.length <= lastHist.current) { lastHist.current = st.history.length; return; }
+    lastHist.current = st.history.length;
+    // after 'Run it!' the scoring toasts wait for the tornado (longer for a mega run's show)
+    const ranDelay = st.tricks.at(-1)?.plays.some((p) => p.run) ? runWaitMs(st) : 0;
+    if (ranDelay && ranWaited.current !== st.history.length) {
+      const len = st.history.length;
+      const release = fx.hold(ranDelay + 300, 'runIt'); // toasts follow the tornado; the score does not wait on this hold
+      const t0 = window.setTimeout(() => { ranWaited.current = len; lastHist.current = len - 1; setHistTick((x) => x + 1); release(); }, ranDelay);
+      return () => { clearTimeout(t0); release(); };
+    }
+    const rec = st.history[st.history.length - 1]!;
+    const base = Date.now();
+    const list = toastsFor(rec, r, names, mySide, spectating).map((t, i) => ({ ...t, id: base + i }));
+    setToasts(list);
+    const setToast = list.some((t) => t.kind === 'set' || t.kind === 'bust');
+    const cue: Record<Toast['kind'], Sfx | null> = { made: 'made', set: 'set', nil: 'nil', bust: 'set', bags: 'bags', info: null };
+    list.forEach((t, i) => { const c = cue[t.kind]; if (c) sound.play(c, { delay: 0.1 + i * 0.45 }); });
+    const tm = setTimeout(() => setToasts([]), 3200);
+    const toastHold = list.length ? fx.hold(3200, 'toasts') : () => {};
+    // A set is the shotgun blast on that scorecard panel (the recap plays the boom). No full-screen banner.
+    // Streak / Wheels wait a beat so their pop-ups don't cover the muzzle flash.
+    const timers: (() => void)[] = [];
+    const calls = calloutsFor(st, mySide, names);
+    const shot = calls.some((c) => c.kind === 'shot' || c.kind === 'gotShot');
+    if (setToast) haptic(HAPTIC.setOrShot, 'set');
+    else if (shot) {
+      const ht = window.setTimeout(() => haptic(HAPTIC.setOrShot, 'shot'), 200);
+      timers.push(() => clearTimeout(ht));
+    }
+    const streak = calls.find((c) => c.kind === 'streak');
+    // Wheels made: a team that bid 10+ together and took 10+ books → the supercar peel-out
+    const made = wheelsMade(r, rec);
+    if (made.length) {
+      const w = made[0]!;
+      timers.push(fx.later('wheelsCar', shot ? 1500 : streak ? 2600 : 600, { text: `${sideName(r, w.side, names)} made ${w.bid} · took ${w.books}` }));
+    }
+    if (streak) timers.push(fx.later('streak', shot ? 1100 : 400, { level: streak.level, text: streak.text.split(' · ')[0], sub: streak.text.split(' · ')[1] }));
+    return () => { clearTimeout(tm); toastHold(); timers.forEach((c) => c()); };
+  }, [st.history, histTick, r, names, mySide, !!pause]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Hand end: the score screen opens as soon as the trick hold ends. That hold is the beat after the last
+  // card lands (~700 ms at normal speed). Run it! keeps the screen closed until that show ends (`runFx`).
+  // A nuke's hold is the 3D blast, so the score stays covered until that allowance ends.
+  // Scoring toasts and hype no longer add another wait on top.
+  const [talkOpen, setTalkOpen] = useState(false);
+  // A shot-out ends the hand in gameOver, which used to skip this recap. Hold the scorecard (blast, tape, sheet)
+  // until Continue, then open the results. The ack is local; the shot count still comes from synced history.
+  // The third-set ending holds the same way (owner, 2026-10-21): its signature
+  // 3 THE HARD WAY flash and the stop's finale set animation live in this
+  // decided recap — without the hold, a third-set game went straight to the
+  // results modal and neither ever played.
+  const [shotRecapAck, setShotRecapAck] = useState(false);
+  useEffect(() => { setShotRecapAck(false); }, [st.phase, st.handNo]);
+  // Post-hand collection (Demetrius 2026-10-19): after a hand ends (not game over), books slide to the
+  // next dealer for 4-6s while bots talk trash. The recap waits until collection finishes.
+  // The pass waits out the finished-trick hold (pause): every card must have landed and the final
+  // trick must have had its on-table beat before anything slides to the dealer (Demetrius 2026-10-19).
+  const [collecting, setCollecting] = useState(false);
+  const collectTimer = useRef<number | null>(null);
+  useEffect(() => {
+    if (st.phase === 'handOver' && !st.result && !online && !pause) {
+      setCollecting(true);
+      if (collectTimer.current) window.clearTimeout(collectTimer.current);
+      collectTimer.current = window.setTimeout(() => setCollecting(false), 5200);
+    } else {
+      setCollecting(false);
+      if (collectTimer.current) { window.clearTimeout(collectTimer.current); collectTimer.current = null; }
+    }
+    return () => { if (collectTimer.current) { window.clearTimeout(collectTimer.current); collectTimer.current = null; } };
+  }, [st.phase, st.handNo, st.result, online, pause]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Trash talk during collection: 1-2 bots chirp while cards slide to the dealer (Demetrius 2026-10-19).
+  // Routed through the talk engine (collectionBanter): persona pools, per-game anti-repeat memory and
+  // hand context (set / made / nil / bags / match point…) — the old raw-pack random draw repeated the
+  // same handful of lines and silently skipped kinds the pack had no section for (2026-10-21 overhaul).
+  const banterDone = useRef(0);
+  useEffect(() => {
+    if (!collecting || online) return;
+    if (banterDone.current === st.handNo) return;
+    banterDone.current = st.handNo;
+    // Density pass: story tables at loud/lively stops take a third banter
+    // line (the next unused context slot). Regular tables keep two.
+    const banterCls = story?.scene ? STOP_DENSITY_CLASS[story.scene.stop.id] : undefined;
+    const lines = offlineTalk.banter(st, banterCls === 'loud' || banterCls === 'lively' ? 3 : 2);
+    // Paced by each line's real clip duration (the beatPacing rule): the
+    // old fixed stagger started the second chirp 1.8 s after the first,
+    // while the persona clips run 2.5–5 s — at regular tables, where
+    // banter is voiced, the second line cut the first mid-sentence
+    // every time (owner, 2026-10-22). A heard line held the floor for
+    // its full duration plus a 350 ms reply beat after that fix; the
+    // reply now RIDES the heard line's last second instead (the tail
+    // ride — the second voice enters as the first lands, and the
+    // cross-talk policy arbitrates the overlap). A line with no clip
+    // (text-only, or a muted seat) keeps its exact legacy 1800 ms
+    // slot, so silent tables — and story tables, whose banter is fenced
+    // to text — pace exactly as they always did. The timers are this
+    // effect's own: a paced line whose start falls past the 5.2 s
+    // collection window still fires, landing in the recap's opening
+    // beat (its chat goes to the corner sheet, the recap stays clear)
+    // rather than being cut or dropped.
+    void (async () => {
+      const durations = await Promise.all(lines.map(async (l) => {
+        if (sound.voiceMuted(l.name)) return null;
+        try { return await spokenClipDurationMs(l.name, l.text, l.persona, l.line, l.bid); } catch { return null; }
+      }));
+      const offsets = beatStartOffsets(durations, 350, 1800, REPLY_TAIL_RIDE_MS);
+      lines.forEach((l, ix) => {
+        // The third line (density pass) never leaves the collection
+        // window: if its paced start plus its clip would overrun the
+        // 5.2 s window it is dropped — the recap's timing does not move.
+        if (ix === 2 && durations[2] != null && 900 + offsets[2]! + durations[2]! > 5200) return;
+        window.setTimeout(() => {
+          push(l.name, showLine(l.text), false, 0, true);
+          offlineTalk.noteDelivered(l);
+          offlineTalk.maybeAnswer(l, {}); // banter is generic-layer speech: the room may answer it
+          if (!sound.voiceMuted(l.name)) speakBot(l.name, l.text, l.persona, l.line, l.bid, pos[l.seat], n);
+        }, 900 + offsets[ix]!);
+      });
+    })();
+  }, [collecting]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!scoreOpened(st.phase, pause, !!runFx)) { setTalkOpen(false); return; }
+    setTalkOpen(true);
+    // the recap itself stays clear; banter lands in the corner chat sheet
+    if (st.phase === 'handOver') setChatOpen(false);
+  }, [st.phase, st.handNo, pause, !!runFx]); // eslint-disable-line react-hooks/exhaustive-deps
+  const talkSend = (text: string) => {
+    push('You', text);
+    const replies = TALK_LINES.replies[text];
+    if (!online && replies) { const bots = names.slice(1); push(pick(bots), pick(replies), false, 900 + Math.random() * 700); }
+  };
+  const reduceFx = useReduceEffects();
+  // The Pj's is a locked venue: the offline Random roll may only land there for a player
+  // entitled to it (Rep 20 / After Dark / dev). Starts locked — the cached unlock fetch
+  // resolves it a beat later and the room re-rolls consistently (seen = heard = named).
+  const [pjsAccess, setPjsAccess] = useState(false);
+  useEffect(() => {
+    let on = true;
+    fetchVenueUnlocks().then((s) => { if (on) setPjsAccess(!!s && venueUnlocked(AFTER_DARK_VENUE, s.unlocks, s.dev)); });
+    return () => { on = false; };
+  }, []);
+  // Unified session room (Phase 4): seen = heard = named. Online the shared room venue decides;
+  // Auto rolls a room from the game seed and that room IS the visual venue for this game.
+  const roomStyle = sessionRoom({ visualVenue: !online && settings.venue !== 'random' ? settings.venue : undefined, seed, onlineVenue: online?.venue, lockedVenues: pjsAccess });
+  const venue: VenueId = roomStyle.venue as VenueId;
+  const [roomName, setRoomName] = useState<string | undefined>(undefined);
+  // Phase 6: the music tension layer follows how close the game feels; calm again off the table.
+  useEffect(() => { sound.setMusicTension(musicTension({ scores: st.scores, target: r.targetScore, phase: st.phase, handNo: st.handNo, nilBid: st.bids.some((b) => b === 0) })); sound.setFilmPhase(st.phase); }, [st, r.targetScore]);
+  useEffect(() => () => { sound.setMusicTension(0); sound.setFilmPhase('playing'); }, []);
+  const [, setMuteTick] = useState(0);
+  // Sound context: a table is 'game' (music by default), leaving returns to 'menu'
+  // (ambience by default) — explicit per-context choices are kept inside the engine.
+  useEffect(() => { sound.enterContext('game'); return () => sound.enterContext('menu'); }, []);
+  useEffect(() => { const style = sound.applySoundscape(seed, online?.venue, !online && settings.venue !== 'random' ? settings.venue : undefined, pjsAccess); setRoomName(style.name); return () => sound.setVenueBed('none'); }, [seed, pjsAccess]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Story games: the stop's score mood + bed identity ride the whole match
+  // (audio-pass contract); cleared on unmount. Normal games never call this.
+  const storyStopId = story?.scene?.stop.id;
+  useEffect(() => {
+    if (!storyStopId) return;
+    sound.setStoryStop(storyStopId);
+    // Story voice scope (one-timbre rule, 2026-10-21): for the whole match,
+    // story seats speak only their cast recordings — generic persona talk
+    // and the speech fallback are text-only for them (talkPrefs).
+    setStoryVoiceScope(true);
+    return () => { sound.setStoryStop(null); setStoryVoiceScope(false); };
+  }, [storyStopId]);
+  // nuke blast: fires only once a nuked trick is COMPLETE and held on the table (the finished-trick
+  // hold) — never while a trick is merely armed (both Jokers down, seats still to play): the nuke
+  // doesn't go off until every card is played, in every trick (Demetrius 2026-10-20). No landing
+  // cue fires it anymore — this watchdog is the only detonation path, which also covers a stalled
+  // renderer (Safari compiling shaders, a backgrounded tab).
+  const nukeKey = pause && clientSeesNuke(shownTrick.plays, !!display.slam) ? `${st.seed}:${st.handNo}:${shownTrick.plays.map((p) => p.card).join('')}` : null;
+  const nukeAtMount = useRef(nukeKey); // a resumed save already showing a nuked trick doesn't re-fire
+  useEffect(() => {
+    if (!nukeKey || nukeKey === nukeAtMount.current) return;
+    const release = fx.hold(1300, 'nukeWatch'); // the hand end waits for the blast (the blast holds itself once it fires)
+    const t = window.setTimeout(() => { fireCue('nuke'); release(); }, 1100);
+    return () => { clearTimeout(t); release(); };
+  }, [nukeKey]);
+  const winBuzzed = useRef(false);
+  useEffect(() => { if (st.phase !== 'gameOver') winBuzzed.current = false; }, [st.phase]);
+  const localWin = st.phase === 'gameOver' && !pause && !runFx && talkOpen && !!st.result?.winners.includes(mySide) && !spectating;
+  useEffect(() => {
+    if (!localWin || winBuzzed.current) return;
+    winBuzzed.current = true;
+    haptic(HAPTIC.gameWin, 'game-win');
+  }, [localWin]);
+  // any modal up: the table, plates, chat, video bubbles etc. dim + blur behind it and can't paint over it
+  const shotOutRecap = st.phase === 'gameOver' && (st.result?.endReason === 'shotOut' || st.result?.endReason === 'third-set') && !shotRecapAck;
+  const showRecap = !pause && !collecting && talkOpen && (st.phase === 'handOver' || shotOutRecap);
+  const showResults = st.phase === 'gameOver' && !pause && !runFx && talkOpen && !!st.result && !shotOutRecap;
+  // Story Mode: a finished story match NEVER takes the generic /rewards
+  // detour — every exit from this modal routes through the host's exit
+  // into StoryHome's outro (win: reward line, deck/set-anim unlock
+  // notices, badge strip, outro-win scene → map; loss: outro-lose +
+  // Retry). A story WIN also demotes Play again — Rematch: you don't
+  // rematch a stop you just cleared from its victory screen; the primary
+  // action is the onward one and replay lives on the map card. A story
+  // LOSS keeps its rematch (same stop, story-scoped via the host).
+  const storyGame = !!story;
+  const storyWon = storyGame && !!st.result && st.result.winners.includes(mySide);
+  const modalOpen = (st.phase === 'handOver' && !pause && !collecting && talkOpen) || confirmLeave || showPad || (st.phase === 'gameOver' && !pause && !runFx && talkOpen && !!st.result) || !!profileTarget;
+
+  const promoted = useCallback((c: Card) => isWildDeuce(c, r), [r]); // badge BOTH wild deuces (2♦ and 2♠), not just the off-suit one
+
+  // One play leaves the hand. Further taps do nothing until that trick moves (or the server rejects the play).
+  const playHold = useRef<PlayTrick | null>(null);
+  const playGateSeen = useRef(online?.source.playGate ?? 0);
+  const trickNow = useMemo(
+    () => playTrickOf(st),
+    [st.handNo, st.tricks.length, st.trick.plays.length, st.turn],
+  );
+  useEffect(() => {
+    const gate = online?.source.playGate ?? 0;
+    if (gate !== playGateSeen.current) {
+      playGateSeen.current = gate;
+      playHold.current = null;
+      setFlying(null);
+    }
+  }, [online?.source.playGate]);
+  useEffect(() => {
+    if (playHold.current && !ignorePlayTap(playHold.current, trickNow)) playHold.current = null;
+  }, [trickNow]);
+
+  const pickedAt = useRef(0);
+  const selectedRef = useRef(selected);
+  selectedRef.current = selected;
+  // Armed only after the selecting finger lifts, so one tap raises and the next tap plays.
+  useEffect(() => {
+    const up = () => {
+      // The click that follows pointerup is still this tap. Arm on the next frame,
+      // after that click, so the first tap cannot play.
+      requestAnimationFrame(() => { if (selectedRef.current) playArmed.current = true; });
+    };
+    window.addEventListener('pointerup', up, true);
+    window.addEventListener('pointercancel', up, true);
+    return () => {
+      window.removeEventListener('pointerup', up, true);
+      window.removeEventListener('pointercancel', up, true);
+    };
+  }, []);
+  const onCard = useCallback((c: Card, dragged = false, slam?: number, rel?: [number, number]) => {
+    if (humanExchanging) {
+      if (dragged) return;
+      sound.play('tap');
+      setExchangePick((p) => (p.includes(c) ? p.filter((x) => x !== c) : p.length < exchangeStep!.count ? [...p, c] : p));
+      return;
+    }
+    if (ignorePlayTap(playHold.current, trickNow)) return;
+    if (!legal.includes(c)) return;
+    // Play sends the selected card id. A different hit only changes the selection.
+    const action = dragged ? { type: 'play' as const, card: c } : confirmPlay(selectedRef.current, c, playArmed.current && selectedRef.current === c);
+    if (action.type === 'ignore') return;
+    if (action.type === 'play') {
+      const held = trickNow;
+      const tapSlam = dragged ? undefined : tapPlaySlamIntensity(effView, turnUp);
+      // Only a positive intensity goes on the wire/in state as a slam field: a gated (Turn Up
+      // OFF) or gentle drag sends no slam field at all, exactly like a gentle tap play.
+      const sent = apply({ type: 'play', seat: HUMAN, card: action.card as Card, ...(dragged && slam ? { slam } : tapSlam ? { slam: tapSlam } : {}), ...(dragged && rel ? { rel } : {}) });
+      if (sent !== false) {
+        playHold.current = held;
+        playArmed.current = false;
+        selectedRef.current = null;
+        setSelected(null);
+        setFlying(action.card as Card);
+      }
+    } else {
+      playArmed.current = false;
+      selectedRef.current = action.card as Card;
+      pickedAt.current = performance.now();
+      setSelected(action.card as Card);
+      sound.play('tap');
+    }
+  }, [humanExchanging, exchangeStep, legal, apply, trickNow, effView, turnUp]);
+
+  const onCardDrop = useCallback((c: Card, slam?: number, rel?: [number, number]) => onCard(c, true, slam, rel), [onCard]);
+
+  const isBotSeat = (seat: number) => (online ? !!online.botSeats?.includes(seat) : seat !== HUMAN);
+  // recorded bot voices: fetch a persona's clips when one of its bots sits down
+  const botKey = names.map((nm, i) => (isBotSeat(i) ? nm : '')).join('|');
+  useEffect(() => {
+    if (!talkPrefs.voices) return;
+    names.forEach((nm, i) => { if (isBotSeat(i)) preloadVoice(personaForName(nm), nm); });
+  }, [botKey, talkPrefs.voices]); // eslint-disable-line react-hooks/exhaustive-deps
+  const notice = onNoticeSides(sb);
+  // `legal` is empty while the play is in flight. The badge still needs the cards that were legal.
+  const playableCount = st.phase === 'playing' ? view.legal.filter((c) => (hand ?? []).includes(c)).length : legal.length;
+  const live = turnView({
+    turn: localTurn, phase: st.phase, pause, dealing, locked: turnLocked, covered: !!runFx,
+    viewerSeat: HUMAN, spectating, legalCount: playableCount, selected: !!selected,
+  });
+  const actor = live.actor;
+  const badge = live.badge;
+  // The opponent plate lives in the canvas, which can paint a turn late. The class follows the same seat as the badge.
+  useEffect(() => {
+    let raf = 0;
+    const sync = () => {
+      if (typeof document === 'undefined') return;
+      const root = document.querySelector('.table-screen');
+      if (root) {
+        const id = actor === null || (actor === HUMAN && spectating) ? '' : `seat-${actor}`;
+        root.querySelectorAll('.plate').forEach((el) => {
+          const on = !!id && el.getAttribute('data-testid') === id;
+          if (el.classList.contains('turn') !== on) el.classList.toggle('turn', on);
+        });
+      }
+      raf = requestAnimationFrame(sync);
+    };
+    sync();
+    return () => cancelAnimationFrame(raf);
+  }, [actor, spectating]);
+  // Canvas plates keep the previous hand's dealer chip and bid/took until their own root
+  // paints. Correct them before the browser paints, and only then show "X deals".
+  const plateKey = `${st.handNo}:${st.phase}:${dealerSeat}:${actor}:${plates.bids.map((b) => (b == null ? '' : String(b))).join('.')}:${tookShown.join('.')}`;
+  const [dealerLive, setDealerLive] = useState(false);
+  useLayoutEffect(() => {
+    const facts: SeatFact[] = [];
+    for (let seat = 0; seat < n; seat++) {
+      facts.push({
+        seat,
+        bid: bidChipText(plates.bids[seat] ?? null, actor === seat && st.phase === 'bidding'),
+        took: plateTookText(tookShown[seat] ?? 0, st.phase),
+        dealer: dealerSeat === seat,
+      });
+    }
+    let dead = false;
+    let raf = 0;
+    const apply = () => {
+      if (dead) return;
+      const screen = document.querySelector('.table-screen');
+      if (screen) syncPlateFacts(screen, facts);
+      const hasPlate = !!screen?.querySelector('.plate');
+      const ok = !showDealer || (!!screen && hasPlate && dealerChipMatches(screen, dealerSeat));
+      setDealerLive((prev) => (prev === ok ? prev : ok));
+      cancelAnimationFrame(raf);
+      raf = showDealer && !ok ? requestAnimationFrame(apply) : 0;
+    };
+    const layer = document.querySelector('.badge-layer');
+    const obs = new MutationObserver(() => apply());
+    if (layer) obs.observe(layer, { childList: true, subtree: true, characterData: true });
+    apply();
+    return () => { dead = true; cancelAnimationFrame(raf); obs.disconnect(); };
+  }, [plateKey, showDealer]); // eslint-disable-line react-hooks/exhaustive-deps
+  const renderSeat = (seat: number) => {
+    const isTurn = actor === seat;
+    const partner = !spectating && r.partnerships && seat === partnerOf(HUMAN, r);
+    const b = plates.bids[seat];
+    const took = tookShown[seat] ?? 0;
+    const seatUid = online?.seatUid?.(seat);
+    // Tappable faces (Demetrius 2026-10-20): a seated human with an account gets a profile
+    // tap on their plate face — bots and account-less guests keep a plain face (no-op).
+    const seatProfile = profileTargetOf({ id: seatUid, name: names[seat] ?? '', bot: isBotSeat(seat) });
+    return (
+      <div className={`plate ${isTurn ? 'turn' : ''} ${partner ? 'ally' : 'foe'}`} data-testid={`seat-${seat}`} title={isBotSeat(seat) ? `${names[seat]} · ${platePersona(names[seat]!)}` : undefined} data-persona={isBotSeat(seat) ? platePersona(names[seat]!) : undefined}>
+        {seatProfile ? (
+          <button type="button" className="plate-face-tap" data-testid={`plate-profile-${seat}`} aria-label={`View ${names[seat]}'s profile`}
+            onClick={() => openPlayerProfile({ id: seatUid, name: names[seat] ?? '' }, { atTable: true })}>
+            <PlateFace uid={seatUid} name={names[seat] ?? ''} color={SEAT_COLORS[seat]} storyId={storySeatIds?.[seat]} bot={isBotSeat(seat)} />
+          </button>
+        ) : <PlateFace uid={seatUid} name={names[seat] ?? ''} color={SEAT_COLORS[seat]} storyId={storySeatIds?.[seat]} bot={isBotSeat(seat)} />}
+        <div className="plate-body">
+          <div className="plate-name">{names[seat]}{dealerSeat === seat && <span className="chip dealer" data-testid={`dealer-${seat}`}>DEALER</span>}{partner && <span className="chip ally">PARTNER</span>}{notice.includes(sideOf(seat, r)) && <span className="chip notice" data-testid={`notice-${seat}`} title="Got shot last hand: one more shot and they're out">ON NOTICE</span>}</div>
+          <div className="plate-stats" key={st.handNo}>
+            <span className="chip" data-testid={`bid-${seat}`}>{bidChipText(b ?? null, isTurn && st.phase === 'bidding')}</span>
+            <span className="chip took" data-testid={`books-${seat}`}>{plateTookText(took, st.phase)}</span>
+          </div>
+        </div>
+        {online?.seatExtra(seat)}
+      </div>
+    );
+  };
+
+  // Your own plate face is tappable too — it opens your profile modal. Spectating, seat 0
+  // is the player being watched (their account, their name), not you. Account-less guests
+  // and bot-held seats resolve to no target and keep a plain face.
+  const mySeatUid = spectating ? online?.seatUid?.(HUMAN) : (acctUser?.username ? acctUser.id : undefined);
+  const mySeatProfile = profileTargetOf({ id: mySeatUid, name: spectating ? (names[HUMAN] ?? '') : (acctUser?.username ?? ''), bot: spectating ? isBotSeat(HUMAN) : false });
+
+  const unread = Math.max(0, msgs.length - seenMsgs);
+
+  // landscape phones: keep the bid / pass panel just above the top of the (resting) hand
+  const screenRef = useRef<HTMLDivElement>(null);
+  const measureHand = st.phase === 'bidding' || st.phase === 'exchange';
+  // Portrait phones: the YOU plate/avatar is pinned to the lower-left corner by a pure CSS
+  // media query in styles.css (max-width 600px + portrait). No JS gate: the class-toggle version
+  // depended on the published hand hits and never fired on the founder's real iPhone.
+  useEffect(() => {
+    if (!measureHand) return;
+    const tick = () => {
+      const L = (window as unknown as { __bwmLayout?: { hand: { y: number }[] } }).__bwmLayout;
+      const el = screenRef.current;
+      if (!el || !L?.hand?.length) return;
+      const top = Math.min(...L.hand.map((q) => q.y));
+      el.style.setProperty('--hand-clear', `${Math.max(60, Math.round(window.innerHeight - top + 6))}px`);
+    };
+    tick();
+    const t = window.setInterval(tick, 400);
+    return () => clearInterval(t);
+  }, [measureHand, vp.short]);
+
+  // Versus intro model (boxing match card): sides from the seats at this table.
+  // Partnership = two duo units under their team names; cutthroat = one side each.
+  // Story seats carry their character id for portrait faces (art pass):
+  // seat 1 = pair[0], seat 2 = Dee, seat 3 = pair[1]; the player keeps their photo.
+  const storySeatIds: Record<number, string> | null = story?.scene
+    ? { 1: story.scene.stop.pair[0], 2: 'dee', 3: story.scene.stop.pair[1] }
+    : null;
+  // Story versus: the narrative tape for this stop, from the same builder the
+  // sit-down StoryTape renders — one content source, never a second copy.
+  const storyTape = story?.scene ? buildStoryTape(story.scene.stop, story.scene.facts) : null;
+  // Story tables load under the STOP's name ("The Porch · Stop 1 of 11"), never
+  // the venue asset's room name ("Grandma's Kitchen") — the loader's room line
+  // is the versus header. (The venue assignment itself is the story data's:
+  // the Porch plays at the grandma venue by design; only the label was wrong.)
+  const storyRoomLabel = story?.scene ? `${story.scene.stop.name} · Stop ${story.scene.stop.n} of ${STORY_STOPS.length}` : undefined;
+  // Taking seats (owner, 2026-10-23): the standard loading hold presents the
+  // REAL seated roster in seat order — story portraits, uploaded pictures,
+  // persona nameplates — mapped exactly like the versus members below (same
+  // seat → face sources, no second lookup path).
+  const loadingSeats: LoadingSeat[] = useMemo(() => Array.from({ length: n }, (_, seat) => {
+    const storyId = storySeatIds?.[seat] ?? null;
+    const bot = isBotSeat(seat);
+    return {
+      name: seatFacingName(names, seat, spectating),
+      tag: storyId ? (STORY_CHARACTERS[storyId]?.role ?? null) : bot ? platePersona(names[seat] ?? '') : null,
+      storyId,
+      uid: online ? (online.seatUid?.(seat) ?? null) : seat === HUMAN ? (acctUser?.id ?? null) : null,
+      direct: !online && seat === HUMAN ? (acctUser?.avatar ?? null) : null,
+      bot,
+      you: seat === HUMAN && !spectating,
+      color: seat === HUMAN && !spectating ? USER_COLORS.You : SEAT_COLORS[seat] ?? '#ddd',
+    };
+  }), [names, storySeatIds, online, acctUser, spectating, n]); // eslint-disable-line react-hooks/exhaustive-deps
+  const versusModel: VersusModel | null = useMemo(() => {
+    if (!versusActive) return null;
+    const member = (seat: number): VersusMember => {
+      const bot = isBotSeat(seat);
+      const storyId = storySeatIds?.[seat] ?? null;
+      return {
+        name: names[seat] ?? 'Player',
+        uid: online ? (online.seatUid?.(seat) ?? null) : seat === HUMAN ? (acctUser?.id ?? null) : null,
+        isBot: bot,
+        direct: !online && seat === HUMAN ? (acctUser?.avatar ?? null) : null,
+        storyId,
+        // Per-player versus cards: a non-story bot seat's persona keys its
+        // recorded head-to-head with the viewer + its scouting read. Offline,
+        // the bot's skill is the very levelFor this table plays with (exact);
+        // online the server owns the seed, so no tier is claimed (null).
+        persona: bot && !storyId ? personaForName(names[seat] ?? '') : null,
+        skill: bot && !online && !storyId ? skillOf(levelFor(seat)) : null,
+        me: seat === HUMAN && !spectating,
+      };
+    };
+    if (r.partnerships) {
+      return {
+        mode: 'team', kind: 'team', pot: online?.pot ?? null, online: !!online,
+        pairNote: online?.versusPairNote ?? null,
+        ...(storyTape ? { story: { tape: storyTape } } : {}),
+        sides: [0, 1].map((side) => {
+          const seats = Array.from({ length: n }, (_, seat) => seat).filter((seat) => sideOf(seat, r) === side);
+          return {
+            label: teamNames?.[side] ?? (online ? online.sideLabel(side) : seats.map((s) => names[s]).join(' & ')),
+            members: seats.map(member),
+          };
+        }),
+      };
+    }
+    return {
+      mode: 'solo', kind: 'cutthroat', pot: online?.pot ?? null, online: !!online,
+      sides: Array.from({ length: n }, (_, seat) => ({ label: names[seat] ?? 'Player', members: [member(seat)] })),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [versusActive, online, acctUser, names, teamNames, r, n, levelFor, spectating, storySeatIds]);
+  // Pre-deal setup window (online): the room holds the first deal; show the table
+  // with a countdown so the pause reads as intentional while players set cam/mic.
+  const dealAtMs = online?.dealAt ?? null;
+  const preDeal = !!online && st.handNo === 0 && dealAtMs !== null;
+  const [preDealNow, setPreDealNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!preDeal) return;
+    setPreDealNow(Date.now());
+    const id = window.setInterval(() => setPreDealNow(Date.now()), 250);
+    return () => window.clearInterval(id);
+  }, [preDeal]);
+  const preDealSecs = preDeal ? Math.max(1, Math.ceil(((dealAtMs as number) - preDealNow) / 1000)) : 0;
+
+  // The fan during a redeal (owner, 2026-10-21: "I shouldn't have cards until they are dealt
+  // to me as per the usual deal"): through the gather beat every fan surface — the 3D fan, the
+  // felt stand-in, the accessible hand — holds the thrown-in hand, never the redealt one.
+  // The deal beat hands the fan back to the live hand, which the deal flight deals out.
+  const gathering = redeal?.phase === 'gather';
+  const fanHand = misdealFanHand(gathering, redeal?.heldHand ?? null, display.hand);
+  // The quick-load hand is on screen before WebGL. During a deal it may only show the cards that have left the deck.
+  const feltShown = useDealtSlots(dealing, {
+    speedK: k,
+    players: n,
+    dealer: st.dealer,
+    seat: HUMAN,
+    slots: display.hand?.length ?? 0,
+    handNo: st.handNo,
+    live: liveSeats(st),
+  });
+
+  return (
+    <div ref={screenRef} className={`table-screen q-${settings.quality}${vp.short ? ' short' : ''}${modalOpen ? ' modal-open' : ''}${showPad ? ' pad-open' : ''}`} inert={loading ? true : undefined} data-dealing={dealing ? 'yes' : 'no'} data-my-turn={myTurn ? 'yes' : 'no'}>
+      <DrivebyLights />
+      {/* styled stand-in table, on screen from the first paint until the 3D table has rendered (then it fades) */}
+      <div className={`table-placeholder ${tableReady ? 'gone' : ''}`} data-testid="table-placeholder" data-venue={venue} style={placeholderStyle(venue, story?.scene ? storyBackdropUrl(story.scene.stop) : undefined)} aria-hidden>
+        <div className="tp-floor" />
+        <div className="tp-table"><div className={`tp-felt${VENUE_DEFS[venue].feltPattern ? ` ${VENUE_DEFS[venue].feltPattern}` : ''}`}><img src="/assets/bwm-wordmark-white.svg" alt="" /></div></div>
+        {!tableReady && !feltHandVisible(display.hand?.length ?? 0, introHand !== st.handNo, webglHand) && <div className="tp-note">Setting the table…</div>}
+      </div>
+      {feltHandVisible(display.hand?.length ?? 0, introHand !== st.handNo, webglHand) && display.hand && (
+        <FeltHand
+          cards={gathering && redeal?.heldHand ? redeal.heldHand : display.hand}
+          visibleCount={gathering ? (redeal?.heldHand ? redeal.heldHand.length : 0) : feltShown}
+          trick={display.trick.map((p) => p.card)}
+          legal={runFx ? [] : humanExchanging && hand ? hand : legal}
+          selected={runFx ? null : selected}
+          onCard={onCard}
+          promoted={promoted}
+        />
+      )}
+      <Suspense fallback={null}>
+        <Scene
+          onTableReady={onTableReady}
+          onFirstFrame={onSceneFirstFrame}
+          onTableDressed={onTableDressed}
+          onHandLive={onHandLive}
+          onDealDone={onDealDone}
+          quality={settings.quality}
+          n={n}
+          handNo={st.handNo}
+          dealer={st.dealer}
+          positions={pos}
+          human={HUMAN}
+          myHand={fanHand}
+          handCounts={display.counts}
+          shownTrick={display.trick}
+          trickArmed={!!view.nukeArmed}
+          slam={display.slam}
+          reduceFx={reduceFx}
+          venue={venue}
+          view={effView}
+          turnUp={turnUp}
+          piles={display.piles}
+          legal={runFx ? [] : humanExchanging && hand ? hand : legal}
+          selected={runFx ? null : selected}
+          turnSeat={actor === HUMAN && !spectating ? actor : null}
+          winnerSeat={winnerSeat}
+          promoted={promoted}
+          onCardTap={onCard}
+          onCardDrop={onCardDrop}
+          landing={landingMode(tips.on)}
+          gameSeed={String(st.seed ?? '')}
+          onFeltTap={() => { if (feltClearsSelection(selected)) { playArmed.current = false; setSelected(null); } }}
+          renderSeat={renderSeat}
+          introHand={introHand}
+          dealing={dealing || redeal?.phase === 'deal'}
+          dealReady={dealReady}
+          animK={redeal?.phase === 'deal' ? k * MISDEAL_DEAL_SPEED : k}
+          gatherHands={redeal?.phase === 'gather' && !fx.osReducedMotion}
+          dealEpoch={dealEpoch}
+          dealFlight={redeal?.phase === 'deal'}
+          kingGunSeat={kingGunSeatFor(story) ?? online?.kingGunSeat ?? null}
+          landCue={landCue}
+          short={vp.short}
+          safe={vp.safe}
+          hintLegal={hintLegal}
+          marked={tipMarked}
+          collecting={collecting}
+        />
+      </Suspense>
+      {!loadGone && <TableLoading progress={loadProgress} leaving={!loading && (!versusActive || versusStoryDone)} room={storyRoomLabel ?? roomName} seats={loadingSeats} reducedMotion={reduceFx || fx.osReducedMotion} versus={versusModel ? <VersusIntro model={versusModel} reduced={reduceFx || fx.osReducedMotion} ready={!loading} onStoryComplete={() => setVersusStoryDone(true)} /> : undefined} />}
+      {preDeal && loadGone && (
+        <div className="predeal-note" data-testid="predeal-note" role="status">
+          <span className="predeal-title">First hand in {preDealSecs}s</span>
+          <span className="predeal-sub">Table&apos;s yours — set your camera &amp; mic</span>
+        </div>
+      )}
+      {badge && badge.seat !== HUMAN && <SeatBadge badge={badge} />}
+
+      {/* scorebug */}
+      <header className="scorebug">
+        <div className="menu-wrap">
+          <button type="button" className={`bug-btn ${menuOpen ? 'on' : ''}`} onClick={() => setMenuOpen(!menuOpen)} aria-label="Menu" aria-haspopup="dialog" data-testid="menu">☰</button>
+          {menuOpen && (
+            <>
+              <div className="menu-scrim" onPointerDown={(e) => runLeaveMenu(e, 'scrim')} onPointerUp={(e) => runLeaveMenu(e, 'scrim')} onClick={(e) => runLeaveMenu(e, 'scrim')} />
+              <div className="game-menu glass" role="menu" data-testid="game-menu" ref={escMenu}>
+                <button type="button" role="menuitem" className={help ? 'on' : ''} data-testid="help" aria-pressed={help} onClick={() => { setHelp(!help); setMenuOpen(false); }}>❓ Help: tips &amp; book counting</button>
+                <button type="button" role="menuitem" data-testid="scorepad-button" onClick={() => { setShowPad(true); setMenuOpen(false); }}>📋 Score pad &amp; house rules</button>
+                <button type="button" role="menuitem" onClick={() => onQuality(settings.quality === 'high' ? 'low' : 'high')}>🎨 Graphics: {settings.quality === 'high' ? 'High' : 'Low'}</button>
+                <button type="button" role="menuitem" data-testid="view-toggle" onClick={toggleView}>{effView === 'sitting' ? '🪑' : '🧍'} View: {effView === 'sitting' ? 'Sitting' : 'Standing'}</button>
+                <button type="button" role="menuitem" data-testid="turnup-toggle" aria-pressed={turnUp} onClick={toggleTurnUp}>🔥 Turn up: {turnUp ? 'On — Standing slams' : 'Off — gentle plays'}</button>
+                {[1, 2, 3].map((seat) => seat < names.length ? <button key={seat} type="button" role="menuitem" data-testid={`voice-mute-${seat}`} aria-pressed={sound.voiceMuted(names[seat]!)} onClick={() => { sound.setVoiceMuted(names[seat]!, !sound.voiceMuted(names[seat]!)); setMuteTick((t) => t + 1); }}>{sound.voiceMuted(names[seat]!) ? '🔇' : '🔊'} {names[seat]} voice: {sound.voiceMuted(names[seat]!) ? 'muted' : 'on'}</button> : null)}
+                <div className="menu-social"><SocialButton className="compact" /></div>
+                <button type="button" role="menuitem" className="danger" data-testid="menu-leave" onPointerDown={(e) => { e.currentTarget.setPointerCapture?.(e.pointerId); runLeaveMenu(e, 'leave'); }} onPointerUp={(e) => runLeaveMenu(e, 'leave')} onClick={(e) => runLeaveMenu(e, 'leave')}>🚪 Leave table</button>
+              </div>
+            </>
+          )}
+        </div>
+        <div className="bug glass">
+          <img className="bug-logo" src="/assets/bwm-wordmark-white.svg" alt="Bid Wit Me" />
+          <span className="beta-tag in-bug" aria-label="Beta">BETA</span>
+          <div className={`bug-teams n${sb.scores.length}`} data-testid="bug-teams">
+            {sb.scores.map((s, i) => (
+              <div key={i} className={`bug-team ${i === mySide ? 'mine' : ''} ${sb.result?.winners.includes(i) ? 'won' : ''}`}>
+                <span className="bug-name">{wheelSides.has(i) && <span className="wheels-tag" data-testid={`wheels-${i}`} title="Wheels: this team bid 10+ books together">WHEELS</span>}{r.partnerships ? (teamNames?.[i] ? sideName(r, i, names) : (online ? online.sideLabel(i) : sideName(r, i, names).replace(' & ', ' + '))).toUpperCase() : names[i]!.toUpperCase()}</span>
+                <TickNumber value={s} className="bug-score" />
+                <span className="bug-bags">{sb.bags[i]}<small>B</small></span>
+              </div>
+            ))}
+          </div>
+          <div className="bug-trumps" aria-label="Trump order">
+            <span className="ts-label">TRUMPS</span><TrumpLadder rules={r} n={4} style="short" />{st.spadesBroken && tips.on && <i className="bt-broken" data-testid="spades-broken-short" title="Spades broken">SPADES BROKEN</i>}
+          </div>
+          <div className="bug-meta">
+            <span className="bug-mode">{modeTitle(r).toUpperCase()}</span>
+            {seriesChip('in-meta')}
+            {learning && <span className="learn-badge" data-testid="learning-badge" title="Tips are on: the game slows down so you can read. Turn tips off to go back to your speed.">LEARNING MODE: SLOW</span>}
+            {st.spadesBroken && tips.on && <span className="bt-broken" data-testid="spades-broken" title="Spades broken">SPADES BROKEN</span>}<span className="bug-hand" data-testid="bug-hand">HAND {st.handNo}{isBooks ? <span className="bug-books"> · BOOKS BID THEMSELVES</span> : ''} · TO {r.targetScore}</span>
+          </div>
+        </div>
+        {/* the always-visible sound dock (main.tsx) sits on this slot */}
+        <span className="bug-btn dock-slot" aria-hidden />
+      </header>
+
+      {/* last-trick readout. After a resolved 'Run it!' the same chip opens every hand the tornado cleared. */}
+      {(piles.length > 0 || !!runHands) && (() => {
+        const seatLabel = (seat: number) => face(seat);
+        if (runHands && runClaimer !== null && ltOpen && runReviewOverTable(st.phase)) {
+          return createPortal(
+            <>
+              <div className="run-review-scrim" onClick={() => setLtOpen(false)} />
+              <div className="last-trick glass slant open run-open" data-testid="last-trick" aria-expanded>
+                <RunItReview hands={runHands} claimer={runClaimer} labels={runHands.map((_, seat) => seatLabel(seat))} r={r} onClose={() => setLtOpen(false)} />
+              </div>
+            </>,
+            document.body,
+          );
+        }
+        if (runHands) {
+          return (
+            <div className="last-trick glass slant chip run-chip" data-testid="last-trick" aria-label="Run it" role="button" tabIndex={0} aria-expanded={false} onClick={() => setLtOpen(true)}>
+              <span className="lt-label">RUN IT!</span>
+            </div>
+          );
+        }
+        // The open readout is a browser over this hand's completed tricks:
+        // ‹/› step through them (absolute index — a trick landing mid-browse
+        // never moves the one on show), the chip always names the newest.
+        const browsed = browsedTrick(piles, ltOpen ? ltIdx : null)!;
+        const t = browsed.trick;
+        const ltIndex = browsed.index;
+        const short = (c: Card) => (c === 'BJ' ? 'BJ' : c === 'LJ' ? 'LJ' : cardLabel(c));
+        return (
+          <div className={`last-trick glass slant ${ltOpen ? 'open' : 'chip'}`} data-testid="last-trick" aria-label="Last trick" role="button" tabIndex={0} aria-expanded={ltOpen} onClick={toggleLt} onKeyDown={(e) => { if (e.target !== e.currentTarget) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleLt(); } }}>
+            <span className="lt-label">{ltOpen ? trickPositionLabel(ltIndex, piles.length) : 'LAST TRICK'}{ltOpen ? <span className="lt-x" aria-hidden="true">✕</span> : t.winner !== null && <> · {face(t.winner)}</>}</span>
+            {ltOpen && t.plays.map((pl) => (
+              <span key={pl.card} className={`lt-card ${pl.seat === t.winner ? 'win' : ''} ${pl.card[1] === 'H' || pl.card[1] === 'D' || pl.card === 'BJ' ? 'red' : ''}`}>
+                <small>{face(pl.seat).slice(0, 3)}</small>{short(pl.card)}
+              </span>
+            ))}
+            {ltOpen && (
+              <span className="lt-navrow">
+                <button type="button" className="lt-nav" data-testid="lt-prev" aria-label="Previous trick" disabled={ltIndex <= 0}
+                  onClick={(e) => { e.stopPropagation(); setLtIdx(stepTrickIndex(ltIndex, -1, piles.length)); }}
+                  onKeyDown={(e) => e.stopPropagation()}>‹</button>
+                <span className="lt-meta" data-testid="lt-meta">{face(t.leader)} led{t.winner !== null && <> · {face(t.winner)} took it</>}</span>
+                <button type="button" className="lt-nav" data-testid="lt-next" aria-label="Next trick" disabled={ltIndex >= piles.length - 1}
+                  onClick={(e) => { e.stopPropagation(); setLtIdx(stepTrickIndex(ltIndex, 1, piles.length)); }}
+                  onKeyDown={(e) => e.stopPropagation()}>›</button>
+              </span>
+            )}
+          </div>
+        );
+      })()}
+
+      {/* center notes */}
+      <div className="center-note-wrap">
+        {showDealer && dealerLive && <DealerPopup name={dealerLabel} localSeat={dealerSeat} />}
+        {st.phase === 'bidding' && !pause && !dealing && localTurn !== HUMAN && localTurn !== null && <div className="center-note" data-testid="bidding-note">{biddingNote(names[localTurn] ?? '', { partnerships: r.partnerships, partnerTurn: localTurn === partnerSeat, spectating })}</div>}
+        {showCenterBidOrder(st.phase, pause, dealing) && <BidOrder st={st} names={names} me={spectating ? -1 : HUMAN} />}
+        {isBooks && st.phase === 'playing' && !pause && !dealing && st.tricks.length === 0 && st.trick.plays.length === 0 && <div className="center-note books-note" data-testid="books-note">{booksBanner(hostMinimum(r), r.partnerships)}</div>}
+        {st.phase === 'exchange' && !humanExchanging && <div className="center-note">{names[exchangeStep!.from]} passes {exchangeStep!.count} to {names[exchangeStep!.to]}…</div>}
+      </div>
+      {showTrumpPopup && <TrumpPopup rules={r} onDone={dismissTrumpPopup} />}
+      {winnerSeat !== null && <TrickBanner key={`${st.handNo}-${st.tricks.length}`} text={trickTakenLine(face(winnerSeat))} />}
+
+      {/* toasts */}
+      <div className="toasts">
+        {toasts.map((t, i) => (
+          <div key={t.id} className={`toast ${t.kind}`} style={{ animationDelay: `${i * 0.18}s` }}>
+            <span className="toast-text">{t.text}</span>
+            {t.sub && <span className="toast-sub">{t.sub}</span>}
+          </div>
+        ))}
+      </div>
+
+      <ChatPanel msgs={msgs} open={chatOpen} onToggle={() => setChatOpen(!chatOpen)} onSend={(t) => (st.phase === 'handOver' ? talkSend(t) : push('You', t))} unread={unread} scope={online ? 'table' : undefined} extra={online ? online.controls : <OfflineMediaBar />}
+        overRecap={showRecap && !showPad}
+        mentionCandidates={online ? (() => {
+          // @ completion at the table: friends → online players → this table's roster
+          const out: { name: string }[] = [];
+          const ss = socialApi.get();
+          for (const f of ss.friends?.friends ?? []) out.push({ name: f.name });
+          for (const u of Object.values(ss.users)) if (!u.guest && u.id !== ss.you?.id) out.push({ name: u.name });
+          for (const n of names) if (n && n !== 'You') out.push({ name: n });
+          return out;
+        })() : undefined}
+        onReact={(online ? online.chat : localChat).react} myId={(online ? online.chat : localChat).youId ?? null}
+        trash={!runFx && !modalOpen && !spectating ? <TrashTalkButton st={st} me={HUMAN} intensity={intensity} onSend={(t) => push('You', t)} /> : null} />
+      {help && !bidTurn && view.hand && view.hand.length > 0 && st.phase !== 'handOver' && st.phase !== 'gameOver' && (
+        <div className="bid-coach-float glass slant"><BidCoach view={view} startOpen title="COUNT YOUR BOOKS" onClose={() => setHelp(false)} /></div>
+      )}
+
+      {/* the human's lower third + controls */}
+      <section className="me">
+        {myTurn && !dealing && st.phase === 'bidding' && view.bidOptions && !autoReveal && (
+          view.hand === null ? (
+            <div className="bid-panel glass slant">
+              <div className="bid-tip-slot" />
+              <div className="panel-title">BLIND NIL?</div>
+              <BidSummary st={st} names={names} me={HUMAN} />
+              <p>Bid before looking — worth ±{r.blindNil.value}.</p>
+              <div className="bid-row">
+                {view.bidOptions.blindNil && <button type="button" className="danger" onClick={() => apply({ type: 'bid', seat: HUMAN, bid: 'blindNil' })}>Blind Nil</button>}
+                <button type="button" className="primary" onClick={() => apply({ type: 'reveal', seat: HUMAN })}>See my cards</button>
+              </div>
+            </div>
+          ) : (
+            <div className={`bid-panel glass slant ${coachBid ? 'with-coach' : ''}`}>
+              <div className="bid-tip-slot" />
+              {coachBid && <BidCoach key={bcKey} view={view} startOpen={help || bcOpen} />}
+              <div className="panel-title">YOUR BID</div>
+              <BidSummary st={st} names={names} me={HUMAN} partnerEstimate={partnerEstimate} />
+              {!raisedMin && teamMinNote(hostMinimum(r), r.partnerships) && <p className="team-min-note" data-testid="team-min-note">{teamMinNote(hostMinimum(r), r.partnerships)}</p>}
+              {raisedMin ? <MinBidLine note={raisedMin} /> : (view.bidOptions.blockReason || view.bidOptions.nilReason) && (
+                <p className="bid-block" data-testid="bid-block">{[view.bidOptions.blockReason, view.bidOptions.nilReason].filter(Boolean).join(' · ')}</p>
+              )}
+              <div className="bid-grid">
+                {bidChoices(view.bidOptions.min, view.bidOptions.max).map((b) => (
+                  <button type="button" key={b} onClick={() => apply({ type: 'bid', seat: HUMAN, bid: b })}>{b}</button>
+                ))}
+                {view.bidOptions.nil && <button type="button" className="nil" onClick={() => apply({ type: 'bid', seat: HUMAN, bid: 'nil' })}>NIL</button>}
+              </div>
+              {canMisdeal && (
+                <button type="button" className="misdeal-btn misdeal-in-panel" data-testid="misdeal" onClick={() => { setSelected(null); apply({ type: 'misdeal', seat: HUMAN }); }}>Call misdeal — no spades</button>
+              )}
+            </div>
+          )
+        )}
+        {humanExchanging && (
+          <div className="bid-panel glass slant">
+            <div className="panel-title">PASS {exchangeStep!.count} TO {names[exchangeStep!.to]!.toUpperCase()}</div>
+            <button type="button" className="primary" disabled={exchangePick.length !== exchangeStep!.count} onClick={() => apply({ type: 'exchange', seat: HUMAN, cards: exchangePick })}>Pass cards ({exchangePick.length}/{exchangeStep!.count})</button>
+          </div>
+        )}
+
+        <div className={`plate me-plate ${actor === HUMAN && !spectating ? 'turn' : ''}`} data-testid="seat-0">
+          {mySeatProfile ? (
+            <button type="button" className="plate-face-tap" data-testid="plate-profile-0" aria-label={`View ${mySeatProfile.name}'s profile`}
+              onClick={() => openPlayerProfile({ id: mySeatUid, name: mySeatProfile.name }, { atTable: true })}>
+              <MyPlateFace name={seatInitial(face(HUMAN))} color={spectating ? SEAT_COLORS[HUMAN] : USER_COLORS.You} />
+            </button>
+          ) : <MyPlateFace name={seatInitial(face(HUMAN))} color={spectating ? SEAT_COLORS[HUMAN] : USER_COLORS.You} />}
+          <div className="plate-body">
+            <div className="plate-name">{face(HUMAN).toUpperCase()}{dealerSeat === HUMAN && <span className="chip dealer" data-testid="dealer-0">DEALER</span>}{notice.includes(sideOf(HUMAN, r)) && <span className="chip notice" data-testid="notice-0" title={noticeTip(spectating)}>ON NOTICE</span>}{!spectating && myBadges.map((b) => BADGES[b.id] && <span key={b.id} className="chip badge" title={`${BADGES[b.id]!.name}: ${BADGES[b.id]!.desc}`} data-testid={`plate-badge-${b.id}`}>{BADGES[b.id]!.icon}</span>)}</div>
+            <div className="plate-stats" key={st.handNo}>
+              <span className="chip" data-testid="bid-0">{bidChipText(plates.bids[HUMAN] ?? null, actor === HUMAN && st.phase === 'bidding')}</span>
+              <span className="chip took" data-testid="books-0">{plateTookText(tookShown[HUMAN] ?? 0, st.phase)}</span>
+              {isNilBid(plates.bids[HUMAN]) && (tookShown[HUMAN] ?? 0) > 0 && <span className="chip bad">NIL BUSTED</span>}
+            </div>
+            {!spectating && (
+              <span className="plate-toggles">
+                <button type="button" className="view-chip" data-testid="view-toggle-plate" aria-pressed={effView === 'sitting'} onClick={toggleView}>{effView === 'sitting' ? '🪑 Sitting view' : '🧍 Standing view'}</button>
+                <button type="button" className={`view-chip turnup-chip ${turnUp ? 'on' : ''}`} data-testid="turnup-toggle-plate" aria-pressed={turnUp} onClick={toggleTurnUp} title="Turn up: Standing plays slam hard. Off: Standing plays are gentle.">🔥 Turn up: {turnUp ? 'On' : 'Off'}</button>
+              </span>
+            )}
+          </div>
+          {badge && badge.seat === HUMAN && <div className="plate-turn" data-testid={badge.testId}>{badge.text}</div>}
+          {online?.seatExtra(HUMAN)}
+        </div>
+        {error && <div className="err">{error}</div>}
+      </section>
+      {online?.overlay}
+      {canRun && <RunItButton tip={runTip} onDismissTip={() => setRunTip(false)} onRun={() => { setRunTip(false); setSelected(null); apply({ type: 'runIt', seat: HUMAN }); }} />}
+      {canMisdeal && !bidPanelShowing && <MisdealButton onCall={() => { setSelected(null); apply({ type: 'misdeal', seat: HUMAN }); }} />}
+      {revealHold && (
+        <MisdealReveal
+          title={revealHold.title}
+          passTo={revealHold.passTo}
+          bidsVoided={revealHold.bidsVoided}
+          cards={revealHold.cards}
+          rules={r}
+          onDismiss={() => setRevealHold((cur) => (cur?.key === revealHold.key ? null : cur))}
+        />
+      )}
+      {runFx?.phase === 'zoom' && <RunZoom cards={runFx.cards} who={face(runFx.claimer)} line={runLine} r={r} />}
+      {callout && !runFx && <div className={`trash-callout seat-${pos[callout.seat]}`} key={callout.id} data-testid="trash-callout"><b>{face(callout.seat)}</b>{showLine(callout.text)}</div>}
+      {runFx && <button type="button" className="run-skip" data-testid="run-skip" aria-label="Skip" onClick={endRun}><span>Tap to skip</span></button>}
+      {badgeToast && BADGES[badgeToast] && (
+        <div className="badge-unlock glass slant" role="status" data-testid="badge-unlock" onClick={() => setBadgeToast(null)}>
+          <span className="bu-icon">{BADGES[badgeToast]!.icon}</span>
+          <span className="bu-text"><small>BADGE UNLOCKED</small><b>{BADGES[badgeToast]!.name}</b><i>{BADGES[badgeToast]!.desc}</i></span>
+        </div>
+      )}
+
+      {/* accessible / automation controls for the 3D hand */}
+      <div className="sr-only" role="group" aria-label="Your hand" data-testid="hand" data-trick-count={shownTrick.plays.length}>
+        {((gathering ? (redeal?.heldHand ?? []) : flying ? flyPlay(hand, shownTrick.plays, flying).hand : hand) ?? []).map((c) => (
+          <button
+            key={c}
+            type="button"
+            data-testid={`card-${c}`}
+            data-legal={legal.includes(c) || humanExchanging ? 'true' : 'false'}
+            disabled={!humanExchanging && !legal.includes(c)}
+            aria-label={cardControlLabel(c, humanExchanging || legal.includes(c))}
+            aria-pressed={selected === c || exchangePick.includes(c)}
+            onClick={() => onCard(c)}
+          >
+            <span aria-hidden="true">{cardLabel(c)}</span>
+          </button>
+        ))}
+      </div>
+
+      {showRecap && (
+        <Intermission
+          st={st}
+          names={names}
+          mySide={mySide}
+          setAnimCtx={{ storyStopId: story?.scene?.stop.id ?? null, venueId: venue, setting: settings.setAnim ?? 'auto' }}
+          secs={shotOutRecap ? null : (online?.talk?.secs ?? null)}
+          ready={shotOutRecap ? undefined : online?.talk?.ready}
+          online={shotOutRecap ? false : !!online}
+          onReady={() => { if (st.phase === 'gameOver') setShotRecapAck(true); else apply({ type: 'nextHand' }); }}
+          onScorePad={() => setShowPad(true)}
+          onLeave={() => { if (online) leave(); else setConfirmLeave(true); }}
+          series={seriesChip()}
+          unread={unread}
+          chatOpen={chatOpen}
+          onChat={() => setChatOpen(!chatOpen)}
+          runReview={runHands && runClaimer !== null ? (
+            clearedOpen ? (
+              <div className="tt-run" data-testid="talk-run">
+                <RunItReview
+                  hands={runHands}
+                  claimer={runClaimer}
+                  labels={runHands.map((_, seat) => face(seat))}
+                  r={r}
+                  onClose={() => setClearedOpen(false)}
+                />
+              </div>
+            ) : (
+              <button type="button" className="tt-run-show" data-testid="talk-run-show" onClick={() => setClearedOpen(true)}>Review last trick</button>
+            )
+          ) : null}
+          trickReview={<RecapTrickReview key={st.handNo} tricks={piles} face={face} />}
+        />
+      )}
+      {seriesOpen && series && <SeriesSheet series={series} mine={seriesMine} onClose={() => setSeriesOpen(false)} />}
+
+      {feedback && <Feedback onClose={() => setFeedback(false)} />}
+      {confirmLeave && (
+        <div className="modal-backdrop" ref={escLeave} onPointerDown={(e) => { if (e.target === e.currentTarget) setConfirmLeave(false); }}>
+          <div className="modal glass slant confirm" role="dialog" aria-label="Leave this game?" data-testid="confirm-leave" onPointerDown={(e) => e.stopPropagation()}>
+            <div className="panel-title big">LEAVE THIS GAME?</div>
+            <p className="muted">{onSuspend ? 'Leave ends it for good. Save & quit lets you resume from the menu.' : 'Your progress in this game will be lost.'}</p>
+            <div className="confirm-actions">
+              <button type="button" className="stay-primary" onClick={() => setConfirmLeave(false)}>Stay</button>
+              {onSuspend && <button type="button" className="ghost-btn" data-testid="save-quit" onClick={() => { suspendGame(); onSuspend(); }}>Save &amp; quit</button>}
+              <div className="exit-divider" aria-hidden="true" />
+              <button type="button" className="leave-red" onClick={leave}>Leave</button>
+            </div>
+            <button type="button" className="link fb-open-ingame" data-testid="open-feedback" onClick={() => { setConfirmLeave(false); setFeedback(true); }}>✉ Send feedback (bug, idea…)</button>
+          </div>
+        </div>
+      )}
+
+      {showResults && online?.victory && st.result && (() => {
+        // online: the winners are the centerpiece (video spotlight); score, series and buttons sit underneath, secondary.
+        // No auto-advance: it stays until someone leaves or the host starts the rematch.
+        const res = st.result!;
+        const seats = Array.from({ length: n }, (_, i) => i);
+        const winSeats = seats.filter((i) => res.winners.includes(sideOf(i, r)));
+        const loseSeats = seats.filter((i) => !res.winners.includes(sideOf(i, r)));
+        const title = winHeadline(res.winners.map((w) => sideName(r, w, names)), r.partnerships);
+        const iWon = !spectating && res.winners.includes(mySide);
+        return (
+          <div className="victory-screen espn" role="dialog" aria-label="Game over" data-testid="victory">
+            <div className="vic-confetti" aria-hidden>{Array.from({ length: 18 }, (_, i) => <i key={i} style={{ left: `${(i % 2 ? 91 : 1) + ((i * 13) % 7)}%`, background: `hsl(${i * 47} 90% 60%)`, animationDuration: `${3.2 + (i % 5) * 0.5}s`, animationDelay: `${-i * 0.37}s` }} />)}</div>
+            <button type="button" className="modal-x" aria-label="Close and go to the main menu" data-testid="gameover-x" onClick={() => openRewards('home')}>✕</button>
+            <h2 className="vic-head">{iWon ? (res.winners.length > 1 ? 'YOU TIED FOR FIRST!' : 'VICTORY!') : 'GAME OVER'}<small>{iWon ? '🏆' : '♠'}</small></h2>
+            {(() => {
+              // the players' names under the team name (skipped when the team has no name of its own: it'd repeat the title)
+              const who = r.partnerships ? winSeats.map((i) => names[i] ?? '?').join(' & ') : undefined;
+              return online.victory!(winSeats, loseSeats, title, who && !title.toLowerCase().startsWith(who.toLowerCase()) ? who : undefined);
+            })()}
+            <div className="vic-foot glass">
+              {/* the middle of the foot scrolls inside the panel (long games run
+                  tall); the action buttons stay pinned below it, always reachable */}
+              <div className="vic-scroll" data-testid="victory-scroll">
+                {res.endReason === 'shotOut' && <div className="shot-out-banner" data-testid="shot-out">SHOT OUT</div>}
+                {res.endReason === 'third-set' && <div className="shot-out-banner third-set" data-testid="third-set">{THIRD_SET_HEADLINE}</div>}
+                <ol className="placements compact">
+                  {res.finalScores
+                    .map((score, side) => ({ side, score, place: res.placements[side]! }))
+                    .sort((a, b) => a.place - b.place)
+                    .map((x) => (
+                      <li key={x.side} className={`${x.side === mySide ? 'mine' : ''}${res.winners.includes(x.side) ? ' win' : ''}`}><span className="place">#{x.place}</span><span>{sideName(r, x.side, names)}</span><b>{x.score}</b></li>
+                    ))}
+                </ol>
+                <BoxScore st={st} label={(s) => sideName(r, s, names)} mySide={mySide} winners={res.winners} />
+                {seriesChip()}
+                <p className="muted small" data-testid="end-reason">{endReasonText(r, st, (side) => sideName(r, side, names))} {st.history.length} hand{st.history.length === 1 ? '' : 's'} played.</p>
+              </div>
+              <div className="confirm-actions">
+                <button type="button" className="quiet-row-btn" onClick={() => setShowPad(true)}>Score pad</button>
+                {!spectating && <button type="button" className="primary big" data-testid="rematch" onClick={() => onRematch(nextDealer(st))}>Play again — Rematch</button>}
+                <button type="button" className="ghost-btn" data-testid="main-menu" onClick={() => openRewards('home')}>Back to home</button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+      {showResults && st.result && !online?.victory && (
+        <div className="modal-backdrop">
+          <div className="modal glass slant gameover espn" role="dialog" aria-label="Game over">
+            <button type="button" className="modal-x" aria-label={storyGame ? 'Close and continue to the story map' : 'Close and go to the main menu'} data-testid="gameover-x" onClick={() => (storyGame ? leave() : openRewards('home'))}>✕</button>
+            <div className="trophy">{st.result.winners.includes(mySide) ? '🏆' : '♠'}</div>
+            <h2>{st.result.winners.includes(mySide) ? (st.result.winners.length > 1 ? 'YOU TIED FOR FIRST!' : 'VICTORY!') : winHeadline(st.result.winners.map((w) => sideName(r, w, names)), r.partnerships).toUpperCase()}</h2>
+            {seriesChip()}
+            {st.result.endReason === 'shotOut' && <div className="shot-out-banner" data-testid="shot-out">SHOT OUT</div>}
+            {st.result.endReason === 'third-set' && <div className="shot-out-banner third-set" data-testid="third-set">{THIRD_SET_HEADLINE}</div>}
+            <p className="muted" data-testid="end-reason">{endReasonText(r, st, (side) => sideName(r, side, names))} {st.history.length} hand{st.history.length === 1 ? '' : 's'} played.</p>
+            {/* placements + box score + headlines scroll inside the sheet (the
+                .modal > .scroll flex contract); hero stays fixed above and the
+                action buttons stay pinned below — nothing is ever clipped */}
+            <div className="scroll go-scroll" data-testid="gameover-scroll">
+              <ol className="placements">
+                {st.result.finalScores
+                  .map((score, side) => ({ side, score, place: st.result!.placements[side]! }))
+                  .sort((a, b) => a.place - b.place)
+                  .map((x) => (
+                    <li key={x.side} className={`${x.side === mySide ? 'mine' : ''}${st.result!.winners.includes(x.side) ? ' win' : ''}`}>
+                      <span className="place">#{x.place}</span>
+                      <span>{sideName(r, x.side, names)}</span>
+                      <b>{x.score}</b>
+                    </li>
+                  ))}
+              </ol>
+              <BoxScore st={st} label={(s) => sideName(r, s, names)} mySide={mySide} winners={st.result.winners} />
+              {tipNudge && (
+                <p className="tip-nudge" data-testid="tip-nudge">
+                  Enjoying BWM? <button type="button" className="link" onClick={openTip}>Tip the devs ♥</button> <small>(a donation, not a prize)</small>
+                  <button type="button" className="link muted" onClick={() => { const s = loadTipJar(); saveTipJar({ ...s, never: true }); setTipNudge(false); }}>Don't show again</button>
+                </p>
+              )}
+            </div>
+            <div className="confirm-actions">
+              <button type="button" className="quiet-row-btn" onClick={() => setShowPad(true)}>Score pad</button>
+              {storyGame ? (
+                storyWon ? (
+                  <button type="button" className="primary big" data-testid="story-to-map" onClick={() => leave()}>To the map</button>
+                ) : (
+                  <>
+                    <button type="button" className="primary big" onClick={() => onRematch(nextDealer(st))}>Play again — Rematch</button>
+                    <button type="button" className="ghost-btn" data-testid="story-to-map" onClick={() => leave()}>To the map</button>
+                  </>
+                )
+              ) : (
+                <>
+                  <button type="button" className="primary big" onClick={() => onRematch(nextDealer(st))}>Play again — Rematch</button>
+                  <button type="button" className="ghost-btn" data-testid="main-menu" onClick={() => openRewards('home')}>Back to home</button>
+                  <div className="exit-divider" aria-hidden="true" />
+                  <button type="button" className="leave-red" onClick={() => openRewards('leave')}>Change mode</button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {(coachOn || help) && !modalOpen && (
+        <Coach
+          ctx={{ st, view, hand, legal, myTurn, me: HUMAN, partnerName: r.partnerships ? names[partnerOf(HUMAN, r) ?? 2] ?? null : null, pause, names }}
+          onMarks={setTipMarked}
+          help={help}
+          onSkip={() => setTipsSkipped(true)}
+          onOff={tipsOff}
+          onCloseHelp={() => setHelp(false)}
+          onOpen={setTipOpen}
+        />
+      )}
+
+      {coachOn && !modalOpen && st.phase === 'playing' && !pause && <LedSuitChip st={st} />}
+      <Hype reduced={reduceFx} low={settings.quality === 'low'} />
+      <AnimFxLayer st={st} online={!!online} names={names} />
+      {showPad && <ScorePad st={st} names={names} dealerName={dealerLabel} onClose={() => setShowPad(false)} onContinue={st.phase === 'handOver' && talkOpen && !online?.talk?.ready?.mine ? () => { setShowPad(false); apply({ type: 'nextHand' }); } : undefined} onLeave={st.phase === 'handOver' ? () => { setShowPad(false); if (online) leave(); else setConfirmLeave(true); } : undefined} locked={online ? undefined : <LockedRulesPanel rules={r} nuke={fx.tableNuke ?? fx.prefs.nuke} skill={settings.botLevel} intensity={settings.talkIntensity} />} />}
+      {/* profile modal over the table (face taps): a direct child so the .modal-open
+          blur rule exempts its .modal-backdrop like every other table modal */}
+      <TableProfileModal />
+    </div>
+  );
+}

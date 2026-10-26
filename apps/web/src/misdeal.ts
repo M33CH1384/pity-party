@@ -1,0 +1,90 @@
+import { fx } from './fx';
+import { dealTimeline } from './three/dealTimeline';
+
+/**
+ * A called misdeal gets a real moment, in the game's own motion language — never a silent swap:
+ *  1. ANNOUNCE + GATHER (`MISDEAL_REVEAL_MS`): the call is announced — who called it, why
+ *     (no spades), and who the deal passes to — with the thrown hand face up as the table's
+ *     proof, while every hand glides across to the INCOMING dealer's deck spot on the same
+ *     glide the end-of-hand collection uses (a misdeal passes the deal like a normal end of
+ *     hand, so the pile travels to the seat about to deal). Bids already placed die with the
+ *     hand, and the announcement says so.
+ *  2. SHUFFLE + DEAL OUT: the card layer restarts the hand's deal (same hand number, fresh deal
+ *     epoch), so the normal shuffle + deal flight replays — shuffled and dealt out of the new
+ *     dealer's hands, since the deck spot sits in front of whoever holds the deal — a touch
+ *     brisker than a fresh hand (`MISDEAL_DEAL_SPEED`) to keep the moment near three seconds.
+ *  3. Bidding opens when the last card lands.
+ * The ANNOUNCEMENT's on-screen life is longer than the sequence's: it holds for
+ * MISDEAL_REVEAL_DWELL_MS (or a tap) even though the redeal finishes underneath
+ * it — the cards are the table's proof and get reading time, while play is
+ * never held hostage to them (the hold is Table-local presentation state).
+ * The sequence rides each source's `dealing` flag for its FULL length (bots, input and dealt
+ * slots all wait), online and solo alike, because the reveal rides the synced view
+ * (`PlayerView.misdealReveal`) — every seat's client runs the same sequence off the same event.
+ * Reduced motion collapses it to the announcement + instant swap.
+ *
+ * THE FAN DURING THE SEQUENCE (owner, 2026-10-21): "I shouldn't have cards until they are
+ * dealt to me as per the usual deal." The state swap is atomic, so the redealt hand exists
+ * in state from the first frame of the announcement — but no fan may SHOW it before the
+ * deal flight deals it. During the gather beat the local fan holds the hand being THROWN IN
+ * (snapshotted from the last committed render before the swap): those are the cards riding
+ * the glide into the pile — for the caller they are the public reveal itself; for any other
+ * viewer, their own hand they were just holding. With no snapshot to hold (a client whose
+ * first render already carries the reveal), the fan is honestly empty until the deal.
+ * The deal beat then deals the new hand out of the deck on the normal per-card flight —
+ * the fan's appearance is the flight's doing, never the state swap's.
+ */
+export const MISDEAL_REVEAL_MS = 1200;
+/** Reduced motion: a shorter, snap announcement, then the hand simply swaps. */
+export const MISDEAL_REVEAL_REDUCED_MS = 600;
+/**
+ * How long the announcement (the thrown hand, face up) stays on screen before it
+ * clears ITSELF (owner, 2026-10-25: at the gather beat's ~1.2s the shown cards
+ * "flash too quick" to register). This is a presentation dwell, NOT a stretch of
+ * the redeal sequence: the gather + deal flight run their normal course
+ * underneath, and the announcement is not yanked when they finish — it holds
+ * for this floor, or until the player taps it away, whichever comes first.
+ */
+export const MISDEAL_REVEAL_DWELL_MS = 8000;
+/** The redeal's shuffle + deal timeline runs at this multiple of the table's speed factor. */
+export const MISDEAL_DEAL_SPEED = 0.7;
+
+export function misdealRevealMs(reduced: boolean = fx.osReducedMotion): number {
+  return reduced ? MISDEAL_REVEAL_REDUCED_MS : MISDEAL_REVEAL_MS;
+}
+
+/** How long the redeal's shuffle + deal flight runs (ms) at the table's speed factor `k`. */
+export function misdealDealMs(k: number, players: number, cards: number): number {
+  return dealTimeline(k * MISDEAL_DEAL_SPEED, players, cards).total * 1000 + 150;
+}
+
+/** The full misdeal moment (ms): announcement/gather + the redeal. Sources hold play this long. */
+export function misdealSequenceMs(k: number, players: number, cards: number, reduced: boolean = fx.osReducedMotion): number {
+  if (reduced) return MISDEAL_REVEAL_REDUCED_MS;
+  return misdealRevealMs(false) + misdealDealMs(k, players, cards);
+}
+
+/** Identity of one thrown hand, so each reveal is shown once (a resume mid-beat may show it again, briefly). */
+export function misdealRevealKey(handNo: number, reveal: { seat: number; cards: readonly string[] } | null | undefined): string | null {
+  return reveal ? `${handNo}:${reveal.seat}:${reveal.cards.join('.')}` : null;
+}
+
+/**
+ * The thrown-in hand a fan may hold during the gather beat: the snapshot taken from the last
+ * committed render before the swap, valid only for the hand it was taken from (a misdeal
+ * keeps the hand number, so a snapshot from another hand is stale and must not be shown).
+ */
+export function heldHandForThrowIn<T>(snapshot: { handNo: number; cards: T[] } | null, handNo: number): T[] | null {
+  return snapshot && snapshot.handNo === handNo ? snapshot.cards : null;
+}
+
+/**
+ * Which hand the local fan shows while a redeal sequence runs. Outside the gather beat (and
+ * whenever the view carries no hand at all — spectator, an unrevealed Blind Nil) it is the
+ * live hand, untouched. During the gather it is the thrown-in hand — or, with no snapshot
+ * to hold, an honestly empty fan: never the redealt hand, which only the deal flight deals.
+ */
+export function misdealFanHand<T>(gathering: boolean, heldHand: T[] | null, liveHand: T[] | null): T[] | null {
+  if (!gathering || !liveHand) return liveHand;
+  return heldHand ?? [];
+}

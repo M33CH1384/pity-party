@@ -1,0 +1,101 @@
+/* Spray-paint screen transition (spray.ts / SprayLayer.tsx): one fixed
+   layer above every surface (app max is z-index 1300) for the ~1.79 s
+   of a spray. Pointer events are set inline per phase — auto (locked)
+   only while covering, none while the paint dissolves. touch-action:
+   none keeps the cover instant from starting a scroll of the screen
+   underneath.
+
+   V4 is compositor-driven: the layer is DOM + SVG, and every moving
+   part is a Web Animations tween of transform, opacity, clip-path or
+   stroke-dashoffset over static pre-rendered textures — the layer
+   holds no painting surface of its own (three per-frame-paint
+   generations all dropped frames on the owner's iPhone). The
+   will-change hints keep the animated pieces on their own
+   compositor layers. */
+.spray-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  touch-action: none;
+}
+.spray-spadebox {
+  position: absolute;
+}
+.spray-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: visible;
+}
+.spray-front {
+  position: absolute;
+  top: 0;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.spray-dab {
+  position: absolute;
+  left: 0;
+  top: 0;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.spray-dab-in,
+.spray-dab-puff {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: translate(-50%, -50%);
+}
+.spray-dab-puff {
+  transform: translate(-50%, -50%) scale(1.6);
+  opacity: 0.22;
+}
+.spray-bloom {
+  position: absolute;
+  border-radius: 50%;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.spray-rv {
+  position: absolute;
+  inset: 0;
+  background: #070708;
+  will-change: opacity, transform;
+}
+
+/* Ink Bloom (the Neon skin): same layer, ink-dark paint. The grain
+   layers carry a deep navy-violet body under their static masks so
+   the dissipating field reads as ink thinning in water, never grey. */
+.ink-rv {
+  background: #04050e;
+}
+.ink-rv-grain {
+  background: linear-gradient(160deg, #120a2e 0%, #04050e 70%);
+}
+.ink-splats {
+  position: absolute;
+  inset: -6%;
+  background-size: cover;
+  background-position: center;
+  mix-blend-mode: screen;
+  will-change: opacity;
+  pointer-events: none;
+}
+.ink-blob {
+  position: absolute;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  will-change: transform, opacity;
+  pointer-events: none;
+}

@@ -1,0 +1,238 @@
+/**
+ * Online browser test: two headless Chrome contexts (fake camera/mic) play on one table through the real Worker.
+ *  - host creates a table, guest joins via the invite link and picks the partner seat; 2 bots fill in
+ *  - both turn their camera on; each must receive the other's live video (WebRTC P2P, signaling via the DO)
+ *  - play part of a hand via the UI, guest REFRESHES mid-game and lands back in the same seat, video reconnects
+ *  - screenshots → screenshots/online/
+ * Usage: node scripts/online-browser.mjs [webUrl=http://localhost:4173] [serverUrl] [chrome=/usr/bin/google-chrome]
+ */
+import { chromium } from 'playwright-core';
+import { mkdirSync } from 'node:fs';
+
+const web = process.argv[2] ?? 'http://localhost:4173';
+const server = process.argv[3] ?? '';
+const executablePath = process.argv[4] ?? '/usr/bin/google-chrome';
+// optional test relay (see scripts/turn-local.mjs): TURN='[{"urls":"turn:172.30.0.2:3478","username":"bwm","credential":"test"}]'
+const turn = process.env.TURN ?? '';
+const out = 'screenshots/online';
+mkdirSync(out, { recursive: true });
+const t0 = Date.now();
+const log = (...a) => console.log(`[${((Date.now() - t0) / 1000).toFixed(1)}s]`, ...a);
+
+const browser = await chromium.launch({
+  executablePath,
+  args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--enable-webgl',
+    '--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream', '--autoplay-policy=no-user-gesture-required'],
+});
+const errors = [];
+process.on('exit', (code) => { if (code && errors.length) console.error('Browser errors so far:\n' + errors.slice(0, 20).join('\n')); });
+async function newPage(label) {
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, permissions: ['camera', 'microphone'] });
+  const page = await ctx.newPage();
+  await page.addInitScript(() => { try { if (!localStorage.getItem('bwm.tips')) localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true })); } catch { /* */ } });
+  page.on('pageerror', (e) => errors.push(`${label}: ${e}`));
+  page.on('console', (m) => { if (process.env.DEBUG) console.log(label, m.type(), m.text()); if (m.type() === 'error' && !/WebSocket|favicon|net::ERR/.test(m.text())) errors.push(`${label}: ${m.text()}`); });
+  return page;
+}
+const qs = new URLSearchParams();
+if (server) qs.set('server', server);
+if (turn) qs.set('turn', turn);
+const q = qs.size ? `?${qs}` : '';
+const host = await newPage('host');
+const guest = await newPage('guest');
+
+// --- host creates a table
+await host.goto(`${web}/${q}`);
+await host.getByTestId('play-online').click();
+await host.getByTestId('mode-joker').click();
+await host.getByLabel('Your name').fill('Demetrius');
+await host.getByTestId('create-table').click();
+await host.getByTestId('lobby').waitFor({ timeout: 20000 });
+const code = (await host.getByTestId('room-code').locator('b').innerText()).trim();
+log('table', code);
+await host.getByTestId('lobby-seat-0').getByText('You').waitFor();
+
+// --- guest joins with the invite link and moves to the partner seat
+await guest.goto(`${web}/t/${code}${q}`);
+await guest.getByLabel('Your name').fill('Keisha');
+await guest.getByRole('button', { name: `Join table ${code}` }).click();
+await guest.getByTestId('lobby').waitFor({ timeout: 20000 });
+await guest.getByTestId('lobby-seat-2').getByRole('button', { name: 'Sit here' }).click();
+await guest.getByTestId('lobby-seat-2').getByText('You').waitFor();
+await host.getByTestId('lobby-seat-2').getByText('Keisha').waitFor();
+log('guest seated across (partner)');
+
+// partner mic mute: a host option, off by default; the guest sees the host's choice (read-only)
+const mmGuest = guest.getByTestId('mic-mute-summary');
+await mmGuest.getByText('Partner mic mute: Off').waitFor({ timeout: 5000 });
+if ((await host.locator('details.settings-panel').getAttribute('open')) === null) await host.locator('details.settings-panel > summary').click();
+const mmToggle = host.getByTestId('mic-mute-toggle');
+if ((await mmToggle.getAttribute('aria-checked')) !== 'false') throw new Error('partner mic mute should default to off');
+await mmToggle.click();
+await mmGuest.getByText('Partner mic mute: On').waitFor({ timeout: 5000 });
+await host.locator('[data-testid="mic-mute-toggle"][aria-checked="true"]').waitFor({ timeout: 5000 }).catch(() => { throw new Error('partner mic mute toggle did not turn on'); });
+log('partner mic mute: off by default, host turned it on, guest sees "On"');
+
+// chat round trip
+// phones: chat is a bottom tab → drawer (one tap)
+for (const p of [guest, host]) if (await p.getByTestId('lobby-chat-tab').count()) await p.getByTestId('lobby-chat-tab').click();
+await guest.getByLabel('Chat message').fill('yo what up');
+await guest.getByLabel('Chat message').press('Enter');
+await host.locator('.lobby-chat').getByText('yo what up').waitFor({ timeout: 5000 });
+for (const p of [guest, host]) if (await p.getByTestId('lobby-chat-tab').count()) await p.getByTestId('lobby-chat-tab').click();
+log('lobby chat round trip (phone chat drawer)');
+
+// --- cameras on (fake devices); each must see the other's live video
+// (clicks are retried: the lobby can shift by a line while chat/state updates arrive)
+async function toggle(page, from, to) {
+  for (let i = 0; i < 4; i++) {
+    await page.getByRole('button', { name: from }).click();
+    try { await page.getByRole('button', { name: to }).waitFor({ timeout: 4000 }); return; } catch { /* retry */ }
+  }
+  throw new Error(`could not toggle ${from}`);
+}
+await toggle(host, 'Turn camera on', 'Turn camera off');
+await toggle(host, 'Turn microphone on', 'Mute microphone');
+await toggle(guest, 'Turn camera on', 'Turn camera off');
+const liveRemote = (page) => page.waitForFunction(() => {
+  const v = document.querySelector('[data-testid^="video-"][data-live="true"] video');
+  return !!v && v.videoWidth > 0 && v.readyState >= 2;
+}, null, { timeout: 30000 });
+try {
+  await Promise.all([liveRemote(host), liveRemote(guest)]);
+} catch (e) {
+  if (process.env.NO_RTC) { log('video: SKIPPED live-remote check (NO_RTC=1: this sandbox gathers no ICE candidates)'); } else {
+  for (const [n, p] of [['host', host], ['guest', guest]]) console.log(n, JSON.stringify(await p.evaluate(() => ({ d: window.__bwmVideo?.debug(), s: { cam: window.__bwmVideo?.state.cam, mic: window.__bwmVideo?.state.mic, err: window.__bwmVideo?.state.error } })), null, 1));
+  console.log(errors);
+  throw e;
+  }
+}
+if (!process.env.NO_RTC) log('video: both sides receive live remote video');
+await host.mouse.click(5, 5); // first tap unmutes remote audio (iOS-style)
+await host.waitForTimeout(800);
+await host.screenshot({ path: `${out}/01-lobby-host.png` });
+await guest.screenshot({ path: `${out}/02-lobby-guest.png` });
+
+// --- start (2 bots fill seats 2 and 4)
+await host.getByTestId('start').click();
+await Promise.all([host.locator('.table-screen').waitFor({ timeout: 20000 }), guest.locator('.table-screen').waitFor({ timeout: 20000 })]);
+log('game started');
+
+const legal = (p) => p.locator('[data-testid^="card-"][data-legal="true"]');
+async function step(p) {
+  const next = p.locator('[data-testid="talk-ready"]:not([disabled])');
+  if (await next.count()) { await next.click({ timeout: 2000 }).catch(() => {}); return 'next'; }
+  const see = p.getByRole('button', { name: 'See my cards' });
+  if (await see.count()) { await see.click({ timeout: 2000 }).catch(() => {}); return 'see'; }
+  const bid = p.locator('.bid-grid button');
+  if (await bid.count()) { await bid.nth(Math.min(2, (await bid.count()) - 1)).click({ timeout: 2000 }).catch(() => {}); return 'bid'; }
+  const l = legal(p);
+  if (await l.count()) { const c = l.last(); await c.dispatchEvent('click'); await c.dispatchEvent('click').catch(() => {}); return 'play'; }
+  return null;
+}
+async function playUntil(cond, ms = 240000) {
+  const end = Date.now() + ms;
+  let plays = 0;
+  while (Date.now() < end) {
+    if (await cond()) return plays;
+    for (const p of [host, guest]) { const r = await step(p); if (r === 'play') plays++; }
+    await host.waitForTimeout(60);
+  }
+  await host.screenshot({ path: `${out}/timeout-host.png` }); await guest.screenshot({ path: `${out}/timeout-guest.png` });
+  throw new Error('playUntil timed out');
+}
+const trickCount = (p) => p.getByTestId('hand').getAttribute('data-trick-count').then(Number).catch(() => 0);
+const piles = (p) => p.locator('[data-testid="last-trick"]').count();
+
+// play into the first hand until a couple of tricks are done
+await playUntil(async () => (await piles(host)) > 0 && (await trickCount(host)) >= 2);
+await host.waitForTimeout(400);
+await host.screenshot({ path: `${out}/03-table-host-video.png` });
+await guest.screenshot({ path: `${out}/04-table-guest-video.png` });
+// voice anti-cheat (host turned partner mic mute on): host + guest are partners → limited to each other during play
+const lim = await host.evaluate(() => window.__bwmVideo?.state.limited ?? []);
+if (lim.length !== 1) throw new Error(`partners should be mic-limited during play, got ${JSON.stringify(lim)}`);
+if (!(await host.getByTestId('mic-limited').count())) throw new Error('MIC LIMITED badge missing (host mic is on)');
+log('voice: partners limited during play, MIC LIMITED badge shown');
+const bubbles = await host.locator(process.env.NO_RTC ? '.badge-layer [data-testid^="video-"]' : '.badge-layer [data-testid^="video-"][data-live="true"]').count();
+const selfView = await host.getByTestId('self-video').count();
+log(`table: host sees ${bubbles} live remote bubble(s) on seat plates, self-view ${selfView ? 'on' : 'off'}`);
+if (!bubbles || !selfView) throw new Error('video bubbles missing on the table');
+
+// --- guest refreshes mid-game → back in the same seat with the same cards
+const handBefore = (await guest.locator('[data-testid^="card-"]').evaluateAll((els) => els.map((e) => e.dataset.testid).sort())).join();
+await guest.reload();
+await guest.locator('.table-screen').waitFor({ timeout: 20000 }).catch(async (e) => {
+  await guest.screenshot({ path: `${out}/debug-refresh-guest.png` }).catch(() => {});
+  console.log('guest after refresh:', (await guest.locator('body').innerText().catch(() => '?')).slice(0, 400));
+  throw e;
+});
+await guest.waitForFunction(() => document.querySelectorAll('[data-testid^="card-"]').length > 0, null, { timeout: 15000 });
+const handAfter = (await guest.locator('[data-testid^="card-"]').evaluateAll((els) => els.map((e) => e.dataset.testid).sort())).join();
+log(`guest refreshed: back at the table, ${handAfter === handBefore ? 'same cards' : 'cards changed (a turn may have auto-played)'}; partner plate shows "${await guest.locator('[data-testid="seat-2"] .plate-name').innerText()}"`);
+const handAfterSet = new Set(handAfter.split(','));
+if (![...handAfterSet].every((c) => handBefore.split(',').includes(c))) throw new Error('refresh landed on a different hand');
+// camera is off after a refresh (by design); turn it back on → host gets video again via a fresh peer connection
+await toggle(guest, 'Turn camera on', 'Turn camera off');
+if (!process.env.NO_RTC) { await liveRemote(host); await liveRemote(guest); log('video re-established after refresh'); }
+
+// finish the hand
+await playUntil(async () => (await host.getByTestId('talk-ready').count()) > 0);
+await host.waitForTimeout(1200);
+await host.screenshot({ path: `${out}/05-table-talk-host.png` });
+const talkLim = await host.evaluate(() => window.__bwmVideo?.state.limited ?? []);
+if (talkLim.length) throw new Error('mics should all be open during Table Talk');
+if (await host.getByTestId('talk-grid').count()) throw new Error('recap should not show the avatar grid');
+log(`Table Talk: chat behind the corner icon, all mics open, countdown "${await host.getByTestId('talk-count').innerText().catch(() => '?')}"`);
+await host.getByTestId('recap-chat').click();
+await host.locator('.chat.recap-chat input[aria-label="Chat message"]').fill('gg');
+await host.locator('.chat.recap-chat button[aria-label="Send"]').click();
+await guest.locator('.chat .chat-line', { hasText: 'gg' }).waitFor({ state: 'attached', timeout: 8000 });
+// (step() may already have pressed Ready for the host while playing into Table Talk)
+if (await host.getByTestId('talk-ready').isEnabled()) await host.getByTestId('talk-ready').click();
+await host.getByTestId('talk-ready-count').filter({ hasText: '1/2' }).waitFor({ timeout: 5000 });
+await guest.getByTestId('talk-ready').click({ timeout: 3000 }).catch(() => {});
+// partners may talk books while bidding: mics stay open until the first card is led, then the 'partners muted' toast
+await host.waitForFunction(() => /HAND 2\b/i.test(document.querySelector('.scorebug')?.textContent ?? ''), null, { timeout: 15000 }).catch(() => {});
+if ((await host.evaluate(() => window.__bwmVideo?.state.limited ?? [])).length && !(await host.locator('[data-testid^="card-"]').count())) throw new Error('partner mics should be open during bidding');
+await playUntil(async () => (await host.getByTestId('talk-over').count()) > 0, 30000);
+log('"First card\'s down — partner mics muted" toast once the first card was led (open during bidding)');
+// (the hand counter, not "a bid button is showing": step() may answer a bid before the condition gets to see it)
+await playUntil(async () => /HAND 2\b/i.test(await host.locator('.scorebug').first().innerText().catch(() => '')), 30000);
+log('hand 2 dealt');
+
+// lobby view while in game (menu) shows the code and "Back to the game"
+await host.getByRole('button', { name: 'Menu' }).click();
+await host.getByTestId('lobby').waitFor();
+await host.screenshot({ path: `${out}/06-lobby-during-game.png` });
+await host.getByRole('button', { name: 'Back to the game' }).click();
+await host.locator('.table-screen').waitFor();
+
+// host kicks the guest from the guest's bubble menu: one menu at a time, confirm, bot takes over, guest sees "removed"
+const gid = await guest.evaluate(() => window.__bwmVideo?.me ?? null).catch(() => null);
+const bubble = host.locator('[data-testid="seat-2"]').locator('.vb-hit, .vb-initial').first();
+// (software GL here: the host can drop to ~1 fps around a new deal, so wait generously)
+await bubble.waitFor({ timeout: 45000 }).catch(async (e) => {
+  console.log('seat-2 debug:', await host.locator('[data-testid="seat-2"]').evaluate((el) => {
+    const q = (s) => el.querySelector(s); const info = (e) => e && (() => { const r = e.getBoundingClientRect(), c = getComputedStyle(e); return `${e.className}: ${Math.round(r.x)},${Math.round(r.y)} ${Math.round(r.width)}x${Math.round(r.height)} d=${c.display} v=${c.visibility} o=${c.opacity} t=${c.transform} anim=${c.animationName}`; })();
+    return [info(el), info(q('.vbubble')), info(q('.vb-hit')), document.querySelector('.table-screen')?.className, document.querySelector('.modal, .sheet, [role=dialog]')?.className].join(' | ');
+  }).catch((x) => String(x)));
+  console.log('raf/2s:', await host.evaluate(() => new Promise((res) => { let n = 0; const t0 = performance.now(); const f = () => { n++; if (performance.now() - t0 < 2000) requestAnimationFrame(f); else res(n); }; requestAnimationFrame(f); setTimeout(() => res(`timeout n=${n}`), 6000); })).catch((x) => String(x)));
+  console.log('nuke:', await host.evaluate(() => JSON.stringify({ n: window.__bwmNuke, t: window.__bwmNukeT, vis: document.visibilityState, canv: document.querySelectorAll('canvas').length })));
+  await host.screenshot({ path: `${out}/debug-kick.png`, timeout: 8000 }).catch((x) => console.log('shot failed', String(x).slice(0, 200)));
+  throw e;
+});
+await bubble.click();
+await host.locator('.vb-menu').getByRole('button', { name: /^Kick/ }).click();
+await host.locator('[data-testid^="kick-yes-"]').click();
+await guest.getByTestId('kicked').waitFor({ timeout: 10000 });
+await host.locator('[data-testid="seat-2"] .plate-name').filter({ hasText: /bot/i }).waitFor({ timeout: 10000 }).catch(() => {});
+if (await host.locator('.vb-menu').count()) throw new Error('bubble menu should close after kicking');
+log(`host kicked the guest${gid ? ` (${gid})` : ''}: guest sees the "removed" screen, partner plate "${await host.locator('[data-testid="seat-2"] .plate-name').innerText()}"`);
+await guest.reload();
+await guest.getByTestId('kicked').waitFor({ timeout: 15000 });
+log('kicked guest cannot rejoin this game (refresh lands on the removed screen)');
+
+await browser.close();
+if (errors.length) { console.error('Browser errors:\n' + errors.join('\n')); process.exit(1); }
+log('PASS');

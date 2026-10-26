@@ -1,0 +1,153 @@
+/* The screen-transition family (transitions.ts) — layer styles for
+   every program except the spray/ink pair, which live in spray.css.
+   All motion here is WAAPI-driven transform/opacity (see the layer
+   components); these rules only paint the static pieces. */
+
+/* ------------------------------------------------ The Card Fan -- */
+.tfan-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  overflow: hidden;
+  touch-action: none;
+}
+.tfan-shade {
+  position: absolute;
+  inset: 0;
+  background: #070708;
+  will-change: opacity;
+}
+.tfan-neon .tfan-shade {
+  background: #04050e;
+}
+.tfan-card {
+  position: absolute;
+  border-radius: 12px;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 55%),
+    linear-gradient(155deg, #23304d 0%, #141d33 55%, #0d1424 100%);
+  border: 1px solid rgba(216, 182, 106, 0.55);
+  box-shadow:
+    inset 0 0 0 5px rgba(10, 14, 26, 0.85),
+    inset 0 0 0 6px rgba(216, 182, 106, 0.28),
+    0 18px 44px rgba(0, 0, 0, 0.5);
+  color: rgba(216, 182, 106, 0.30);
+  will-change: transform, opacity;
+}
+.tfan-neon .tfan-card {
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(91, 223, 255, 0.14), rgba(91, 223, 255, 0) 55%),
+    linear-gradient(155deg, #2a1656 0%, #170b38 55%, #0a0618 100%);
+  border-color: rgba(128, 84, 255, 0.65);
+  box-shadow:
+    inset 0 0 0 5px rgba(7, 9, 20, 0.85),
+    inset 0 0 0 6px rgba(91, 223, 255, 0.30),
+    0 18px 44px rgba(0, 0, 0, 0.55);
+  color: rgba(91, 223, 255, 0.34);
+}
+.tfan-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 52%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+/* ------------------------------------- The Deal + The Book Sweep -- */
+.tt-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  overflow: hidden;
+  touch-action: none;
+}
+.tt-felt {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 70% at 50% 42%, rgba(38, 84, 62, 0.5), rgba(0, 0, 0, 0) 70%),
+    linear-gradient(160deg, #0c1712 0%, #060a08 70%);
+  will-change: opacity;
+}
+.tt-card {
+  will-change: transform, opacity;
+}
+/* The scoop: a felt panel whose leading (left) edge carries a gold
+   bar and the won-book stack, like a hand gathering a trick. */
+.tt-scoop {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(90% 70% at 50% 42%, rgba(38, 84, 62, 0.35), rgba(0, 0, 0, 0) 70%),
+    linear-gradient(160deg, #0d130f 0%, #070908 70%);
+  will-change: transform, opacity;
+}
+.tt-scoop-edge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: linear-gradient(180deg, rgba(216, 182, 106, 0), rgba(216, 182, 106, 0.85) 30%, rgba(216, 182, 106, 0.85) 70%, rgba(216, 182, 106, 0));
+}
+.tt-stack {
+  position: absolute;
+  left: 26px;
+  top: 50%;
+  margin-top: -12%;
+}
+.tt-stack-card {
+  position: absolute;
+  inset: 0;
+}
+
+/* ------------------------------------------------ The Doorway -- */
+.tdoor-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  overflow: hidden;
+  touch-action: none;
+  perspective: 1100px;
+}
+.tdoor-shade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 100% at 58% 42%, #2a1608 0%, #140b06 62%);
+  will-change: opacity;
+}
+.tdoor-glow {
+  position: absolute;
+  left: 58%;
+  top: 46%;
+  width: 92vmin;
+  height: 92vmin;
+  background: radial-gradient(circle, rgba(255, 179, 92, 0.5) 0%, rgba(255, 138, 60, 0.18) 45%, rgba(255, 138, 60, 0) 70%);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.tdoor-light {
+  position: absolute;
+  top: -4%;
+  bottom: -4%;
+  right: 42%;
+  width: 66%;
+  transform-origin: 100% 50%;
+  background: linear-gradient(270deg, #ffd9a0 0%, rgba(255, 179, 92, 0.78) 30%, rgba(255, 138, 60, 0.3) 66%, rgba(255, 138, 60, 0) 100%);
+  clip-path: polygon(0 5%, 100% 0, 100% 100%, 0 95%);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.tdoor-panel {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 58%;
+  width: 44%;
+  transform-origin: 100% 50%;
+  background: linear-gradient(100deg, #2b1a0a 0%, #1a0f05 55%, #120a03 100%);
+  border-left: 2px solid rgba(255, 217, 160, 0.85);
+  box-shadow: -18px 0 44px rgba(255, 160, 70, 0.25);
+  will-change: transform, opacity;
+}
