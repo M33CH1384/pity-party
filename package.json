@@ -7,7 +7,7 @@
   "scripts": {
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "typecheck": "tsc -p packages/rules && tsc -p packages/bots && tsc -p packages/protocol && tsc -p apps/web --noEmit && tsc -p apps/server --noEmit",
+    "typecheck": "tsc -p packages/game && tsc -p packages/rules && tsc -p packages/bots && tsc -p packages/protocol && tsc -p apps/web --noEmit && tsc -p apps/server --noEmit",
     "simulate": "tsx scripts/simulate.ts",
     "dev": "pnpm --filter @pp/web dev",
     "build": "pnpm --filter @pp/web build",

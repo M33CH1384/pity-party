@@ -5,7 +5,7 @@ export default defineConfig({
     include: ['packages/*/test/**/*.test.ts', 'apps/*/test/**/*.test.ts'],
     coverage: {
       provider: 'v8',
-      include: ['packages/rules/src/**', 'packages/bots/src/**'],
+      include: ['packages/game/src/**', 'packages/rules/src/**', 'packages/bots/src/**'],
       reporter: ['text-summary', 'text'],
     },
   },
