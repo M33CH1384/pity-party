@@ -9,6 +9,7 @@ Shared: 52-card deck, no jokers by default; seeded shuffle; dealer rotates left;
 - Players 2–4 [V PAGAT-PP, RRB-PP]; 5 allowed [V DNX-PP]. Default 4.
 - Deal 5 each, one at a time from dealer's left [V RRB-PP, DNX-PP]. Rest = stock; flip top card = upcard (starts discard pile) [V all].
 - Suits irrelevant; only rank matters [V RRB-PP].
+- **Deuces wild** (Demetrius 2026-10-26, default on, option `deucesWild`): a 2 pairs with any card — a 2 in hand pairs with any upcard, and any card pairs with a 2 upcard. Goal unchanged: get to zero cards first.
 ### Turn flow (state machine)
 ```
 DEAL → [CHECK_DEALT_WIN] → TURN(seat)
@@ -64,6 +65,10 @@ Each reading below is the default of a setup option in `PITTY_PAT_OPTIONS` (pack
 | 5 | Hands-won game coins | game winner gets ante × (players − 1), everyone else pays the ante; a tie pays nothing | `handsWonPayout` = antePerOpponent | none |
 | 6 | Hands won + "last with coins" (no coins in play) | ends at first to N wins | `handsWonEnd` = firstToWins | fixedHands: after N hands |
 | 7 | may-pair: declining before any flip | you flip instead (after a flip, declining = pass) | `declineAction` = flip | pass |
+| W1 | Deuces wild | on | `deucesWild` | off (a 2 is just a 2) |
+| W2 | Can a 2 pair with another 2 | yes | `deuceOnDeuce` | no (a 2 still pairs with any natural) |
+| W3 | Do deuces count for a win on the deal (and for held pairs going out) | yes, for the deal | `dealtWinWild` | no: the deal check uses natural pairs only (held pairs going out mid-hand still use wilds when `deucesWild` is on) |
+| W4 | Trips with wilds (`tripsAsOne` on) | only two naturals of the upcard's rank shed as trips; a 2 always pairs one card; a 2 upcard never makes trips | — (follows `tripsAsOne`) | — |
 | 8 | Max players / hand size | engine 2–5 (online tables seat 4); 5 cards | table seats, `handSize` = 5 | 7 |
 Table pacing (not a rule): `pauseBetweenHands` (default off) holds each hand's result until the winner (or the next dealer after a void) taps Next hand.
 Engine bounds (keep every option combination finite): 200 hands per game, 2000 moves per hand (then void), 60 flips per turn in until-match, 5 redeals on a dealt-win tie.
