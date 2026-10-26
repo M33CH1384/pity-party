@@ -1,3 +1,4 @@
+import { defaultRules } from '@pp/rules';
 import type { ClientMsg, ServerMsg } from '@pp/protocol';
 import { createRng } from '@pp/rules';
 import { DEFAULT_TIMING, Room, type RoomData, type RoomIO, type RoomTiming, newRoomData } from '../src/room';
@@ -16,9 +17,8 @@ export class FakeEnv {
   room: Room;
   tourResults: { match: string; scores: number[]; places: number[] }[] = [];
   challengeResults: import('../src/room').ChallengeResult[] = [];
-  storyResults: import('../src/room').StoryRoomResult[] = [];
-  records: { rec: import('../src/stats/record').GameRecord; rated: boolean; meta?: import('../src/stats/record').SaveMeta }[] = [];
-  highlights: import('../src/stats/highlights').HighlightEvent[] = [];
+  /** generic per-game stats records (modeGameOver) */
+  records: import('../src/room').ModeGameRecord[] = [];
   /** The DO's socket close can re-enter the room. Tests set this to simulate that. */
   onClose?: (cid: string) => void;
   timing: RoomTiming;
@@ -27,7 +27,7 @@ export class FakeEnv {
     // The suite was written against instant first deals: the pre-deal setup window
     // defaults OFF here and is exercised explicitly by pre-deal.test.ts.
     this.timing = { preDealMs: 0, ...timing };
-    this.room = new Room(data ?? newRoomData('ABCDE', this.t), this.io(), this.timing);
+    this.room = new Room(data ?? newRoomData('ABCDE', this.t, defaultRules('joker')), this.io(), this.timing);
   }
 
   io(): RoomIO {
@@ -45,11 +45,9 @@ export class FakeEnv {
       // match the DO: a later alarm does not postpone an earlier one; clearing is a no-op
       setAlarm: (at) => { if (at === null || (this.alarm !== null && this.alarm <= at)) return; this.alarm = at; this.alarmSets++; },
       persist: () => { this.persists++; },
-      gameOver: (rec, rated, meta) => { this.records.push({ rec, rated, meta }); },
-      highlight: (ev) => { this.highlights.push(ev); },
+      modeGameOver: (rec) => { this.records.push(rec); },
       tournamentResult: (t, scores, places) => { this.tourResults.push({ match: t.match, scores, places }); },
       challengeResult: (_c, r) => { this.challengeResults.push(r); },
-      storyResult: (r) => { this.storyResults.push(r); },
       randomId: () => Array.from({ length: 4 }, () => this.rng.nextUint32().toString(16).padStart(8, '0')).join(''),
     };
   }

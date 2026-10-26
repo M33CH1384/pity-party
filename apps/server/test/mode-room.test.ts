@@ -54,7 +54,14 @@ describe('registry-mode rooms (placeholder via @pp/game)', () => {
     expect(s.mode!.results.done).toBe(true);
     expect(s.mode!.results.deltas.reduce((x, y) => x + y, 0)).toBe(0);
     expect((s.mode!.view as HcView).wins.reduce((x, y) => x + y, 0)).toBe(3);
-    expect(env.records).toHaveLength(0); // no Spades stats record for registry modes
+    // one generic stats record per finished game: seats, placements, coin changes, recap
+    expect(env.records).toHaveLength(1);
+    const rec = env.records[0]!;
+    expect(rec).toMatchObject({ room: 'ABCDE', modeId: 'placeholder', options: { handSize: 3 } });
+    expect(rec.seats.map((x) => x.bot)).toEqual([false, false, true, true]);
+    expect(rec.seats[0]!.name).toBe('P0');
+    expect(rec.deltas).toEqual(s.mode!.results.deltas);
+    expect(rec.placements).toEqual(s.mode!.results.placements);
     // rematch deals a fresh game
     env.send('a', { t: 'rematch' });
     expect(st(env, 'a').room.phase).toBe('playing');

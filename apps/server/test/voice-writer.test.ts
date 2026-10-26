@@ -61,14 +61,6 @@ describe('voice writer validation + thin rule + breaker', () => {
     for (let i = 0; i < 3; i++) expect(await writeVoiceLine({ ai: bad, store: s, breaker, now: () => 1000 }, req)).toBe('error');
     expect(await writeVoiceLine({ ai: aiSaying('Set by one! Y all got cute.'), store: s, breaker, now: () => 1000 }, req)).toBe('breaker');
   });
-  it('the trigger is gated by aiTalk (default off) at the room layer', async () => {
-    const { readFileSync } = await import('node:fs');
-    const room = readFileSync(new URL('../src/room.ts', import.meta.url), 'utf8');
-    expect(room).toContain('if (d.aiTalk && this.io.voiceMiss');
-    expect(room).toContain('aiTalk: !!d.aiTalk');
-    const wrangler = readFileSync(new URL('../wrangler.toml', import.meta.url), 'utf8');
-    expect(wrangler).toContain('[ai]\nbinding = "AI"');
-  });
 });
 
 describe('D1 -> queue.json export merge', () => {

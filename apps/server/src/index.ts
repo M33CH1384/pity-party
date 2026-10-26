@@ -38,13 +38,15 @@ import { saveRecord } from './stats/record';
 import { recordHighlight, wireText } from './stats/highlights';
 import { backfillHomiesOnce } from './stats/backfill';
 import { handleTournaments } from './tournament/routes';
+import { FEATURES, featureOff } from './features';
 import type { TOp } from './tournament/do';
 import { handleWagerChallenges } from './wager/routes';
 import type { WOp } from './wager/do';
 import { type PushEnv, handlePushHttp } from './push/routes';
 import { notifyDm, notifyFriendsOfOnline, notifyInvite, notifyMention, notifyTurn, pushVapid, runScheduledPushes, sendCredPushEvent } from './push/notify';
 import { blockedBetween, usersByKeys } from './social/mentions';
-import type { TableRules } from '@pp/rules';
+import { defaultRules, type TableRules } from '@pp/rules'; // TODO(rebuild): table rules shell still borrows @pp/rules
+import { saveModeGame } from './stats/mode-games';
 export { TournamentDO } from './tournament/do';
 import type { TournamentDO } from './tournament/do';
 export { ChallengeDO } from './wager/do';
@@ -255,6 +257,7 @@ export default {
     }
 
     if (parts[1] === 'tournaments') {
+      if (!FEATURES.tournaments) return featureOff(); // TODO(rebuild): docs/plan/REBUILD.md
       const slow = await limited(req, env, req.method === 'POST' && !parts[2] ? 'create' : 'info');
       if (slow) return slow;
       return handleTournaments(req, env, url, parts, Date.now(), (id, op: TOp) =>
@@ -262,6 +265,7 @@ export default {
     }
 
     if (parts[1] === 'wager-challenges') {
+      if (!FEATURES.wagers) return featureOff(); // TODO(rebuild): docs/plan/REBUILD.md
       const slow = await limited(req, env, req.method === 'POST' && !parts[2] ? 'create' : 'info');
       if (slow) return slow;
       return handleWagerChallenges(req, env, url, parts, Date.now(), (id, op: WOp) =>
@@ -403,31 +407,11 @@ export class TableDO extends DurableObject<Env> {
       setAlarm: (at) => this.armAlarm(at),
       persist: () => this.scheduleSave(),
       randomId: () => crypto.randomUUID().replace(/-/g, ''),
-      gameOver: (rec, rated, meta) => {
+      // generic stats record per finished mode game (migration 0034). TODO(rebuild): rated games/Elo, cred
+      // push events and live highlights hung off the Spades gameOver/highlight hooks (docs/plan/REBUILD.md).
+      modeGameOver: (rec) => {
         if (!this.env.DB) return;
-        const db = this.env.DB;
-        this.ctx.waitUntil((async () => {
-          const events = await saveRecord(db, rec, rated, meta).catch((e) => { console.error('saveRecord', e); return []; });
-          if (!events.length) return;
-          const vapid = pushVapid(this.env);
-          if (!vapid) return; // VAPID secrets not configured yet
-          const now = Date.now();
-          for (const ev of events) await sendCredPushEvent(db, vapid, ev, now);
-        })());
-      },
-      // Live highlights (league data wave 6b): store for the ticker in
-      // waitUntil — never on the game path. Marquee events (item 7) ALSO go
-      // to global chat as a League Wire line via the Social hub, which
-      // dedupes by event id and caps the cadence.
-      highlight: (ev) => {
-        if (this.env.DB) {
-          const db = this.env.DB;
-          this.ctx.waitUntil(recordHighlight(db, ev).catch((e) => console.error('highlight', e)));
-        }
-        if (ev.marquee && this.env.SOCIAL) {
-          const stub = this.env.SOCIAL.get(this.env.SOCIAL.idFromName('hub'));
-          this.ctx.waitUntil(stub.fetch('https://social/wire', { method: 'POST', body: JSON.stringify({ id: ev.id, text: wireText(ev) }) }).then(() => undefined).catch((e) => console.error('wire', e)));
-        }
+        this.ctx.waitUntil(saveModeGame(this.env.DB, rec).catch((e) => console.error('saveModeGame', e)));
       },
       // Voice (c): a thin catalog bucket -> one writer call in waitUntil (never on the game path).
       voiceMiss: (req: WriterRequest) => { if (this.env.AI && this.env.DB) this.ctx.waitUntil(writeVoiceLine({ ai: this.env.AI, store: new D1QueueStore(this.env.DB), breaker: voiceBreaker }, req).then(() => undefined).catch((e) => console.error('voiceWriter', e))); },
@@ -482,7 +466,7 @@ export class TableDO extends DurableObject<Env> {
         const op: WOp = { op: 'result', result: r };
         this.ctx.waitUntil(stub.fetch('https://challenge/op', { method: 'POST', body: JSON.stringify(op) }).then(() => undefined).catch((e) => console.error('challengeResult', e)));
       },
-    }, data.tournament?.fast && this.env.TEST_HOOKS === '1' ? FAST_TIMING : undefined);
+    });
   }
 
   /** Release 10: Open tables. Only changes are sent (ignoring the timestamp), at most one report per 1.5 s per table. */
@@ -564,57 +548,24 @@ export class TableDO extends DurableObject<Env> {
     const code = url.searchParams.get('code') ?? '';
     if (url.pathname === '/create') {
       if (this.room) return new Response('exists', { status: 409 });
-      this.attach(newRoomData(code, Date.now()));
+      this.attach(newRoomData(code, Date.now(), defaultRules('joker')));
       this.flush();
       // garbage-collect the table if it's never used
       this.armAlarm(Date.now() + IDLE_DELETE_MS);
       return new Response('created', { status: 201 });
     }
-    if (url.pathname === '/tournament-setup' && req.method === 'POST') {
-      // internal only (TournamentDO → table); not routed from the public Worker
-      if (this.room) return new Response('exists', { status: 409 });
-      const b = await req.json() as { tid: string; name: string; match: string; rules: TableRules; reserved: ({ uid: string; name: string } | null)[]; autostartAt: number; bots: boolean; fast?: boolean };
-      const data = newRoomData(code, Date.now());
-      data.tournament = { id: b.tid, match: b.match, name: b.name, reserved: b.reserved, autostartAt: b.autostartAt, bots: b.bots, ...(b.fast ? { fast: true } : {}) };
-      this.attach(data);
-      this.room!.setupTournament(data.tournament, b.rules);
-      this.flush();
-      return new Response('created', { status: 201 });
-    }
-    if (url.pathname === '/challenge-setup' && req.method === 'POST') {
-      // internal only (ChallengeDO → table); not routed from the public Worker
-      if (this.room) return new Response('exists', { status: 409 });
-      const b = await req.json() as { cid: string; rules: TableRules; reserved: ({ uid: string; name: string } | null)[]; autostartAt: number; teamNames?: [string | null, string | null] };
-      const data = newRoomData(code, Date.now());
-      data.challenge = { id: b.cid, reserved: b.reserved, autostartAt: b.autostartAt, ...(b.teamNames ? { teamNames: b.teamNames } : {}) };
-      this.attach(data);
-      this.room!.setupChallenge(data.challenge, b.rules);
-      this.flush();
-      return new Response('created', { status: 201 });
-    }
-    if (url.pathname === '/test-state' && req.method === 'POST') {
-      // only reachable through the TEST_HOOKS-gated route above
-      if (this.env.TEST_HOOKS !== '1' || !this.room) return new Response('not found', { status: 404 });
-      this.room.testLoadGame(await req.json());
-      return new Response('ok');
+    if (url.pathname === '/tournament-setup' || url.pathname === '/challenge-setup' || url.pathname === '/test-state') {
+      // TODO(rebuild, docs/plan/REBUILD.md): tournament / Big Bank table setup and the Spades test-state loader
+      // are off until those features are rebuilt on the registry.
+      return new Response('feature off', { status: 503 });
     }
     if (url.pathname === '/info') {
       if (!this.room) return Response.json({ exists: false }, { status: 404 });
       return Response.json({ exists: true, ...this.room.summary() });
     }
     if (url.pathname === '/handlog') {
-      // Hand-history log for testing (Demetrius 2026-10-19): ground truth of the current game.
-      // The outer Worker forwards the verified ticket as x-uid and marks x-admin for admins.
-      if (!this.room) return Response.json({ error: 'no such table' }, { status: 404 });
-      if (req.headers.get('x-admin') !== '1') {
-        const uid = req.headers.get('x-uid');
-        const d = this.room.data;
-        const participant = !!uid && Object.values(d.members).some((m) => m.uid === uid);
-        if (!participant) return Response.json({ error: 'not found' }, { status: 404 });
-      }
-      const log = this.room.handLogJson();
-      if (!log) return Response.json({ error: 'no game yet' }, { status: 404 });
-      return Response.json(log, { headers: { 'cache-control': 'no-store' } });
+      // TODO(rebuild, docs/plan/REBUILD.md): hand log returns per mode
+      return Response.json({ error: 'hand log is off for now' }, { status: 503 });
     }
     if (url.pathname === '/ws') {
       if (!this.room) return new Response('no such table', { status: 404 });
