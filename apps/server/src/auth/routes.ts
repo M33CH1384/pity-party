@@ -166,6 +166,19 @@ async function deleteUser(db: D1Database, userId: string): Promise<void> {
     db.prepare('DELETE FROM tournament_players WHERE user_id = ?').bind(userId),
     db.prepare('DELETE FROM awards WHERE user_id = ?').bind(userId),
     db.prepare('DELETE FROM tournaments WHERE host_id = ?').bind(userId),
+    // tables added later (0016-0028) that reference users(id) WITHOUT a cascade: they must go first or the users
+    // delete fails the FK check (live 500 on 2026-10-26: last_seen + presence rows from simply being online)
+    db.prepare('DELETE FROM last_seen WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM presence WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM game_claims WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM story_tracks WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM story_progress WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM story_claims WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM story_finds WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM story_sessions WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM story_room_results WHERE uid_a = ? OR uid_b = ?').bind(userId, userId),
+    db.prepare('DELETE FROM wager_challenge_players WHERE user_id = ?').bind(userId),
+    db.prepare('DELETE FROM wager_challenges WHERE challenger_id = ?').bind(userId),
     db.prepare("UPDATE games SET seats = replace(seats, ?, 'deleted') WHERE instr(seats, ?) > 0").bind(userId, userId),
     db.prepare('DELETE FROM users WHERE id = ?').bind(userId),
   ]);
