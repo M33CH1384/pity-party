@@ -12,13 +12,13 @@
    "gameTarget": 6
   }
  },
- "moves": 364,
- "moveLog": "0:drawStock 0:spread:7D+7S+7H 0:discard:10S 1:drawStock 1:discard:10C 2:drawStock 2:hit:7C@1 2:discard:QS 3:drawStock 3:discard:KD 0:drawStock 0:discard:9H 1:drawStock 1:discard:JH 2:drawStock 2:discard:QH 3:drawStock 3:discard:5H 0:drawStock 0:discard:8H 1:drawStock 1:discard:QC 2:drawStock 2:discard:KC 3:drawStock 3:discard:KH 0:drawStock 0:discard:QD 1:drawStock 1:discard:9C 2:drawStock 2:discard:JC 3:drawStock 3:discard:8C 0:drawStock 0:discard:KS 1:drawStock 1:discard:8D 2:drawStock 2:discard:9S 3:drawStock 3:discard:10D 0:drawStock 0:discard:JD 1:drawStock 1:discard:6C 2:drawStock 2:discard:5D 3:drawStock 3:discard:8S 0:drawStock 0:discard:6H 1:drawStock 1:discard:9D 2:drawStock 2:discard:10H 3:drawStock 3:discard:JS 0:drawStock 0:discard:6S 1:drawStock 1:discard:6D 2:drawStock 2:discard:5C 1:drawStock 1:discard:JS 2:drawStock 2:discard:KH 3:drawStock 3:discard:10S 0:drawStock 0:discard:QC 1:drawStock 1:discard:KC 2:drawStock 2:discard:8S 3:drawStock 3:discard:10H 0:drawStock 0:discard:10D 1:drawStock 1:discard:JH 2:drawStock 2:discard:QH 3:drawStock 3:discard:JC 0:drawStock 0:discard:QD 1:drawStock 1:discard:KD 2:drawStock 2:spread:7D+6D+5D 2:discard:8C 3:drawStock 3:hit:8D@1 3:discard:9H 0:drawStock 0:spread:AH+2H+3H 0:discard:KS 1:drawStock 1:hit:9D@1 1:discard:JD 2:drawStock 2:discard:7C 3:drawStock 3:spread:5C+5S+5H 3:discard:6H 0:drawStock 0:hit:4H@2 0:discard:6S 1:drawStock 1:discard:10C 2:drawStock 2:discard:4S 3:drop 2:drawStock 2:discard:KD 3:drawStock 3:discard:JC 0:drawStock 0:discard:9S 1:drawStock 1:spread:2D+AD+3D 1:discard:QH 2:drawStock 2:discard:JS 3:drawStock 3:discard:7S 0:drawStock 0:discard:9D 1:drawStock 1:hit:4D@1 1:discard:5H 2:drawStock 2:discard:JD 3:drawStock 3:discard:JH 0:drawStock 0:discard:KH 1:drop 3:drawStock 3:discard:JH 0:drawStock 0:discard:QC 1:drawStock 1:discard:10C 2:drawStock 2:discard:10S 3:drawStock 3:discard:8S 0:drawDiscard 0:spread:8H+8D+8S 0:discard:6S 1:drawStock 1:discard:10D 2:drawStock 2:discard:5D 3:drawStock 3:discard:7C 0:drawStock 0:discard:5C 1:drawStock 1:discard:KS 2:drawStock 2:discard:4C 3:drawStock 3:discard:9S 0:drawStock 0:discard:QS 1:drawStock 1:discard:JS 2:drawStock 2:discard:4D 3:drawStock 3:hit:8C@1 3:discard:6H 0:drawStock 0:discard:5H 1:drawStock 1:discard:JD 2:drawStock 2:discard:9D 3:drawStock 3:discard:5S 0:drawStock 0:discard:KD 1:drawStock 1:spread:7H+7D+7S 1:discard:QH 2:drawStock 2:discard:KH 3:drawStock 3:discard:6C 0:drawStock 0:discard:4H 1:drawStock 1:discard:10H 2:drawStock 2:discard:9C 3:drawStock 3:discard:KC 0:drop 0:drawStock 0:discard:10D 1:drawStock 1:discard:10H 2:drawStock 2:discard:QS 3:drawStock 3:spread:5H+4H+3H 3:discard:KS 0:drawStock 0:hit:2H@1 0:discard:KC 1:drawStock 1:hit:6H@1 1:hit:AH@1 1:discard:10S 2:drawStock 2:discard:JD 3:drawStock 3:discard:QD 0:drawStock 0:discard:KD 1:drawStock 1:hit:7H@1 1:discard:7D 2:drawStock 2:discard:QH 3:drawStock 3:discard:JS 0:drawStock 0:discard:JH 1:drawStock 1:discard:9S 2:drawStock 2:discard:9C 3:drawStock 3:discard:10C 0:drawStock 0:discard:QC 1:drawStock 1:discard:JC 2:drawStock 2:spread:5S+3S+2S+4S 2:discard:7S 3:drawStock 3:discard:8D 0:drawStock 0:hit:AS@2 0:discard:5D 1:drawStock 1:hit:6S@2 1:discard:3C 2:drawStock 2:discard:6D 3:drawStock 3:discard:8S 0:drawStock 0:hit:8H@1 0:discard:5C 1:drawStock 1:discard:8C 2:drop 1:drawStock 1:discard:JD 2:drawStock 2:discard:QS 3:drawStock 3:discard:KD 0:drawStock 0:discard:QD 1:drawStock 1:discard:QH 2:drawStock 2:discard:10D 3:drawStock 3:discard:10C 0:drawStock 0:discard:8H 1:drawStock 1:discard:10S 2:drawStock 2:discard:9H 3:drawStock 3:discard:JH 0:drawStock 0:discard:KC 1:drawStock 1:spread:5S+5D+5H 1:discard:7S 2:drawDiscard 2:spread:7H+7C+7S 2:discard:9C 3:drawStock 3:discard:QC 0:drawStock 0:discard:6H 1:drawStock 1:discard:JC 2:drawStock 2:hit:7D@2 2:discard:4S 3:drawStock 3:discard:10H 0:drawStock 0:discard:6S 1:drawStock 1:discard:6D 2:drop 2:drawStock 2:discard:JH 3:drawStock 3:discard:JS 0:drawStock 0:discard:QC 1:drawStock 1:discard:JC 2:drawStock 2:discard:10S 3:drawStock 3:discard:KH 0:drawStock 0:discard:9D 1:drawStock 1:discard:10C 2:drawStock 2:discard:7S 3:drawStock 3:discard:5S 0:drawStock 0:discard:9H 1:drawStock 1:discard:KD 2:drawStock 2:discard:10D 3:drawStock 3:discard:7C 0:drawStock 0:discard:8D 1:drawStock 1:spread:2C+3C+4C 1:discard:6H 2:drawDiscard 2:spread:6S+6C+6H 2:discard:4S 3:drawStock 3:discard:8H 0:drawStock 0:hit:AC@1 0:hit:6D@2 0:hit:5C@1 0:discard:8C 1:drawStock 1:discard:QS 2:drawStock 2:discard:4D 3:drawStock 3:discard:9S 0:drawStock 0:discard:8S 1:drawStock 1:discard:QD 2:drop",
+ "moves": 288,
+ "moveLog": "0:drawStock 0:spread:7D+7S+7H 0:discard:10S 1:drawStock 1:discard:10C 2:drawStock 2:discard:7C 3:slap@1 3:discard:KD 3:drawStock 3:discard:5H 0:drawStock 0:discard:9H 1:drawStock 1:discard:JH 2:drawStock 2:discard:5D 3:drawStock 3:discard:4H 0:drawStock 0:discard:8H 1:drawStock 1:discard:QC 2:drawDiscard 2:spread:QS+QH+QC 2:discard:4D 3:drawStock 3:discard:KC 0:drawStock 0:discard:KH 1:drawStock 1:hit:QD@2 1:discard:9C 2:drawStock 2:discard:5S 3:drawStock 3:discard:JC 0:drawStock 0:discard:8C 1:drawStock 1:discard:KS 2:drop 1:drawStock 1:discard:KD 2:drawStock 2:discard:KH 3:drawStock 3:discard:10S 0:drawStock 0:discard:10D 1:drawStock 1:discard:KC 2:drawStock 2:discard:8C 3:drawStock 3:discard:10H 0:drawStock 0:discard:QC 1:drawStock 1:discard:JS 2:drawStock 2:discard:7D 3:drawStock 3:discard:JC 0:drawStock 0:discard:KS 1:drawStock 1:discard:JH 2:drawStock 2:discard:QH 3:drawStock 3:discard:9H 0:drawStock 0:spread:AH+2H+3H 0:discard:QD 1:drawStock 1:discard:JD 2:drawStock 2:discard:7C 3:drawStock 3:spread:5C+5S+5H 3:discard:8D 0:drawStock 0:hit:4H@1 0:discard:6S 1:drawStock 1:discard:10C 2:drawStock 2:hit:5D@2 2:discard:4S 3:drawStock 3:discard:6H 0:drop 2:drawStock 2:discard:10S 3:drawStock 3:discard:JC 0:drawStock 0:discard:9D 1:drawStock 1:spread:2D+AD+3D 1:discard:QH 2:drawStock 2:discard:KD 3:drawStock 3:discard:7S 0:drawStock 0:discard:9S 1:drawStock 1:hit:4D@1 1:discard:5H 2:drawStock 2:discard:9C 3:drawStock 3:discard:JH 0:drawStock 0:discard:KH 1:drop 3:drawStock 3:discard:JH 0:drawStock 0:discard:QC 1:drawStock 1:discard:QH 2:drawStock 2:discard:10S 3:drawStock 3:discard:8S 0:drawDiscard 0:spread:8H+8D+8S 0:discard:6S 1:drawStock 1:discard:JD 2:drawStock 2:discard:4D 3:drawStock 3:discard:7C 0:drop 0:drawStock 0:discard:10D 1:drawStock 1:discard:10H 2:drawStock 2:discard:QS 3:drawStock 3:spread:5H+4H+3H 3:discard:JS 0:drawStock 0:hit:2H@1 0:discard:KC 1:drawStock 1:hit:6H@1 1:hit:AH@1 1:discard:10S 2:drawStock 2:discard:JD 3:drawStock 3:discard:QD 0:drawStock 0:discard:KD 1:drawStock 1:hit:7H@1 1:discard:7D 2:drawStock 2:discard:QH 3:drawStock 3:discard:KS 0:drawStock 0:discard:JH 1:drawStock 1:discard:9S 2:drawStock 2:discard:9C 3:drawStock 3:discard:10C 0:drawStock 0:discard:QC 1:drawStock 1:discard:JC 2:drawStock 2:discard:7S 3:drawStock 3:discard:8D 0:drawStock 0:discard:5C 1:drawStock 1:discard:6S 2:drawStock 2:spread:5S+3S+4S 2:discard:6D 3:drop 1:drawStock 1:discard:JD 2:drawStock 2:discard:10D 3:drawStock 3:discard:JH 0:drawStock 0:discard:QD 1:drawStock 1:discard:QH 2:drawStock 2:discard:9C 3:drawStock 3:discard:10C 0:drawStock 0:discard:8H 1:drawStock 1:discard:10S 2:drawStock 2:discard:7H 3:drawStock 3:discard:QC 0:drawStock 0:discard:KC 1:drawStock 1:spread:5S+5D+5H 1:discard:7S 2:drawStock 2:discard:9H 3:drawStock 3:discard:KD 0:drawStock 0:discard:JC 1:drawStock 1:discard:7D 2:drawStock 2:discard:QS 3:drawStock 3:discard:9S 0:drawStock 0:discard:6H 1:drawStock 1:discard:KS 2:drawStock 2:discard:8S 3:drawStock 3:spread:4H+2H+AH+3H 3:discard:6S 0:drawStock 0:discard:6C 1:drawStock 1:discard:4C 2:drawStock 2:discard:KH 3:drop 2:drawStock 2:discard:6S 3:drawStock 3:discard:JS 0:drawStock 0:discard:QC 1:drawStock 1:discard:JC 2:drawStock 2:discard:10S 3:drawStock 3:discard:KH 0:drawStock 0:discard:9D 1:drawStock 1:discard:10C 2:drawStock 2:discard:6C 3:drawStock 3:discard:5S 0:drawStock 0:discard:9H 1:drawStock 1:discard:KD 2:drawStock 2:discard:JH 3:drawStock 3:discard:7C 0:drawStock 0:discard:8C 1:drawStock 1:spread:2C+3C+4C 1:discard:6H 2:drawStock 2:discard:10D 3:drawStock 3:discard:7D 0:drawDiscard 0:spread:8D+6D+7D 0:hit:5C@1 0:hit:AC@1 0:discard:2D",
  "results": {
   "placements": [
-   2,
-   1,
    0,
+   1,
+   2,
    3
   ],
   "deltas": [
@@ -30,34 +30,34 @@
   "recap": {
    "v": 1,
    "points": [
+    6,
     -1,
-    0,
-    7,
-    -6
+    -1,
+    -4
    ],
    "coinStakes": false,
    "hands": [
     {
      "n": 0,
-     "winner": 0,
-     "how": "stockOut",
-     "dropper": null,
+     "winner": 2,
+     "how": "drop",
+     "dropper": 2,
      "deltas": [
+      -1,
+      -1,
       3,
-      -1,
-      -1,
       -1
      ]
     },
     {
      "n": 1,
      "winner": 0,
-     "how": "caught",
-     "dropper": 3,
+     "how": "drop",
+     "dropper": 0,
      "deltas": [
-      1,
-      0,
-      0,
+      3,
+      -1,
+      -1,
       -1
      ]
     },
@@ -75,49 +75,49 @@
     },
     {
      "n": 3,
-     "winner": 1,
-     "how": "caught",
+     "winner": 0,
+     "how": "drop",
      "dropper": 0,
      "deltas": [
+      3,
       -1,
-      1,
-      0,
-      0
+      -1,
+      -1
      ]
     },
     {
      "n": 4,
      "winner": 2,
-     "how": "drop",
-     "dropper": 2,
+     "how": "caught",
+     "dropper": 3,
      "deltas": [
-      -1,
-      -1,
-      3,
-      -1
+      0,
+      1,
+      1,
+      -2
      ]
     },
     {
      "n": 5,
-     "winner": 2,
+     "winner": 3,
      "how": "drop",
-     "dropper": 2,
+     "dropper": 3,
      "deltas": [
       -1,
       -1,
-      3,
-      -1
+      -1,
+      3
      ]
     },
     {
      "n": 6,
-     "winner": 2,
-     "how": "drop",
-     "dropper": 2,
+     "winner": 0,
+     "how": "out",
+     "dropper": null,
      "deltas": [
-      -1,
-      -1,
       3,
+      -1,
+      -1,
       -1
      ]
     }
@@ -129,13 +129,13 @@
     0
    ],
    "drops": [
+    2,
     1,
     1,
-    3,
-    1
+    2
    ],
    "caught": [
-    1,
+    0,
     0,
     0,
     1
