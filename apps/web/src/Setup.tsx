@@ -21,6 +21,8 @@ import { AccountEntry } from './account/AccountUI';
 import { useAccount } from './account/api';
 import { SocialButton } from './social/Social';
 import { OpenTables } from './social/OpenTables';
+import { ModeSetup } from './modes/ModeSetup';
+import { type ModeChoice, loadModeChoice, saveModeChoice } from './modes/catalog';
 import { OFFLINE_PAIR_KEY, TeamNameField, pairTeamNames, useTeamNameFor } from './TeamName';
 
 /**
@@ -171,6 +173,10 @@ export default function Setup({ settings: s, onChange, tips, onTips, onStart, on
   const offlineTeamName = useTeamNameFor(OFFLINE_PAIR_KEY);
   const [dir, setDir] = useState<'fwd' | 'back'>('fwd');
   const [ask, setAsk] = useState(isFirstVisit);
+  const [modeChoice, setModeChoiceState] = useState<ModeChoice>(() => loadModeChoice());
+  const setModeChoice = (c: ModeChoice) => { setModeChoiceState(c); saveModeChoice(c); };
+  // PR 2.3a: the picker + options are saved; 2.3b starts the picked mode offline and sends it online (mode message).
+  const gameCard = <SetupCard title="Game"><ModeSetup value={modeChoice} onChange={setModeChoice} /></SetupCard>;
   const onlineSeat = useOnlineSeat();
   const touchAt = useRef(0);
   const choose = (fn: () => void) => ({
@@ -354,6 +360,7 @@ export default function Setup({ settings: s, onChange, tips, onTips, onStart, on
         <h2 className="wiz-title">{path === 'online' ? (view === 'create' ? 'Create a table' : 'Find a table') : 'Your Table'}<small>{mode.title}</small></h2>
         {path === 'bots' ? (
           <div className="ess ess-barred">
+            {gameCard}
             {!cut && (
               <SetupCard title="Your team">
                 <div className="ess-row stack">
@@ -387,7 +394,7 @@ export default function Setup({ settings: s, onChange, tips, onTips, onStart, on
             <SetupBar summary={setupBarSummary(s, true)}><button type="button" className="primary big go" data-testid="start-bots" onClick={onStart}>DEAL ME IN</button><p className="sticky-note">No seating step vs bots — bots fill the table</p></SetupBar>
           </div>
         ) : (
-          <OnlineStep settings={s} venue={s.venue ?? 'classic'} onVenue={(v) => set('venue', v)} deck={deck} deckGallery={<DeckGallery value={s.deck} onChange={(v) => set('deck', v)} />} barSummary={setupBarSummary(s, false)} onHouseRules={() => requestSettingsSheet()} summary={summary} tipsRow={tipsRow} view={view} onOpenCreate={() => go('table', 'online', kind, 'create')} />
+          <OnlineStep settings={s} venue={s.venue ?? 'classic'} onVenue={(v) => set('venue', v)} deck={deck} deckGallery={<DeckGallery value={s.deck} onChange={(v) => set('deck', v)} />} barSummary={setupBarSummary(s, false)} onHouseRules={() => requestSettingsSheet()} summary={summary} tipsRow={tipsRow} gameCard={gameCard} view={view} onOpenCreate={() => go('table', 'online', kind, 'create')} />
         )}
       </>
     );
@@ -457,7 +464,8 @@ export function RulesStatLine({ settings }: { settings: Settings }) {
  * wizard's Back returns here), regrouped ESPN-style into cards. Name and music
  * state live here so moving between the two screens keeps what you typed.
  */
-function OnlineStep({ settings, venue, onVenue, deck, deckGallery, barSummary, onHouseRules, summary, tipsRow, view, onOpenCreate }: {
+function OnlineStep({ settings, venue, onVenue, deck, deckGallery, barSummary, onHouseRules, summary, tipsRow, gameCard, view, onOpenCreate }: {
+  gameCard: ReactNode;
   settings: Settings; venue: VenueChoice; onVenue: (v: VenueChoice) => void; deck: ReactNode; deckGallery: ReactNode;
   barSummary: string; onHouseRules: () => void; summary: ReactNode; tipsRow: ReactNode; view: TableView; onOpenCreate: () => void;
 }) {
@@ -502,6 +510,7 @@ function OnlineStep({ settings, venue, onVenue, deck, deckGallery, barSummary, o
   if (view === 'create') {
     return (
       <div className="ess ess-barred" key="create">
+        {gameCard}
         <SetupCard title="Table">
           {nameRow}
         </SetupCard>
