@@ -10,7 +10,19 @@
  * every terminal transition runs inside the DO's serialized ops, so a result
  * reported twice can never pay twice.
  */
-import type { TableRules } from '@pp/rules';
+import type { TableRules } from '@pp/protocol';
+
+/**
+ * TODO(rebuild): Big Bank was Spades-only. Its challenge rules keep the old Spades labels
+ * (mode / deck / target / partnerships) on top of the generic table rules until it is rebuilt
+ * on the registry (docs/plan/REBUILD.md). The feature is switched off (FEATURES.wagers).
+ */
+export interface WagerRules extends TableRules {
+  mode: 'joker' | 'aceDown' | 'cutthroat';
+  deck: 'joker' | 'aceDown';
+  targetScore: number;
+  partnerships: boolean;
+}
 import { balance } from '../cred/coins';
 import {
   wagerEnabled, wagerEscrow, wagerEscrowedCount, wagerForfeit, wagerLevelOk,
@@ -47,7 +59,7 @@ export interface WData {
   challengerId: string;
   format: WagerFormat;
   mode: 'joker' | 'aceDown' | 'cutthroat';
-  rules: TableRules;
+  rules: WagerRules;
   wager: number;
   startAt: number;
   status: WagerStatus;
@@ -73,7 +85,7 @@ export interface WIO {
   now(): number;
   db: D1Database;
   /** create a table DO set up for this match; returns its code */
-  createMatchTable(setup: { cid: string; rules: TableRules; reserved: ({ uid: string; name: string } | null)[]; autostartAt: number; teamNames: [string | null, string | null] }): Promise<string>;
+  createMatchTable(setup: { cid: string; rules: WagerRules; reserved: ({ uid: string; name: string } | null)[]; autostartAt: number; teamNames: [string | null, string | null] }): Promise<string>;
   /** in-app notice to these accounts (Social hub) */
   notify(uids: string[], n: WNotice): Promise<void>;
   /** League Wire (item 7): post a marquee result to global chat. Optional —
@@ -137,7 +149,7 @@ async function escrowGate(io: WIO, uid: string, wager: number): Promise<void> {
 export interface WCreate {
   id: string;
   format: WagerFormat;
-  rules: TableRules;
+  rules: WagerRules;
   wager: number;
   startAt: number;
   /** partnership: the challenger's side team name (already cleaned), or null */

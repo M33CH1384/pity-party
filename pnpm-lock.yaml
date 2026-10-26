@@ -7,13 +7,6 @@ settings:
 importers:
 
   .:
-    dependencies:
-      '@pp/bots':
-        specifier: workspace:*
-        version: link:packages/bots
-      '@pp/rules':
-        specifier: workspace:*
-        version: link:packages/rules
     devDependencies:
       '@types/node':
         specifier: ^26.6.4
@@ -57,18 +50,12 @@ importers:
 
   apps/server:
     dependencies:
-      '@pp/bots':
-        specifier: workspace:*
-        version: link:../../packages/bots
       '@pp/game':
         specifier: workspace:*
         version: link:../../packages/game
       '@pp/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol
-      '@pp/rules':
-        specifier: workspace:*
-        version: link:../../packages/rules
       '@simplewebauthn/server':
         specifier: ^13.3.3
         version: 13.3.3
@@ -82,18 +69,12 @@ importers:
       '@fontsource/barlow-condensed':
         specifier: ^5.3.0
         version: 5.3.0
-      '@pp/bots':
-        specifier: workspace:*
-        version: link:../../packages/bots
       '@pp/game':
         specifier: workspace:*
         version: link:../../packages/game
       '@pp/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol
-      '@pp/rules':
-        specifier: workspace:*
-        version: link:../../packages/rules
       '@simplewebauthn/browser':
         specifier: ^13.3.0
         version: 13.3.0
@@ -120,21 +101,9 @@ importers:
         specifier: ^6.4.4
         version: 6.4.4(@types/node@26.6.4)(tsx@4.23.15)
 
-  packages/bots:
-    dependencies:
-      '@pp/rules':
-        specifier: workspace:*
-        version: link:../rules
-
   packages/game: {}
 
-  packages/protocol:
-    dependencies:
-      '@pp/rules':
-        specifier: workspace:*
-        version: link:../rules
-
-  packages/rules: {}
+  packages/protocol: {}
 
 packages:
 

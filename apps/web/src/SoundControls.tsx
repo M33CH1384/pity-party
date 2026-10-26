@@ -3,8 +3,6 @@ import { createPortal } from 'react-dom';
 import { sound, useSoundSettings } from './audio';
 import { speakerAriaLabel } from './audioSession';
 import { requestSettingsSheet } from './settingsSheet';
-import { tableIntensity, talkPrefs, useTalkPrefs } from './talkPrefs';
-import { TALK_INTENSITY_LABEL } from '@pp/bots';
 import { type NukeIntensity, fx, useNukeIntensity, useReduceEffects, useTableNuke } from './fx';
 import { setVibration, useVibration } from './haptics';
 import { normalizeCategoryVolumes } from './spatial';
@@ -118,7 +116,6 @@ export function SoundFields({ compact = false }: { compact?: boolean }) {
       )}
       {s.music && s.nowPlaying && <p className="hint np-inline">♫ {s.nowPlaying.track.title} — {s.nowPlaying.track.artist}</p>}
       <SpatialFields />
-      <BotTalkFields />
       <p className="hint">Menus run no venue-ambience scene. Games default to music; every venue has its own signature sounds, set automatically from the venue you're in, and they play whether music is on or off. Your switch choices here are remembered per kind of screen.</p>
       {!compact && <p className="hint">On iPhone, the silent switch also mutes game sound.</p>}
     </div>
@@ -297,38 +294,6 @@ export function TableNukeInfo({ short = false }: { short?: boolean }) {
   );
 }
 
-/** Per-player bot talk controls (local; work even when the host has trash talk on): voices, voice volume, hide text; the table's intensity (read-only). */
-export function BotTalkFields() {
-  const t = useTalkPrefs();
-  // recorded clips need Web Audio; Web Speech covers lines without a clip
-  const voiceOk = typeof window !== 'undefined' && ('AudioContext' in window || 'webkitAudioContext' in window || 'speechSynthesis' in window);
-  return (
-    <div className="bot-talk-fields" data-testid="bot-talk-fields">
-      <label className="sf-row">
-        <span>Bot voices{!voiceOk && <small className="sf-note"> · not supported here</small>}</span>
-        <button type="button" role="switch" aria-checked={t.voices} aria-label="Bot voices" data-testid="bot-voices" className={`switch ${t.voices ? 'on' : ''}`} disabled={!voiceOk} onClick={() => talkPrefs.set({ voices: !t.voices })}><i /></button>
-      </label>
-      {t.voices && (
-        <VolumeRow label="Bot voice volume" value={t.voiceVolume} testId="bot-voice-volume" onChange={(v) => talkPrefs.set({ voiceVolume: v })} />
-      )}
-      {t.voices && (
-        <label className="sf-row">
-          <span>AI voice lines<small className="sf-note"> · big moments, when the table has them</small></span>
-          <button type="button" role="switch" aria-checked={t.aiVoices} aria-label="AI voice lines" data-testid="ai-voices" className={`switch ${t.aiVoices ? 'on' : ''}`} onClick={() => talkPrefs.set({ aiVoices: !t.aiVoices })}><i /></button>
-        </label>
-      )}
-      <label className="sf-row">
-        <span>Hide bot trash talk<small className="sf-note"> · in your chat</small></span>
-        <button type="button" role="switch" aria-checked={t.hideBotTalk} aria-label="Hide bot trash talk" data-testid="hide-bot-talk" className={`switch ${t.hideBotTalk ? 'on' : ''}`} onClick={() => talkPrefs.set({ hideBotTalk: !t.hideBotTalk })}><i /></button>
-      </label>
-      <div className="sf-row" data-testid="talk-intensity-info">
-        <span>Trash talk<small className="sf-note"> · set for the table{tableIntensity() === 'family' ? ' · mild cursing masked' : ''}</small></span>
-        <b className="sf-val">{TALK_INTENSITY_LABEL[tableIntensity()]}</b>
-      </div>
-    </div>
-  );
-}
-
 /**
  * The retired Sound sheet's two quick actions, now at the top of the Settings
  * sheet's Sound & music group (owner consolidation, 2026-10-20): mute the bot
@@ -337,23 +302,11 @@ export function BotTalkFields() {
  */
 export function SoundQuickActions() {
   const s = useSoundSettings();
-  const t = useTalkPrefs();
   const allOff = !s.on && !s.music;
+  // TODO(rebuild): the "Mute bots" quick action returns with bot voices (REBUILD.md)
   return (
     <div className="sheet-actions">
-      <button type="button" className={`mute-all bot-mute big ${t.voices ? '' : 'off'}`} data-testid="bot-voice-quick" aria-pressed={!t.voices} onClick={() => talkPrefs.set({ voices: !t.voices })}>🤖 {t.voices ? 'Mute bots' : 'Bots muted'}</button>
       <button type="button" className="mute-all big" data-testid="mute-all" onClick={() => sound.toggleMuteAll()}>{allOff ? '🔊 Unmute' : '🔇 Mute all'}</button>
     </div>
-  );
-}
-
-/** Offline table setting: bots talk trash (online the host decides in the lobby). */
-export function BotTrashTalkRow() {
-  const t = useTalkPrefs();
-  return (
-    <label className="sf-row">
-      <span>Bot trash talk<small className="sf-note"> · offline games; online the host decides</small></span>
-      <button type="button" role="switch" aria-checked={t.botTalk} aria-label="Bot trash talk" data-testid="bot-trash-talk" className={`switch ${t.botTalk ? 'on' : ''}`} onClick={() => talkPrefs.set({ botTalk: !t.botTalk })}><i /></button>
-    </label>
   );
 }

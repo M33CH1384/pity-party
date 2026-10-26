@@ -19,7 +19,8 @@
  * counts as a Boston / Wheels matches the stats pipeline's definitions
  * exactly (see the wheels predicate in stats/record.ts).
  */
-import { type Card, type HandRecord, isNukeTrick } from '@pp/rules';
+// TODO(rebuild): per-trick / per-hand highlight extraction (Spades nukes, Bostons, nils, Wheels) was removed in 3b;
+// registry modes report highlights through their own results (docs/plan/REBUILD.md).
 
 export type HighlightType = 'nuke' | 'boston' | 'nil' | 'blindNil' | 'wheels';
 
@@ -44,85 +45,6 @@ export interface HighlightSeat { name: string; kind: 'user' | 'guest' | 'bot'; s
 export const HIGHLIGHT_TTL_MS = 15 * 60_000;
 const KEEP = 30;
 const PRUNE_AGE_MS = 60 * 60_000;
-
-const isHuman = (s: HighlightSeat) => s.kind === 'user' || s.kind === 'guest';
-
-/** The human names on a side ("A + B"), or null when the side is all bots. */
-function sideName(seats: HighlightSeat[], side: number): string | null {
-  const humans = seats.filter((s) => s.side === side && isHuman(s)).map((s) => s.name);
-  return humans.length ? humans.join(' + ') : null;
-}
-
-/** Nuke events from tricks that just completed (the room's fresh tricks). */
-export function trickHighlights(o: {
-  tricks: readonly { plays: readonly { seat: number; card: Card }[] }[];
-  seats: HighlightSeat[]; code: string; handNo: number; at: number;
-}): HighlightEvent[] {
-  const out: HighlightEvent[] = [];
-  for (const t of o.tricks) {
-    if (!isNukeTrick(t.plays)) continue;
-    const bj = t.plays.find((p) => p.card === 'BJ');
-    if (!bj) continue;
-    const seat = o.seats[bj.seat];
-    if (!seat || !isHuman(seat)) continue;
-    out.push({
-      id: `${o.code}:${o.handNo}:nuke:${bj.seat}`, at: o.at, type: 'nuke', name: seat.name,
-      text: `☢ ${seat.name}'s nuke blew in Hand ${o.handNo}`, code: o.code, hand: o.handNo, marquee: true,
-    });
-  }
-  return out;
-}
-
-/** Hand-end events from the finished hand's record. */
-export function handHighlights(o: {
-  rec: HandRecord; seats: HighlightSeat[]; partnerships: boolean; code: string; at: number;
-}): HighlightEvent[] {
-  const { rec } = o;
-  const out: HighlightEvent[] = [];
-  const totalTricks = rec.sides.reduce((a, s) => a + s.tricks, 0);
-  const booksHand = rec.bids.every((b) => b === 'books');
-  for (const s of rec.sides) {
-    const name = sideName(o.seats, s.side);
-    if (name) {
-      // Boston: the side took every book in the hand.
-      const boston = totalTricks >= 13 && s.tricks === totalTricks;
-      if (boston) {
-        out.push({
-          id: `${o.code}:${rec.handNo}:boston:${s.side}`, at: o.at, type: 'boston', name,
-          text: `${name} just ran a Boston in Hand ${rec.handNo}`, code: o.code, hand: rec.handNo, marquee: true,
-        });
-      } else {
-        // Wheels — the same predicate the stats pipeline stores per player
-        // (record.ts): partnerships need a made 10+ contract (or a books
-        // hand with 10+), cutthroat just 10+ tricks. A Boston hand already
-        // headlined above; don't double-report the same hand for a side.
-        const wheels = o.partnerships
-          ? (s.contract >= 10 && s.contractMade === true) || (booksHand && s.tricks >= 10)
-          : s.tricks >= 10;
-        if (wheels) {
-          out.push({
-            id: `${o.code}:${rec.handNo}:wheels:${s.side}`, at: o.at, type: 'wheels', name,
-            text: `${name} took Wheels in Hand ${rec.handNo}`, code: o.code, hand: rec.handNo, marquee: true,
-          });
-        }
-      }
-    }
-    // Made nils name the seat, not the side — and only human seats.
-    for (const n of s.nils) {
-      if (!n.made) continue;
-      const seat = o.seats[n.seat];
-      if (!seat || !isHuman(seat)) continue;
-      const blind = n.kind === 'blindNil';
-      out.push({
-        id: `${o.code}:${rec.handNo}:${blind ? 'blindNil' : 'nil'}:${n.seat}`, at: o.at,
-        type: blind ? 'blindNil' : 'nil', name: seat.name,
-        text: blind ? `${seat.name} made a BLIND NIL in Hand ${rec.handNo}` : `${seat.name} made a nil in Hand ${rec.handNo}`,
-        code: o.code, hand: rec.handNo, marquee: blind,
-      });
-    }
-  }
-  return out;
-}
 
 /**
  * The League Wire copy for a marquee event (item 7): the ticker's

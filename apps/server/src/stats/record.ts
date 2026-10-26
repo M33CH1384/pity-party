@@ -2,7 +2,6 @@
  * Release 9: online game records → per-player stats + Elo. Pure (no Cloudflare imports) so it's unit-tested.
  * Only seats linked to an account (signed-in players) get stats rows; guests and bots appear in the game's seat list.
  */
-import { type GameState, sideCount, sideOf } from '@pp/rules';
 import { processGameCred } from '../cred/hooks';
 import type { CredPushEvent } from '../push/notify';
 
@@ -58,64 +57,6 @@ export interface GameRecord {
   tournamentId?: string;
 }
 
-export function buildRecord(o: { id: string; room: string; game: GameState; seats: SeatRef[]; names: string[]; teamNames?: (string | null)[]; live?: LiveStats; endedAt: number; tournamentId?: string }): GameRecord {
-  const g = o.game;
-  const r = g.rules;
-  const n = r.playerCount;
-  const kind: RatingKind = r.partnerships ? 'team' : 'cutthroat';
-  const winners = g.result?.winners ?? [];
-  const players: GameRecord['players'] = [];
-  for (let seat = 0; seat < n; seat++) {
-    const ref = o.seats[seat];
-    if (!ref || ref.kind !== 'user' || !ref.uid) continue;
-    const side = sideOf(seat, r);
-    const st: PlayerGameStats = { won: winners.includes(side), hands: g.history.length, bids: 0, bidSum: 0, made: 0, set: 0, bags: 0, nilBids: 0, nilMade: 0, blindNilMade: 0, books: 0, maxBooksHand: 0, maxDeficit: 0, foeEliminated: false, runItClaims: 0, shotsTaken: 0, shotsGiven: 0, wheels: 0, bjWins: o.live?.bj[seat] ?? 0, bidMs: o.live?.bidMs[seat] ?? 0, bidN: o.live?.bidN[seat] ?? 0, playMs: o.live?.playMs[seat] ?? 0, playN: o.live?.playN[seat] ?? 0 };
-    for (const h of g.history) {
-      const b = h.bids[seat];
-      const tw = h.tricksWon[seat] ?? 0;
-      st.books += tw;
-      st.maxBooksHand = Math.max(st.maxBooksHand, tw);
-      const mine = h.sides.find((s) => s.side === side);
-      if (!mine) continue;
-      // deficit after this hand: best opponent total minus mine (for the comeback check)
-      const bestOpp = Math.max(...h.sides.filter((s) => s.side !== side).map((s) => s.totalScore));
-      st.maxDeficit = Math.max(st.maxDeficit, bestOpp - mine.totalScore);
-      if (!r.partnerships && h.sides.some((s) => s.side !== side && s.out) && !mine.out) st.foeEliminated = true;
-      if (typeof b === 'number') {
-        st.bids++; st.bidSum += b;
-        if (mine.contractMade === true) st.made++;
-        else if (mine.contractMade === false) st.set++;
-      } else if (b === 'nil' || b === 'blindNil') {
-        st.nilBids++;
-        if (mine.nils.find((x) => x.seat === seat)?.made) {
-          st.nilMade++;
-          if (b === 'blindNil') st.blindNilMade++;
-        }
-      }
-      // Side bags from scoreHand: overtricks on a make, nil tricks on a set, tricks with no contract.
-      // Books hands and "bags off" already store bagsAdded 0, so this matches the score pad.
-      st.bags += mine.bagsAdded;
-      if (mine.contractMade === false) st.shotsTaken++;
-      st.shotsGiven += h.sides.filter((s) => s.side !== side && s.contractMade === false).length;
-      const wheel = r.partnerships ? (mine.contract >= 10 && mine.contractMade === true) || (h.bids.every((x) => x === 'books') && mine.tricks >= 10) : mine.tricks >= 10;
-      if (wheel) st.wheels++;
-    }
-    const partnerSeat = r.partnerships ? (seat + 2) % n : -1;
-    const p = partnerSeat >= 0 ? o.seats[partnerSeat] : undefined;
-    st.runItClaims = (g.runItClaims ?? []).filter((s) => s === seat).length;
-    players.push({ seat, uid: ref.uid, side, won: st.won, partner: p?.kind === 'user' && p.uid ? p.uid : null, teamName: r.partnerships ? (o.teamNames?.[side] ?? null) : null, stats: st });
-  }
-  return {
-    id: o.id, room: o.room, mode: r.mode ?? 'joker', kind, endedAt: o.endedAt, hands: g.history.length,
-    final: [...(g.result?.finalScores ?? g.scores)], winners: [...winners], names: [...o.names], seats: o.seats, players, ...(o.tournamentId ? { tournamentId: o.tournamentId } : {}),
-  };
-}
-
-/**
- * Rated for Elo only when signed-in players sit on at least two sides.
- * A guest does not count, and neither do bots. Those games still record stats.
- * Games already stored as rated keep the Elo written at the time; this does not recompute them.
- */
 export function isRated(rec: GameRecord, rules: { playerCount: number; partnerships: boolean }): boolean {
   const sides = new Set(rec.seats.filter((s) => s.kind === 'user').map((s) => s.side));
   return rec.players.length > 0 && sides.size >= 2 && rules.playerCount === rec.seats.length;
@@ -178,34 +119,7 @@ const emptyStats = (hands: number): PlayerGameStats => ({
   shotsTaken: 0, shotsGiven: 0, wheels: 0, bjWins: 0, bidMs: 0, bidN: 0, playMs: 0, playN: 0,
 });
 
-/** An in-progress game that will not be finished by these seats. Nobody won. Stats stay empty so accuracy is untouched. */
-export function abandonedRecord(o: { id: string; room: string; game: GameState; seats: SeatRef[]; names: string[]; teamNames?: (string | null)[]; endedAt: number; tournamentId?: string }): GameRecord {
-  const g = o.game;
-  const r = g.rules;
-  const n = r.playerCount;
-  const kind: RatingKind = r.partnerships ? 'team' : 'cutthroat';
-  const players: GameRecord['players'] = [];
-  for (let seat = 0; seat < n; seat++) {
-    const ref = o.seats[seat];
-    if (!ref || ref.kind !== 'user' || !ref.uid) continue;
-    const side = sideOf(seat, r);
-    const partnerSeat = r.partnerships ? (seat + 2) % n : -1;
-    const p = partnerSeat >= 0 ? o.seats[partnerSeat] : undefined;
-    players.push({
-      seat, uid: ref.uid, side, won: false,
-      partner: p?.kind === 'user' && p.uid ? p.uid : null,
-      teamName: r.partnerships ? (o.teamNames?.[side] ?? null) : null,
-      stats: emptyStats(0),
-    });
-  }
-  return {
-    id: o.id, room: o.room, mode: r.mode ?? 'joker', kind, endedAt: o.endedAt, hands: g.history.length,
-    final: [...g.scores], winners: [], names: [...o.names], seats: o.seats, players,
-    ...(o.tournamentId ? { tournamentId: o.tournamentId } : {}),
-  };
-}
-
-/** Rated abandon: only the leaver loses Elo, against a 1200 table. 0 games at 1200 → 1180. */
+// TODO(rebuild): buildRecord / abandonedRecord (Spades GameState → GameRecord) removed in 3b; mode games record via stats/mode-games.ts.
 export function leaverLoss(rec: GameRecord, current: Record<string, { elo: number; games: number }>, leaverId: string | null): Record<string, { before: number; after: number }> {
   if (!leaverId || !rec.players.some((p) => p.uid === leaverId)) return {};
   const before = current[leaverId]?.elo ?? ELO_START;
@@ -247,4 +161,3 @@ export async function saveRecord(db: D1Database, rec: GameRecord, rated: boolean
   return processGameCred(db, { ...rec, players }, { rated, endReason: abandoned ? 'abandoned' : 'finished', leaverId: meta.leaverId ?? null, venue: meta.venue ?? null }, elo);
 }
 
-export { sideCount };

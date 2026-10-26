@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { makeRules } from '@pp/rules';
 import { makeD1 } from './d1';
 import { CHECKIN_MS, type TData, type TIO, type TMeta, alarm, begin, checkin, create, register, result, unregister, view } from '../src/tournament/service';
 import { parseCreate } from '../src/tournament/routes';
+const makeRules = (mode: 'joker' | 'aceDown' | 'cutthroat', o: { playerCount?: number } = {}) => ({
+  // TODO(rebuild): Spades-labelled rules for the switched-off tournament/wager services (REBUILD.md)
+  mode, deck: mode === 'aceDown' ? 'aceDown' as const : 'joker' as const, targetScore: 500, partnerships: mode !== 'cutthroat', playerCount: o.playerCount ?? 4, turnTimerSec: 30,
+});
 
 let db: D1Database;
 let now = 1_800_000_000_000;

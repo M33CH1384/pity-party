@@ -1,37 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import type { Card } from '@pp/rules';
-import { makeRules } from '@pp/rules';
-import { chooseBotAction } from '@pp/bots';
-import type { GameAction } from '@pp/protocol';
-import { FakeEnv } from './harness';
 import { makeD1 } from './d1';
 import { type GameRecord, eloUpdate, expected, isRated, placementsOf, saveRecord } from '../src/stats/record';
 import { personalStats } from '../src/stats/boards';
-
-const FAST = { botMs: 10, trickPauseMs: 0, dealMs: 0, disconnectGraceMs: 5000, handOverMs: 3000, handEndHoldMs: 0 };
-
-function playTurn(env: FakeEnv, cids: string[]): boolean {
-  for (const cid of cids) {
-    const st = env.last(cid, 'state');
-    const v = st?.view;
-    if (!v || st.room.phase !== 'playing' || st.spectator || st.seat === null) continue;
-    if (v.phase === 'handOver') { env.send(cid, { t: 'next' }); continue; }
-    if (v.turn !== v.seat) continue;
-    const a = chooseBotAction(v, 'normal');
-    if (!a) continue;
-    const action: GameAction = a.type === 'reveal' ? { type: 'reveal' } : a.type === 'bid' ? { type: 'bid', bid: a.bid } : a.type === 'play' ? { type: 'play', card: a.card } : a.type === 'runIt' ? { type: 'runIt' } : { type: 'exchange', cards: (a as { cards: Card[] }).cards };
-    env.advance(400); // think time
-    env.send(cid, { t: 'act', action, seq: st.room.seq });
-    return true;
-  }
-  return false;
-}
-
-function playOut(env: FakeEnv, cids: string[]) {
-  for (let i = 0; i < 20000 && env.room.data.phase === 'playing'; i++) if (!playTurn(env, cids)) env.advance(200);
-  expect(env.room.data.phase).toBe('over');
-}
-
 
 describe('who counts for Elo', () => {
   const rules = { playerCount: 4, partnerships: true };

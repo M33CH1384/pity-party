@@ -58,7 +58,8 @@ describe('registry table shell', () => {
     const { env } = twoHumans();
     env.send('a', { t: 'start' });
     env.send('a', { t: 'act', id: 'x1', action: { type: 'bid', bid: 3 } } as never);
-    expect(env.last('a', 'ack')).toMatchObject({ ok: false, code: 'WRONG_MODE' });
+    expect(env.last('a', 'ack')).toBeUndefined();
+    expect(env.errors('a').at(-1)!.code).toBe('BAD_MESSAGE');
   });
 
   it('survives a restart (JSON round-trip) mid-game', () => {

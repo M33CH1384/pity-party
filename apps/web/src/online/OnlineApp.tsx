@@ -175,12 +175,8 @@ function TableRoomInner({ conn, code }: { conn: TableConnection; code: string })
     const created = sessionStorage.getItem(`bwm.created.${code}`) === '1';
     if (created && room.hostId === cs.you && room.phase === 'lobby') {
       sessionStorage.removeItem(`bwm.created.${code}`);
-      // House rules from the menu. A turn timer the host already picked (Relaxed) stays;
-      // this arrival must not put the default clock back.
-      const base = settingsToRules(settings);
-      const chosen = room.rules.turnTimerSec;
-      const keepTimer = chosen.bid !== base.turnTimerSec.bid || chosen.play !== base.turnTimerSec.play;
-      conn.send({ t: 'config', rules: keepTimer ? { ...base, turnTimerSec: { ...chosen } } : base, botLevel: settings.botLevel });
+      // Generic table rules (3b): seats + the host's saved turn timer. Game rules are the mode's options below.
+      conn.send({ t: 'config', rules: settingsToRules(settings, room.rules.playerCount), botLevel: settings.botLevel });
       // Venue picked on the setup screen: the host's room takes it before the game starts.
       const pendingVenue = takePendingVenue(code);
       if (pendingVenue && pendingVenue !== room.venue) conn.send({ t: 'venue', venue: pendingVenue });
@@ -215,7 +211,7 @@ function TableRoomInner({ conn, code }: { conn: TableConnection; code: string })
   const seatsOpen = room0 ? joinableSeats(room0) : [];
   const openSeat = seatsOpen[0] ?? -1;
   const openCount = seatsOpen.length;
-  const pmode = room0 ? (room0.rules.mode === 'joker' || room0.rules.mode === 'aceDown' ? room0.rules.mode : 'cutthroat') : undefined;
+  const pmode = room0 ? (room0.modeId ?? 'placeholder') : undefined;
   const watchFull = room0 ? spectatorsFull(room0) : false;
   // A finished game is not a table anyone can spectate. Reporting it kept a guest row up after the room ended.
   // Story rooms (co-op spec §2.3) carry a story descriptor on the room

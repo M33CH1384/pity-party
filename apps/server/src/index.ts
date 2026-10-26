@@ -28,14 +28,11 @@ import { FEEDBACK_LIMITS, type FeedbackRow, adminHtml, hashIp, notifyOwner, pars
 import { ADMIN_COOKIE, ADMIN_TTL_MS, adminCookieOk, adminLoginHtml, makeAdminCookie, readCookie } from './admin';
 import { type Bucket, LIMITS, type LimitEnv, hit, limited } from './limits';
 import { type AuthEnv, handleAuth } from './auth/routes';
-import { handleLocalStats } from './stats/local';
 import { type SocialEnv, handleSocialHttp, isAdmin } from './social/routes';
 import { type CredEnv, handleCredHttp } from './cred/routes';
 import { pjsVenueAccess } from './cred/venueAccess';
 import { verifyTicket } from './social/ticket';
 import { type ConnAtt, type GlobalLog, Hub, type TableLog } from './social/hub';
-import { saveRecord } from './stats/record';
-import { recordHighlight, wireText } from './stats/highlights';
 import { backfillHomiesOnce } from './stats/backfill';
 import { handleTournaments } from './tournament/routes';
 import { FEATURES, featureOff } from './features';
@@ -45,7 +42,7 @@ import type { WOp } from './wager/do';
 import { type PushEnv, handlePushHttp } from './push/routes';
 import { notifyDm, notifyFriendsOfOnline, notifyInvite, notifyMention, notifyTurn, pushVapid, runScheduledPushes, sendCredPushEvent } from './push/notify';
 import { blockedBetween, usersByKeys } from './social/mentions';
-import { defaultRules, type TableRules } from '@pp/rules'; // TODO(rebuild): table rules shell still borrows @pp/rules
+import { DEFAULT_TABLE_RULES } from '@pp/protocol';
 import { saveModeGame } from './stats/mode-games';
 export { TournamentDO } from './tournament/do';
 import type { TournamentDO } from './tournament/do';
@@ -214,7 +211,8 @@ export default {
     if (parts[1] === 'stats' && parts[2] === 'local' && req.method === 'POST') {
       const slow = await limited(req, env, 'stats', origin);
       if (slow) return slow;
-      return handleLocalStats(req, env, url, Date.now());
+      // TODO(rebuild): offline Spades stats were removed in 3b (docs/plan/REBUILD.md)
+      return json({ error: 'Offline stats are switched off for now' }, { status: 503 }, origin);
     }
 
     if (parts[1] === 'social') {
@@ -548,7 +546,7 @@ export class TableDO extends DurableObject<Env> {
     const code = url.searchParams.get('code') ?? '';
     if (url.pathname === '/create') {
       if (this.room) return new Response('exists', { status: 409 });
-      this.attach(newRoomData(code, Date.now(), defaultRules('joker')));
+      this.attach(newRoomData(code, Date.now(), { ...DEFAULT_TABLE_RULES }));
       this.flush();
       // garbage-collect the table if it's never used
       this.armAlarm(Date.now() + IDLE_DELETE_MS);

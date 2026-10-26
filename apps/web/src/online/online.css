@@ -794,3 +794,4 @@
   .lobby-settings .settings-panel > summary { padding-top: 2px; padding-bottom: 2px; }
   .lobby-settings .settings-panel .sr-mode { display: none; }
 }
+.lobby-settings .table-panel { margin: 0; }

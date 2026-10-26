@@ -9,7 +9,6 @@ import { cardRankForLevel } from '../src/cred/xp';
 import { badgeCompletionFor, badgeKey, cardFor, cleanCardShowcase, cleanCardStatus, cleanCardTags, earnedBadgesFor, type BadgeSummary, type PlayerCardData } from '../src/cred/card';
 import { bigJokerSeasonActive, seasonIdFor } from '../src/cred/bigJokerSeason';
 import { ACHIEVEMENTS } from '../src/cred/achievements';
-import { STORY_BADGE_DEFS, STORY_SECRETS } from '@pp/bots';
 import { handleCredHttp } from '../src/cred/routes';
 import { ensureSeason } from '../src/cred/seasons';
 
@@ -152,7 +151,7 @@ describe('the earned pool + card payload', () => {
     expect(c.rank).toMatchObject({ rank: '3', suit: 'hearts', level: 1 });
     expect(c.status).toBeNull();
     expect(c.tags).toEqual([]);
-    expect(c.story).toEqual({ stopsCleared: 0, stopsTotal: 11, completed: false });
+    expect(c.story).toEqual({ stopsCleared: 0, stopsTotal: 0, completed: false });
     // default showcase: the 3 most recently earned (story badges carry no
     // timestamp, so they sort after every dated earn)
     expect(c.showcase.map(badgeKey)).toEqual(['badge:storm-chaser', 'achievement:clean-nil', 'achievement:first-dub']);
@@ -200,9 +199,6 @@ describe('the Big Joker: latched feat, seasonal crown', () => {
       await db.prepare('INSERT INTO story_progress (user_id, track_key, stop_id, attempts, clears, first_cleared_at) VALUES (?, ?, ?, ?, ?, ?)').bind('d', 'solo', stop, attempts, 1, 500).run();
     }
     await db.prepare('INSERT INTO story_tracks (user_id, track_key, completed_at, updated_at) VALUES (?, ?, ?, ?)').bind('d', 'solo', 900, 900).run();
-    for (const s of Object.values(STORY_SECRETS)) {
-      await db.prepare('INSERT INTO story_finds (user_id, track_key, kind, find_id, created_at) VALUES (?, ?, ?, ?, ?)').bind('d', 'solo', 'egg', s.egg.id, 700).run();
-    }
     for (const f of ['story-church-pencil', 'story-roof-coin', 'story-pjs-bulb', 'story-porch-cap', 'story-king-crown-cap', 'story-rec-buzzer']) {
       await db.prepare('INSERT INTO story_finds (user_id, track_key, kind, find_id, created_at) VALUES (?, ?, ?, ?, ?)').bind('d', 'solo', 'feat', f, 700).run();
     }

@@ -1,8 +1,7 @@
 /**
  * Engine adapter: the room's only door into game rules for registry modes.
  * Everything here goes through the @pp/game registry (rule sets + bots), so the
- * room never imports a mode's internals. Legacy Spades tables still use @pp/rules
- * directly until milestone 2.2b removes that path.
+ * room never imports a mode's internals.
  */
 import { type BotTier, type ModeId, type OptionValues, type Results, RuleError, getBot, getRules, listModes, seededRng, validateOptions } from '@pp/game';
 

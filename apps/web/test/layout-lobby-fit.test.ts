@@ -806,7 +806,7 @@ describe('the settings selects clear the dock at rest (v8d, the D2 remainder —
     // hiding it is what lets the timer rest on the summary's first row
     expect(v8dStage.match(/display: none/g)).toHaveLength(1);
     expect(v8dStage).toContain('.lobby-settings .settings-panel .sr-mode { display: none; }');
-    expect(lobby).toContain('{modeTitle(r)}');
+    expect(lobby).toContain('{gameTitle(room)}');
   });
 
   it('landscape: both selects rest inside the box, above the dock, at internal scroll 0', () => {
