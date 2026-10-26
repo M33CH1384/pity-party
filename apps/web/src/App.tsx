@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { preloadTable } from './three/preload';
 import { secureSeed } from '@pp/rules';
 import Setup from './Setup';
+import LocalModeGame from './modes/LocalModeGame';
+import { type ModeChoice, loadModeChoice } from './modes/catalog';
 import SettingsSheetHost from './SettingsSheetHost';
 import { type TipsPref, loadTips } from './tips';
 import { usePresence } from './social/Social';
@@ -22,6 +24,8 @@ export default function App() {
   // both the wizard and the table — and the wizard's own tips toggle share one copy.
   const [tips, setTips] = useState<TipsPref>(loadTips);
   const applySettings = (s: Settings) => { setSettings(s); saveSettings(s); };
+  // PR 2.3b: "Deal me in" plays the picked registry mode vs bots. The Spades table below is a remnant (milestone 3 removes it).
+  const [modeGame, setModeGame] = useState<{ choice: ModeChoice; seed: string } | null>(null);
   const [game, setGame] = useState<{ seed: string; settings: Settings; resume?: SavedGame; dealer?: number; continueSeries?: boolean } | null>(() => {
     const p = new URLSearchParams(location.search);
     if (p.get('autostart')) {
@@ -55,6 +59,10 @@ export default function App() {
   // Table switches to 'game' itself; this covers boot, lobby and setup screens.
   useEffect(() => { if (!game) sound.enterContext('menu'); }, [game === null]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  if (modeGame) {
+    return <LocalModeGame key={modeGame.seed} choice={modeGame.choice} seed={modeGame.seed} onLeave={() => { history.replaceState({ wiz: 'home', d: 0 }, '', location.pathname); setModeGame(null); }} />;
+  }
+
   if (!game) {
     const saved = loadGame();
     return (
@@ -65,7 +73,7 @@ export default function App() {
         onChange={applySettings}
         tips={tips}
         onTips={setTips}
-        onStart={() => { if (!confirmReplaceSave(saved, (m) => window.confirm(m))) return; history.replaceState({ wiz: 'home', d: 0 }, '', location.pathname); saveSettings(settings); saveSeries(null); coverTableEntry(); setGame({ seed: secureSeed(), settings, continueSeries: false }); }}
+        onStart={() => { saveSettings(settings); setModeGame({ choice: loadModeChoice(), seed: secureSeed() }); }}
         onResume={saved ? () => { history.replaceState({ wiz: 'home', d: 0 }, '', location.pathname); coverTableEntry(); setGame({ seed: saved.seed, settings: saved.settings, resume: saved, continueSeries: true }); } : null}
         resumeLabel={saved ? `${MODES.find((m) => m.key === saved.settings.mode)?.title ?? 'game'} · hand ${saved.state.handNo}` : undefined}
       />

@@ -13,6 +13,8 @@ import { forgetToken, loadName, saveName } from './identity';
 import Lobby from './Lobby';
 import { codeFromPath, navigate } from './nav';
 import OnlineTable from './OnlineTable';
+import OnlineModeTable from './OnlineModeTable';
+import { loadModeChoice } from '../modes/catalog';
 import { preloadTable } from '../three/preload';
 import { takePendingVenue } from '../venues';
 import { TableLoading } from '../TableLoading';
@@ -185,6 +187,9 @@ function TableRoomInner({ conn, code }: { conn: TableConnection; code: string })
       // Venue picked on the setup screen: the host's room takes it before the game starts.
       const pendingVenue = takePendingVenue(code);
       if (pendingVenue && pendingVenue !== room.venue) conn.send({ t: 'venue', venue: pendingVenue });
+      // PR 2.3b: the game picked on the setup screen (host-only mode message + its options)
+      const pick = loadModeChoice();
+      conn.send({ t: 'mode', modeId: pick.modeId, options: pick.options });
     }
     // Release 9 invites deep-link a seat (/t/CODE?seat=N): take it if it's still open (a bot's seat mid-game)
     const q = new URLSearchParams(location.search);
@@ -302,12 +307,14 @@ function TableRoomInner({ conn, code }: { conn: TableConnection; code: string })
     setTimeout(() => navigate(to, true, to === '/' ? { wiz: 'home', d: 0 } : null), 50);
   };
   // spectators (Release 10) get a redacted view and watch on the same 3D table
-  const inGame = cs.room.phase !== 'lobby' && !!cs.view && (cs.seat !== null || !!cs.spectator);
+  const inGame = cs.room.phase !== 'lobby' && (!!cs.view || !!cs.mode) && (cs.seat !== null || !!cs.spectator);
   return (
     <>
       <NowPlaying />
       <HostMusicBridge conn={conn} cs={cs} mesh={mesh} />
-      {inGame && !lobbyOpen ? (
+      {inGame && !lobbyOpen && cs.mode ? (
+        <OnlineModeTable conn={conn} cs={cs} onLobby={() => setLobbyOpen(true)} onLeave={() => leave('/')} />
+      ) : inGame && !lobbyOpen ? (
         <OnlineTable conn={conn} cs={cs} mesh={mesh} onLobby={() => setLobbyOpen(true)} onMainMenu={() => leave('/')} />
       ) : (
         <Lobby

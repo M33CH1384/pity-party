@@ -4,7 +4,7 @@
  * reconnect land back in the same seat.
  */
 import { TICKET_RETRY_MS, accountTicketState, clearAccountTicket } from '../social/store';
-import type { ChatLine, ClientMsg, GameAction, RoomInfo, RunPlayback, ServerMsg } from '@pp/protocol';
+import type { ChatLine, ClientMsg, GameAction, ModeState, RoomInfo, RunPlayback, ServerMsg } from '@pp/protocol';
 import type { PlayerView } from '@pp/rules';
 import { playSendBlocked } from './playGuard';
 import { wsUrl } from './config';
@@ -19,6 +19,8 @@ export interface ConnState {
   room: RoomInfo | null;
   seat: number | null;
   view: PlayerView | null;
+  /** registry-mode game as this viewer sees it (view, toAct, legal, results); null at Spades / lobby */
+  mode?: ModeState | null;
   /** Public Run it! play-out (real seats), or null once the next hand starts. */
   run: RunPlayback | null;
   chat: ChatLine[];
@@ -288,7 +290,7 @@ export class TableConnection {
           if (playAdvanced) this.playSentSeq = null;
           this.clearJoinWatch();
           this.set({
-            status: 'open', room: m.room, seat: m.seat, view, run: m.run ?? null, spectator: !!m.spectator, joinFault: null,
+            status: 'open', room: m.room, seat: m.seat, view, mode: m.mode ?? null, run: m.run ?? null, spectator: !!m.spectator, joinFault: null,
             ...(settled ? { pending: false } : {}),
             ...(playAdvanced ? { playGate: (this.state.playGate ?? 0) + 1 } : {}),
           });
@@ -444,6 +446,11 @@ export class TableConnection {
   private settle(): void {
     this.inflight = null;
     if (this.ackTimer) { clearTimeout(this.ackTimer); this.ackTimer = null; }
+  }
+
+  /** Registry modes: send a move tagged with the room seq it was chosen against (a stale one is answered with fresh state). */
+  sendMove(move: unknown): void {
+    this.send({ t: 'move', move, seq: this.state.room?.seq ?? 0 });
   }
 
   send(m: ClientMsg): void {
