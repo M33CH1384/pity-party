@@ -55,7 +55,7 @@ and come back on the registry. See `docs/plan/REBUILD.md`.
 10. Desi visuals/palette, venues, PWA (2 PRs).
 11. Cloudflare provisioning + first deploy after Yoda confirms (1 PR). **(c) Every rebuild item must be back before this.**
 
-Total ≈ **33–37 PRs** (was 20–22): +1 for the split of milestone 2, +3–4 for rebuild (a), +8–10 for rebuild (b).
+Total ≈ **33–38 PRs** (was 20–22): +2 because milestones 1 and 2 each took one PR more than planned, +3–4 for rebuild (a), +8–10 for rebuild (b).
 Done so far: 6 merged plus this one. Skeleton = steps 1–4. Mode A can still ship first internally with Mode B
 hidden behind a setup flag, but launch (11) waits for everything.
 
