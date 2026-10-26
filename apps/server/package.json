@@ -9,10 +9,11 @@
     "typecheck": "tsc -p . --noEmit"
   },
   "dependencies": {
-    "@simplewebauthn/server": "^13.3.3",
     "@pp/bots": "workspace:*",
+    "@pp/game": "workspace:*",
     "@pp/protocol": "workspace:*",
-    "@pp/rules": "workspace:*"
+    "@pp/rules": "workspace:*",
+    "@simplewebauthn/server": "^13.3.3"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20260702.1"

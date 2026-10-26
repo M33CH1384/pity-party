@@ -177,6 +177,10 @@ export type ClientMsg =
   | { t: 'kick'; seat: number }
   | { t: 'rtc'; to: string; data: unknown }
   | { t: 'leave' }
+  /** host, lobby only: pick the game mode from the @pp/game registry and its setup options (validated server-side). */
+  | { t: 'mode'; modeId: string; options?: Record<string, unknown> }
+  /** a move in a registry mode (the room's `modeId` game). `seq` = RoomInfo.seq it was chosen from; stale moves are dropped. */
+  | { t: 'move'; move: unknown; seq?: number }
   /** Story co-op: concede the match for the pair (story rooms only; partnership = shared fate).
    *  The room ends the game as a pair loss and witnesses it like any story result. */
   | { t: 'concede' }
@@ -208,7 +212,20 @@ export interface MemberInfo { playerId: string; name: string; connected: boolean
 
 export type RoomPhase = 'lobby' | 'playing' | 'over';
 
+/** A registry-mode game as one viewer may see it (from the mode's own view/results). */
+export interface ModeState {
+  modeId: string;
+  view: unknown;
+  toAct: number[];
+  /** this viewer's legal moves (empty for spectators / off-turn) */
+  legal: unknown[];
+  results: { done: boolean; placements: number[]; deltas: number[]; recap: unknown };
+}
+
 export interface RoomInfo {
+  /** registry mode of this table; absent = the legacy Spades engine */
+  modeId?: string;
+  modeOptions?: Record<string, boolean | number | string>;
   code: string;
   hostId: string;
   phase: RoomPhase;
@@ -354,7 +371,7 @@ export interface RunPlayback extends RunPlayout {
 export type ServerMsg =
   | { t: 'welcome'; you: string; token: string; code: string; chat: ChatLine[]; v: number }
   /** `view.history` is null when unchanged since the last state sent on this connection (keep the previous one) */
-  | { t: 'state'; room: RoomInfo; seat: number | null; view: PlayerView | null; /** Release 10: you're watching (view = a redacted table view from seat 0: no hand, no legal moves) */ spectator?: boolean; /** remaining tricks of a resolved Run it!, so every client can play them out */ run?: RunPlayback }
+  | { t: 'state'; room: RoomInfo; seat: number | null; view: PlayerView | null; /** Release 10: you're watching (view = a redacted table view from seat 0: no hand, no legal moves) */ spectator?: boolean; /** registry-mode tables: the mode game as this viewer sees it */ mode?: ModeState; /** remaining tricks of a resolved Run it!, so every client can play them out */ run?: RunPlayback }
   | { t: 'chat'; line: ChatLine }
   /** a chat line's reactions changed (toggle): `id` names the line, the client upserts the map (not a new line) */
   | { t: 'chatReact'; id: number; reactions: ChatReactions }
@@ -411,6 +428,10 @@ export function parseClientMsg(raw: unknown): ClientMsg | null {
       return { t: 'hello', name: m.name, token: isStr(m.token, 100) ? m.token : undefined, v: isInt(m.v) ? m.v : undefined, ...(isStr(m.gid, 64) ? { gid: m.gid } : {}), ...(isStr(m.ticket, 400) ? { ticket: m.ticket } : {}) };
     case 'sit': case 'addBot': case 'removeBot': case 'kick':
       return isInt(m.seat) && m.seat >= 0 && m.seat < 4 ? { t: m.t, seat: m.seat } : null;
+    case 'mode':
+      return isStr(m.modeId, 40) ? { t: 'mode', modeId: m.modeId, ...(isObj(m.options) ? { options: m.options as Record<string, unknown> } : {}) } : null;
+    case 'move':
+      return 'move' in m && JSON.stringify(m.move ?? null).length < 2000 ? { t: 'move', move: m.move, ...(isInt(m.seq) ? { seq: m.seq } : {}) } : null;
     case 'stand': case 'start': case 'next': case 'rematch': case 'leave': case 'concede':
       return { t: m.t };
     case 'storyReady':
