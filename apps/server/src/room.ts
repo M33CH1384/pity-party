@@ -275,6 +275,13 @@ export function newRoomData(code: string, now: number, rules: TableRules): RoomD
 }
 
 /** Host table settings are untrusted: only the seat count (2–4) and turn timers are taken; the rest stays as it was. */
+/** The seats a table can offer for a mode: the registry range, capped by the room's 4 seats. */
+export function tableSeatRange(id: ModeId): { min: number; max: number } {
+  const { min, max } = modeSeatRange(id);
+  return { min: Math.min(min, MAX_TABLE_SEATS), max: Math.min(max, MAX_TABLE_SEATS) };
+}
+const MAX_TABLE_SEATS = 4;
+
 function clampRules(prev: TableRules, r: unknown): TableRules {
   const x = (r && typeof r === 'object' ? r : {}) as Partial<TableRules>;
   const pc = typeof x.playerCount === 'number' && Number.isInteger(x.playerCount) ? Math.min(4, Math.max(2, x.playerCount)) : prev.playerCount;
@@ -599,6 +606,16 @@ export class Room {
     }
   }
 
+  /** Seats at or beyond `n` are emptied (their players stand up and stay as members). */
+  private vacateBeyond(n: number): void {
+    const d = this.data;
+    for (let s = n; s < d.seats.length; s++) {
+      const slot = d.seats[s]!;
+      if (slot.kind === 'human') d.members[slot.playerId]!.seat = null;
+      d.seats[s] = { kind: 'empty' };
+    }
+  }
+
   private handle(connId: string, pid: string, msg: ClientMsg): void {
     const d = this.data;
     const me = d.members[pid]!;
@@ -671,7 +688,7 @@ export class Room {
         }
         const rules = clampRules(d.rules, msg.rules);
         if (d.modeId) {
-          const { min, max } = modeSeatRange(d.modeId);
+          const { min, max } = tableSeatRange(d.modeId);
           if (rules.playerCount < min || rules.playerCount > max) throw new RoomError('BAD_RULES', `This mode seats ${min}–${max}`);
         }
         d.rules = rules;
@@ -686,12 +703,7 @@ export class Room {
           d.botLevel = msg.botLevel;
           d.seats.forEach((s) => { if (s.kind === 'bot') s.level = msg.botLevel!; });
         }
-        // seats beyond the player count are vacated
-        for (let s = rules.playerCount; s < 4; s++) {
-          const slot = d.seats[s]!;
-          if (slot.kind === 'human') d.members[slot.playerId]!.seat = null;
-          d.seats[s] = { kind: 'empty' };
-        }
+        this.vacateBeyond(rules.playerCount);
         break;
       }
       case 'music': {
@@ -736,8 +748,10 @@ export class Room {
         this.requireHost(isHost);
         if (d.phase === 'playing') throw new RoomError('IN_GAME', 'Game in progress');
         if (!isMode(msg.modeId)) throw new RoomError('BAD_MODE', 'Unknown game mode');
-        const { min, max } = modeSeatRange(msg.modeId);
-        if (d.rules.playerCount < min || d.rules.playerCount > max) throw new RoomError('BAD_MODE', `This mode seats ${min}–${max}`);
+        // 3c: switching games fits the table to the new mode's seat range (seats beyond it are vacated)
+        const { min, max } = tableSeatRange(msg.modeId);
+        const pc = Math.min(max, Math.max(min, d.rules.playerCount));
+        if (pc !== d.rules.playerCount) { d.rules = { ...d.rules, playerCount: pc }; this.vacateBeyond(pc); }
         d.modeId = msg.modeId;
         d.modeOptions = cleanModeOptions(msg.modeId, msg.options);
         d.mg = null;

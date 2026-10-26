@@ -56,3 +56,13 @@ export function saveModeChoice(c: ModeChoice, storage: Pick<Storage, 'setItem'> 
 export function defaultChoice(id: ModeId): ModeChoice {
   return { modeId: id, options: defaultsOf(modeEntry(id).schema) };
 }
+
+/** Seats an online table can offer for a mode: the registry range capped at the table's 4 seats. Coming-soon modes parse their "2–4 players" label. */
+export const MAX_TABLE_SEATS = 4;
+export function tableSeatRange(id: ModeId): { min: number; max: number } {
+  const e = modeEntry(id);
+  let min = 2, max = MAX_TABLE_SEATS;
+  if (e?.available) { const r = getRules(id); min = r.minSeats; max = r.maxSeats; }
+  else { const m = /(\d+)\D+(\d+)/.exec(e?.seats ?? ''); if (m) { min = Number(m[1]); max = Number(m[2]); } }
+  return { min: Math.min(min, MAX_TABLE_SEATS), max: Math.min(max, MAX_TABLE_SEATS) };
+}
