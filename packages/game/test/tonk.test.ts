@@ -42,10 +42,10 @@ function runGame(opts: Record<string, unknown>, seats: number, seed: string, che
 }
 
 describe('registry + options', () => {
-  it('registered (rules + stand-in bot) but unlisted until milestone 9', () => {
+  it('registered with its bot tiers and listed (M9b)', () => {
     expect(getRules('tonk')).toBe(R);
     expect(getBot('tonk').modeId).toBe('tonk');
-    expect(listModes().map((m) => m.modeId)).not.toContain('tonk');
+    expect(listModes().map((m) => m.modeId)).toContain('tonk');
   });
   it('defaults are the documented ones; [UNVERIFIED] rules are unverified options', () => {
     expect(defaultsOf(TONK_OPTIONS)).toMatchObject({ handSize: '5', instantWin: '49-50', aces: 'low', allowDrop: true, caughtPenalty: '2', hitLock: false, slap: false, wilds: 'none', spreadBeforeDrop: false, noDiscardPickup: false, stockOut: 'lowestWins', caughtLowestCollects: true, gameEnd: 'firstToPoints', gameTarget: 10, coinStakes: false, stake: 1, pauseBetweenHands: false });

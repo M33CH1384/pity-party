@@ -3024,3 +3024,20 @@ body:has(.modal-backdrop) .setup-bar { visibility: hidden; }
 .pp-hands { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; max-height: 26dvh; overflow-y: auto; font-size: 13px; }
 .pp-hands li { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; padding: 4px 8px; border-radius: 6px; background: var(--pp-surface); }
 .pp-recap .placings li { grid-template-columns: 1fr auto auto auto; }
+
+/* Tonk table (9b): same neutral --pp-* tokens as Pitty Pat */
+.tk-spreads { display: flex; flex-direction: column; gap: 6px; max-height: 38vh; overflow-y: auto; padding: 8px; border-radius: 12px; background: var(--pp-surface-2); }
+.tk-spread-seat { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.tk-spread-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.tk-spread { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 4px 8px; border-radius: 10px; border: 1px solid rgba(var(--pp-edge-rgb), .45); max-width: 100%; flex-wrap: wrap; }
+button.tk-spread { cursor: pointer; }
+.tk-hit-tag { margin-left: 4px; font-weight: 700; font-size: .8rem; }
+.pp-mini.wild { outline: 2px solid var(--pp-accent); }
+.tk-hand { flex-wrap: wrap; }
+.tk-hand .pp-card-slot.tk-picked { transform: translateY(-8px); }
+.tk-hand .pp-card-slot.tk-picked .pcard { outline: 3px solid var(--pp-accent); }
+.tk-count { width: 100%; margin: 2px 0 0; font-size: .85rem; opacity: .8; }
+/* "Collecting and reshuffling…" beat between hands (display only; skipped under reduced motion) */
+.pp-reshuffle { margin: 0; text-align: center; font-weight: 600; opacity: .85; animation: pp-fade 700ms ease-out both; }
+@keyframes pp-fade { 0% { opacity: 0; } 25%, 75% { opacity: .85; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pp-reshuffle { display: none; } }

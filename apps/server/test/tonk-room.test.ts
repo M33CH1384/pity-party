@@ -1,7 +1,6 @@
 /**
  * Milestone 8b: a full Tonk game through the server's engine adapter (engine.ts → @pp/game registry), in a real
- * Room with 2 humans + 2 bots. Tonk is registered but unlisted: tables refuse it unless the deployment names it in
- * PREVIEW_MODES (production leaves that unset).
+ * Room with 2 humans + 2 bots. Tonk is listed since M9b (no PREVIEW_MODES needed).
  */
 import { describe, expect, it } from 'vitest';
 import type { ServerMsg } from '@pp/protocol';
@@ -14,7 +13,6 @@ const st = (env: FakeEnv, cid: string) => env.last(cid, 'state') as State;
 
 function table(options: Record<string, unknown> = {}) {
   const env = new FakeEnv();
-  env.previewModes = ['tonk'];
   for (const [i, cid] of ['a', 'b'].entries()) { env.join(cid, `P${i}`); env.send(cid, { t: 'sit', seat: i }); }
   env.send('a', { t: 'addBot', seat: 2 }); env.send('a', { t: 'addBot', seat: 3 });
   env.send('a', { t: 'mode', modeId: 'tonk', options });
@@ -36,13 +34,13 @@ function playHumans(env: FakeEnv, cids: string[]): number {
 }
 
 describe('Tonk through the room (engine adapter)', () => {
-  it('unlisted: refused without PREVIEW_MODES, allowed with it', () => {
-    expect(isMode('tonk')).toBe(false);
-    expect(isMode('tonk', ['tonk'])).toBe(true);
+  it('listed (M9b): accepted without PREVIEW_MODES', () => {
+    expect(isMode('tonk')).toBe(true);
     const env = new FakeEnv();
     env.join('a', 'Host');
     env.send('a', { t: 'mode', modeId: 'tonk' });
-    expect(env.errors('a').at(-1)!.code).toBe('BAD_MODE');
+    expect(env.errors('a').some((e) => e.code === 'BAD_MODE')).toBe(false);
+    expect(st(env, 'a').room.modeId).toBe('tonk');
   });
 
   it('plays a full game: 2 humans + 2 bots, hidden hands, points zero-sum, stats record written', () => {

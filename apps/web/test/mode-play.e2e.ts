@@ -26,7 +26,7 @@ async function newPage(b: Browser): Promise<Page> {
 /** Tap a legal card whenever it is this page's turn, until the recap shows. */
 async function playToRecap(pages: Page[], shotMid?: string, onTick?: (p: Page) => Promise<void>): Promise<void> {
   let shot = false;
-  for (let i = 0; i < 3000; i++) {
+  for (let i = 0; i < 9000; i++) {
     for (const p of pages) {
       if (await p.getByTestId('mode-recap').isVisible().catch(() => false)) continue;
       const card = p.locator('.pcard-btn:not([disabled]), .pp-move:not([disabled])').first();
@@ -260,10 +260,96 @@ async function pittyOnline(b: Browser) {
   await layoutOk(host, 'online recap');
 }
 
+async function tonkOffline(b: Browser) {
+  console.log('tonk offline');
+  const p = await newPage(b);
+  await p.goto(base);
+  await guestIn(p);
+  await p.evaluate(() => localStorage.removeItem('pp.modeChoice'));
+  await toBots(p);
+  await p.getByTestId('mode-setup').waitFor();
+  ok(!(await p.getByTestId('pick-tonk').isDisabled()), 'Tonk is listed (no "Coming soon")');
+  await p.getByTestId('pick-tonk').click();
+  ok(await p.getByTestId('pick-tonk').getAttribute('aria-checked') === 'true', 'host can pick Tonk');
+  await p.getByTestId('mode-setup').scrollIntoViewIfNeeded();
+  await p.waitForTimeout(400);
+  await p.screenshot({ path: `${shots}/9b-setup-390.png` });
+  ok(await p.evaluate(() => document.documentElement.scrollWidth) <= 390, 'tonk setup: no horizontal scroll at 390');
+  await p.evaluate(() => localStorage.setItem('pp.modeChoice', JSON.stringify({ modeId: 'tonk', options: { gameTarget: 5, handSize: '7', pauseBetweenHands: true, wilds: 'jokers' } })));
+  await toBots(p);
+  await p.getByTestId('start-bots').click();
+  await p.getByTestId('mode-screen').waitFor();
+  ok(await p.getByTestId('mode-screen').getAttribute('data-mode') === 'tonk', 'Deal me in opens Tonk vs bots');
+  ok((await p.getByTestId('pp-goal').textContent())?.includes('First to 5 points') === true, 'tonk goal line shows the points target');
+  ok(await p.getByTestId('tk-stake').count() === 0, 'tonk: no coins shown (stakes off by default)');
+  await layoutOk(p, 'tonk table');
+  const shotsTaken = { table: false, spread: false, hit: false, result: false, beat: false };
+  // bots may deal the next hand quickly: record transient panels with an observer, not just by polling
+  await p.evaluate(() => { const w = window as unknown as Record<string, boolean>; new MutationObserver(() => { if (document.querySelector('[data-testid="tk-hand-result"]')) w.__tkResult = true; if (document.querySelector('[data-testid="reshuffle-beat"]')) w.__tkBeat = true; }).observe(document.body, { childList: true, subtree: true }); });
+  const flags = () => p.evaluate(() => { const w = window as unknown as Record<string, boolean>; return { result: !!w.__tkResult, beat: !!w.__tkBeat }; });
+  // a game can end on an instant win in hand 1 (random deal): play again (same page) until the between-hands flow was seen
+  for (let game = 0; game < 4; game++) {
+    await playToRecap([p], undefined, async (pg) => {
+      if (!shotsTaken.table && await pg.getByTestId('tk-drawStock').isVisible().catch(() => false)) { shotsTaken.table = true; await pg.screenshot({ path: `${shots}/9b-table-390.png` }); await layoutOk(pg, 'tonk 7-card hand'); }
+      if (!shotsTaken.spread && await pg.locator('.pp-actions [data-testid^="tk-spread-"]').first().isVisible().catch(() => false)) { shotsTaken.spread = true; await pg.screenshot({ path: `${shots}/9b-spread-390.png` }); await layoutOk(pg, 'tonk spread controls'); }
+      if (!shotsTaken.hit && await pg.locator('[data-testid^="tk-hit-"]').first().isVisible().catch(() => false)) { shotsTaken.hit = true; await pg.screenshot({ path: `${shots}/9b-hit-390.png` }); await layoutOk(pg, 'tonk hit controls'); }
+      if (!shotsTaken.beat && await pg.getByTestId('reshuffle-beat').isVisible().catch(() => false)) shotsTaken.beat = true;
+      if (!shotsTaken.result && await pg.getByTestId('tk-hand-result').isVisible().catch(() => false)) { shotsTaken.result = true; await pg.waitForTimeout(300); await pg.screenshot({ path: `${shots}/9b-hand-result-390.png` }); await layoutOk(pg, 'tonk hand result'); }
+    });
+    const f = await flags();
+    if (f.result && f.beat && (shotsTaken.spread || shotsTaken.hit)) break;
+    await p.getByTestId('mode-again').click();
+    await p.getByTestId('mode-recap').waitFor({ state: 'hidden' });
+  }
+  const seen = await p.evaluate(() => { const w = window as unknown as Record<string, boolean>; return { result: !!w.__tkResult, beat: !!w.__tkBeat }; });
+  ok(seen.result || shotsTaken.result, 'tonk: hand result shown between hands (pauseBetweenHands)');
+  ok(seen.beat || shotsTaken.beat, 'tonk: "Collecting and reshuffling…" beat shown after Next hand');
+  ok(shotsTaken.spread || shotsTaken.hit, `tonk: spread/hit controls seen (spread ${shotsTaken.spread}, hit ${shotsTaken.hit})`);
+  const pts = await Promise.all([0, 1, 2, 3].map(async (i) => Number(((await p.getByTestId(`recap-points-${i}`).textContent()) ?? '').replace(/[^\d-]/g, ''))));
+  ok(Math.max(...pts) >= 5 && pts.reduce((a, x) => a + x, 0) === 0, `tonk: full game to the points target, zero-sum (${pts.join('/')})`);
+  ok(await p.getByTestId('tk-recap-hands').locator('li').count() >= 1, 'tonk recap lists hand by hand');
+  await p.waitForTimeout(300);
+  await p.screenshot({ path: `${shots}/9b-recap-390.png` });
+  await layoutOk(p, 'tonk recap');
+  await p.evaluate(() => localStorage.removeItem('pp.modeChoice'));
+  await p.context().close();
+}
+
+async function tonkOnline(b: Browser) {
+  console.log('tonk online');
+  const r = await fetch(`${server}/api/tables`, { method: 'POST', headers: { origin: base } });
+  if (!r.ok) throw new Error(`create ${r.status}`);
+  const { code } = await r.json() as { code: string };
+  const host = await newPage(b);
+  await host.goto(base);
+  await host.evaluate((c) => { sessionStorage.setItem(`bwm.created.${c}`, '1'); localStorage.setItem('pp.modeChoice', JSON.stringify({ modeId: 'tonk', options: { gameTarget: 5 } })); localStorage.setItem('bwm.online.name', 'Host'); }, code);
+  await host.goto(`${base}/t/${code}`);
+  await guestIn(host);
+  const guest = await newPage(b);
+  await guest.goto(`${base}/t/${code}`);
+  await guestIn(guest);
+  await host.getByTestId('start').waitFor();
+  await host.waitForTimeout(1500);
+  await host.getByTestId('start').click();
+  await host.getByTestId('mode-screen').waitFor();
+  await guest.getByTestId('mode-screen').waitFor();
+  ok(await host.getByTestId('mode-screen').getAttribute('data-mode') === 'tonk' && await guest.getByTestId('mode-screen').getAttribute('data-mode') === 'tonk', 'tonk online: both humans (+bots) on the Tonk table');
+  const hostCards = await host.locator('[data-testid^="tk-card-"]').evaluateAll((els) => els.map((e) => e.getAttribute('data-testid')));
+  const guestHtml = await guest.content();
+  ok(hostCards.length > 0 && hostCards.every((t) => !guestHtml.includes(`"${t}"`)), 'tonk online: the guest never sees the host\'s hand');
+  await playToRecap([host, guest], '9b-online-table-390.png');
+  const pts = await Promise.all([0, 1, 2, 3].map(async (i) => Number(((await host.getByTestId(`recap-points-${i}`).textContent().catch(() => '0')) ?? '').replace(/[^\d-]/g, '') || 0)));
+  ok(Math.max(...pts) >= 5 && pts.reduce((a, x) => a + x, 0) === 0, `tonk online: full game to the points target, zero-sum (${pts.join('/')})`);
+  await host.screenshot({ path: `${shots}/9b-online-recap-390.png` });
+  await layoutOk(host, 'tonk online recap');
+}
+
 const b = await chromium.launch();
 try {
   await offline(b).catch(async (e) => { for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: '/tmp/fail.png' }); throw e; });
   await pittyOffline(b).catch(async (e) => { for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: '/tmp/failpp.png' }); throw e; });
+  await tonkOffline(b).catch(async (e) => { for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: '/tmp/failtk.png' }); throw e; });
+  if (process.env.BWM_SKIP_ONLINE !== '1') await tonkOnline(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/failtko${i++}.png` }); throw e; });
   if (process.env.BWM_SKIP_ONLINE !== '1') await pittyOnline(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/failppo${i++}.png` }); throw e; });
   if (process.env.BWM_SKIP_ONLINE !== '1') await online(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/fail${i++}.png` }); throw e; });
 } finally { await b.close(); }

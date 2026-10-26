@@ -29,8 +29,8 @@ describe('registry + placeholder mode', () => {
   it('is registered with a bot', () => {
     expect(listModes().map((m) => m.modeId)).toContain('placeholder');
     expect(getBot('placeholder').modeId).toBe('placeholder');
-    expect(getRules('tonk').modeId).toBe('tonk'); // M8a: registered, unlisted
-    expect(listModes().map((m) => m.modeId)).not.toContain('tonk');
+    expect(getRules('tonk').modeId).toBe('tonk'); // M9b: listed
+    expect(listModes().map((m) => m.modeId)).toContain('tonk');
   });
   it('rejects out-of-turn and unheld cards', () => {
     const s = rules.newGame({}, 3, 'x') as HcState;
