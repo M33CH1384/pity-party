@@ -33,13 +33,25 @@ export interface AuthEnv extends ProviderEnv {
   DB?: D1Database;
   PUBLIC_ORIGIN?: string;
   ALLOWED_ORIGINS?: string;
+  /** Passkey relying-party id (a registrable domain). Default: PUBLIC_ORIGIN's hostname. Set at deploy (docs/plan/DEPLOY.md). */
+  RP_ID?: string;
+  /** Passkey relying-party display name shown by the OS sheet. Default "Pity Party". */
+  RP_NAME?: string;
+  /** Cookie name prefix (session `<p>_sid`, OAuth state `<p>_oauth`). Default "pp". Changing it signs everyone out. */
+  COOKIE_PREFIX?: string;
 }
 export interface AuthDeps { fetch: typeof fetch; now: () => number }
 
 export const SESSION_TTL_MS = 30 * 24 * 3600_000;
 const STATE_TTL_MS = 10 * 60_000;
 const CHALLENGE_TTL_MS = 5 * 60_000;
-const RP_NAME = 'Bid Wit Me';
+export const DEFAULT_RP_NAME = 'Pity Party';
+export const DEFAULT_COOKIE_PREFIX = 'pp';
+/** env COOKIE_PREFIX if it is a safe token, else the default */
+export function cookiePrefix(env: Pick<AuthEnv, 'COOKIE_PREFIX'>): string {
+  const p = env.COOKIE_PREFIX?.trim();
+  return p && /^[a-z][a-z0-9]{0,15}$/.test(p) ? p : DEFAULT_COOKIE_PREFIX;
+}
 
 interface UserRow { id: string; username: string | null; created_at: number; progress_imported_at: number | null }
 
@@ -47,8 +59,8 @@ interface UserRow { id: string; username: string | null; created_at: number; pro
 export function publicOrigin(env: AuthEnv, url: URL): string { return (env.PUBLIC_ORIGIN || url.origin).replace(/\/$/, ''); }
 export function redirectUri(env: AuthEnv, url: URL, p: ProviderId): string { return `${publicOrigin(env, url)}/api/auth/${p}/callback`; }
 function secure(origin: string) { return origin.startsWith('https://'); }
-export function sessionCookieName(origin: string) { return secure(origin) ? '__Host-bwm_sid' : 'bwm_sid'; }
-const STATE_COOKIE = 'bwm_oauth';
+export function sessionCookieName(origin: string, prefix = DEFAULT_COOKIE_PREFIX) { return secure(origin) ? `__Host-${prefix}_sid` : `${prefix}_sid`; }
+const stateCookie = (env: AuthEnv) => `${cookiePrefix(env)}_oauth`;
 
 function cookie(origin: string, name: string, value: string, maxAgeS: number, path = '/'): string {
   return `${name}=${value}; Path=${path}; Max-Age=${maxAgeS}; HttpOnly; SameSite=Lax${secure(origin) ? '; Secure' : ''}`;
@@ -89,7 +101,7 @@ const newId = () => [...crypto.getRandomValues(new Uint8Array(16))].map((x) => x
 /* ------------------------------------------------------------------ sessions */
 export async function currentUser(req: Request, env: AuthEnv, url: URL, now: number): Promise<UserRow | null> {
   if (!env.DB) return null;
-  const tok = readCookie(req, sessionCookieName(publicOrigin(env, url)));
+  const tok = readCookie(req, sessionCookieName(publicOrigin(env, url), cookiePrefix(env)));
   if (!tok) return null;
   const row = await env.DB.prepare('SELECT u.id, u.username, u.created_at, u.progress_imported_at FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id_hash = ? AND s.expires_at > ?')
     .bind(await sha256b64(tok), now).first<UserRow>();
@@ -103,9 +115,9 @@ async function startSession(env: AuthEnv, url: URL, userId: string, now: number)
     db.prepare('INSERT INTO sessions (id_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)').bind(await sha256b64(tok), userId, now, now + SESSION_TTL_MS),
   ]);
   const o = publicOrigin(env, url);
-  return cookie(o, sessionCookieName(o), tok, SESSION_TTL_MS / 1000);
+  return cookie(o, sessionCookieName(o, cookiePrefix(env)), tok, SESSION_TTL_MS / 1000);
 }
-function clearSession(env: AuthEnv, url: URL): string { const o = publicOrigin(env, url); return cookie(o, sessionCookieName(o), '', 0); }
+function clearSession(env: AuthEnv, url: URL): string { const o = publicOrigin(env, url); return cookie(o, sessionCookieName(o, cookiePrefix(env)), '', 0); }
 
 async function userView(env: AuthEnv, u: UserRow) {
   const db = env.DB!;
@@ -210,7 +222,7 @@ export async function handleAuth(req: Request, env: AuthEnv, url: URL, parts: st
 
   const me = await currentUser(req, env, url, now);
   if (a === 'logout') {
-    const tok = readCookie(req, sessionCookieName(origin));
+    const tok = readCookie(req, sessionCookieName(origin, cookiePrefix(env)));
     if (tok) await db.prepare('DELETE FROM sessions WHERE id_hash = ?').bind(await sha256b64(tok)).run();
     return json({ ok: true }, 200, { 'set-cookie': clearSession(env, url) });
   }
@@ -270,20 +282,20 @@ async function oauthStart(req: Request, env: AuthEnv, url: URL, p: ProviderId, n
   const origin = publicOrigin(env, url);
   let to = authorizeUrl(p, { clientId: creds.id!, redirectUri: redirectUri(env, url, p), state, challenge: verifier ? await pkceChallenge(verifier) : null, origin });
   if (p === 'mock') to += `&as=${encodeURIComponent((url.searchParams.get('as') ?? 'tester').slice(0, 40))}`;
-  return redirect(to, [cookie(origin, STATE_COOKIE, state, STATE_TTL_MS / 1000, '/api/auth')]);
+  return redirect(to, [cookie(origin, stateCookie(env), state, STATE_TTL_MS / 1000, '/api/auth')]);
 }
 
 async function oauthCallback(req: Request, env: AuthEnv, url: URL, p: ProviderId, deps: AuthDeps): Promise<Response> {
   const db = env.DB!;
   const now = deps.now();
   const origin = publicOrigin(env, url);
-  const clearState = cookie(origin, STATE_COOKIE, '', 0, '/api/auth');
+  const clearState = cookie(origin, stateCookie(env), '', 0, '/api/auth');
   const fail = (reason: string, ret = '/') => redirect(withParams(ret, { signin: 'error', reason }), [clearState]);
   const state = url.searchParams.get('state') ?? '';
   const row = state ? await db.prepare('SELECT * FROM oauth_states WHERE state = ?').bind(state).first<{ state: string; provider: string; verifier: string | null; mode: string; user_id: string | null; return_to: string | null; created_at: number }>() : null;
   if (row) await db.prepare('DELETE FROM oauth_states WHERE state = ?').bind(state).run(); // single use
   // the state must exist, be fresh, be for this provider, and match the cookie set on this browser at /start
-  if (!row || row.provider !== p || now - row.created_at > STATE_TTL_MS || readCookie(req, STATE_COOKIE) !== state) return fail('state');
+  if (!row || row.provider !== p || now - row.created_at > STATE_TTL_MS || readCookie(req, stateCookie(env)) !== state) return fail('state');
   const ret = safeReturn(row.return_to);
   if (url.searchParams.get('error')) return fail('cancelled', ret);
   const code = url.searchParams.get('code');
@@ -321,11 +333,14 @@ async function oauthCallback(req: Request, env: AuthEnv, url: URL, p: ProviderId
 }
 
 /* ------------------------------------------------------------------ passkeys */
-function rp(env: AuthEnv, url: URL) { const o = publicOrigin(env, url); return { origin: o, rpID: new URL(o).hostname }; }
+function rp(env: AuthEnv, url: URL) {
+  const o = publicOrigin(env, url);
+  return { origin: o, rpID: env.RP_ID?.trim() || new URL(o).hostname, rpName: env.RP_NAME?.trim() || DEFAULT_RP_NAME };
+}
 
 async function passkey(req: Request, env: AuthEnv, url: URL, b: string | undefined, c: string | undefined, body: Record<string, unknown>, now: number): Promise<Response> {
   const db = env.DB!;
-  const { origin, rpID } = rp(env, url);
+  const { origin, rpID, rpName } = rp(env, url);
   const me = await currentUser(req, env, url, now);
   await db.prepare('DELETE FROM webauthn_challenges WHERE created_at < ?').bind(now - CHALLENGE_TTL_MS).run();
 
@@ -342,7 +357,7 @@ async function passkey(req: Request, env: AuthEnv, url: URL, b: string | undefin
     }
     const existing = me ? (await db.prepare('SELECT id, transports FROM passkeys WHERE user_id = ?').bind(me.id).all<{ id: string; transports: string | null }>()).results : [];
     const options = await generateRegistrationOptions({
-      rpName: RP_NAME, rpID, userName, userDisplayName: userName,
+      rpName, rpID, userName, userDisplayName: userName,
       userID: new TextEncoder().encode(userId),
       attestationType: 'none',
       excludeCredentials: existing.map((k) => ({ id: k.id, transports: k.transports ? (JSON.parse(k.transports) as AuthenticatorTransportFuture[]) : undefined })),

@@ -13,7 +13,7 @@ import { handleSocialHttp } from '../src/social/routes';
 
 let db: D1Database;
 const NOW = 1_800_000_000_000;
-const ORIGIN = 'https://bid-wit-me.pages.dev';
+const ORIGIN = 'https://pity-party.pages.dev';
 
 async function addUserWithSession(id: string, username: string): Promise<string> {
   await db.prepare('INSERT INTO users (id, username, username_key, created_at) VALUES (?, ?, ?, 1)').bind(id, username, username.toLowerCase()).run();
@@ -26,7 +26,7 @@ const post = (body: unknown, tok?: string) => {
   const url = new URL('/api/social/presence', ORIGIN);
   return handleSocialHttp(new Request(url, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', ...(tok ? { cookie: `__Host-bwm_sid=${tok}` } : {}) },
+    headers: { 'content-type': 'application/json', ...(tok ? { cookie: `__Host-pp_sid=${tok}` } : {}) },
     body: JSON.stringify(body),
   }), { DB: db, PUBLIC_ORIGIN: ORIGIN }, url, ['api', 'social', 'presence'], NOW);
 };

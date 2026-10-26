@@ -98,7 +98,7 @@ describe('leaderboards', () => {
 });
 
 describe('my stats', () => {
-  const ORIGIN = 'https://bid-wit-me.pages.dev';
+  const ORIGIN = 'https://pity-party.pages.dev';
   it('a bots-only game is in the totals with a null Elo, and the split wins add up', async () => {
     await db.prepare("INSERT INTO users (id, username, username_key, created_at) VALUES ('m33', 'M33CH', 'm33ch', 1)").run();
     const cutBots = JSON.stringify([
@@ -115,7 +115,7 @@ describe('my stats', () => {
     const tok = 'm33-session';
     await db.prepare('INSERT INTO sessions (id_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)').bind(await sha256b64(tok), 'm33', 1, NOW + 10_000_000).run();
     const url = new URL('/api/social/me/stats', ORIGIN);
-    const res = await handleSocialHttp(new Request(url, { headers: { cookie: `__Host-bwm_sid=${tok}` } }), { DB: db, PUBLIC_ORIGIN: ORIGIN }, url, ['api', 'social', 'me', 'stats'], NOW);
+    const res = await handleSocialHttp(new Request(url, { headers: { cookie: `__Host-pp_sid=${tok}` } }), { DB: db, PUBLIC_ORIGIN: ORIGIN }, url, ['api', 'social', 'me', 'stats'], NOW);
     expect(res.status).toBe(200);
     const body = await res.json() as Awaited<ReturnType<typeof myStats>>;
     expect(body.cutthroat).toMatchObject({
@@ -195,10 +195,10 @@ describe('extra metric boards (league data wave, item 2)', () => {
   it('the new boards respect kind and route through /api/social/leaderboard', async () => {
     expect(await leaderboard(db, { board: 'books', kind: 'cutthroat', period: 'all', region: null, now: NOW })).toEqual([]);
     const tok = 'm33-session-2';
-    const ORIGIN = 'https://bid-wit-me.pages.dev';
+    const ORIGIN = 'https://pity-party.pages.dev';
     await db.prepare('INSERT INTO sessions (id_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)').bind(await sha256b64(tok), 'e', 1, NOW + 10_000_000).run();
     const url = new URL('/api/social/leaderboard?board=winpct&kind=team&scope=global&period=all', ORIGIN);
-    const res = await handleSocialHttp(new Request(url, { headers: { cookie: `__Host-bwm_sid=${tok}` } }), { DB: db, PUBLIC_ORIGIN: ORIGIN }, url, ['api', 'social', 'leaderboard'], NOW);
+    const res = await handleSocialHttp(new Request(url, { headers: { cookie: `__Host-pp_sid=${tok}` } }), { DB: db, PUBLIC_ORIGIN: ORIGIN }, url, ['api', 'social', 'leaderboard'], NOW);
     expect(res.status).toBe(200);
     const body = await res.json() as { rows: { name: string; value: number }[] };
     expect(body.rows[0]).toMatchObject({ name: 'E', value: 75 });

@@ -42,6 +42,12 @@ apps/server/wrangler.toml (already renamed in milestone 4):
 - `name = "pity-party-server"`, `workers_dev = true`
 - `ALLOWED_ORIGINS = "https://pity-party.pages.dev,http://localhost:5173,http://localhost:4173,http://127.0.0.1:4173"`
 - `PUBLIC_ORIGIN = "https://pity-party.pages.dev"` (OAuth redirect base, passkey RP ID, cookie site)
+- **Accounts (5a), must be right before the first sign-in:**
+  - `RP_ID = "pity-party.pages.dev"`: passkey relying-party id. Must match PUBLIC_ORIGIN's host (or a registrable
+    parent if a custom domain is added). **Changing it later orphans every passkey**, so pick the final domain first.
+  - `RP_NAME = "Pity Party"`: the name the OS passkey sheet shows.
+  - `COOKIE_PREFIX = "pp"`: session cookie `__Host-pp_sid` (https) / `pp_sid` (http dev), OAuth state `pp_oauth`.
+    Lowercase letters/digits only; anything else falls back to `pp`. Changing it signs everyone out.
 - `ADMIN_USERNAMES = "M33CH"` — confirm with Demetrius (chat moderators)
 - `[[d1_databases]] binding = "DB"`, `database_name = "pity-party"`,
   **`database_id = "00000000-0000-0000-0000-000000000000"` ← the only placeholder; fill after step 1**
@@ -100,6 +106,6 @@ Watch from Open tables → chat → reload (reconnect) → finish → Rematch (s
 - Coins only — no payment provider, no real-money secrets.
 
 ## 7. Known leftovers (not blockers)
-Cookie names (`bwm_sid`, `bwm_oauth`) and `bwm.*` storage keys are per-origin, so they cannot collide with
+Cookie names are now `pp_sid`/`pp_oauth` (COOKIE_PREFIX). `bwm.*` browser storage keys are per-origin, so they cannot collide with
 BWM on a different pages.dev host; renaming them is cosmetic (REBUILD.md / 3d list). privacy.html/terms.html
 still name BWM — needs a legal text pass before public launch.

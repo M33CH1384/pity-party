@@ -36,7 +36,7 @@ const SECURITY = (server: string) => ({
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Permissions-Policy': 'geolocation=(), payment=(), usb=()',
 });
-const prodServer = (process.env.VITE_SERVER_URL || 'https://bid-wit-me-server.demetrius-robinson31.workers.dev').trim().replace(/\/$/, '');
+const prodServer = (process.env.VITE_SERVER_URL || 'https://pity-party-server.invalid').trim().replace(/\/$/, '');
 const localServer = 'http://127.0.0.1:8787';
 /**
  * The generated `_headers` body (extracted so tests can pin it). The

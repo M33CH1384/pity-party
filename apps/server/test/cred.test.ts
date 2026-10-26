@@ -44,7 +44,7 @@ async function session(uid: string, tok = `${uid}-tok`) {
   return tok;
 }
 const authed = (tok: string, path: string, init?: RequestInit) =>
-  handleCredHttp(new Request(new URL(path, ORIGIN), { headers: { cookie: `__Host-bwm_sid=${tok}` }, ...init }), { DB: db, PUBLIC_ORIGIN: ORIGIN }, new URL(path, ORIGIN), path.split('/').filter(Boolean), NOW);
+  handleCredHttp(new Request(new URL(path, ORIGIN), { headers: { cookie: `__Host-pp_sid=${tok}` }, ...init }), { DB: db, PUBLIC_ORIGIN: ORIGIN }, new URL(path, ORIGIN), path.split('/').filter(Boolean), NOW);
 
 beforeEach(async () => {
   db = await makeD1();
@@ -363,7 +363,7 @@ describe('daily bonus grant report (owner 2026-10-23: the push tap landed silent
     await db.prepare('INSERT INTO sessions (id_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
       .bind(await sha256b64('a-long-tok'), 'a', 1, NOW + 30 * DAY).run();
     const call = (now: number) => handleCredHttp(
-      new Request(new URL('/api/profile/me', ORIGIN), { headers: { cookie: '__Host-bwm_sid=a-long-tok' } }),
+      new Request(new URL('/api/profile/me', ORIGIN), { headers: { cookie: '__Host-pp_sid=a-long-tok' } }),
       { DB: db, PUBLIC_ORIGIN: ORIGIN }, new URL('/api/profile/me', ORIGIN), ['api', 'profile', 'me'], now);
     const d1 = await (await call(NOW)).json() as any;
     expect(d1.dailyBonus).toMatchObject({ granted: true, amount: 100, streak: 1, day: '2027-01-15' });

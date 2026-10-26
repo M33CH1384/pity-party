@@ -62,6 +62,7 @@
  * showcased badges) edit through the card's Edit card button
  * (profile/CardEditor.tsx), separate from the Edit profile stack.
  */
+import { OFFERED_MODE_NAME } from '../offeredModes';
 import { useEffect, useRef, useState } from 'react';
 import { presenceLine } from '@pp/protocol';
 /** Story Mode collectibles by name. TODO(rebuild): Story Mode (REBUILD.md); until then ids show raw. */
@@ -116,6 +117,8 @@ interface CredData {
   season?: { id: string; name: string; endsAt: number };
   rank: { team: SeasonRank; cutthroat: SeasonRank };
   stats: { team: Record<string, number | string | null>; cutthroat: Record<string, number | string | null> };
+  /** Pity Party: generic per-mode stats from mode_games (every registry mode) */
+  modes?: ModeStatsData;
   challenges?: { daily: Challenge[]; weekly: Challenge[]; season?: SeasonChallenges };
   achievements: Achievement[];
   unlocks?: Unlock[];
@@ -321,6 +324,41 @@ const STAT_LABELS: Record<string, string> = {
   shotsGiven: 'Shots given', shotsTaken: 'Shots taken', wheels: 'Wheels', bjWins: 'Blackjack wins',
   winsVsPlayers: 'Wins vs players', winsVsBots: 'Wins vs bots',
 };
+
+export interface ModeStatsData {
+  total: { games: number; wins: number; coins: number };
+  modes: { modeId: string; games: number; wins: number; coins: number; avgPlace: number; lastAt: number }[];
+  recent: { modeId: string; endedAt: number; place: number; of: number; delta: number }[];
+}
+const modeTitle = (id: string) => OFFERED_MODE_NAME[id as keyof typeof OFFERED_MODE_NAME] ?? id;
+const coinsTxt = (n: number) => `${n > 0 ? '+' : ''}${n.toLocaleString()} coins`;
+const ordinal = (n: number) => `${n}${n % 10 === 1 && n % 100 !== 11 ? 'st' : n % 10 === 2 && n % 100 !== 12 ? 'nd' : n % 10 === 3 && n % 100 !== 13 ? 'rd' : 'th'}`;
+
+/** Generic stats for every registry mode (5a): totals, a row per mode, last few games. */
+export function ModeStatsBlock({ modes }: { modes: ModeStatsData }) {
+  const t = modes.total;
+  return (
+    <div className="mode-stats" data-testid="mode-stats">
+      <div className="soc-stats wins-summary">
+        <div><b>{t.games}</b><small>games</small></div>
+        <div><b>{t.games ? Math.round((t.wins / t.games) * 100) : 0}%</b><small>wins</small></div>
+        <div><b>{t.coins > 0 ? '+' : ''}{t.coins.toLocaleString()}</b><small>coins net</small></div>
+      </div>
+      {!modes.modes.length ? <p className="soc-empty" data-testid="mode-stats-empty">No finished games yet. Play a table and your record shows up here.</p> : (
+        <>
+          {modes.modes.map((m) => (
+            <div key={m.modeId} data-testid={`mode-stats-${m.modeId}`}>
+              <h4>{modeTitle(m.modeId)}</h4>
+              <StatRows rows={[['Games', String(m.games)], ['Wins', `${m.wins} (${Math.round((m.wins / m.games) * 100)}%)`], ['Avg finish', String(m.avgPlace)], ['Coins', coinsTxt(m.coins)]]} />
+            </div>
+          ))}
+          <h4>Recent games</h4>
+          <StatRows rows={modes.recent.map((g) => [`${modeTitle(g.modeId)} · ${new Date(g.endedAt).toLocaleDateString()}`, `${ordinal(g.place)} of ${g.of} · ${coinsTxt(g.delta)}`] as [string, string])} />
+        </>
+      )}
+    </div>
+  );
+}
 
 /** ESPN-style stat table (owner, 2026-10-20: stats should look "like looking
  *  at ESPN but for Spades players") — label left, number right, striped rows,
@@ -800,46 +838,15 @@ export function ProfileView({ host, name, id }: {
         {activeTab === 'stats' && (
           <>
             {!me && socialP && acct.user?.username && <CompareBlock them={socialP} myName={acct.user.username} />}
-            {cred && (
-              <>
-                <p className="rank-explainer" data-testid="rating-explainer">Rating starts at 1,200. Win rated games to raise it, lose and it drops — beating stronger players moves it more.</p>
-                <div className="rank-cards">
-                  <RankCard title="Partnership" rank={cred.rank.team} />
-                  <RankCard title="Cutthroat" rank={cred.rank.cutthroat} />
-                </div>
-              </>
-            )}
+            {cred?.modes && <ModeStatsBlock modes={cred.modes} />}
             {socialP && (
               <div className="soc-stats wins-summary">
                 <div><b>{socialP.totals.games}</b><small>online games</small></div>
                 <div><b>{socialP.totals.games ? Math.round((socialP.totals.wins / socialP.totals.games) * 100) : 0}%</b><small>wins</small></div>
               </div>
             )}
-            {cred && (
-              <>
-                <h3>Partnership</h3><StatsGrid stats={cred.stats.team} />
-                <h3>Cutthroat</h3><StatsGrid stats={cred.stats.cutthroat} />
-              </>
-            )}
-            {socialP?.stats && socialP.stats.games > 0 && (
-              <>
-                <h4>Online record</h4>
-                <div data-testid="profile-stats">
-                  <StatRows rows={[
-                    ['Win streak', `${socialP.stats.streak} (best ${socialP.stats.bestStreak})`],
-                    ['Bid accuracy', `${socialP.stats.accuracy ?? '—'}${socialP.stats.accuracy !== null ? '%' : ''}`],
-                    ['Books / hand', String(socialP.stats.booksPerHand ?? '—')],
-                    ['Nils made', socialP.stats.nil],
-                    ['Shots given', String(socialP.stats.shotsGiven)],
-                    ['Shots taken', String(socialP.stats.shotsTaken)],
-                    ['Wheels', String(socialP.stats.wheels)],
-                    ['Big Joker wins', String(socialP.stats.bjWins)],
-                    ['Avg bid', `${socialP.stats.bidSec ?? '—'}s`],
-                    ['Avg play', `${socialP.stats.playSec ?? '—'}s`],
-                  ]} />
-                </div>
-              </>
-            )}
+            {/* TODO(rebuild): Spades rating cards (Partnership/Cutthroat), Spades stat grids and the Spades
+                "Online record" rows (bids, books, nils, wheels, Big Joker) are off — REBUILD.md P1. */}
             {socialP?.vsYou && <p className="soc-vs" data-testid="profile-vs">You vs {socialP.username}: <b>{socialP.vsYou.wins}–{socialP.vsYou.losses}</b> in {socialP.vsYou.games} game{socialP.vsYou.games === 1 ? '' : 's'}</p>}
             {socialP && (
               <>
