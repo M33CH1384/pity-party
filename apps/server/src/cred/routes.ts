@@ -26,7 +26,6 @@
  */
 import { type AuthEnv, currentUser } from '../auth/routes';
 import { isAdmin } from '../social/routes';
-import { hasStoryAccess } from '../story/access';
 import { myStats } from '../stats/boards';
 import { avatarOf, parseAvatarDataUrl } from './avatar';
 import { cleanTagline, taglineOf } from './tagline';
@@ -113,10 +112,7 @@ async function fullProfile(db: D1Database, userId: string, username: string, now
     card,
     /** developer (owner) accounts bypass unlock gates, e.g. The Pj's */
     dev,
-    /** story-mode access (see story/access): admins, the named player
-     *  allowlist while story mode is owner-only, everyone once the lock
-     *  is off. The client keys the story lock off this — never off dev —
-     *  so an allowlisted player plays without holding any dev surface. */
+    /** Pity Party: Story Mode was removed; always false. */
     storyAccess,
     level: { ...level, xpForNext: xpForLevel(level.level) },
     season: { id: season.id, name: season.name, endsAt: season.endsAt },
@@ -146,7 +142,7 @@ export async function handleCredHttp(req: Request, env: CredEnv, url: URL, parts
 
   if (parts[1] === 'profile' && parts[2] === 'me' && req.method === 'GET') {
     if (!me) return json({ error: 'Sign in to see your profile.' }, 401);
-    return json(await fullProfile(db, me.id, me.username ?? 'Player', now, isAdmin(env, me.id, me.username ?? null), hasStoryAccess(env, me.id, me.username ?? null)));
+    return json(await fullProfile(db, me.id, me.username ?? 'Player', now, isAdmin(env, me.id, me.username ?? null), false));
   }
   if (parts[1] === 'profile' && parts[2] === 'me' && parts[3] === 'avatar' && (req.method === 'POST' || req.method === 'DELETE')) {
     if (!me) return json({ error: 'Sign in to change your picture.' }, 401);
