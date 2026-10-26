@@ -16,6 +16,7 @@
     "@react-three/xr": "6.6.32",
     "@simplewebauthn/browser": "^13.3.0",
     "@pp/bots": "workspace:*",
+    "@pp/game": "workspace:*",
     "@pp/protocol": "workspace:*",
     "@pp/rules": "workspace:*",
     "html-to-image": "^1.11.13",

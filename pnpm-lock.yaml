@@ -85,6 +85,9 @@ importers:
       '@pp/bots':
         specifier: workspace:*
         version: link:../../packages/bots
+      '@pp/game':
+        specifier: workspace:*
+        version: link:../../packages/game
       '@pp/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol
