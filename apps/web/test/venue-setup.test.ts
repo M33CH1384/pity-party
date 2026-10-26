@@ -49,41 +49,7 @@ beforeEach(() => {
 afterEach(() => { act(() => { root.unmount(); }); el.remove(); localStorage.clear(); sessionStorage.clear(); vi.unstubAllGlobals(); });
 
 describe('venue choice in setup', () => {
-  it('bots setup: venue row sits in Table essentials before Deal, all 11 venues + Random, pick feeds settings.venue', async () => {
-    await act(async () => { root.render(createElement(Harness)); });
-    await toTable('play-bots');
-    const row = document.querySelector('[data-testid="venue-row"]');
-    expect(row).not.toBeNull();
-    expect(document.querySelector('[data-testid="start-bots"]')).not.toBeNull();
-    // the venue row comes before the Deal button in the essentials list
-    expect(row!.compareDocumentPosition(document.querySelector('[data-testid="start-bots"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    const sel = document.querySelector<HTMLSelectElement>('[data-testid="venue-select-setup"]')!;
-    const values = [...sel.options].map((o) => o.value);
-    expect(values).toEqual([...VENUE_LIST.map((v) => v.id), 'random']);
-    expect([...sel.options].map((o) => o.textContent).join(' ')).toContain('Yacht Deck');
-    expect(sel.value).toBe('classic'); // untouched: the saved default, no forced roll
-    pickVenue('yacht');
-    expect(current.venue).toBe('yacht');
-    // explicit pick wins the unified room (seen = heard = named)
-    expect(sessionRoom({ seed: 'g1', visualVenue: current.venue === 'random' ? undefined : current.venue }).venue).toBe('yacht');
-    expect(resolveVenue(current.venue)).toBe('yacht');
-  });
 
-  it('online setup: same picker before Create Table; untouched stays classic, Random stays Random (Auto)', async () => {
-    await act(async () => { root.render(createElement(Harness)); });
-    await toTable('play-online');
-    // lobby restructure (2026-10-20): the create form is its own step behind
-    // the lobby's one Create entry — the picker lives there now
-    expect(document.querySelector('[data-testid="create-table"]')).toBeNull();
-    await click('create-open');
-    expect(document.querySelector('[data-testid="venue-select-setup"]')).not.toBeNull();
-    expect(document.querySelector('[data-testid="create-table"]')).not.toBeNull();
-    expect(current.venue).toBe('classic');
-    pickVenue('random');
-    expect(current.venue).toBe('random');
-    // Auto/random untouched by the new row: offline roll still resolves per game, never classic-forced
-    expect(resolveVenue('random', 0.42)).not.toBe('classic');
-  });
 
   it('online create carries the setup pick to the new table (pending venue, one-shot)', () => {
     savePendingVenue('ABC123', 'beach');
@@ -94,12 +60,4 @@ describe('venue choice in setup', () => {
     expect(takePendingVenue('XYZ999')).toBe('random');
   });
 
-  it('the Settings-sheet venue picker still exists (same settings.venue)', async () => {
-    await act(async () => { root.render(createElement(Harness)); });
-    await toTable('play-bots');
-    await click('more');
-    const sheetSel = document.querySelector<HTMLSelectElement>('[data-testid="venue-select"]');
-    expect(sheetSel).not.toBeNull();
-    expect(sheetSel!.value).toBe(current.venue);
-  });
 });

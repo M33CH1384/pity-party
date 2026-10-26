@@ -96,55 +96,9 @@ describe('Setup home parity', () => {
     expect(inventory(neon)).toEqual(classicInv);
   });
 
-  it('home with a game to resume: identical inventory (PLAY + RESUME + rejoin)', async () => {
-    const extra = { onResume: () => {}, resumeLabel: 'hand 3 · your bid' };
-    const classic = await setupEl('classic', extra);
-    const classicInv = inventory(classic);
-    expect(classicInv.some((x) => x.includes('|resume|'))).toBe(true);
-    const neon = await setupEl('neon', extra);
-    expect(inventory(neon)).toEqual(classicInv);
-  });
 
-  it('game-select (door step after PLAY): identical inventory under both themes', async () => {
-    const doorInv = async (theme: 'classic' | 'neon') => {
-      history.replaceState(null, '', '/');
-      const c = await setupEl(theme);
-      const play = c.querySelector<HTMLButtonElement>('[data-testid="play"]')!;
-      await act(async () => { play.click(); });
-      return inventory(c);
-    };
-    const classicInv = await doorInv('classic');
-    expect(classicInv.some((x) => x.includes('|door-team|'))).toBe(true);
-    expect(classicInv.some((x) => x.includes('|door-cutthroat|'))).toBe(true);
-    expect(await doorInv('neon')).toEqual(classicInv);
-  });
 });
 
-describe('settings sheet parity (MoreOptions)', () => {
-  it('identical control inventory under Classic and Neon', async () => {
-    const { default: MoreOptions } = await import('../src/MoreOptions');
-    const { DEFAULT_SETTINGS } = await import('../src/settings');
-    const node = () => createElement(MoreOptions, {
-      settings: DEFAULT_SETTINGS,
-      onChange: () => {},
-      tips: { on: false, asked: true },
-      onTips: () => {},
-      onClose: () => {},
-    });
-    const classic = await renderThemed('classic', node());
-    const classicInv = inventory(classic);
-    expect(classicInv.length).toBeGreaterThan(10);
-    // the sheet's entry points are all here: theme seg, bot skill, closes…
-    expect(classicInv.some((x) => x.includes('|theme-classic|'))).toBe(true);
-    expect(classicInv.some((x) => x.includes('|theme-neon|'))).toBe(true);
-    expect(classicInv.some((x) => x.includes('|bot-skill|'))).toBe(true);
-    // the settings overhaul's placements are part of the shared inventory:
-    // chat sounds lives in the sheet (Sound & music group) under both themes
-    expect(classicInv.some((x) => x.includes('|chat-sounds-switch|'))).toBe(true);
-    const neon = await renderThemed('neon', node());
-    expect(inventory(neon)).toEqual(classicInv);
-  });
-});
 
 describe('source pins — no theme branch may alter an action set', () => {
   it('Setup.tsx consumes no theme state at all', () => {

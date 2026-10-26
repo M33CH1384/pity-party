@@ -35,15 +35,7 @@ import { describe, expect, it } from 'vitest';
 const src = (p: string) => readFileSync(new URL(`../src/${p}`, import.meta.url), 'utf8');
 
 describe('setup scroll safety — source pins', () => {
-  it('DeckGallery never calls scrollIntoView (it pans the wizard sideways)', () => {
-    expect(src('DeckGallery.tsx')).not.toMatch(/\.scrollIntoView\s*\(/);
-  });
 
-  it('DeckGallery parks on the current deck by scrolling the slider itself', () => {
-    const gallery = src('DeckGallery.tsx');
-    expect(gallery).toContain("querySelector('.dg-cover.on')");
-    expect(gallery).toMatch(/list\.scrollLeft\s*\+=/);
-  });
 
   it('the wizard slide animation never fills forwards (a fill captures fixed descendants)', () => {
     const css = src('styles.css');

@@ -7,7 +7,6 @@ import { createPortal } from 'react-dom';
 import { TrumpLadder } from '../trumpLadder';
 import { BOT_SKILL_SETTINGS, SKILL_SETTING_LABEL, TALK_INTENSITY_LABEL, type TalkIntensity, skillSettingOf } from '@pp/bots';
 import { TALK_INTENSITIES, type BotLevel } from '@pp/protocol';
-import { TALK_HINT } from '../MoreOptions';
 import { LockedRulesPanel } from '../LockedRules';
 import type { RoomInfo, SeatInfo } from '@pp/protocol';
 import { type ModeKey, type Settings, MODES, modeTitle, rulesSummary, settingsToRules } from '../settings';
@@ -202,10 +201,6 @@ export default function Lobby({ conn, cs, mesh, settings, onSettings, onBackToGa
           <label className="row"><span className="row-label">Bot skill<small>Mixed: every bot rolls its own (hidden)</small></span><span className="row-control">
             <select data-testid="lobby-bot-skill" value={skillSettingOf(room.botLevel)} onChange={(e) => config(settings, timerKey(room), e.target.value as BotLevel)}>
               {BOT_SKILL_SETTINGS.map((k) => <option key={k} value={k}>{SKILL_SETTING_LABEL[k]}</option>)}
-            </select></span></label>
-          <label className="row"><span className="row-label">Trash talk<small>{TALK_HINT[room.talkIntensity ?? 'cookout']}</small></span><span className="row-control">
-            <select data-testid="lobby-talk-intensity" value={room.talkIntensity ?? 'cookout'} onChange={(e) => config(settings, timerKey(room), room.botLevel, room.talkSec, room.afkLimit ?? 3, room.partnerMicMute ?? false, room.nukeIntensity ?? 'full', e.target.value as TalkIntensity)}>
-              {TALK_INTENSITIES.map((k) => <option key={k} value={k}>{TALK_INTENSITY_LABEL[k]}{k === 'cookout' ? ' (default)' : ''}</option>)}
             </select></span></label>
           <label className="row"><span className="row-label">Shot = out<small>shot on hand 1, or twice in a row, loses</small></span><span className="row-control">
             <button type="button" data-testid="lobby-shot-out" className={`toggle ${settings.shotOut !== false ? 'on' : ''}`} role="switch" aria-checked={settings.shotOut !== false} aria-label="Shot = out" onClick={() => set('shotOut', settings.shotOut === false)}><span /></button>

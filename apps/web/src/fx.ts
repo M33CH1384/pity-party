@@ -162,7 +162,7 @@ if (typeof window !== 'undefined') (window as unknown as { __bwmFx?: FxBus }).__
 
 const FX_CUES = new Set(['jokerLittle', 'jokerBig', 'nuke', 'overcut', 'overcut3']);
 /** A landing cue from a card animation: plain sounds play; joker cues go through the effects bus (sound + visuals). */
-export function fireCue(c: string, delay = 0, seat?: import('./three/layout').SeatPos, playerCount = 4) {
+export function fireCue(c: string, delay = 0, seat?: 'bottom' | 'left' | 'top' | 'right', playerCount = 4) {
   if (FX_CUES.has(c.split('|')[0]!)) {
     const go = () => fx.emit(c as FxKind);
     if (c.startsWith('overcut')) {

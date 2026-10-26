@@ -8,7 +8,7 @@
  * `cancelHaptics` calls vibrate(0) when an animation is skipped or the page is hidden.
  */
 import { useSyncExternalStore } from 'react';
-import { isIosWebKit, currentNukeDevice } from './three/nukeVisual';
+import { isIosWebKit, currentNukeDevice } from './nukeVisual';
 
 export const HAPTIC = {
   /** Heartbeat lub, fired when a beat mark is crossed. */

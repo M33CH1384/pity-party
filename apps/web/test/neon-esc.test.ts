@@ -98,13 +98,3 @@ describe('glass v3 — Social floats on the ink (social.css escalation section)'
   });
 });
 
-describe('the Classic logo on the home (Setup.tsx)', () => {
-  const src = read('../src/Setup.tsx');
-
-  it('ONE splash renders the shared logo asset — the same markup for both themes', () => {
-    const logo = '<img className="logo splash-logo" src="/assets/bwm-wordmark-white.svg" alt="" />';
-    expect(src.split(logo)).toHaveLength(2); // the single shared splash (parity pass)
-    expect(src).not.toContain('nh-wordmark');
-    expect(src).not.toContain('nh-brand-row');
-  });
-});

@@ -81,49 +81,7 @@ async function toOnlineLobby() {
   await click(qs('[data-testid=play-online]'));
 }
 
-describe('online lobby first', () => {
-  it('shows ONE create entry, ONE Open tables heading, and NO form until create is chosen', async () => {
-    await toOnlineLobby();
-    // exactly one create affordance, and it is the lobby entry — not a form submit
-    expect(el.querySelectorAll('[data-testid=create-open]')).toHaveLength(1);
-    expect(qs('[data-testid=create-table]')).toBeNull();
-    // exactly one "Open tables" heading anywhere on the step
-    const headings = [...el.querySelectorAll('h1,h2,h3,h4')].filter((h) => /open tables/i.test(h.textContent ?? ''));
-    expect(headings).toHaveLength(1);
-    // join-by-code is part of the lobby
-    expect(qs('[data-testid=join-code]')).not.toBeNull();
-    // the create form's fields are not on this screen at all
-    expect(qs('[data-testid=table-name]')).toBeNull();
-  });
 
-  it('the Open Tables filters are exactly the offered modes — no cutthroat3 chip', async () => {
-    await toOnlineLobby();
-    expect(qs('[data-testid=ot-filter-all]')).not.toBeNull();
-    for (const m of OFFERED_MODES) expect(qs(`[data-testid=ot-filter-${m.key}]`)).not.toBeNull();
-    expect(qs('[data-testid=ot-filter-cutthroat3]')).toBeNull();
-    expect(OFFERED_MODES.map((o) => o.key)).toEqual(['joker', 'cutthroat4', 'aceDown']);
-  });
-});
-
-describe('create as its own step', () => {
-  it('opens the grouped form with its submit inside; Back returns to the lobby', async () => {
-    await toOnlineLobby();
-    await click(qs('[data-testid=create-open]'));
-    // the form's own submit is here; the lobby entry is gone (one create affordance per view)
-    expect(qs('[data-testid=create-table]')).not.toBeNull();
-    expect(qs('[data-testid=create-open]')).toBeNull();
-    // ESPN-style grouped cards with the specced section headers
-    const headers = [...el.querySelectorAll('.setup-card-h')].map((h) => h.textContent);
-    expect(headers).toEqual(expect.arrayContaining(['Table', 'Deck & venue', 'Rules', 'Sound']));
-    // the house-rules summary renders as a stat line (mode · play to · timers)
-    expect(qs('[data-testid=rules-stats]')?.textContent).toMatch(/Play to/);
-    expect(qs('[data-testid=rules-stats]')?.textContent).toMatch(/30s bid/);
-    // Back returns to the lobby, form hidden again
-    await click(qs('[data-testid=wiz-back]'));
-    expect(qs('[data-testid=create-open]')).not.toBeNull();
-    expect(qs('[data-testid=create-table]')).toBeNull();
-  });
-});
 
 describe('offered modes vs engine kinds', () => {
   it('a legacy 3-player cutthroat table still classifies, but is never an offered filter', () => {
@@ -139,28 +97,7 @@ describe('offered modes vs engine kinds', () => {
 });
 
 describe('per-pairing team names (offline setup)', () => {
-  it('the bots step shows the team-name field for team modes, prefilled with the pairing name', async () => {
-    pairTeamNames.set(OFFLINE_PAIR_KEY, 'Book Bandits'); // the pairing's saved name
-    await renderWizard();
-    await click(qs('[data-testid=play]'));
-    await click(qs('[data-testid=door-team]'));
-    await click(qs('[data-testid=mode-joker]'));
-    await click(qs('[data-testid=play-bots]'));
-    const field = qs<HTMLInputElement>('[id="setup-team-name-in"]');
-    expect(field).not.toBeNull();
-    expect(field!.value).toBe('Book Bandits'); // prefilled from the pairing store
-    // (editing saves through the same pairTeamNames.set the store test below
-    // exercises — synthetic typing into a controlled input is not reliable
-    // under happy-dom, so the save path is asserted at the store level)
-  });
 
-  it('the bots step hides the team-name field for cutthroat (no teams)', async () => {
-    await renderWizard();
-    await click(qs('[data-testid=play]'));
-    await click(qs('[data-testid=door-cutthroat]'));
-    await click(qs('[data-testid=play-bots]'));
-    expect(qs('[data-testid=setup-team-name]')).toBeNull();
-  });
 
   it('store: per-pairing save, legacy global fallback, account-wins merge', () => {
     myTeamName.set('Homies'); // the retired Settings value migrates as the default

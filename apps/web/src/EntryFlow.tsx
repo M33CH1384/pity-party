@@ -133,15 +133,7 @@ export default function EntryFlow({ onPrefsDone }: { onPrefsDone?: () => void })
           </div>
         </div>
       )}
-      {offerVisible && prefsView === 'settings' && prefsSettings && prefsTips && (
-        <MoreOptions
-          settings={prefsSettings}
-          onChange={(s) => { setPrefsSettings(s); saveSettings(s); }}
-          tips={prefsTips}
-          onTips={setPrefsTips}
-          onClose={finishPrefs}
-        />
-      )}
+      {offerVisible && prefsView === 'settings' && <MoreOptions onClose={finishPrefs} />}
     </>
   );
 }

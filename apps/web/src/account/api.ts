@@ -7,7 +7,6 @@ import { useSyncExternalStore } from 'react';
 import { clearIdleNotice } from '../inactivity';
 import { invalidateVenueUnlocks } from '../venues';
 import { badges, mergeBadges } from '../badges';
-import { loadSeries } from '../Series';
 import { myTeamName, pairTeamNames } from '../TeamName';
 import { loadName, saveName } from '../online/identity';
 
@@ -191,7 +190,7 @@ function passkeyError(e: unknown): string {
 
 /* ---- "Save my progress" */
 export function localProgress() {
-  return { badges: badges(), series: loadSeries(), teamName: myTeamName.get() || null, teamNames: pairTeamNames.all() };
+  return { badges: badges(), series: null, teamName: myTeamName.get() || null, teamNames: pairTeamNames.all() };
 }
 export function hasLocalProgress(): boolean { const p = localProgress(); return p.badges.length > 0 || !!p.series || !!p.teamName || Object.keys(p.teamNames).length > 0; }
 export async function saveProgress(): Promise<string | null> {
