@@ -50,11 +50,18 @@ export class RuleError extends Error {
 
 const RULES = new Map<ModeId, RuleSet>();
 const BOTS = new Map<ModeId, BotStrategy>();
+const UNLISTED = new Set<ModeId>();
 
-export function registerMode<S, M, V>(rules: RuleSet<S, M, V>, bot: BotStrategy<M, V>): void {
+/**
+ * `listed: false` registers an engine that is built and tested but not offered yet: `getRules` works (tests,
+ * tooling), but `listModes` leaves it out, so the Setup picker keeps it "coming soon" and the server won't open
+ * tables for it. Flip to listed when its table view ships.
+ */
+export function registerMode<S, M, V>(rules: RuleSet<S, M, V>, bot: BotStrategy<M, V>, opts: { listed?: boolean } = {}): void {
   if (rules.modeId !== bot.modeId) throw new Error('rule set and bot mode differ');
   RULES.set(rules.modeId, rules as unknown as RuleSet);
   BOTS.set(bot.modeId, bot as unknown as BotStrategy);
+  if (opts.listed === false) UNLISTED.add(rules.modeId); else UNLISTED.delete(rules.modeId);
 }
 export function getRules(id: ModeId): RuleSet {
   const r = RULES.get(id);
@@ -67,5 +74,5 @@ export function getBot(id: ModeId): BotStrategy {
   return b;
 }
 export function listModes(): { modeId: ModeId; title: string }[] {
-  return [...RULES.values()].map((r) => ({ modeId: r.modeId, title: r.title }));
+  return [...RULES.values()].filter((r) => !UNLISTED.has(r.modeId)).map((r) => ({ modeId: r.modeId, title: r.title }));
 }

@@ -18,6 +18,7 @@ export const PITTY_PAT_OPTIONS: readonly OptionDef[] = [
   { key: 'dealtWinAuto', label: 'Dealt pairs win after shedding', type: 'bool', default: true, source: 'BLZ / RRB-PP', verified: true },
   { key: 'stockEmpty', label: 'When the stock runs out', type: 'enum', default: 'reshuffle', choices: choices(['reshuffle', 'Reshuffle the discards'], ['void', 'Void the hand']), source: 'RRB-PP (reshuffle); void house', verified: false },
   { key: 'scoring', label: 'Scoring', type: 'enum', default: 'pot', choices: choices(['pot', 'Coin pot'], ['handsWon', 'Hands won']), source: 'RRB-PP', verified: true },
+  { key: 'stack', label: 'Starting coins (per game)', type: 'int', default: 10, min: 1, max: 100, source: 'house (RRB-PP chips, amount not given)', verified: false, help: 'Play coins only; players who can’t cover the ante drop out' },
   { key: 'ante', label: 'Ante (coins)', type: 'int', default: 1, min: 0, max: 10, source: 'RRB-PP chips', verified: true },
   { key: 'pityPayouts', label: '"Pity" payouts (per pair, double for a dealt win)', type: 'bool', default: false, source: 'house', verified: false },
   { key: 'gameEnd', label: 'Game ends', type: 'enum', default: 'lastWithChips', choices: choices(['lastWithChips', 'Last player with coins'], ['firstToWins', 'First to N hand wins'], ['fixedHands', 'After N hands']), source: 'RRB-PP', verified: true },
