@@ -708,3 +708,12 @@
 .lobby-game-name small { opacity: .75; }
 .lobby-game-facts .row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0; }
 .lobby-game .mode-options[disabled] { opacity: .85; }
+
+/* Milestone 4: table chat on the registry-mode table (players + spectators) */
+.table-chat-tab { position: fixed; z-index: 43; right: 14px; bottom: calc(14px + env(safe-area-inset-bottom)); width: 52px; height: 52px; border-radius: 50%; border: 1px solid rgba(255,255,255,.14); background: var(--glass-strong, rgba(21,23,25,.96)); color: var(--ink); font-size: 22px; display: grid; place-items: center; box-shadow: 0 6px 18px rgba(0,0,0,.4); }
+.table-chat-tab.on { border-color: var(--purple); }
+.table-chat-tab .unread { top: -2px; right: -2px; }
+/* the drawer is portaled to <body>: lift it over the table and keep it opaque so cards never show through */
+body:has(.mode-screen) .lobby-chat.drawer { bottom: calc(76px + env(safe-area-inset-bottom)); z-index: 80; background: var(--pp-surface); animation: none; }
+.table-chat-tab { z-index: 81; }
+.chat-watching { color: var(--muted); font-weight: 600; font-size: 11px; }

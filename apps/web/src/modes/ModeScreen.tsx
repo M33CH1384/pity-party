@@ -1,10 +1,11 @@
+import type { ReactNode } from 'react';
 import type { Results } from '@pp/game';
 import { modeViews } from './views';
 
 /** The shell around a mode's table: title bar, the mode's table, its recap when the game is done. Used offline and online. */
-export function ModeScreen({ modeId, view, legal, toAct, results, mySeat, names, onMove, busy, onLeave, onAgain, againLabel = 'Play again', status }: {
+export function ModeScreen({ modeId, view, legal, toAct, results, mySeat, names, onMove, busy, onLeave, onAgain, againLabel = 'Play again', status, children }: {
   modeId: string; view: unknown; legal: readonly unknown[]; toAct: readonly number[]; results: Results; mySeat: number | null; names: readonly string[];
-  onMove: (m: unknown) => void; busy?: boolean; onLeave: () => void; onAgain?: (() => void) | null; againLabel?: string; status?: string;
+  onMove: (m: unknown) => void; busy?: boolean; onLeave: () => void; onAgain?: (() => void) | null; againLabel?: string; status?: string; children?: ReactNode;
 }) {
   const v = modeViews(modeId);
   return (
@@ -28,6 +29,7 @@ export function ModeScreen({ modeId, view, legal, toAct, results, mySeat, names,
           )}
         </>
       )}
+      {children}
     </div>
   );
 }

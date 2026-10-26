@@ -1,7 +1,7 @@
 /**
- * Pages Function: /api/* on bid-wit-me.pages.dev → the game Worker (service binding API = bid-wit-me-server).
+ * Pages Function: /api/* on pity-party.pages.dev → the game Worker (service binding API = pity-party-server).
  * Keeps accounts + sign-in same-origin, so the session cookie is first-party (Safari blocks third-party cookies),
- * and makes the OAuth callback URLs live on bid-wit-me.pages.dev. The original URL is passed through unchanged.
+ * and makes the OAuth callback URLs live on pity-party.pages.dev. The original URL is passed through unchanged.
  */
 interface Env { API: { fetch(req: Request): Promise<Response> } }
 

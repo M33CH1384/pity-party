@@ -22,12 +22,19 @@ fi
 
 W="npx --yes wrangler@3"
 
-echo "▶ applying D1 migrations (accounts) to the remote database…"
-(cd apps/server && $W d1 migrations apply bid-wit-me --remote)
+# Pity Party: resources are created once, by hand, after Demetrius OKs it (docs/plan/DEPLOY.md).
+# Refuse to run while wrangler.toml still has the placeholder D1 id.
+if grep -q '00000000-0000-0000-0000-000000000000' apps/server/wrangler.toml; then
+  echo "✘ apps/server/wrangler.toml still has the placeholder D1 database_id — see docs/plan/DEPLOY.md first." >&2
+  exit 1
+fi
 
-echo "▶ deploying apps/server (bid-wit-me-server)…"
+echo "▶ applying D1 migrations (accounts) to the remote database…"
+(cd apps/server && $W d1 migrations apply pity-party --remote)
+
+echo "▶ deploying apps/server (pity-party-server)…"
 out=$(cd apps/server && $W deploy 2>&1 | tee /dev/stderr)
-url=$(grep -oE 'https://bid-wit-me-server\.[a-z0-9-]+\.workers\.dev' <<<"$out" | head -1 || true)
+url=$(grep -oE 'https://pity-party-server\.[a-z0-9-]+\.workers\.dev' <<<"$out" | head -1 || true)
 if [[ -z "${url}" ]]; then echo "✘ couldn't find the workers.dev URL in the deploy output" >&2; exit 1; fi
 echo "✓ server: $url"
 curl -fsS "$url/health" && echo
@@ -35,7 +42,7 @@ curl -fsS "$url/health" && echo
 echo "▶ building web with VITE_SERVER_URL=$url"
 (cd apps/web && VITE_SERVER_URL="$url" npx vite build)
 
-echo "▶ deploying Pages (bid-wit-me)…"
+echo "▶ deploying Pages (pity-party)…"
 # run from apps/web so wrangler picks up its wrangler.toml (the API service binding) and functions/ (the /api proxy)
-(cd apps/web && $W pages deploy dist --project-name=bid-wit-me --branch=main --commit-dirty=true)
-echo "✓ done: https://bid-wit-me.pages.dev  ·  server $url"
+(cd apps/web && $W pages deploy dist --project-name=pity-party --branch=main --commit-dirty=true)
+echo "✓ done: https://pity-party.pages.dev  ·  server $url"

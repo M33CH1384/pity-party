@@ -490,8 +490,15 @@ export class TableDO extends DurableObject<Env> {
       const stub = this.env.SOCIAL.get(this.env.SOCIAL.idFromName('hub'));
       this.ctx.waitUntil(stub.fetch('https://social/table', { method: 'POST', body: JSON.stringify({ code, table: p.t }) }).then(() => undefined).catch((e) => console.error('listing', e)));
     };
-    if (this.listingTimer) return;
-    const wait = Math.max(0, this.lastListingAt + 1500 - Date.now());
+    // A pending timer is only a backstop: a DO timer can be dropped (eviction / hibernation between
+    // socket events), so a later report past the throttle window flushes right away instead of waiting on it.
+    // A phase change (waiting → playing → over, or listed ↔ unlisted) is never throttled: the Open tables list
+    // must not show a started table as waiting.
+    const phaseOf = (k: string | null) => (k === null ? '' : k === 'null' ? 'null' : (JSON.parse(k) as OpenTable).status);
+    const urgent = phaseOf(key) !== phaseOf(this.lastListing);
+    const wait = urgent ? 0 : Math.max(0, this.lastListingAt + 1500 - Date.now());
+    if (this.listingTimer && wait > 0) return;
+    if (this.listingTimer) { clearTimeout(this.listingTimer); this.listingTimer = null; }
     if (wait === 0) flush();
     else this.listingTimer = setTimeout(flush, wait);
   }

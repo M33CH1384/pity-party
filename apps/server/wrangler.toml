@@ -1,14 +1,14 @@
-# Bid Wit Me game server: one Worker + one SQLite-backed Durable Object per table (Workers Free plan).
-name = "bid-wit-me-server"
+# Pity Party game server: one Worker + one SQLite-backed Durable Object per table (Workers Free plan).
+name = "pity-party-server"
 main = "src/index.ts"
 compatibility_date = "2025-07-18"
 workers_dev = true
 
 [vars]
 # Comma-separated origins allowed to open tables / websockets ("*" during local dev).
-ALLOWED_ORIGINS = "https://bid-wit-me.pages.dev,http://localhost:5173,http://localhost:4173,http://127.0.0.1:4173"
+ALLOWED_ORIGINS = "https://pity-party.pages.dev,http://localhost:5173,http://localhost:4173,http://127.0.0.1:4173"
 # Public site that fronts /api/auth/* (Pages Functions proxy): OAuth redirect URIs, passkey RP ID, cookie site.
-PUBLIC_ORIGIN = "https://bid-wit-me.pages.dev"
+PUBLIC_ORIGIN = "https://pity-party.pages.dev"
 # Chat moderators (Release 9): usernames, comma-separated, case-insensitive. Empty = nobody.
 ADMIN_USERNAMES = "M33CH"
 # Sign-in providers turn on only when BOTH of their secrets exist (npx wrangler secret put …):
@@ -84,14 +84,12 @@ class_name = "ChallengeDO"
 tag = "v6"
 new_sqlite_classes = ["ChallengeDO"]
 
-# Voice (c) line writer (docs/voice-phase2-design.md): Workers AI on the free daily allowance.
-# Code hard-stops at 8,000 neurons/day (src/voice/writer.ts). Needs "Workers AI" permission on the deploy token.
-[ai]
-binding = "AI"
+# Workers AI is OFF for Pity Party (free tier is shared with BWM): no [ai] binding. env.AI is optional in code,
+# so the Voice (c) line writer simply never runs. Do not add [ai] without Demetrius' OK (docs/plan/DEPLOY.md).
 
 # Accounts (users, linked logins, passkeys, sessions, progress). Free tier. Schema: migrations/
 [[d1_databases]]
 binding = "DB"
-database_name = "bid-wit-me"
-database_id = "00000000-0000-0000-0000-000000000000" # placeholder: create a NEW D1 for Pity Party (docs/plan/CLOUDFLARE.md)
+database_name = "pity-party"
+database_id = "00000000-0000-0000-0000-000000000000" # PLACEHOLDER: fill with the id printed by `wrangler d1 create pity-party` (docs/plan/DEPLOY.md)
 migrations_dir = "migrations"

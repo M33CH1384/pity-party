@@ -103,6 +103,44 @@ async function online(b: Browser) {
   const hostHand = await host.locator('[data-testid^="hc-"]').count();
   const guestHand = await guest.locator('[data-testid^="hc-"]').count();
   ok(hostHand === 3 && guestHand === 3, 'per-seat view: each player sees only their own 3 cards');
+  // milestone 4: open-table list, spectator, in-room chat, reconnect
+  let listed: { code: string; mode: string; status: string; spectators: number } | undefined;
+  for (let i = 0; i < 20 && !listed; i++) {
+    const lt = await (await fetch(`${server}/api/social/tables`, { headers: { origin: base } })).json() as { tables: typeof listed[] };
+    listed = lt.tables.find((t) => t?.code === code);
+    if (!listed) await host.waitForTimeout(300);
+  }
+  ok(listed?.mode === 'placeholder' && listed.status === 'playing', 'open-table list shows the table (registry mode, in progress)');
+  const watcher = await newPage(b);
+  await watcher.goto(`${base}/t/${code}?watch=1`);
+  await guestIn(watcher);
+  await watcher.getByTestId('mode-screen').waitFor();
+  ok((await watcher.locator('.mode-status').textContent())?.includes('watching') === true, 'spectator lands on the table, watching');
+  ok(await watcher.locator('[data-testid^="hc-"]').count() === 0 && await watcher.locator('.pcard-btn:not([disabled])').count() === 0, 'spectator sees no hand and has no moves');
+  await host.locator('.mode-status', { hasText: '👁 1' }).waitFor();
+  ok(true, 'players see the spectator count');
+  await watcher.getByTestId('table-chat-tab').click();
+  await watcher.getByLabel('Chat message').fill('go host!');
+  await watcher.getByLabel('Chat message').press('Enter');
+  await host.getByTestId('table-unread').waitFor();
+  await host.getByTestId('table-chat-tab').click();
+  await host.getByTestId('lobby-chat').getByText('go host!').waitFor();
+  ok(await host.getByTestId('lobby-chat').getByTestId('chat-watching').count() >= 1, 'in-room chat: spectator line reaches the host, tagged watching');
+  await host.getByLabel('Chat message').fill('thanks');
+  await host.getByLabel('Chat message').press('Enter');
+  await watcher.getByTestId('lobby-chat').getByText('thanks').waitFor();
+  ok(true, 'in-room chat: host reply reaches the spectator');
+  await host.waitForTimeout(600); // let the drawer's fade-up finish
+  await host.screenshot({ path: `${shots}/4a-online-chat-390.png` });
+  await host.getByTestId('table-chat-tab').click();
+  await watcher.getByTestId('table-chat-tab').click();
+  await watcher.screenshot({ path: `${shots}/4a-spectator-390.png` });
+  const before = await guest.locator('[data-testid^="hc-"]').allTextContents();
+  await guest.reload();
+  await guestIn(guest);
+  await guest.getByTestId('mode-screen').waitFor();
+  await guest.locator('[data-testid^="hc-"]').first().waitFor();
+  ok(JSON.stringify(await guest.locator('[data-testid^="hc-"]').allTextContents()) === JSON.stringify(before), 'reconnect (reload) mid-game: same seat, same hand');
   await playToRecap([host, guest], '2.3b-online-table-390.png');
   await host.screenshot({ path: `${shots}/2.3b-online-recap-390.png` });
   ok(await host.getByTestId('mode-again').textContent() === 'Rematch', 'host gets Rematch');

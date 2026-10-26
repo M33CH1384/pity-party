@@ -263,7 +263,7 @@ function SeatCard({ seat, info, spot, mine, isHost, playing, hostId, onSit, onBo
  * Lobby chat. Wide screens: a full-height column, always visible, input pinned to the bottom.
  * Phones: a sticky bottom tab (with unread badge) that opens a drawer — always one tap away.
  */
-function LobbyChat({ cs, onSend, open, setOpen, wide }: { cs: ConnState; onSend: (t: string) => void; open: boolean; setOpen: (v: boolean) => void; wide: boolean }) {
+export function LobbyChat({ cs, onSend, open, setOpen, wide }: { cs: ConnState; onSend: (t: string) => void; open: boolean; setOpen: (v: boolean) => void; wide: boolean }) {
   const [text, setText] = useState('');
   const list = useRef<HTMLDivElement>(null);
   useEffect(() => { list.current?.scrollTo({ top: 1e6 }); }, [cs.chat.length, open]);
@@ -280,7 +280,7 @@ function LobbyChat({ cs, onSend, open, setOpen, wide }: { cs: ConnState; onSend:
       <div className="chat-list" ref={list}>
         {cs.chat.slice(-100).map((l) => (
           <div key={l.id} className={`chat-line ${l.system ? 'system' : ''}`}>
-            {l.system ? <span>{l.text}</span> : <><b style={{ color: l.from === cs.you && !cs.spectator ? 'var(--gold)' : colorFor(l.from ?? '') }}>{l.from === cs.you && !cs.spectator ? 'You' : l.name}</b> <span>{l.text}</span></>}
+            {l.system ? <span>{l.text}</span> : <><b style={{ color: l.from === cs.you && !cs.spectator ? 'var(--gold)' : colorFor(l.from ?? '') }}>{l.from === cs.you && !cs.spectator ? 'You' : l.name}</b>{l.spectator && <small className="chat-watching" data-testid="chat-watching"> watching</small>} <span>{l.text}</span></>}
           </div>
         ))}
       </div>
@@ -296,7 +296,7 @@ function LobbyChat({ cs, onSend, open, setOpen, wide }: { cs: ConnState; onSend:
   return wide ? ui : createPortal(<div className="lobby-chat-portal">{ui}</div>, document.body);
 }
 
-function useWide(): boolean {
+export function useWide(): boolean {
   const q = '(min-width: 1024px) and (min-height: 600px)';
   const [wide, setWide] = useState(() => window.matchMedia(q).matches);
   useEffect(() => { const m = window.matchMedia(q); const on = () => setWide(m.matches); m.addEventListener('change', on); return () => m.removeEventListener('change', on); }, []);
