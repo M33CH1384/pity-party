@@ -3,6 +3,7 @@
   "seats": 2,
   "seed": "golden-pity",
   "options": {
+   "coinPot": true,
    "pityPayouts": true,
    "pityStyle": "perPair",
    "stockEmpty": "void",
@@ -23,7 +24,12 @@
    8
   ],
   "recap": {
-   "v": 1,
+   "v": 2,
+   "points": [
+    0,
+    1
+   ],
+   "coinPot": true,
    "hands": [
     {
      "n": 0,

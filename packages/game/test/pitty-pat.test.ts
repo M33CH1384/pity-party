@@ -16,8 +16,8 @@ const ids = (cs: readonly Card[]) => cs.map((c) => c.id);
 
 /** Rig a hand: given hands + upcard (+ optional stock head), the rest of the deck becomes the stock (conservation holds). */
 function rig(hands: string[][], upcard: string, opts0: Record<string, unknown> = {}, stockHead: string[] = []): PpState {
-  // rigged hands use natural ranks unless a test turns deuces wild on
-  const opts = { deucesWild: false, ...opts0 };
+  // rigged hands use natural ranks and the coin pot (to check coin flows) unless a test says otherwise
+  const opts = { deucesWild: false, coinPot: true, ...opts0 };
   const base = R.newGame({ ...opts, dealtWinAuto: false, deadCardSteal: false }, hands.length, 'rig');
   const used = new Set([...hands.flat(), upcard, ...stockHead]);
   const stock = [...stockHead.map(C), ...DECK.filter((c) => !used.has(c.id))];
@@ -36,7 +36,7 @@ describe('registry + options', () => {
   });
   it('options schema: defaults are the documented ones; every [UNVERIFIED] rule is an unverified option', () => {
     const d = defaultsOf(PITTY_PAT_OPTIONS);
-    expect(d).toMatchObject({ handSize: '5', mustPair: 'must', flipsPerTurn: 'one', tripsAsOne: false, deadCardSteal: false, stockEmpty: 'reshuffle', scoring: 'pot', ante: 1, pityPayouts: false, gameEnd: 'lastWithChips' });
+    expect(d).toMatchObject({ handSize: '5', mustPair: 'must', flipsPerTurn: 'one', tripsAsOne: false, deadCardSteal: false, stockEmpty: 'reshuffle', coinPot: false, ante: 1, pityPayouts: false, gameEnd: 'firstToPoints', targetPoints: 5 });
     const un = PITTY_PAT_OPTIONS.filter((o) => !o.verified).map((o) => o.key);
     expect(un).toEqual(expect.arrayContaining(['handSize', 'flipsPerTurn', 'tripsAsOne', 'deadCardSteal', 'stockEmpty', 'pityPayouts', 'dealtWinTie', 'stack']));
     expect(R.optionsSchema).toBe(PITTY_PAT_OPTIONS);
@@ -63,8 +63,11 @@ describe('setup', () => {
     expect(R.newGame({}, 4, 'same')).toEqual(R.newGame({}, 4, 'same'));
     expect(ids(R.newGame({}, 4, 'a').hands[0]!)).not.toEqual(ids(R.newGame({}, 4, 'b').hands[0]!));
   });
-  it('pot scoring: every active player antes into the pot', () => {
-    const s = R.newGame({ ante: 2, stack: 10, dealtWinAuto: false }, 3, 'ante');
+  it('coin pot (optional): every active player antes into the pot; off by default (no coins at all)', () => {
+    const off = R.newGame({ dealtWinAuto: false }, 3, 'ante');
+    expect(off.pot).toBe(0);
+    expect(off.chips).toEqual([0, 0, 0]);
+    const s = R.newGame({ coinPot: true, ante: 2, stack: 10, dealtWinAuto: false }, 3, 'ante');
     expect(s.pot).toBe(6);
     expect(s.chips).toEqual([8, 8, 8]);
   });
@@ -201,24 +204,45 @@ describe('ending + scoring', () => {
     expect(s.history[0]!.deltas).toEqual([4 + 2 + 1, -4, -3]);
   });
   it('players who can\'t cover the ante drop; last with coins wins the game; deltas are coin change and sum to zero', () => {
-    const g = runGame({ ante: 5, stack: 10 }, 3, 'drop');
+    const g = runGame({ coinPot: true, gameEnd: 'lastWithChips', ante: 5, stack: 10 }, 3, 'drop');
     expect(g.over).toBe(true);
     const r = R.results(g);
     expect(r.done).toBe(true);
     expect(r.deltas.reduce((a, b) => a + b, 0)).toBe(0);
     expect(g.active.filter(Boolean).length).toBeLessThanOrEqual(2);
   });
-  it('scoring handsWon / gameEnd firstToWins / fixedHands', () => {
-    const hw = runGame({ scoring: 'handsWon', gameTarget: 3 }, 3, 'hw');
-    expect(Math.max(...hw.wins)).toBe(3);
-    expect(R.results(hw).placements[0]).toBe(hw.wins.indexOf(3));
-    const fixed = runGame({ gameEnd: 'fixedHands', gameTarget: 4 }, 4, 'fx');
-    expect(fixed.history).toHaveLength(4);
-    const ftw = runGame({ gameEnd: 'firstToWins', gameTarget: 2 }, 2, 'ftw');
-    expect(Math.max(...ftw.wins)).toBe(2);
+  it('DEFAULT: points (1 per hand won), first to targetPoints (5) ends the game; standings by points', () => {
+    const g = runGame({}, 3, 'pts');
+    expect(Math.max(...g.wins)).toBe(5);
+    expect(g.wins.filter((w) => w === 5)).toHaveLength(1);
+    expect(g.chips).toEqual([0, 0, 0]);
+    expect(g.pot).toBe(0);
+    const r = R.results(g);
+    expect(r.placements[0]).toBe(g.wins.indexOf(5));
+    for (let i = 1; i < 3; i++) expect(g.wins[r.placements[i - 1]!]!).toBeGreaterThanOrEqual(g.wins[r.placements[i]!]!);
+    expect(R.view(g, 0)).toMatchObject({ points: g.wins, targetPoints: 5, coinPot: false });
+    for (const t of [1, 15]) expect(Math.max(...runGame({ targetPoints: t }, 2, `t${t}`).wins)).toBe(t);
+    expect(R.newGame({ targetPoints: 99 }, 2, 'x').opts.targetPoints).toBe(15); // clamped 1–15
+  });
+  it('alternatives: after N hands (with or without coins); last with coins (needs the pot)', () => {
+    expect(runGame({ gameEnd: 'fixedHands', gameTarget: 4 }, 4, 'fx').history).toHaveLength(4);
+    expect(runGame({ gameEnd: 'fixedHands', gameTarget: 4, coinPot: true }, 4, 'fx').history).toHaveLength(4);
+    const lwc = runGame({ gameEnd: 'lastWithChips', coinPot: true, ante: 2, stack: 6 }, 3, 'lwc');
+    expect(lwc.chips.filter((c) => c >= 2)).toHaveLength(1);
+    expect(R.results(lwc).placements[0]).toBe(lwc.chips.findIndex((c) => c >= 2));
+    // points with the pot on: points still rank, coins only break ties
+    const both = runGame({ coinPot: true, targetPoints: 3 }, 3, 'both');
+    expect(Math.max(...both.wins)).toBe(3);
+    expect(R.results(both).placements[0]).toBe(both.wins.indexOf(3));
+  });
+  it('"last with coins" without coins in play falls back to first-to-N-points (validated, never a stuck game)', () => {
+    expect(R.newGame({ gameEnd: 'lastWithChips' }, 2, 'v').opts.gameEnd).toBe('firstToPoints');
+    expect(R.newGame({ gameEnd: 'lastWithChips', coinPot: true, ante: 0 }, 2, 'v').opts.gameEnd).toBe('firstToPoints');
+    expect(R.newGame({ gameEnd: 'lastWithChips', coinPot: true }, 2, 'v').opts.gameEnd).toBe('lastWithChips');
+    expect(Math.max(...runGame({ gameEnd: 'lastWithChips', targetPoints: 2 }, 3, 'fb').wins)).toBe(2);
   });
   it('coins only: deltas are integers bounded by the table\'s coins (no money anywhere in state)', () => {
-    const g = runGame({}, 4, 'coins');
+    const g = runGame({ coinPot: true }, 4, 'coins');
     const r = R.results(g);
     for (const d of r.deltas) { expect(Number.isInteger(d)).toBe(true); expect(Math.abs(d)).toBeLessThanOrEqual(10 * 4); }
     expect(JSON.stringify(g)).not.toMatch(/\$|usd|cash|money/i);
@@ -253,15 +277,11 @@ describe('M6 readings are options (Q2–Q7) + pause between hands', () => {
     d = R.applyMove(d, who, R.legalMoves(d, who)[0]!);
     if (!d.history.length) expect(d.turn).toBe((who + 1) % 4);
   });
-  it('Q5 handsWonPayout none: no coins move in a hands-won game', () => {
-    const g = runGame({ scoring: 'handsWon', handsWonPayout: 'none', gameTarget: 2 }, 3, 'hwp');
+  it('Q5 handsWonPayout none: no coins move in a points game', () => {
+    const g = runGame({ handsWonPayout: 'none', targetPoints: 2 }, 3, 'hwp');
     expect(R.results(g).deltas).toEqual([0, 0, 0]);
-    const d = runGame({ scoring: 'handsWon', gameTarget: 2 }, 3, 'hwp');
+    const d = runGame({ targetPoints: 2 }, 3, 'hwp');
     expect(R.results(d).deltas.some((x) => x !== 0)).toBe(true);
-  });
-  it('Q6 handsWonEnd fixedHands: hands-won + last-with-coins ends after N hands', () => {
-    const g = runGame({ scoring: 'handsWon', gameEnd: 'lastWithChips', handsWonEnd: 'fixedHands', gameTarget: 3 }, 3, 'hwe');
-    expect(g.history).toHaveLength(3);
   });
   it('Q7 declineAction pass: declining a pair before flipping passes the turn', () => {
     const s = rig([['7C', '2D', '9H', 'KS', '4C'], ['3C', '3D', '5H', '6S', '8C']], '7D', { mustPair: 'may', declineAction: 'pass' });
@@ -283,16 +303,18 @@ describe('M6 readings are options (Q2–Q7) + pause between hands', () => {
   });
   it('every M6 reading is a changeable, unverified option with the documented default', () => {
     const d = defaultsOf(PITTY_PAT_OPTIONS);
-    expect(d).toMatchObject({ stack: 10, pityStyle: 'perHand', dealtWin7: true, stealResume: 'stealerLeft', handsWonPayout: 'antePerOpponent', handsWonEnd: 'firstToWins', declineAction: 'flip', pauseBetweenHands: false });
-    for (const k of ['stack', 'pityStyle', 'dealtWin7', 'stealResume', 'handsWonPayout', 'handsWonEnd', 'declineAction']) expect(PITTY_PAT_OPTIONS.find((o) => o.key === k)!.verified).toBe(false);
+    expect(d).toMatchObject({ stack: 10, pityStyle: 'perHand', dealtWin7: true, stealResume: 'stealerLeft', handsWonPayout: 'antePerOpponent', declineAction: 'flip', pauseBetweenHands: false });
+    for (const k of ['stack', 'pityStyle', 'dealtWin7', 'stealResume', 'handsWonPayout', 'declineAction']) expect(PITTY_PAT_OPTIONS.find((o) => o.key === k)!.verified).toBe(false);
   });
 });
 
 describe('stats recap (mode_games.recap_json)', () => {
   it('hands (winner/how/pot/deltas), pairs per seat, wins, chips, dealtWins — public only', () => {
-    const g = runGame({}, 4, 'recap');
+    const g = runGame({ coinPot: true }, 4, 'recap');
     const r = R.results(g).recap as import('../src').PpRecap;
-    expect(r.v).toBe(1);
+    expect(r.v).toBe(2);
+    expect(r.points).toEqual(g.wins);
+    expect(r.coinPot).toBe(true);
     expect(r.hands).toHaveLength(g.history.length);
     expect(r.hands[0]).toEqual({ n: 0, winner: expect.anything(), how: expect.any(String), pot: expect.any(Number), deltas: expect.any(Array) });
     expect(r.pairs).toHaveLength(4);
@@ -424,10 +446,10 @@ function runGame(opts: Record<string, unknown>, seats: number, seed: string, pic
 const optArb = fc.record({
   handSize: fc.constantFrom('5', '7'), mustPair: fc.constantFrom('must', 'may'), flipsPerTurn: fc.constantFrom('one', 'untilMatch'),
   tripsAsOne: fc.boolean(), deadCardSteal: fc.boolean(), dealtWinAuto: fc.boolean(), stockEmpty: fc.constantFrom('reshuffle', 'void'),
-  scoring: fc.constantFrom('pot', 'handsWon'), stack: fc.integer({ min: 1, max: 30 }), ante: fc.integer({ min: 0, max: 10 }), pityPayouts: fc.boolean(),
-  gameEnd: fc.constantFrom('lastWithChips', 'firstToWins', 'fixedHands'), gameTarget: fc.integer({ min: 1, max: 8 }), dealtWinTie: fc.constantFrom('turnOrder', 'redeal'),
+  coinPot: fc.boolean(), targetPoints: fc.integer({ min: 1, max: 6 }), stack: fc.integer({ min: 1, max: 30 }), ante: fc.integer({ min: 0, max: 10 }), pityPayouts: fc.boolean(),
+  gameEnd: fc.constantFrom('firstToPoints', 'lastWithChips', 'fixedHands'), gameTarget: fc.integer({ min: 1, max: 8 }), dealtWinTie: fc.constantFrom('turnOrder', 'redeal'),
   pityStyle: fc.constantFrom('perHand', 'perPair'), dealtWin7: fc.boolean(), stealResume: fc.constantFrom('stealerLeft', 'firstPlayer'),
-  handsWonPayout: fc.constantFrom('antePerOpponent', 'none'), handsWonEnd: fc.constantFrom('firstToWins', 'fixedHands'), declineAction: fc.constantFrom('flip', 'pass'),
+  handsWonPayout: fc.constantFrom('antePerOpponent', 'none'), declineAction: fc.constantFrom('flip', 'pass'),
   pauseBetweenHands: fc.boolean(),
   deucesWild: fc.boolean(), deuceOnDeuce: fc.boolean(), dealtWinWild: fc.boolean(),
 });
@@ -439,7 +461,7 @@ describe('properties (fast-check)', () => {
         if (s.over) return;
         expect(conserved(s)).toBe(true);
         expect(s.chips.every((c) => c >= 0)).toBe(true);
-        expect(s.chips.reduce((a, b) => a + b, 0) + s.pot).toBe(opts.scoring === 'pot' ? opts.stack * seats : 0);
+        expect(s.chips.reduce((a, b) => a + b, 0) + s.pot).toBe(opts.coinPot ? opts.stack * seats : 0);
       });
       const r = R.results(g);
       expect(r.done).toBe(true);
@@ -448,6 +470,18 @@ describe('properties (fast-check)', () => {
       expect(g.history.length).toBeLessThanOrEqual(PP_LIMITS.maxHands);
     }), { numRuns: 120 });
   }, 120_000);
+  it('terminates under the default ending and every alternative, coins on and off', () => {
+    for (const gameEnd of ['firstToPoints', 'lastWithChips', 'fixedHands']) for (const coinPot of [false, true]) {
+      fc.assert(fc.property(optArb, fc.integer({ min: 2, max: 5 }), fc.string({ maxLength: 8 }), (opts, seats, seed) => {
+        const g = runGame({ ...opts, gameEnd, coinPot }, seats, seed);
+        expect(g.over).toBe(true);
+        const o = g.opts;
+        if (o.gameEnd === 'firstToPoints' && g.history.length < PP_LIMITS.maxHands && g.active.filter(Boolean).length >= 2) expect(Math.max(...g.wins)).toBe(o.targetPoints);
+        if (o.gameEnd === 'fixedHands' && g.active.filter(Boolean).length >= 2) expect(g.history.length).toBe(Math.min(o.gameTarget, PP_LIMITS.maxHands));
+        if (o.gameEnd === 'lastWithChips') expect(o.coinPot && o.ante > 0).toBe(true);
+      }), { numRuns: 15 });
+    }
+  }, 180_000);
   it('deterministic replay: same options + seed + move choices → identical game', () => {
     fc.assert(fc.property(optArb, fc.integer({ min: 2, max: 5 }), fc.string({ maxLength: 8 }), (opts, seats, seed) => {
       expect(runGame(opts, seats, seed)).toEqual(runGame(opts, seats, seed));
