@@ -43,7 +43,7 @@ describe('slam intensity', () => {
   });
 });
 
-import { parseClientMsg } from '@spades/protocol';
+import { parseClientMsg } from '@pp/protocol';
 
 describe('online slam field', () => {
   it('is optional and back-compatible', () => {

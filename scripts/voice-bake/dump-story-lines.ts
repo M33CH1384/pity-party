@@ -26,7 +26,7 @@ import {
   AWARENESS_NEVER_RECORD, SEATED_AWARENESS_LINES, allGuideLines, allSoloRundowns,
   PAIR_AWARENESS_RUNDOWNS, PAIR_FIRST_RUNDOWNS, PAIR_RETURN_CLEAR_RUNDOWNS, PAIR_RETURN_LOSS_RUNDOWNS,
   KING_PROPOSAL_LINES,
-} from '@spades/bots';
+} from '@pp/bots';
 
 const ROOT = join(import.meta.dirname, '../..');
 const PUB = join(ROOT, 'apps/web/public/voices/v2');

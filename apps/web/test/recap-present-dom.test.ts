@@ -16,8 +16,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
-import { type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { Intermission } from '../src/Intermission';
 import { clearTeamHoles } from '../src/shotMarks';
 

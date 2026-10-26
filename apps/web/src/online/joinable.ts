@@ -1,4 +1,4 @@
-import { LIMITS, type RoomInfo } from '@spades/protocol';
+import { LIMITS, type RoomInfo } from '@pp/protocol';
 
 type SeatRoom = Pick<RoomInfo, 'phase' | 'seats' | 'rules' | 'takeable' | 'tournament'>;
 

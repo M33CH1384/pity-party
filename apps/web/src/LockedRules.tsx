@@ -1,5 +1,5 @@
-import { type TableRules, hostMinimum, shotOutOn } from '@spades/rules';
-import { SKILL_SETTING_LABEL, TALK_INTENSITY_LABEL, type TalkIntensity, skillSettingOf } from '@spades/bots';
+import { type TableRules, hostMinimum, shotOutOn } from '@pp/rules';
+import { SKILL_SETTING_LABEL, TALK_INTENSITY_LABEL, type TalkIntensity, skillSettingOf } from '@pp/bots';
 import { modeTitle, rulesSummary } from './settings';
 import { timerSettingLabel } from './turnTimer';
 

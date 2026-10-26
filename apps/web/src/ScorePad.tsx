@@ -7,7 +7,7 @@
  */
 import { type ReactNode, useEffect, useRef } from 'react';
 import { useEscapeClose } from './useEscapeClose';
-import { type GameState, type HandRecord, type SideHandResult, type TableRules, bidLabel, hostMinimum, shotCounts, shotOutOn } from '@spades/rules';
+import { type GameState, type HandRecord, type SideHandResult, type TableRules, bidLabel, hostMinimum, shotCounts, shotOutOn } from '@pp/rules';
 import { SEAT_COLORS } from './overlay';
 import { hudSeatName } from './dealerName';
 import { holeMarks, punchedLabel, rememberHoles } from './shotMarks';

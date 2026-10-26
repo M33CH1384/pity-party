@@ -10,7 +10,7 @@ import {
   BOT_NAMES, STORY_STOPS, STOP_DENSITY_CLASS, TALK, TALK_PROFILES, botTalk, collectionBanter,
   newTalkState, personaForName, profileOf, type TalkTable,
 } from '../src';
-import { makeRules, newGame, type GameState, type HandRecord, type SideHandResult } from '@spades/rules';
+import { makeRules, newGame, type GameState, type HandRecord, type SideHandResult } from '@pp/rules';
 
 const rng32 = (seed = 1) => { let x = seed >>> 0; return () => { x = (x * 1103515245 + 12345) % 2 ** 31; return x / 2 ** 31; }; };
 const nameFor = (p: string) => BOT_NAMES.find((n) => personaForName(n) === p)!;

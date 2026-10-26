@@ -16,7 +16,7 @@
  * (blockAfterDark) was purpose-made for those stops, so they keep its
  * panorama.
  */
-import { storyStopById, type StoryStop } from '@spades/bots';
+import { storyStopById, type StoryStop } from '@pp/bots';
 
 /** Stops with their own story backdrop art, in route order. */
 export const STORY_BACKDROP_STOPS: readonly string[] = [

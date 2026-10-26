@@ -14,7 +14,7 @@
  * never shows a thread and nothing navigates away from the table.
  */
 import { type FormEvent, useEffect, useState } from 'react';
-import { presenceLine, SOCIAL_LIMITS } from '@spades/protocol';
+import { presenceLine, SOCIAL_LIMITS } from '@pp/protocol';
 import { AvatarCircle, useAvatar } from '../avatar';
 import { closeTableProfile, useTableProfileTarget, type ProfileTarget } from '../profileTap';
 import { TaglineText } from '../tagline';

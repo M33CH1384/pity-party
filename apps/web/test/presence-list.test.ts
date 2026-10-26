@@ -1,4 +1,4 @@
-import { PRESENCE_TTL_MS, type OpenTable, type PresenceEntry, stalePresence } from '@spades/protocol';
+import { PRESENCE_TTL_MS, type OpenTable, type PresenceEntry, stalePresence } from '@pp/protocol';
 import { describe, expect, it } from 'vitest';
 import { shownPlayers } from '../src/social/presence';
 

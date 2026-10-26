@@ -35,7 +35,7 @@
  * stats — never fabricated; with nothing real to say the bar is absent.
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { statusLabel } from '@spades/protocol';
+import { statusLabel } from '@pp/protocol';
 import { fx, useReduceEffects } from '../fx';
 import { useSocial } from './store';
 

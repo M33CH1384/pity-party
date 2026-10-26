@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { makeRules, CLASSIC_JOKER } from '@spades/rules';
+import { makeRules, CLASSIC_JOKER } from '@pp/rules';
 import { ackTrumpPopup, trumpPopupSeen, trumpSeenKey } from '../src/TrumpPopup';
 
 // Minimal localStorage stub (unit tests run in node, no DOM).

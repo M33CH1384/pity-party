@@ -3,7 +3,7 @@
  * (Tips on or off), settle, then the tornado takes them. Same seed → same pile. Reduced motion: a tidy row.
  * Screenshots: mid-drop, settled, tornado.
  */
-import { makeRules, newGame, canRunIt, type Card, type GameState } from '@spades/rules';
+import { makeRules, newGame, canRunIt, type Card, type GameState } from '@pp/rules';
 import { webkit, type Browser } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

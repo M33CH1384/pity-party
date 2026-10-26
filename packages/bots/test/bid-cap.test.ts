@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type Card, type GameState, type TableRules, applyAction, buildDeck, createRng, makeRules, newGame, viewFor } from '@spades/rules';
+import { type Card, type GameState, type TableRules, applyAction, buildDeck, createRng, makeRules, newGame, viewFor } from '@pp/rules';
 import { chooseBid, estimateTricks, partnerBidIntent } from '../src';
 
 const joker = makeRules('joker');

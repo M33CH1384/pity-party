@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { type GameState, applyAction, legalPlays, makeRules, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { type GameState, applyAction, legalPlays, makeRules, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { tipsFor } from '../src/Coach';
 import { TERM_ORDER, glossary, parseTerms, plainText } from '../src/glossary';
 

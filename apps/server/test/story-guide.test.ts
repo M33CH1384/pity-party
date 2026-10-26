@@ -7,9 +7,9 @@
  * facts, and her guide voice going quiet while she covers a seat.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { createRng, type Card } from '@spades/rules';
-import { GUIDE_AWARE, allGuideLines, chooseBotAction, type AwarenessCase } from '@spades/bots';
-import type { ChatLine, GameAction } from '@spades/protocol';
+import { createRng, type Card } from '@pp/rules';
+import { GUIDE_AWARE, allGuideLines, chooseBotAction, type AwarenessCase } from '@pp/bots';
+import type { ChatLine, GameAction } from '@pp/protocol';
 import { FakeEnv } from './harness';
 
 const FAST = { botMs: 10, trickPauseMs: 0, dealMs: 0, disconnectGraceMs: 5000, handOverMs: 3000 };

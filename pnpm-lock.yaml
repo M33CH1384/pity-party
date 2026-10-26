@@ -8,10 +8,10 @@ importers:
 
   .:
     dependencies:
-      '@spades/bots':
+      '@pp/bots':
         specifier: workspace:*
         version: link:packages/bots
-      '@spades/rules':
+      '@pp/rules':
         specifier: workspace:*
         version: link:packages/rules
     devDependencies:
@@ -60,13 +60,13 @@ importers:
       '@simplewebauthn/server':
         specifier: ^13.3.3
         version: 13.3.3
-      '@spades/bots':
+      '@pp/bots':
         specifier: workspace:*
         version: link:../../packages/bots
-      '@spades/protocol':
+      '@pp/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol
-      '@spades/rules':
+      '@pp/rules':
         specifier: workspace:*
         version: link:../../packages/rules
     devDependencies:
@@ -94,13 +94,13 @@ importers:
       '@simplewebauthn/browser':
         specifier: ^13.3.0
         version: 13.3.0
-      '@spades/bots':
+      '@pp/bots':
         specifier: workspace:*
         version: link:../../packages/bots
-      '@spades/protocol':
+      '@pp/protocol':
         specifier: workspace:*
         version: link:../../packages/protocol
-      '@spades/rules':
+      '@pp/rules':
         specifier: workspace:*
         version: link:../../packages/rules
       html-to-image:
@@ -137,13 +137,13 @@ importers:
 
   packages/bots:
     dependencies:
-      '@spades/rules':
+      '@pp/rules':
         specifier: workspace:*
         version: link:../rules
 
   packages/protocol:
     dependencies:
-      '@spades/rules':
+      '@pp/rules':
         specifier: workspace:*
         version: link:../rules
 

@@ -4,7 +4,7 @@
  * chips render whatever reactions a line actually carries — including palette extras
  * (REACTION_PALETTE) picked from the Social popover's "+" palette.
  */
-import { REACT_EMOJIS, REACTION_PALETTE } from '@spades/protocol';
+import { REACT_EMOJIS, REACTION_PALETTE } from '@pp/protocol';
 
 /** Reaction chips under a chat line: emoji + count, highlighted when `myId` reacted. Tapping a chip toggles it. */
 export function ReactionChips({ reactions, myId, onToggle }: { reactions?: Record<string, string[]>; myId: string | null; onToggle: (emoji: string) => void }) {

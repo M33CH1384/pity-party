@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { useEscapeClose } from './useEscapeClose';
-import { type Card, type RunCard, type TableRules, sortHand } from '@spades/rules';
+import { type Card, type RunCard, type TableRules, sortHand } from '@pp/rules';
 import { drawFace } from './cardArt';
 import { isWildDeuce } from './cardFaces';
 

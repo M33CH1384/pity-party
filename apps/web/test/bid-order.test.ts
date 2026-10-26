@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { bidOrder, makeRules, newGame } from '@spades/rules';
+import { bidOrder, makeRules, newGame } from '@pp/rules';
 import { BidOrder, showCenterBidOrder } from '../src/PartnerTalk';
 
 const names = ['You', 'Leilani', 'Queenie', 'Elena'];

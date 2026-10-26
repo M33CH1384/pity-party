@@ -1,8 +1,8 @@
 /** Big Bank Take Lil Bank (Phase 1): /api/wager-challenges — create, list mine, detail + actions (the challenge's Durable Object).
  * (Not /api/challenges — that path already belongs to the daily/weekly cred challenges.)
  * Ships dark: while the wager_challenges_enabled flag is off, creates 404 and lists read empty. */
-import { makeRules, type TableRules } from '@spades/rules';
-import { cleanTeamName } from '@spades/protocol';
+import { makeRules, type TableRules } from '@pp/rules';
+import { cleanTeamName } from '@pp/protocol';
 import { type AuthEnv, currentUser } from '../auth/routes';
 import { type SocialEnv, isAdmin } from '../social/routes';
 import { isWagerAmount, wagerEnabled, wagerHorizonMs } from '../cred/wager';

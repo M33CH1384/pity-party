@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { type Card, type GameState, type PlayerView, SUIT_NAME, type Suit, booksHand, cardLabel, cardPower, effectiveSuit, handSize, hostMinimum, isTrump, shotOutOn, sideOf, trumpOrder } from '@spades/rules';
+import { type Card, type GameState, type PlayerView, SUIT_NAME, type Suit, booksHand, cardLabel, cardPower, effectiveSuit, handSize, hostMinimum, isTrump, shotOutOn, sideOf, trumpOrder } from '@pp/rules';
 import { promotedTrumpLabels } from './trumpLadder';
 import { TERM_ORDER, type TermKey, glossary, parseTerms, topTrumps, trumpWords } from './glossary';
 import { TIP_MAX_SHOWS, bumpTip, tipCount, tipDurationMs } from './tips';

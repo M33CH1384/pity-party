@@ -5,7 +5,7 @@ import Feedback, { AboutRow } from './Feedback';
 import { BotTrashTalkRow, ChatSoundsRow, NukeIntensityRow, ReduceEffectsRow, SoundFields, SoundQuickActions } from './SoundControls';
 import { SetAnimRow } from './SetAnimPicker';
 import ThemeToggle from './ThemeToggle';
-import { CLASSIC_JOKER, makeRules } from '@spades/rules';
+import { CLASSIC_JOKER, makeRules } from '@pp/rules';
 import { type Settings, settingsToRules } from './settings';
 import { type SectionOpenMap, type SettingsSectionId, loadSectionOpen, saveSectionOpen } from './settingsSections';
 import { TRUMP_SEP, trumpLadder, trumpLadderText } from './trumpLadder';

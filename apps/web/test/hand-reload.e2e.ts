@@ -4,7 +4,7 @@
  * A strip tap selects that card. One tap never plays.
  */
 import { writeFileSync } from 'node:fs';
-import { makeRules, newGame, viewFor, canRunIt, type Card, type GameState } from '@spades/rules';
+import { makeRules, newGame, viewFor, canRunIt, type Card, type GameState } from '@pp/rules';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { chromium, webkit, type Browser, type Page } from 'playwright-core';
 

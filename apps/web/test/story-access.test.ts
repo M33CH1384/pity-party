@@ -14,7 +14,7 @@ import { createElement, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import { STORY_STOPS } from '@spades/bots';
+import { STORY_STOPS } from '@pp/bots';
 import Setup from '../src/Setup';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import StoryHome from '../src/story/StoryHome';

@@ -30,7 +30,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { STORY_STOPS } from '@spades/bots';
+import { STORY_STOPS } from '@pp/bots';
 import StoryHome from '../src/story/StoryHome';
 import type { StoryProgress, StoryTracks } from '../src/story/storyApi';
 

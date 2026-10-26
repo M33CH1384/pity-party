@@ -9,7 +9,7 @@
  * highlighted as NEW, and on the player's own profile.
  */
 import { useState, type CSSProperties } from 'react';
-import { storyBadgesFor, type StoryBadgeFacts } from '@spades/bots';
+import { storyBadgesFor, type StoryBadgeFacts } from '@pp/bots';
 import { BadgeDetail } from './StoryDetailSheet';
 
 export function badgeFactsOf(p: { stops: { stopId: string; attempts: number; clears: number }[]; finds?: { eggs: string[]; feats: string[] }; completed: boolean; anyTrack?: { stops: { stopId: string; attempts: number; clears: number }[]; finds: { eggs: string[]; feats: string[] }; completed: boolean } } | null): StoryBadgeFacts {

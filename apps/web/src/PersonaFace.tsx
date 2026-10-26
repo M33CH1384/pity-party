@@ -3,7 +3,7 @@
  * faces"): the persona × gender portrait from
  * /assets/personas/portraits/<persona>-<g>.webp, resolved from the bot's
  * name by the same persona / gender resolution its voice and plate tag use
- * (personaPortraitFor in @spades/bots) — so the face a player sees is the
+ * (personaPortraitFor in @pp/bots) — so the face a player sees is the
  * voice they hear. Mirrors StoryFace exactly: the initial medallion is the
  * fallback AND the loading state, so if the art has not landed (or fails)
  * the initial renders exactly as it always has, with no broken-image icon
@@ -11,7 +11,7 @@
  * (the loading hold's nameplate) swap over when the art fails.
  */
 import { useState } from 'react';
-import { personaForName, personaPortraitFor, voiceGender } from '@spades/bots';
+import { personaForName, personaPortraitFor, voiceGender } from '@pp/bots';
 import './story/storyFace.css';
 
 export default function PersonaFace({ name, className = '', onError }: {

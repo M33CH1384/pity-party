@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { platePersona } from '@spades/bots';
+import { platePersona } from '@pp/bots';
 import { FakeEnv } from './harness';
 
 describe('bot plate tags', () => {

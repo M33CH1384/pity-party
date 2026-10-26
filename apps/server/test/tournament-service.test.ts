@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { makeRules } from '@spades/rules';
+import { makeRules } from '@pp/rules';
 import { makeD1 } from './d1';
 import { CHECKIN_MS, type TData, type TIO, type TMeta, alarm, begin, checkin, create, register, result, unregister, view } from '../src/tournament/service';
 import { parseCreate } from '../src/tournament/routes';

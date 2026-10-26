@@ -1,4 +1,4 @@
-import { type Rng, createRng } from '@spades/rules';
+import { type Rng, createRng } from '@pp/rules';
 
 /**
  * Bot names: picked at random per game (offline from the game seed, online by the server), never twice at a table

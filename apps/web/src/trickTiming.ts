@@ -11,7 +11,7 @@
  *  - Run it!: RUN_SHOW_MS, then the score — the tornado is the wait
  * Scoring toasts (3200 ms) and the old 1200 ms beat used to run after all of these. They don't anymore.
  */
-import { NUKE_ALLOWANCE_MS, TRICK_HOLD_MS, HAND_END_REVEAL_MS, type NukeIntensity } from '@spades/protocol';
+import { NUKE_ALLOWANCE_MS, TRICK_HOLD_MS, HAND_END_REVEAL_MS, type NukeIntensity } from '@pp/protocol';
 import { RUN_SHOW_MS } from './runIt';
 
 export { TRICK_HOLD_MS, HAND_END_REVEAL_MS, RUN_SHOW_MS };

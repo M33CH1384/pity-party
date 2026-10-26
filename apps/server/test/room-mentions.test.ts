@@ -4,7 +4,7 @@
  * production (D1 username resolution, the mute cache, the mention push).
  */
 import { describe, expect, it } from 'vitest';
-import type { ChatLine, ServerMsg } from '@spades/protocol';
+import type { ChatLine, ServerMsg } from '@pp/protocol';
 import { Room, type RoomIO } from '../src/room';
 import { FakeEnv } from './harness';
 

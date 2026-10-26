@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { chooseBotAction } from '@spades/bots';
-import type { Card } from '@spades/rules';
-import type { GameAction } from '@spades/protocol';
+import { chooseBotAction } from '@pp/bots';
+import type { Card } from '@pp/rules';
+import type { GameAction } from '@pp/protocol';
 import { FakeEnv } from './harness';
 
 const FAST = { botMs: 10, trickPauseMs: 0, dealMs: 0, disconnectGraceMs: 5000, handOverMs: 3000 };

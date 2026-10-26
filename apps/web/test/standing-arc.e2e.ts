@@ -1,5 +1,5 @@
 /** Standing max-slam flight (Turn up ON) must arc (rise then fall, never a beam) + plate View toggle at 390px. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

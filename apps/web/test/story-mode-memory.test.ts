@@ -42,7 +42,7 @@ import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { STORY_STOPS } from '@spades/bots';
+import { STORY_STOPS } from '@pp/bots';
 import StoryHome, { STORY_MODE_KEY, initialStoryMode, loadStoryMode, saveStoryMode, storedStoryMode, storyReloadEntry } from '../src/story/StoryHome';
 import { themeStore } from '../src/theme';
 

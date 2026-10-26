@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   CLASSIC_JOKER, type Card, type GameState, type TableRules, applyAction, buildDeck, createRng, makeRules, newGame, viewFor,
-} from '@spades/rules';
+} from '@pp/rules';
 import { analyzeHand, bidAdvice, chooseBotAction, chooseBid, chooseExchange, choosePlay, estimateTricks, nilWorthy, simulateGame, wantsBlindNil } from '../src';
 
 const joker = makeRules('joker');

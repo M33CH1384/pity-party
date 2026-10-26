@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeRules } from '@spades/rules';
+import { makeRules } from '@pp/rules';
 import { FakeEnv } from './harness';
 import { DEFAULT_TIMING, TOURNAMENT_EMPTY_GRACE_MS, type TournamentSeat } from '../src/room';
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildDeck } from '@spades/rules';
+import { buildDeck } from '@pp/rules';
 import { DEFAULT_SETTINGS, settingsToRules } from '../src/settings';
 
 /** The live app's settings -> rules paths must all deal the exact house joker deck. */

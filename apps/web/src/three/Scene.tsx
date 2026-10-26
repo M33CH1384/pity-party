@@ -3,7 +3,7 @@ import { Html } from '@react-three/drei';
 import { Canvas, events as r3fEvents, useFrame, useThree } from '@react-three/fiber';
 import { type ReactNode, type RefObject, Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { type BufferGeometry, type Camera, type Group, type Material, type Mesh, type Object3D, ACESFilmicToneMapping, AdditiveBlending, CanvasTexture, DataTexture, Matrix4, MeshBasicMaterial, MeshPhysicalMaterial, MeshStandardMaterial, PCFSoftShadowMap, Quaternion, RepeatWrapping, Scene as ThreeScene, SRGBColorSpace, Texture, Vector2, Vector3 } from 'three';
-import { type Card, type Play, type Trick } from '@spades/rules';
+import { type Card, type Play, type Trick } from '@pp/rules';
 import Card3D, { createLitCardMaterial } from './Card3D';
 import KingGun from './KingGun';
 import { departureSlot, handCardKey, handReactKey } from '../handOrder';

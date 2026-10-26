@@ -21,7 +21,7 @@
 import type { PersonaId } from './personas';
 import type { BotSkill } from './bidding';
 import type { DensityClass } from './talk';
-import { makeRules, type RulesOverrides, type TableRules } from '@spades/rules';
+import { makeRules, type RulesOverrides, type TableRules } from '@pp/rules';
 
 export type StoryTier =
   | 'gentle' | 'easyPlus' | 'mediumMinus' | 'medium' | 'mediumPlus'

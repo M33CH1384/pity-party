@@ -8,7 +8,7 @@
  * (see `osReducedMotion`) — the 3D explosion still plays. (Before v0.3.2 it silently switched the nuke to Off.)
  */
 import { useSyncExternalStore } from 'react';
-import { HYPE_SETTLE_MAX_MS } from '@spades/protocol';
+import { HYPE_SETTLE_MAX_MS } from '@pp/protocol';
 import { type Sfx, sound } from './audio';
 
 /** How long each effect stays on screen (ms): the hand-end hold waits these out. wheelsCar is released by the car itself. */

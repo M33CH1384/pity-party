@@ -8,7 +8,7 @@
  *   GET /api/social/reports           → admin only: latest reports
  * The websocket (/api/social/ws) is routed in index.ts to the Social Durable Object.
  */
-import { isFriendActivity } from '@spades/protocol';
+import { isFriendActivity } from '@pp/protocol';
 import { type AuthEnv, currentUser } from '../auth/routes';
 import { regionOf } from '../cred/region';
 import { leaderboard, myStats, personalStats, serverStats, type PersonalStats } from '../stats/boards';

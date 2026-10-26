@@ -10,7 +10,7 @@ import { act } from 'react';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { makeRules } from '@spades/rules';
+import { makeRules } from '@pp/rules';
 import { TURN_TIMERS, TurnTimerSelect, rulesWithTimer, timerSettingLabel, type TimerKey } from '../src/turnTimer';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;

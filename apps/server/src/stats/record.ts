@@ -2,7 +2,7 @@
  * Release 9: online game records → per-player stats + Elo. Pure (no Cloudflare imports) so it's unit-tested.
  * Only seats linked to an account (signed-in players) get stats rows; guests and bots appear in the game's seat list.
  */
-import { type GameState, sideCount, sideOf } from '@spades/rules';
+import { type GameState, sideCount, sideOf } from '@pp/rules';
 import { processGameCred } from '../cred/hooks';
 import type { CredPushEvent } from '../push/notify';
 

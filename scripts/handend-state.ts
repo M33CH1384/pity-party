@@ -4,8 +4,8 @@
  * my team takes its 10th book (Wheels made) and the hand ends on a nuke → the score screen waits out the blast, then opens.
  * Usage: npx tsx scripts/handend-state.ts
  */
-import { type Card, type GameState, type Trick, applyAction, buildDeck, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction, pickBotNames } from '@spades/bots';
+import { type Card, type GameState, type Trick, applyAction, buildDeck, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction, pickBotNames } from '@pp/bots';
 import { DEFAULT_SETTINGS, settingsToRules } from '../apps/web/src/settings';
 
 const settings = { ...DEFAULT_SETTINGS, mode: 'joker' as const, speed: 'normal' as const, quality: 'low' as const, targetScore: 500 as const };

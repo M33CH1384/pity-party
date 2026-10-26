@@ -6,7 +6,7 @@
  *  - Playing: a "👁 N" chip listing who's watching, with this player's own "Hide spectator chat" switch.
  */
 import { useState } from 'react';
-import type { RoomInfo } from '@spades/protocol';
+import type { RoomInfo } from '@pp/protocol';
 import type { ConnState } from './connection';
 
 export function SpectatorOverlay({ room, cs, spectator, names, hideChat, onHideChat, onTake, onLeave }: {

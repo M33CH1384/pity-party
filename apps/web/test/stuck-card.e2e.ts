@@ -3,7 +3,7 @@
  * is dealt to you again it must be in your hand, not drawn on the table. (The "just played" card was kept forever
  * offline, so a re-dealt copy was shown on the felt until a tap re-rendered the hand.)
  */
-import { applyAction, makeRules, newGame, type Card, type GameState } from '@spades/rules';
+import { applyAction, makeRules, newGame, type Card, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

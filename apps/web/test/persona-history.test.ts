@@ -3,11 +3,11 @@
  *
  * Persona memory, web layer: the persona-ledger writer (personaHistory.ts,
  * contract in personaLedger.ts) and the offlineTalk history beats that
- * cite it. The engine is the real @spades/bots; talkPrefs/decks are
+ * cite it. The engine is the real @pp/bots; talkPrefs/decks are
  * mocked as in density-talk.test.ts.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { BOT_NAMES, personaForName, type TalkLine, type TalkTable } from '@spades/bots';
+import { BOT_NAMES, personaForName, type TalkLine, type TalkTable } from '@pp/bots';
 
 vi.mock('../src/talkPrefs', () => ({
   talkPrefs: { get: () => ({ botTalk: true, hideBotTalk: false, voices: true, voiceVolume: 0.6, aiVoices: true }) },

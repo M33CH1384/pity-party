@@ -4,8 +4,8 @@
  * A state jump with no playback (offline, or a bot claim bundled with the play that enabled it)
  * still finds the run even when an ordinary trick arrives first.
  */
-import { type Card, type GameState, hasBothJokers } from '@spades/rules';
-import type { RunPlayback } from '@spades/protocol';
+import { type Card, type GameState, hasBothJokers } from '@pp/rules';
+import type { RunPlayback } from '@pp/protocol';
 
 export interface RunSequence {
   claimer: number;

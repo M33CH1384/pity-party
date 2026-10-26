@@ -1,6 +1,6 @@
 /** Classic Studio before/after at 390 (WebKit): saves the resumed classic table. BWM_VENUE_ASSETS=off skips nothing —
  *  the "before" is shot on master behaviour via BWM_SHOTS naming only; this file just captures the current build. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

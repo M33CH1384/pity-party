@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { parseSocialMsg, PRESENCE_TTL_MS, type SocialChatLine, type SocialServerMsg } from '@spades/protocol';
+import { parseSocialMsg, PRESENCE_TTL_MS, type SocialChatLine, type SocialServerMsg } from '@pp/protocol';
 import { type ConnAtt, type GlobalLog, Hub, maskChat, uniqueGuestName } from '../src/social/hub';
 import { SocialStore } from '../src/social/store';
 import { resetTicketKey, signTicket, verifyTicket } from '../src/social/ticket';
@@ -15,7 +15,7 @@ class Harness {
   seq = 1;
   ids = 0;
   hub: Hub;
-  tables = new Map<string, import('@spades/protocol').OpenTable>();
+  tables = new Map<string, import('@pp/protocol').OpenTable>();
   /** when set, prune treats a socket outside this predicate as disconnected */
   live: ((cid: string) => boolean) | null = null;
   /** when set, prune asks this instead of a table DO */
@@ -599,7 +599,7 @@ describe('profiles + recent players (from game records)', () => {
 });
 
 describe('open tables (Release 10)', () => {
-  const T = (code: string, over: Partial<import('@spades/protocol').OpenTable> = {}) => ({ code, host: 'Dee', mode: 'joker', playerCount: 4, target: 500, venue: 'classic', humans: 1, bots: 0, open: 3, status: 'waiting' as const, spectators: 0, at: h.t, ...over });
+  const T = (code: string, over: Partial<import('@pp/protocol').OpenTable> = {}) => ({ code, host: 'Dee', mode: 'joker', playerCount: 4, target: 500, venue: 'classic', humans: 1, bots: 0, open: 3, status: 'waiting' as const, spectators: 0, at: h.t, ...over });
   it('hello carries the list; updates and removals reach everyone; stale entries expire', async () => {
     h.hub.tableUpdate('AAAAA', T('AAAAA'));
     await h.hub.open('c1', { name: 'Guest' });
@@ -620,7 +620,7 @@ describe('open tables (Release 10)', () => {
 });
 
 describe('stale presence rows', () => {
-  const T = (code: string, over: Partial<import('@spades/protocol').OpenTable> = {}) => ({
+  const T = (code: string, over: Partial<import('@pp/protocol').OpenTable> = {}) => ({
     code, host: 'SWE', mode: 'joker', playerCount: 4, target: 250, venue: 'classic', humans: 0, bots: 4, open: 4, status: 'playing' as const, spectators: 0, at: h.t, ...over,
   });
 

@@ -5,7 +5,7 @@
 -- { won, margin, endReason } as JSON (the double_leg_facts pattern),
 -- written by the result post in apps/server/src/story/routes.ts and
 -- surfaced on the progress payload as lastResult. From it the scene
--- layer derives manner bands (storyManner in @spades/bots). Rows
+-- layer derives manner bands (storyManner in @pp/bots). Rows
 -- written before this migration carry NULL — no manner fact exists
 -- for them, and no manner line may ever fire off a NULL.
 ALTER TABLE story_progress ADD COLUMN last_result TEXT;

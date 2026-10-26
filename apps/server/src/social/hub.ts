@@ -9,7 +9,7 @@
 import {
   type ChatReactions, type FriendActivity, type FriendsState, type InviteMsg, type OpenTable, type PresenceEntry, type PresenceStatus, type ReplyRef, type SocialChatLine, type SocialClientMsg, type SocialServerMsg, type SocialSettings,
   GUEST_SESSION, PRESENCE_TTL_MS, SOCIAL_LIMITS, activityOf, blockLinks, cleanName, cleanText, dmReplySnapshot, maskProfanity, parseSocialMsg, replySnapshot, stalePresence, toggleReaction,
-} from '@spades/protocol';
+} from '@pp/protocol';
 import { isProfane } from '../auth/username';
 import { extractMentionKeys } from './mentions';
 import { DEFAULT_SETTINGS, SocialStore, uidOf } from './store';

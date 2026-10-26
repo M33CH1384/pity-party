@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { type Card, type GameState, applyAction, makeRules, newGame, runPlayout, spectatorView, viewFor } from '@spades/rules';
-import type { RunPlayback } from '@spades/protocol';
+import { type Card, type GameState, applyAction, makeRules, newGame, runPlayout, spectatorView, viewFor } from '@pp/rules';
+import type { RunPlayback } from '@pp/protocol';
 import { rotateView } from '../src/online/rotate';
 import { orientRun, pickRunShow, runBeats, scoreOpened, sequenceRun, showForJump } from '../src/runPlayback';
 import { actingSeat } from '../src/turnState';

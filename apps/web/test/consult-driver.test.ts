@@ -8,8 +8,8 @@
  * audio graph is touched.
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { makeRules, newGame, viewFor, type GameState } from '@spades/rules';
-import { INTRO_COMMON, INTRO_OWN, partnerBidIntent } from '@spades/bots';
+import { makeRules, newGame, viewFor, type GameState } from '@pp/rules';
+import { INTRO_COMMON, INTRO_OWN, partnerBidIntent } from '@pp/bots';
 
 vi.mock('../src/talkPrefs', () => ({
   talkPrefs: { get: () => ({ botTalk: true, hideBotTalk: false, voices: true, voiceVolume: 0.6, aiVoices: true }) },

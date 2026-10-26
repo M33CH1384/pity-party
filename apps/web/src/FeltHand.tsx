@@ -1,4 +1,4 @@
-import { type Card, cardLabel } from '@spades/rules';
+import { type Card, cardLabel } from '@pp/rules';
 import { useEffect, useRef, useState } from 'react';
 import { paintFace } from './cardArt';
 

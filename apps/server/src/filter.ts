@@ -1,1 +1,1 @@
-export { blockLinks, cleanName, cleanText, maskProfanity } from '@spades/protocol';
+export { blockLinks, cleanName, cleanText, maskProfanity } from '@pp/protocol';

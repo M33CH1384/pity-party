@@ -16,7 +16,8 @@
  * plain public files fetched only when a rundown opens (preload="none").
  * The push-only service worker (public/sw.js) precaches nothing.
  */
-import manifest from '../../public/story/rundowns/rundowns.json';
+// Pity Party: story rundown videos were not copied from Bid Wit Me; empty manifest = text/voice fallback everywhere.
+const manifest: Record<string, unknown> = {};
 
 export interface RundownVideoEntry {
   file: string;

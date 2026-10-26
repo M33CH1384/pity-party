@@ -1,4 +1,4 @@
-import type { OpenTable, PresenceStatus } from '@spades/protocol';
+import type { OpenTable, PresenceStatus } from '@pp/protocol';
 
 export const WATCH_FULL_REASON = 'Spectator seats are full';
 

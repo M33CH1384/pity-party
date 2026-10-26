@@ -8,8 +8,8 @@
  * Table.tsx feeds snapshots in; nothing here touches React or the DOM,
  * and nothing here runs for non-story games.
  */
-import type { GameState } from '@spades/rules';
-import type { StoryMilestone } from '@spades/bots';
+import type { GameState } from '@pp/rules';
+import type { StoryMilestone } from '@pp/bots';
 
 export interface StorySnap {
   phase: GameState['phase'];
@@ -112,7 +112,7 @@ export function storyEvents(prev: StorySnap, next: StorySnap): StoryEventId[] {
 }
 
 /** The finished game's honest fact sheet (from its own hand history).
- *  The implementation lives in @spades/bots (storySecrets) so the co-op
+ *  The implementation lives in @pp/bots (storySecrets) so the co-op
  *  story room computes the identical sheet server-side; re-exported here
  *  for this module's existing consumers. */
-export { storyFactsOf } from '@spades/bots';
+export { storyFactsOf } from '@pp/bots';

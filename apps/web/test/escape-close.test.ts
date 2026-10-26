@@ -9,7 +9,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it } from 'vitest';
-import { makeRules, newGame } from '@spades/rules';
+import { makeRules, newGame } from '@pp/rules';
 import { ScorePad } from '../src/ScorePad';
 import { useEscapeClose } from '../src/useEscapeClose';
 

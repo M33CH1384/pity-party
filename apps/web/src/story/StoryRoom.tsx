@@ -15,8 +15,8 @@ import {
   STORY_CHARACTERS, STORY_SECRETS, STORY_STOPS, awarenessCaseFor, awarenessFactsFor, beatsFor,
   coopRundownFor, guideOutroLine, kingProposalBeats, railCastForAttempt, storyStopById,
   type PairContextFacts, type StoryBeatFacts, type StoryStop,
-} from '@spades/bots';
-import type { ChatLine, ClientMsg, SeatInfo } from '@spades/protocol';
+} from '@pp/bots';
+import type { ChatLine, ClientMsg, SeatInfo } from '@pp/protocol';
 import { TableConnection, type ConnState } from '../online/connection';
 import { useConn } from '../online/useOnline';
 import OnlineTable from '../online/OnlineTable';

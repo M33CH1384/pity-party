@@ -14,7 +14,7 @@
  * replaying on a hand with no intro.
  * Saves docs/misdeal-button-390.png and docs/misdeal-reveal-390.png when BWM_SHOTS=docs.
  */
-import { isTrump, makeRules, newGame, type GameState } from '@spades/rules';
+import { isTrump, makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

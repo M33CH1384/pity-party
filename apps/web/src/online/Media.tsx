@@ -1,7 +1,7 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { loserCaption, victoryIdentity } from './victory';
 import { createPortal } from 'react-dom';
-import type { SeatInfo } from '@spades/protocol';
+import type { SeatInfo } from '@pp/protocol';
 import type { VideoMesh, VideoState } from './video';
 import { sound, useSoundSettings } from '../audio';
 import type { SeatPos } from '../spatial';

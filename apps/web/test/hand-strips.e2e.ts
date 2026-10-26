@@ -3,7 +3,7 @@
  * grew past four cards. Every DOM card keeps a visible hit strip at 390px,
  * before and after a reload. The first tap raises and does not play.
  */
-import { makeRules, newGame, type Card, type GameState } from '@spades/rules';
+import { makeRules, newGame, type Card, type GameState } from '@pp/rules';
 import { writeFileSync } from 'node:fs';
 import { chromium, webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';

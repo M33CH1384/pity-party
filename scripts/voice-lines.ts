@@ -3,7 +3,7 @@
  * /workspace/bwm-voices (scripts/generate_v2.py). Usage: npx tsx scripts/voice-lines.ts [out.json]
  */
 import { writeFileSync } from 'node:fs';
-import { HUSTLER_NEWBIE_SPEED, PERSONAS, PERSONA_VOICES, type PersonaId, speakableLines } from '@spades/bots';
+import { HUSTLER_NEWBIE_SPEED, PERSONAS, PERSONA_VOICES, type PersonaId, speakableLines } from '@pp/bots';
 
 const out = process.argv[2] ?? '/workspace/bwm-voices/lines-v2.json';
 const personas = Object.fromEntries((Object.keys(PERSONAS) as PersonaId[]).map((id) => [id, {

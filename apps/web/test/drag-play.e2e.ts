@@ -1,5 +1,5 @@
 /** Drag-to-play at 390px in WebKit: a drag onto the felt plays, a drag that ends in the hand snaps back, a tap stays a tap. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

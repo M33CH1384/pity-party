@@ -1,5 +1,5 @@
 /** Deck picker integration: each Desi deck renders its court art in the hand (390px screenshots per deck). */
-import { makeRules, newGame, type Card, type GameState } from '@spades/rules';
+import { makeRules, newGame, type Card, type GameState } from '@pp/rules';
 import { webkit, type Browser } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { DECKS } from '../src/decks';

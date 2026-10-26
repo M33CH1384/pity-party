@@ -1,5 +1,5 @@
 import { createElement } from 'react';
-import { type Card, type TableRules, cardLabel, trumpOrder } from '@spades/rules';
+import { type Card, type TableRules, cardLabel, trumpOrder } from '@pp/rules';
 
 /** How jokers are written. The rung order is always `trumpOrder` (high → low). */
 export type JokerStyle = 'short' | 'long' | 'plain' | 'emoji';

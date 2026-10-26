@@ -1,5 +1,5 @@
 /** Fan slide at 390px in WebKit: a tap mid-slide lands on the intended card; reduced motion snaps. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

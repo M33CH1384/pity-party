@@ -3,7 +3,7 @@
  * general tab. Lines come from the trash-talk pack, filtered by the table's intensity. Sent as a normal chat line;
  * every client also pops it as a callout bubble by the sender's plate.
  */
-import { LINE_META, PACK, type TalkIntensity, type TalkKind, lineAllowed } from '@spades/bots';
+import { LINE_META, PACK, type TalkIntensity, type TalkKind, lineAllowed } from '@pp/bots';
 
 const clean = (raw: string) => raw.replace(/^\[[a-z,]+\]\s*/, '').replace(/^!+/, '').replace(/ @\w+$/, '');
 /** pack lines by event (templates and condition-gated lines left out: a human picks them blind) */

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { makeRules, newGame, viewFor, type GameState } from '@spades/rules';
+import { makeRules, newGame, viewFor, type GameState } from '@pp/rules';
 import { rotateView } from '../src/online/rotate';
 import { dealTimeline, seatDealDelay, dealtSlotCount } from '../src/three/dealTimeline';
 import { noteDiag, getDiagnostics, diagFailureCount, resetDiagnostics } from '../src/diagnostics';

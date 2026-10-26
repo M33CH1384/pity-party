@@ -4,9 +4,9 @@
  * witnessed game-over — with NO regular game record ever written.
  */
 import { describe, expect, it } from 'vitest';
-import type { Card, GameState } from '@spades/rules';
-import { GUIDE_FINALE, chooseBotAction } from '@spades/bots';
-import type { GameAction } from '@spades/protocol';
+import type { Card, GameState } from '@pp/rules';
+import { GUIDE_FINALE, chooseBotAction } from '@pp/bots';
+import type { GameAction } from '@pp/protocol';
 import { FakeEnv } from './harness';
 
 const FAST = { botMs: 10, trickPauseMs: 0, dealMs: 0, disconnectGraceMs: 5000, handOverMs: 3000 };

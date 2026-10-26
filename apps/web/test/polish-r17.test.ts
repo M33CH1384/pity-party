@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { hostMinimum, makeRules } from '@spades/rules';
+import { hostMinimum, makeRules } from '@pp/rules';
 import { booksBanner, minimumChip, teamMinNote } from '../src/polishText';
 import { trickSpot } from '../src/three/layout';
 import { BOT_PLAY_MS } from '../src/useGame';

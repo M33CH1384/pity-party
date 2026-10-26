@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { SocialChatLine } from '@spades/protocol';
+import type { SocialChatLine } from '@pp/protocol';
 import { badgeCount, isMuted, unseenMentions, type SocialState } from '../src/social/store';
 
 const line = (id: number, from: string, mentions?: string[]): SocialChatLine => ({

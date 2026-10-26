@@ -4,8 +4,8 @@
  *   shotout : your last card of the hand that shoots a side out of the game (play it → SHOT OUT game over)
  * Usage: npx tsx scripts/release5-state.ts notice|shotout
  */
-import { type GameState, applyAction, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction, pickBotNames } from '@spades/bots';
+import { type GameState, applyAction, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction, pickBotNames } from '@pp/bots';
 import { DEFAULT_SETTINGS, settingsToRules } from '../apps/web/src/settings';
 
 const what = process.argv[2] ?? 'notice';

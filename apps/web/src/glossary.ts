@@ -1,4 +1,4 @@
-import { type TableRules, cardLabel, hostMinimum, shotOutOn, trumpOrder } from '@spades/rules';
+import { type TableRules, cardLabel, hostMinimum, shotOutOn, trumpOrder } from '@pp/rules';
 import { trumpLadder } from './trumpLadder';
 
 /**

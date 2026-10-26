@@ -1,5 +1,5 @@
-import type { Bid, BidOptions, TableRules } from '@spades/rules';
-import { hostMinimum, isNilBid } from '@spades/rules';
+import type { Bid, BidOptions, TableRules } from '@pp/rules';
+import { hostMinimum, isNilBid } from '@pp/rules';
 
 export interface MinBidNote {
   /** "Min bid 3 · house rule" */

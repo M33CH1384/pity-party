@@ -4,7 +4,7 @@
  * the hand or colliding with the YOU plate / view chips. Saves the PR screenshot when
  * BWM_SHOTS is set (docs/bid-summary-390.png in the PR workflow).
  */
-import { isTrump, makeRules, newGame, type GameState } from '@spades/rules';
+import { isTrump, makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

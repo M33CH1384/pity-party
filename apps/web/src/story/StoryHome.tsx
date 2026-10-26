@@ -9,11 +9,11 @@
  * and a loss is a free retry with nothing lost.
  */
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
-import { secureSeed } from '@spades/rules';
+import { secureSeed } from '@pp/rules';
 import {
   STORY_SECRETS, STORY_STOPS, STORY_CHARACTERS, STORY_TIER_LABEL, STORY_TIER_SKILL, beatsFor, deeSkillForStop,
   kingDoubleBeats, mannerBandOf, storyClearReward, targetForStop, type MannerBand, type StoryBeatFacts, type StoryGameFacts, type StoryStop,
-} from '@spades/bots';
+} from '@pp/bots';
 import Table from '../Table';
 import { usePresence } from '../social/Social';
 import SettingsSheetHost from '../SettingsSheetHost';
@@ -36,7 +36,7 @@ import { deckForStop, type DeckDef } from '../decks';
 import { DeckViewer } from '../DeckGallery';
 import { deckBackUrl } from '../three/cardTextures';
 import { clearStoryGame, loadStoryGame, storySaveSummary, storySaveValidFor, type StorySavedGame } from './storySave';
-import { railCastForAttempt, rundownFor, storyBadgesFor } from '@spades/bots';
+import { railCastForAttempt, rundownFor, storyBadgesFor } from '@pp/bots';
 import ScriptPlayer, { type SceneEgg } from './ScriptPlayer';
 import { livingMoodFor } from './storyLiving';
 import { SceneAudio } from './SceneAudio';

@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { personaPortraitFor } from '@spades/bots';
+import { personaPortraitFor } from '@pp/bots';
 import {
   LOADING_SEAT_STAGGER_MS,
   TableLoading,

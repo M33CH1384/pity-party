@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { type Card, type GameState, makeRules, newGame } from '@spades/rules';
+import { type Card, type GameState, makeRules, newGame } from '@pp/rules';
 import { landCueFor } from '../src/landCue';
 import { handWinner, streakLabel, streakOf } from '../src/fx';
 
@@ -100,7 +100,7 @@ describe('wheels made / Cutthroat 10th book', () => {
 });
 
 import { cutLevel } from '../src/landCue';
-import { makeRules } from '@spades/rules';
+import { makeRules } from '@pp/rules';
 describe('cut levels / over-cuts', () => {
   const P = (...cs: string[]) => cs.map((card, seat) => ({ seat, card })) as never;
   const joker = makeRules('joker');

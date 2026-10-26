@@ -3,7 +3,7 @@
  * Plain TS types + small hand-written guards (no runtime schema lib, to keep the Worker bundle and CPU tiny).
  * Every client message is validated on the server with `parseClientMsg`; anything malformed is dropped.
  */
-import type { Card, PlayerView, RunPlayout, Series, TableRules } from '@spades/rules';
+import type { Card, PlayerView, RunPlayout, Series, TableRules } from '@pp/rules';
 import { isReactionEmoji, type ChatReactions } from './filter';
 export * from './filter';
 export * from './social';

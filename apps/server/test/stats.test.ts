@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import type { Card } from '@spades/rules';
-import { makeRules } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
-import type { GameAction } from '@spades/protocol';
+import type { Card } from '@pp/rules';
+import { makeRules } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
+import type { GameAction } from '@pp/protocol';
 import { FakeEnv } from './harness';
 import { makeD1 } from './d1';
 import { type GameRecord, eloUpdate, expected, isRated, placementsOf, saveRecord } from '../src/stats/record';

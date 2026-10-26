@@ -21,7 +21,7 @@
  *   - A table with nobody connected freezes (no bots, no timers) and is deleted after 24 h idle.
  */
 import { DurableObject } from 'cloudflare:workers';
-import { CODE_ALPHABET, CODE_LENGTH, GUEST_SESSION, type ServerMsg, isRoomCode, normalizeRoomCode } from '@spades/protocol';
+import { CODE_ALPHABET, CODE_LENGTH, GUEST_SESSION, type ServerMsg, isRoomCode, normalizeRoomCode } from '@pp/protocol';
 import { Room, type RoomData, ROOM_DATA_VERSION, newRoomData } from './room';
 import { dispatchTableMessage } from './dispatch';
 import { FEEDBACK_LIMITS, type FeedbackRow, adminHtml, hashIp, notifyOwner, parseFeedback, rateOk, tokenOk } from './feedback';
@@ -46,12 +46,12 @@ import type { WOp } from './wager/do';
 import { type PushEnv, handlePushHttp } from './push/routes';
 import { notifyDm, notifyFriendsOfOnline, notifyInvite, notifyMention, notifyTurn, pushVapid, runScheduledPushes, sendCredPushEvent } from './push/notify';
 import { blockedBetween, usersByKeys } from './social/mentions';
-import type { TableRules } from '@spades/rules';
+import type { TableRules } from '@pp/rules';
 export { TournamentDO } from './tournament/do';
 import type { TournamentDO } from './tournament/do';
 export { ChallengeDO } from './wager/do';
 import type { ChallengeDO } from './wager/do';
-import type { ChatReactions, OpenTable, ReplyRef, SocialChatLine, SocialServerMsg } from '@spades/protocol';
+import type { ChatReactions, OpenTable, ReplyRef, SocialChatLine, SocialServerMsg } from '@pp/protocol';
 
 import { D1QueueStore, WriterBreaker, writeVoiceLine, type WorkersAiLike, type WriterRequest } from './voice/writer';
 export interface Env extends LimitEnv, AuthEnv, SocialEnv {
@@ -620,7 +620,7 @@ export class TableDO extends DurableObject<Env> {
     if (url.pathname === '/story-setup' && req.method === 'POST') {
       // internal only (story routes → table); not routed from the public Worker
       if (this.room) return new Response('exists', { status: 409 });
-      const b = await req.json() as { stopId: string; hostUid: string; partnerUid: string | null; aware?: Record<string, import('@spades/bots').AwarenessCase>; buzz?: Record<string, import('@spades/bots').StoryBuzzInput> };
+      const b = await req.json() as { stopId: string; hostUid: string; partnerUid: string | null; aware?: Record<string, import('@pp/bots').AwarenessCase>; buzz?: Record<string, import('@pp/bots').StoryBuzzInput> };
       const data = newRoomData(code, Date.now());
       this.attach(data);
       this.room!.setupStory(b.stopId, b.hostUid, b.partnerUid ?? null, b.aware, b.buzz);
@@ -631,7 +631,7 @@ export class TableDO extends DurableObject<Env> {
     if (url.pathname === '/story-bind' && req.method === 'POST') {
       // internal only (story routes → table): a share-code partner binds their account
       if (!this.room) return new Response('no such table', { status: 404 });
-      const b = await req.json() as { uid: string; aware?: Record<string, import('@spades/bots').AwarenessCase>; buzz?: Record<string, import('@spades/bots').StoryBuzzInput> };
+      const b = await req.json() as { uid: string; aware?: Record<string, import('@pp/bots').AwarenessCase>; buzz?: Record<string, import('@pp/bots').StoryBuzzInput> };
       if (!this.room.bindStoryPartner(b.uid, b.aware, b.buzz)) return Response.json({ error: 'spoken for' }, { status: 409 });
       this.flush();
       const s = this.room.data.story!;

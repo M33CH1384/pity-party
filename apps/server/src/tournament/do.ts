@@ -1,6 +1,6 @@
 /** Release 9b: one Durable Object per tournament (idFromName(id)); serialised ops, DO alarms for check-in + start. */
 import { DurableObject } from 'cloudflare:workers';
-import { CODE_ALPHABET, CODE_LENGTH } from '@spades/protocol';
+import { CODE_ALPHABET, CODE_LENGTH } from '@pp/protocol';
 import type { Env } from '../index';
 import { type TData, type TIO, type TMeta, TError, alarm, begin, cancel, checkin, create, register, result, unregister, view } from './service';
 

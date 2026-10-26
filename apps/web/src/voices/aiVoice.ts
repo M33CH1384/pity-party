@@ -4,7 +4,7 @@
  * if anything misses (player toggle off, voices or sound off, clip missing, slow, or no table), the canned line goes
  * out exactly as today, text and audio together. The game never waits on this beyond a short clip fetch.
  */
-import { aiClipUrl } from '@spades/bots';
+import { aiClipUrl } from '@pp/bots';
 import { sound } from '../audio';
 
 /** Past this, the moment has passed: fall back to the canned line. */

@@ -6,7 +6,7 @@
  * manner band, and the scene layer stays silent.
  */
 import { describe, expect, it } from 'vitest';
-import { STORY_STOPS } from '@spades/bots';
+import { STORY_STOPS } from '@pp/bots';
 import { routeFactsFor, trueNextStop, type StoryProgress, type StoryStopProgress } from '../src/story/storyApi';
 
 const stop = (id: string) => STORY_STOPS.find((s) => s.id === id)!;

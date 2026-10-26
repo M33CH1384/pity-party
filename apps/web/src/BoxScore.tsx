@@ -16,7 +16,7 @@
  *   side's numbers, so no fact is hidden, the loser just doesn't get the
  *   headline on the winner's screen.
  */
-import { type GameState, type HandRecord, shotCounts, shotCovers } from '@spades/rules';
+import { type GameState, type HandRecord, shotCounts, shotCovers } from '@pp/rules';
 import { handWinner } from './fx';
 
 const sgn = (n: number) => (n > 0 ? `+${n}` : n < 0 ? `−${-n}` : '0');

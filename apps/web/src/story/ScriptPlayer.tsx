@@ -20,7 +20,7 @@
  * scene in place — discovery feels like the scene opening a side door.
  */
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { STORY_CHARACTERS, personaForName, storyPortraitFor, type StoryBeat } from '@spades/bots';
+import { STORY_CHARACTERS, personaForName, storyPortraitFor, type StoryBeat } from '@pp/bots';
 import { sound } from '../audio';
 import { cancelActiveSpeech } from '../audioSession';
 import { setStoryVoiceScope, speakBot, spokenClipDurationMs } from '../talkPrefs';

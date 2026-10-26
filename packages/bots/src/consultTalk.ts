@@ -23,7 +23,7 @@
  * key by their raw text. A lookup that misses renders TEXT ONLY under the
  * standing fence rules — never a substitute voice.
  */
-import type { PlayerView } from '@spades/rules';
+import type { PlayerView } from '@pp/rules';
 import { analyzeHand, partnerBidIntent, skillOf, wantsBlindNil, type BotLevel } from './bidding';
 import type { PersonaId } from './personas';
 

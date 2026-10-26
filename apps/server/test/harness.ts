@@ -1,5 +1,5 @@
-import type { ClientMsg, ServerMsg } from '@spades/protocol';
-import { createRng } from '@spades/rules';
+import type { ClientMsg, ServerMsg } from '@pp/protocol';
+import { createRng } from '@pp/rules';
 import { DEFAULT_TIMING, Room, type RoomData, type RoomIO, type RoomTiming, newRoomData } from '../src/room';
 
 /** Fake Durable Object environment: manual clock, captured messages, timers, alarm, save counter. */

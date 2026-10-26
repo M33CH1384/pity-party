@@ -7,7 +7,7 @@
  *   (× master volume; silent when sound is off)
  */
 import { useSyncExternalStore } from 'react';
-import { PERSONAS, type PersonaId, type TalkIntensity, applyPronunciation, maskMild, personaForName, storyCastForName, voiceGender } from '@spades/bots';
+import { PERSONAS, type PersonaId, type TalkIntensity, applyPronunciation, maskMild, personaForName, storyCastForName, voiceGender } from '@pp/bots';
 import { sound } from './audio';
 import { cancelActiveSpeech } from './audioSession';
 import { clipDurationMs, playClip, rawLine } from './voices/voices';

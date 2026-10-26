@@ -16,7 +16,7 @@ import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { STORY_STOPS, kingDoubleBeats, type StoryStop } from '@spades/bots';
+import { STORY_STOPS, kingDoubleBeats, type StoryStop } from '@pp/bots';
 import ScriptPlayer from '../src/story/ScriptPlayer';
 import { kingGunSeatFor } from '../src/Table';
 

@@ -20,7 +20,7 @@
  * same identity the painted face carries.
  */
 import { useEffect, useRef, useState } from 'react';
-import type { Card } from '@spades/rules';
+import type { Card } from '@pp/rules';
 import { DECKS, deckArtUrl, deckBackUrl, deckById, deckThumbUrl, type DeckDef } from './decks';
 import { deckUnlockLine, deckUnlocked, useClearedStoryStops } from './storyDecks';
 import { DECK_CARD_ORDER, cardLabel, deckCardFact, deckLore } from './deckLore';

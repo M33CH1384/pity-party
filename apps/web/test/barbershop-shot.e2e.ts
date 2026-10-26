@@ -1,5 +1,5 @@
 /** Barbershop cube room at 390 (WebKit): table view that must name the room (checker/storefront). */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

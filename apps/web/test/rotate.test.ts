@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { type Card, type GameState, applyAction, makeRules, newGame, pendingTurn, scoreHand, sideOf, spectatorView, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { type Card, type GameState, applyAction, makeRules, newGame, pendingTurn, scoreHand, sideOf, spectatorView, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { HIDDEN, rotateView, rotation } from '../src/online/rotate';
 
 function advance(st: GameState, steps: number): GameState {

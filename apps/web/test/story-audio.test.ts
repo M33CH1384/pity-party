@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { STORY_STOPS } from '@spades/bots';
+import { STORY_STOPS } from '@pp/bots';
 import { STORY_STOP_AUDIO, storyAudioForStop } from '../src/spatial';
 import { STORY_MOTIF_HZ, STORY_TRACK_FILE, TRACKS, sound } from '../src/audio';
 

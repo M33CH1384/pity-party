@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { applyPronunciation } from '@spades/bots';
+import { applyPronunciation } from '@pp/bots';
 
 // The pronunciation dictionary lives in ONE place (packages/bots/src/pronounce.ts) and both
 // speech paths consume it: the recorded bake (via spokenTake) and this app's Web Speech
@@ -10,9 +10,9 @@ import { applyPronunciation } from '@spades/bots';
 const talkPrefs = readFileSync(join(process.cwd(), 'apps/web/src/talkPrefs.ts'), 'utf8');
 
 describe('pronunciation: one dictionary, both speech paths', () => {
-  it('the fallback imports the shared dictionary from @spades/bots', () => {
+  it('the fallback imports the shared dictionary from @pp/bots', () => {
     expect(talkPrefs).toContain('applyPronunciation');
-    expect(talkPrefs).toMatch(/import \{[^}]*applyPronunciation[^}]*\} from '@spades\/bots'/);
+    expect(talkPrefs).toMatch(/import \{[^}]*applyPronunciation[^}]*\} from '@pp\/bots'/);
     expect(talkPrefs).toContain('applyPronunciation(clean)');
     expect(talkPrefs).toContain('applyPronunciation(text)');
   });

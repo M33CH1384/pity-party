@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   CARD_LAND_MS, HAND_END_AFTER_LAND_MS, HAND_END_BEAT_MS, HAND_END_HOLD_MS, HAND_END_REVEAL_MS,
   HYPE_SETTLE_MAX_MS, MEGA_RUN_FX_MS, NUKE_ALLOWANCE_MS, RUN_FX_MS, TRICK_HOLD_MS, handEndLeadMs,
-} from '@spades/protocol';
+} from '@pp/protocol';
 import { RUN_MEGA_SHOW_EXTRA_MS, RUN_SHOW_MS, RUN_TORNADO_AFTER_MS, RUN_TORNADO_MS, RUN_ZOOM_MS } from '../src/runIt';
 import { SCORE_TOAST_MS, TRICK_SWEEP_MS, finishedTrickHoldMs } from '../src/trickTiming';
 

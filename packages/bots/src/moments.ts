@@ -2,7 +2,7 @@
  * Turn a game step (state before → after an action) into trash-talk moments for the talk engine.
  * Shared by the server (online) and the offline game.
  */
-import { type Action, type Card, type GameState, effectiveSuit, isTrump, legalPlays, rulesForLive, sideCount, sideOf, tricksStillRemaining, trickWinner } from '@spades/rules';
+import { type Action, type Card, type GameState, effectiveSuit, isTrump, legalPlays, rulesForLive, sideCount, sideOf, tricksStillRemaining, trickWinner } from '@pp/rules';
 import type { GapBucket, TalkEvent, TricksLeftBucket } from './talk';
 
 const LOW = new Set(['2', '3', '4', '5']);

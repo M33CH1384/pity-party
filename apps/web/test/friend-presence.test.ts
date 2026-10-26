@@ -14,7 +14,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { PRESENCE_STALE_MS, type PresenceEntry } from '@spades/protocol';
+import { PRESENCE_STALE_MS, type PresenceEntry } from '@pp/protocol';
 import { friendPresenceView, friendStatusLabel, roomHasStory } from '../src/social/presence';
 
 const now = 1_800_000_000_000;

@@ -1,5 +1,5 @@
 /** Release 9b: /api/tournaments — list (D1), create, detail + actions (the tournament's Durable Object). */
-import { makeRules } from '@spades/rules';
+import { makeRules } from '@pp/rules';
 import { type AuthEnv, currentUser } from '../auth/routes';
 import { isProfane } from '../auth/username';
 import { type SocialEnv, isAdmin } from '../social/routes';

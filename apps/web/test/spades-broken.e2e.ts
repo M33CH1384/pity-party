@@ -1,5 +1,5 @@
 /** SPADES BROKEN chip: only when the viewer's Tips are ON. */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import type { HandHitCard } from '../src/three/handHit';

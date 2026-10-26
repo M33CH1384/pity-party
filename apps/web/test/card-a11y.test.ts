@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { Card } from '@spades/rules';
+import type { Card } from '@pp/rules';
 import { cardControlLabel, spokenCard } from '../src/cardA11y';
 
 describe('spoken card controls', () => {

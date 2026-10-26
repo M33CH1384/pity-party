@@ -1,5 +1,5 @@
 import { type FormEvent, type PointerEvent as ReactPointerEvent, type ReactNode, useEffect, useRef, useState } from 'react';
-import { CODE_LENGTH, isRoomCode, normalizeRoomCode } from '@spades/protocol';
+import { CODE_LENGTH, isRoomCode, normalizeRoomCode } from '@pp/protocol';
 import { Seg, Toggle } from './MoreOptions';
 import { requestSettingsSheet } from './settingsSheet';
 import { type ModeKey, type Settings, MODES, modeTitle, rulesSummary, settingsToRules } from './settings';
@@ -9,7 +9,7 @@ import { coverThen } from './spray';
 import { serverUrl } from './online/config';
 import { createTable, tableInfo } from './online/connection';
 import { type PendingMusic, SetupMusicPicker, savePendingMusic } from './online/HostMusic';
-import { isMusicLink } from '@spades/protocol';
+import { isMusicLink } from '@pp/protocol';
 import { loadName, saveName } from './online/identity';
 import { navigate } from './online/nav';
 import { deckName } from './decks';

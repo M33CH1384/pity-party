@@ -2,7 +2,7 @@
  * Physics landing at 390px in WebKit. Tips OFF: thrown cards come to rest where the throw sends them, the same
  * on every run (seeded). Tips ON: the fixed per-seat spots. Saves resting-layout screenshots.
  */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import { pickHandCard, type HandHitCard } from '../src/three/handHit';

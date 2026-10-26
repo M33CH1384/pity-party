@@ -1,5 +1,5 @@
-import { STORY_STOPS, storyStopById } from '@spades/bots';
-import type { GameResult, ShotCover } from '@spades/rules';
+import { STORY_STOPS, storyStopById } from '@pp/bots';
+import type { GameResult, ShotCover } from '@pp/rules';
 
 /**
  * Per-stop SET ANIMATIONS (owner, 2026-10-21): every story stop has its own

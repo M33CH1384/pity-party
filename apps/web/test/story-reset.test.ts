@@ -13,7 +13,7 @@ import { createElement, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { STORY_STOPS } from '@spades/bots';
+import { STORY_STOPS } from '@pp/bots';
 import StoryHome from '../src/story/StoryHome';
 import { invalidateStoryProgress, useClearedStoryStops } from '../src/storyDecks';
 import type { StoryProgress } from '../src/story/storyApi';

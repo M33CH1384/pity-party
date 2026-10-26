@@ -2,8 +2,8 @@
  * Headless bot-vs-bot simulation: plays full games in every mode and checks invariants.
  * Usage: pnpm simulate [gamesPerMode=25] [seedPrefix=sim]
  */
-import { simulateGame } from '@spades/bots';
-import { type Card, type GameState, type TableRules, buildDeck, deckForHand, handSize, makeRules, sideCount } from '@spades/rules';
+import { simulateGame } from '@pp/bots';
+import { type Card, type GameState, type TableRules, buildDeck, deckForHand, handSize, makeRules, sideCount } from '@pp/rules';
 
 const games = Number(process.argv[2] ?? 25);
 const prefix = process.argv[3] ?? 'sim';

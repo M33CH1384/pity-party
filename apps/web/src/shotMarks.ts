@@ -5,7 +5,7 @@
  * object is reused for a seed and side, so a recap remount and the score pad
  * share the count and the punched flags and never roll new positions.
  */
-import { type Bid, type SideHandResult, type TableRules, isShot, sideCount } from '@spades/rules';
+import { type Bid, type SideHandResult, type TableRules, isShot, sideCount } from '@pp/rules';
 
 /**
  * On-notice card. All three sit in the tape lane: below the name and the total,

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { type PlayerView, cardLabel, createRng, handSize } from '@spades/rules';
-import { type BidAdvice, bidAdvice } from '@spades/bots';
+import { type PlayerView, cardLabel, createRng, handSize } from '@pp/rules';
+import { type BidAdvice, bidAdvice } from '@pp/bots';
 import { topTrumps } from './glossary';
 
 /** ~1½ style: books rounded to the nearest half. */

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import { VENUES } from '@spades/protocol';
-import { BOT_NAMES, PERSONAS, type PersonaId, personaForName, voiceGender } from '@spades/bots';
+import { VENUES } from '@pp/protocol';
+import { BOT_NAMES, PERSONAS, type PersonaId, personaForName, voiceGender } from '@pp/bots';
 import { ROOM_STYLES, TOURNAMENT_ROOM, audioIdentityForVenue, styleForVenue } from '../src/spatial';
 import { VENUE_DEFS } from '../src/venues';
 import { TRACKS } from '../src/audio';

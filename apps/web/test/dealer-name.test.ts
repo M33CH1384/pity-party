@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { makeRules, newGame, scoreHand } from '@spades/rules';
+import { makeRules, newGame, scoreHand } from '@pp/rules';
 import { rotation } from '../src/online/rotate';
 import { DealerPopup } from '../src/DealerPopup';
 import {

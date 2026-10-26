@@ -1,7 +1,7 @@
 /** Hand Recap must fit one screenful at 390x844 and 393x852: TOP SCORES, both team
  *  sheets, Score pad, Continue and Leave game — Leave above the fold, no scrolling. */
-import { makeRules, newGame, applyAction, pendingTurn, viewFor, type GameState } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { makeRules, newGame, applyAction, pendingTurn, viewFor, type GameState } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

@@ -2,8 +2,8 @@
  * Dev helper: print a saved offline game (localStorage 'bwm.game') paused at a hand-over, for screenshots of
  * Table Talk. Usage: tsx scripts/gen-save.ts [minHands=3] [wantNegative=1] > /tmp/save.json
  */
-import { applyAction, makeRules, newGame, pendingTurn, viewFor, createRng, type GameState } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { applyAction, makeRules, newGame, pendingTurn, viewFor, createRng, type GameState } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 const minHands = +(process.argv[2] ?? 3);
 const wantNeg = (process.argv[3] ?? '1') === '1';
 for (let k = 0; k < 400; k++) {

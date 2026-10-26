@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { applyAction, bidOptions, hostMinimum, makeRules } from '@spades/rules';
+import { applyAction, bidOptions, hostMinimum, makeRules } from '@pp/rules';
 import { fill, rigged } from '../../../packages/rules/test/helpers';
 import { MinBidLine, bidChoices, minBidNote } from '../src/minBid';
 

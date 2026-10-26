@@ -6,7 +6,7 @@
  * jpg backdrop + a 256×128 .hdr for lighting in High quality), light colours, a few procedural props and a quiet
  * procedural ambient sound bed (audio.ts → venueBed). Sources are in CREDITS.md.
  */
-import { isVenueChoice, type VenueChoice, type VenueId, VENUES, rollVenue } from '@spades/protocol';
+import { isVenueChoice, type VenueChoice, type VenueId, VENUES, rollVenue } from '@pp/protocol';
 import { styleForVenue } from './spatial';
 import { noteDailyBonus } from './dailyBonus';
 

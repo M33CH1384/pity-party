@@ -1,4 +1,4 @@
-import type { SeatInfo } from '@spades/protocol';
+import type { SeatInfo } from '@pp/protocol';
 import { winHeadline } from '../headline';
 
 /**

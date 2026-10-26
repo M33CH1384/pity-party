@@ -14,7 +14,7 @@
  * keeps recognizing the phrase in free text for chat/save compatibility
  * (§11.9): we stopped GENERATING suit talk, not hearing it.
  */
-import type { PlayerView } from '@spades/rules';
+import type { PlayerView } from '@pp/rules';
 
 export const PARTNER_TALK_PRESETS = ['I got about 2', '3-ish', '4+', "I'm weak", 'I can go Nil'] as const;
 

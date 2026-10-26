@@ -2,7 +2,7 @@ import { saveSeries } from './Series';
 import { clearTableChatOpen } from './chatView';
 import { useEffect, useState } from 'react';
 import { preloadTable } from './three/preload';
-import { secureSeed } from '@spades/rules';
+import { secureSeed } from '@pp/rules';
 import Setup from './Setup';
 import SettingsSheetHost from './SettingsSheetHost';
 import { type TipsPref, loadTips } from './tips';

@@ -10,7 +10,7 @@
  *  - TTS safety: every new line must survive the talkPrefs speech cleanup with words left.
  */
 import { describe, expect, it } from 'vitest';
-import { type GameState, type HandRecord, type SideHandResult, makeRules, newGame } from '@spades/rules';
+import { type GameState, type HandRecord, type SideHandResult, makeRules, newGame } from '@pp/rules';
 import {
   BOT_NAMES, COMMON, LINE_META, PERSONAS, applyPronunciation, banterContextFor, botTalk, collectionBanter, gapBiasOf, lineById,
   maskMild, momentsFor, newTalkState, personaForName, poolFor,

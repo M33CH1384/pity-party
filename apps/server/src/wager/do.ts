@@ -1,6 +1,6 @@
 /** Big Bank Take Lil Bank (Phase 1): one Durable Object per challenge (idFromName(id)); serialised ops, DO alarms for the accept deadline, check-in opening and the scheduled start. Cloned from TournamentDO. */
 import { DurableObject } from 'cloudflare:workers';
-import { CODE_ALPHABET, CODE_LENGTH } from '@spades/protocol';
+import { CODE_ALPHABET, CODE_LENGTH } from '@pp/protocol';
 import type { Env } from '../index';
 import { notifyWager, pushVapid } from '../push/notify';
 import { type WData, type WIO, type WPerson, type WResult, WError, accept, alarm, cancel, checkin, create, decline, result, view, type WCreate } from './service';

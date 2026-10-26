@@ -1,5 +1,5 @@
 /** Hand Recap pill: reads "Review last trick" and still opens the cleared-hands review (WebKit 390). */
-import { makeRules, newGame, canRunIt, type Card, type GameState } from '@spades/rules';
+import { makeRules, newGame, canRunIt, type Card, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

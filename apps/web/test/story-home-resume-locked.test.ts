@@ -13,7 +13,7 @@ import { createElement, type ReactNode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { makeRules, newGame } from '@spades/rules';
+import { makeRules, newGame } from '@pp/rules';
 import Setup from '../src/Setup';
 import { DEFAULT_SETTINGS } from '../src/settings';
 import StoryHome from '../src/story/StoryHome';

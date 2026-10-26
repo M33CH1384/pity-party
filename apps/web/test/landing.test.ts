@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { cleanRel } from '@spades/rules';
-import { parseClientMsg } from '@spades/protocol';
+import { cleanRel } from '@pp/rules';
+import { parseClientMsg } from '@pp/protocol';
 import { CH, CW, FELT, TRICK_SCALE, trickSpot, type SeatPos } from '../src/three/layout';
 import { MAX_SLIDE, MAX_SPIN, THROW_SPREAD, VISIBLE_FELT, clampLanding, cornerIndex, landTrick, landingMode, playSeed, restingOffset } from '../src/three/landing';
 

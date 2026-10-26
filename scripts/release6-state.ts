@@ -5,8 +5,8 @@
  *   pad    : 4+ hands scored, mid-hand (score pad with history + the hand in progress)
  * Usage: npx tsx scripts/release6-state.ts bidme|bidwait|pad
  */
-import { type GameState, applyAction, bidOrder, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction, pickBotNames } from '@spades/bots';
+import { type GameState, applyAction, bidOrder, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction, pickBotNames } from '@pp/bots';
 import { DEFAULT_SETTINGS, settingsToRules } from '../apps/web/src/settings';
 
 const what = process.argv[2] ?? 'bidme';

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { OpenTable, PresenceStatus } from '@spades/protocol';
+import type { OpenTable, PresenceStatus } from '@pp/protocol';
 import { WATCH_FULL_REASON, playerTableAction } from '../src/social/tableActions';
 
 const local: PresenceStatus = { kind: 'table', mode: 'joker', offline: true };

@@ -5,7 +5,7 @@
 import {
   STORY_CHARACTERS, STORY_STOPS, mannerBandOf, targetForStop,
   type StoryBeatFacts, type StoryEndReason, type StoryStop, type StoryStopState,
-} from '@spades/bots';
+} from '@pp/bots';
 import { fetchVenueUnlocks } from '../venues';
 
 /**
@@ -193,7 +193,7 @@ export async function fetchStoryProgress(track = 'solo'): Promise<ProgressFetch>
 /** Record a finished stop game. Returns null when the write failed (offline, signed out, server error).
  *  Co-op posts carry the pair track + the room's gameId: the server credits
  *  from its witness row (the body's won/facts are ignored for pair tracks). */
-export async function postStoryResult(stopId: string, won: boolean, gameId: string, facts?: import('@spades/bots').StoryGameFacts, track = 'solo'): Promise<StoryResult | null> {
+export async function postStoryResult(stopId: string, won: boolean, gameId: string, facts?: import('@pp/bots').StoryGameFacts, track = 'solo'): Promise<StoryResult | null> {
   try {
     const r = await fetch('/api/story/result', {
       method: 'POST',

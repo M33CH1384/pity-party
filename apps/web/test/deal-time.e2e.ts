@@ -3,8 +3,8 @@
  * from the deck, and nobody acts (YOUR TURN, timer, bot lead) until the deal settles.
  * Hand 2 deals the same way with nothing left over from hand 1. A resumed hand shows at once.
  */
-import { applyAction, makeRules, newGame, pendingTurn, viewFor, type GameState } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
+import { applyAction, makeRules, newGame, pendingTurn, viewFor, type GameState } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
 import { webkit, chromium, type Browser, type Page } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 

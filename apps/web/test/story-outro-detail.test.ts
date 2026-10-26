@@ -23,7 +23,7 @@ import { readFileSync } from 'node:fs';
 import { act, createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { STORY_SECRETS, STORY_STOPS, storyBadgesFor } from '@spades/bots';
+import { STORY_SECRETS, STORY_STOPS, storyBadgesFor } from '@pp/bots';
 import StoryBadges, { badgeFactsOf } from '../src/story/StoryBadges';
 import { FindDetail, SetAnimDetail, splitSetAnimBlurb } from '../src/story/StoryDetailSheet';
 import { SET_ANIMS, setAnimForStop } from '../src/setAnims';

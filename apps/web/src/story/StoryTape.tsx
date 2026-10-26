@@ -11,7 +11,7 @@
  * rides the same labeled-row system; the history line is a quiet
  * hairline caption in the story design family.
  */
-import { buildStoryTape, type CoopRundown, type StoryBeatFacts, type StoryRundown, type StoryStop, type StoryTapeEntry } from '@spades/bots';
+import { buildStoryTape, type CoopRundown, type StoryBeatFacts, type StoryRundown, type StoryStop, type StoryTapeEntry } from '@pp/bots';
 import StoryFace from './StoryFace';
 import DeeRundownPanel from './DeeRundown';
 import { storyBackdropUrl } from './storyBackdrop';

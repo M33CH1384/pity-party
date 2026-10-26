@@ -1,5 +1,5 @@
 /** Cube venue at 390 WebKit. Env: BWM_VENUE=mansion BWM_ROOM=mansion BWM_URL BWM_SHOTS BWM_TAG */
-import { makeRules, newGame, type GameState } from '@spades/rules';
+import { makeRules, newGame, type GameState } from '@pp/rules';
 import { webkit } from 'playwright-core';
 import { DEFAULT_SETTINGS } from '../src/settings';
 const VENUE = process.env.BWM_VENUE ?? 'mansion'; const ROOM = process.env.BWM_ROOM ?? VENUE;

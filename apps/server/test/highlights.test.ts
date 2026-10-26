@@ -8,7 +8,7 @@
  */
 import { beforeEach, describe, expect, it } from 'vitest';
 import { makeD1 } from './d1';
-import { type HandRecord } from '@spades/rules';
+import { type HandRecord } from '@pp/rules';
 import { handHighlights, recentHighlights, recordHighlight, trickHighlights, type HighlightEvent, type HighlightSeat } from '../src/stats/highlights';
 
 const NOW = 1_800_000_000_000;

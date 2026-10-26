@@ -9,7 +9,7 @@ import {
   STORY_CALLBACK_LINES, openStorySession, runStoryCallbacks, storyCallbackCoverage, storyCallbackPayload,
 } from '../src/story/callback';
 import { b64uDecode, b64uEncode, type VapidKeys } from '../src/push/crypto';
-import { STORY_CHARACTERS, STORY_STOPS } from '@spades/bots';
+import { STORY_CHARACTERS, STORY_STOPS } from '@pp/bots';
 
 let db: D1Database;
 const NOW = 1_800_000_000_000;

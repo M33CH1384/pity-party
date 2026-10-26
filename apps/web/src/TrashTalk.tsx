@@ -1,7 +1,7 @@
 import { type CSSProperties, useEffect, useMemo, useRef, useState } from 'react';
 import { useEscapeClose } from './useEscapeClose';
-import { type GameState, sideOf } from '@spades/rules';
-import type { TalkIntensity, TalkKind } from '@spades/bots';
+import { type GameState, sideOf } from '@pp/rules';
+import type { TalkIntensity, TalkKind } from '@pp/bots';
 import { QUICK_CONTEXTS, QUICK_COOLDOWN_MS, generalLines, quickLines } from './quickTrash';
 
 /** what just happened, from this player's point of view (most relevant first) */

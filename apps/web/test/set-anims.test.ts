@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { type GameResult, type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@spades/rules';
-import { chooseBotAction } from '@spades/bots';
-import { STORY_STOPS } from '@spades/bots';
+import { type GameResult, type GameState, applyAction, makeRules, newGame, pendingTurn, viewFor } from '@pp/rules';
+import { chooseBotAction } from '@pp/bots';
+import { STORY_STOPS } from '@pp/bots';
 import {
   SET_ANIMS, isThirdSetEnd, resolveSetAnim, setAnimForStop, setAnimStopForVenue,
   setAnimUnlockLine, setAnimUnlockNotice, setAnimUnlocked, setTierForCover,

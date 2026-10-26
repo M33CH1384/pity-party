@@ -13,8 +13,8 @@
  * for all four seats. Clearing the stop is what lets the player take the
  * deck home in the picker; playing AT the stop never required owning it.
  */
-import { makeRules, type RulesOverrides, type TableRules } from '@spades/rules';
-import { DEE, STORY_CHARACTERS, type StoryStop } from '@spades/bots';
+import { makeRules, type RulesOverrides, type TableRules } from '@pp/rules';
+import { DEE, STORY_CHARACTERS, type StoryStop } from '@pp/bots';
 import { deckForStop } from '../decks';
 import { type Settings, settingsToRules } from '../settings';
 import type { VenueChoice } from '../venues';

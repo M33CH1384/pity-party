@@ -12,7 +12,7 @@ import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { makeRules, type HandRecord, type PlayerView } from '@spades/rules';
+import { makeRules, type HandRecord, type PlayerView } from '@pp/rules';
 import AnimFxLayer, { buildSpotlightShade, paintSpotlightShade, SPOT_PEAK, SPOT_PEAK_MINE } from '../src/animfx/AnimFxLayer';
 import { fx } from '../src/fx';
 

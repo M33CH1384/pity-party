@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import type { StoryStop } from '@spades/bots';
+import type { StoryStop } from '@pp/bots';
 import { sound } from '../audio';
 
 /**

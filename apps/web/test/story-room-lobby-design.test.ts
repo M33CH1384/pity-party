@@ -26,7 +26,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { act } from 'react';
 import { readFileSync } from 'node:fs';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { STORY_STOPS } from '@spades/bots';
+import { STORY_STOPS } from '@pp/bots';
 import type { ConnState } from '../src/online/connection';
 import { StoryRoomInner } from '../src/story/StoryRoom';
 import type { StoryProgress } from '../src/story/storyApi';

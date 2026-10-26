@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { STORY_CHARACTERS, STORY_VOICE_CAST, personaForName, storyCastForName } from '@spades/bots';
+import { STORY_CHARACTERS, STORY_VOICE_CAST, personaForName, storyCastForName } from '@pp/bots';
 
 /**
  * One-timbre rule (Demetrius 2026-10-21, Barbershop report: "the characters

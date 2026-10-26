@@ -21,7 +21,7 @@
  *    silent except the ambience scheduler's own headlight pass (audio.ts).
  */
 import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { type Bid, type GameResult, type HandRecord, type Phase, type TableRules, type Trick } from '@spades/rules';
+import { type Bid, type GameResult, type HandRecord, type Phase, type TableRules, type Trick } from '@pp/rules';
 import { useSocial } from '../social/store';
 
 /**

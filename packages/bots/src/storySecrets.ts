@@ -18,7 +18,7 @@
  * offline result post). `needsWin` feats only grant on a win.
  */
 import type { StoryStop } from './story';
-import type { GameState } from '@spades/rules';
+import type { GameState } from '@pp/rules';
 import { storyEndReasonOf, type StoryEndReason } from './storyManner';
 
 export type StoryEggTrigger =

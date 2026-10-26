@@ -1,4 +1,4 @@
-import type { GameState, HandRecord, TableRules } from '@spades/rules';
+import type { GameState, HandRecord, TableRules } from '@pp/rules';
 
 /** Sides that got shot on the last scored hand while the game goes on: they're ON NOTICE (one more shot and they're out). */
 export function onNoticeSides(st: Pick<GameState, 'history' | 'phase' | 'rules'>): number[] {

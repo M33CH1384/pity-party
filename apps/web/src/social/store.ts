@@ -4,7 +4,7 @@
  * without one (they show up as "Guest", can read global chat and receive invites).
  */
 import { useSyncExternalStore } from 'react';
-import { activityOf, type DmLine, type FriendActivity, type FriendsState, type InviteMsg, type OpenTable, type PresenceEntry, type PresenceStatus, type SocialChatLine, type SocialClientMsg, type SocialServerMsg, type SocialSettings, stalePresence } from '@spades/protocol';
+import { activityOf, type DmLine, type FriendActivity, type FriendsState, type InviteMsg, type OpenTable, type PresenceEntry, type PresenceStatus, type SocialChatLine, type SocialClientMsg, type SocialServerMsg, type SocialSettings, stalePresence } from '@pp/protocol';
 import { account, loadAccount } from '../account/api';
 import { serverUrl } from '../online/config';
 import { guestSessionId, loadName } from '../online/identity';
