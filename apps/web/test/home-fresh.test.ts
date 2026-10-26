@@ -59,7 +59,7 @@ describe('home starts fresh', () => {
     localStorage.clear();
   });
 
-  it('shows the menu after a mid-hand save, and a new game starts at 0–0', async () => {
+  it('shows the menu after a mid-hand save, and Deal me in opens the picked registry mode', async () => {
     const state = midHand();
     expect(state.phase).not.toBe('gameOver');
     localStorage.setItem(SAVE_KEY, JSON.stringify({
@@ -86,6 +86,8 @@ describe('home starts fresh', () => {
     await act(async () => { document.querySelector<HTMLButtonElement>('[data-testid="play-bots"]')!.click(); });
     await act(async () => { document.querySelector<HTMLButtonElement>('[data-testid="start-bots"]')!.click(); });
 
-    expect(loadSeries()).toBeNull();
+    // PR 2.3b: Deal me in plays the picked registry mode (High Card) vs bots; the Spades save/series are left alone
+    expect(document.querySelector('[data-testid="mode-screen"]')?.getAttribute('data-mode')).toBe('placeholder');
+    expect(document.querySelectorAll('.seat-chip')).toHaveLength(4);
   });
 });

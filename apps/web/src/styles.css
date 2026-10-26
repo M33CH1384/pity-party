@@ -4343,3 +4343,34 @@ body:has(.modal-backdrop) .setup-bar { visibility: hidden; }
 .stepper button { min-width: 44px; min-height: 44px; border-radius: 8px; font-size: 22px; line-height: 1; color: inherit; background: rgba(127,127,127,.18); border: 1.5px solid rgba(127,127,127,.45); }
 .stepper button:disabled { opacity: .4; }
 .stepper output { min-width: 2ch; text-align: center; font-variant-numeric: tabular-nums; font-weight: 700; }
+
+/* ---- Registry-mode table + recap (PR 2.3b). Neutral placeholder theme; Desi's palette lands later. ---- */
+.mode-screen { min-height: 100dvh; display: flex; flex-direction: column; gap: 12px; padding: max(10px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom)); background: #1d1f24; color: #eceef2; font-family: system-ui, -apple-system, sans-serif; box-sizing: border-box; position: relative; }
+.mode-bar { padding-right: 52px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; }
+.mode-bar h1 { margin: 0; font-size: 18px; text-align: center; }
+.mode-leave, .recap-actions button { min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #555b66; background: #2b2e35; color: inherit; font: inherit; }
+.mode-status { font-size: 12px; color: #9aa1ad; }
+.seat-strip { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 6px; }
+.seat-chip { display: flex; flex-direction: column; padding: 8px; border-radius: 10px; background: #2b2e35; border: 2px solid transparent; font-size: 14px; }
+.seat-chip small { color: #9aa1ad; font-size: 12px; }
+.seat-chip.turn { border-color: #e9e3c8; }
+.seat-chip.is-me b { text-decoration: underline; }
+.trick-area { flex: 1; min-height: 180px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px; border-radius: 16px; background: #262f2a; padding: 12px; }
+.trick-empty { color: #9aa1ad; }
+.played { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: #c4c9d1; }
+.turn-line { text-align: center; min-height: 22px; margin: 0; font-weight: 600; }
+.my-hand { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.pcard { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 80px; border-radius: 8px; background: #f6f6f2; color: #1d1f24; font-weight: 700; font-size: 20px; box-shadow: 0 1px 3px rgba(0,0,0,.4); }
+.pcard.red { color: #b3261e; }
+.pcard-btn { padding: 0; border: 0; background: none; border-radius: 8px; min-width: 44px; }
+.pcard-btn:disabled { opacity: .45; }
+.pcard-btn:not(:disabled) .pcard { outline: 2px solid #e9e3c8; outline-offset: 2px; }
+.recap-sheet { position: absolute; inset: auto 0 0 0; padding: 18px 16px max(18px, env(safe-area-inset-bottom)); background: #2b2e35; border-radius: 18px 18px 0 0; box-shadow: 0 -6px 24px rgba(0,0,0,.5); }
+.mode-recap h2 { margin: 0 0 10px; font-size: 22px; text-align: center; }
+.placings { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.placings li { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 10px; border-radius: 10px; background: #1d1f24; }
+.placings li.is-me { outline: 1px solid #e9e3c8; }
+.placings small { color: #9aa1ad; }
+.placings .up { color: #8fd18f; } .placings .down { color: #e48b8b; }
+.recap-actions { display: flex; gap: 10px; justify-content: center; margin-top: 14px; }
+.recap-actions .again { background: #e9e3c8; color: #1d1f24; border-color: #e9e3c8; font-weight: 700; }
