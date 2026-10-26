@@ -40,6 +40,7 @@ const credBase = (id: string, name: string) => ({
   season: { id: 's1', name: 'Season 1', endsAt: 0 },
   rank: { team: RANK, cutthroat: RANK },
   stats: { team: { games: 10, wins: 4 }, cutthroat: { games: 2, wins: 1 } },
+  modes: { total: { games: 3, wins: 2, coins: 25 }, modes: [{ modeId: 'placeholder', games: 3, wins: 2, coins: 25, avgPlace: 1.33, lastAt: 1_790_000_000_000 }], recent: [{ modeId: 'placeholder', endedAt: 1_790_000_000_000, place: 1, of: 4, delta: 20 }] },
   achievements: [{ id: 'first-dub', title: 'First Dub', hint: 'Win a game', xp: 25, coins: 0, unlockedAt: 123 }],
   coins: { balance: 3325 },
 });
@@ -126,7 +127,7 @@ describe('one profile, both hosts', () => {
     // explainer ride at the top of Stats, which is the default tab now
     expect(panelInv).not.toContain('tab:Rank');
     expect(panelInv).toContain('tab:Stats');
-    expect(panelInv).toContain('testid:rating-explainer');
+    expect(panelInv).toContain('testid:mode-stats');
     // …and none of the self-only content leaks into another player's profile
     expect(panelInv).not.toContain('tab:Challenges');
     expect(panelInv).not.toContain('tab:Unlocks');
@@ -146,13 +147,13 @@ describe('one profile, both hosts', () => {
     const text = page.textContent ?? '';
     expect(text).not.toContain('ELO');
     expect(text).not.toContain('Elo');
-    expect(text).toContain('Rating starts at 1,200.');
-    expect(text).toContain('This season');
-    expect(text).toContain('4 wins – 6 losses');
-    expect(text).toContain('#3 of 9 players');
-    expect(text).toContain('Best rating');
+    expect(text).toContain('High Card');
+    expect(text).toContain('+25');
+    expect(text).toContain('1st of 4');
+    // 5a: the Spades rating cards are off (TODO(rebuild) REBUILD.md P1)
+    expect(text).not.toContain('Rating starts at 1,200.');
     const chips = page.querySelector('[data-testid="profile-rep"]')?.textContent ?? '';
-    expect(chips).toContain('Rating 1000');
+    expect(chips).not.toContain('Rating');
     expect(chips).not.toContain('Block');
     // self-only affordances ride along in BOTH hosts now — same page, same
     // person. The editors themselves stay HIDDEN behind the one Edit profile

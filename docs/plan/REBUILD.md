@@ -71,3 +71,9 @@ not Spades bids/tricks) **before launch (milestone 11)**.
 (`teamName` answers NO_TEAMS until a partnership mode exists), lobby venue/teams/trash-talk/nuke panels
 (3c shows timer + options; the rest return with W1–W3), Spades dev scripts (`simulate`, `online-clients`,
 state generators: `c05e069:scripts/*`). Search `TODO(rebuild` for every switch-off point.
+
+## Milestone 5 switch-offs (accounts, social, push)
+
+| # | Feature off | Where (TODO(rebuild)) | Comes back as | Needs |
+|---|---|---|---|---|
+| P1 | **Spades rating UI on the profile**: rating chips (⚔ Partnership / 🔪 Cutthroat), rating cards + explainer, Partnership/Cutthroat stat grids, Spades "Online record" rows (bid accuracy, books, nils, shots, wheels, Big Joker, bid/play time) | `apps/web/src/RepBlock.tsx`, `apps/web/src/profile/ProfileView.tsx` (Stats tab). Server still returns `rank`/`stats` (empty for Pity Party). Old UI: master before 5a | per-mode rating chips + per-mode stat rows from `mode_games` recaps (5a already shows games/wins/coins/avg finish/recent per mode) | "Rated games / Elo" row above |

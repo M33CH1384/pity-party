@@ -50,7 +50,7 @@ export function CoinIcon({ size = 15 }: { size?: number } = {}) {
   );
 }
 
-export function RepBlock({ level, rank, team, cutthroat, coins, testid, coinsTestid }: {
+export function RepBlock({ level, rank, team: _team, cutthroat: _cutthroat, coins, testid, coinsTestid }: {
   level: RepLevelInfo;
   /** The player's rank card off the profile payload (card.rank). When a
    *  payload predates the card, the headline falls back to the bare level
@@ -72,8 +72,7 @@ export function RepBlock({ level, rank, team, cutthroat, coins, testid, coinsTes
         : <div className="soc-rep-level"><b>Level {level.level}</b></div>}
       <div className="xp-bar" data-testid={`${testid}-xp`}><i style={{ width: `${xpPct}%` }} /><small>{level.xpIntoLevel}/{level.xpForNext} XP</small></div>
       <div className="soc-rep-ranks">
-        <span className="soc-div-chip" title="Partnership rating">⚔ Rating {team.elo}</span>
-        <span className="soc-div-chip" title="Cutthroat rating">🔪 Rating {cutthroat.elo}</span>
+        {/* TODO(rebuild): Spades Partnership/Cutthroat rating chips are off until registry modes get ratings (REBUILD.md P1) */}
         {coins !== undefined && <span className="soc-coin-chip" title="Coin balance" data-testid={coinsTestid}><CoinIcon /> {coins.toLocaleString()}</span>}
       </div>
     </div>

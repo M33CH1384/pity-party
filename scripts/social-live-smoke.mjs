@@ -3,11 +3,11 @@
  * see each other online, a global chat line reaches everyone, a DM and a table invite reach the other account,
  * leaderboard + tournament list answer. Both accounts are deleted at the end (their DMs/friends go with them;
  * the one global chat line stays in the hub's rolling 200-line history unless an admin deletes it).
- * Usage: node scripts/social-live-smoke.mjs [web=https://bid-wit-me.pages.dev] [server=https://bid-wit-me-server.demetrius-robinson31.workers.dev]
+ * Usage: node scripts/social-live-smoke.mjs [web=https://pity-party.pages.dev] [server=https://pity-party-server.invalid]
  */
 import { chromium } from 'playwright-core';
-const web = process.argv[2] ?? 'https://bid-wit-me.pages.dev';
-const server = process.argv[3] ?? 'https://bid-wit-me-server.demetrius-robinson31.workers.dev';
+const web = process.argv[2] ?? 'https://pity-party.pages.dev';
+const server = process.argv[3] ?? 'https://pity-party-server.invalid';
 const browser = await chromium.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader'] });
 const ok = (m) => console.log(`✓ ${m}`);
 async function account() {

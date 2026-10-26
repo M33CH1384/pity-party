@@ -9,6 +9,12 @@ workers_dev = true
 ALLOWED_ORIGINS = "https://pity-party.pages.dev,http://localhost:5173,http://localhost:4173,http://127.0.0.1:4173"
 # Public site that fronts /api/auth/* (Pages Functions proxy): OAuth redirect URIs, passkey RP ID, cookie site.
 PUBLIC_ORIGIN = "https://pity-party.pages.dev"
+# Passkeys + cookies (5a). Set per env at deploy; see docs/plan/DEPLOY.md §2.
+#   RP_ID must equal (or be a registrable suffix of) PUBLIC_ORIGIN's host. Changing RP_ID later orphans every
+#   existing passkey; changing COOKIE_PREFIX signs everyone out (harmless, they sign in again).
+RP_ID = "pity-party.pages.dev"
+RP_NAME = "Pity Party"
+COOKIE_PREFIX = "pp"
 # Chat moderators (Release 9): usernames, comma-separated, case-insensitive. Empty = nobody.
 ADMIN_USERNAMES = "M33CH"
 # Sign-in providers turn on only when BOTH of their secrets exist (npx wrangler secret put …):

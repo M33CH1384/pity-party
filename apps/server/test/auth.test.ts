@@ -1,11 +1,11 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { type AuthEnv, handleAuth, safeReturn } from '../src/auth/routes';
+import { type AuthEnv, cookiePrefix, handleAuth, safeReturn, sessionCookieName } from '../src/auth/routes';
 import { authorizeUrl, b64url, enabledProviders, parseSignedRequest, pkceChallenge } from '../src/auth/providers';
 import { checkUsername, isProfane, suggestUsername } from '../src/auth/username';
 import { mergeProgress, sanitizeProgress } from '../src/auth/progress';
 import { makeD1 } from './d1';
 
-const ORIGIN = 'https://bid-wit-me.pages.dev';
+const ORIGIN = 'https://pity-party.pages.dev';
 
 /** Drives handleAuth like a browser: keeps cookies, follows nothing automatically. */
 class Browser {
@@ -68,7 +68,7 @@ describe('providers', () => {
   it('authorize URLs carry state, exact redirect URI, minimal scopes, PKCE where supported', async () => {
     const ch = await pkceChallenge('v');
     const g = new URL(authorizeUrl('google', { clientId: 'cid', redirectUri: `${ORIGIN}/api/auth/google/callback`, state: 's1', challenge: ch, origin: ORIGIN }));
-    expect(g.searchParams.get('redirect_uri')).toBe('https://bid-wit-me.pages.dev/api/auth/google/callback');
+    expect(g.searchParams.get('redirect_uri')).toBe('https://pity-party.pages.dev/api/auth/google/callback');
     expect(g.searchParams.get('scope')).toBe('openid profile');
     expect(g.searchParams.get('code_challenge_method')).toBe('S256');
     const x = new URL(authorizeUrl('x', { clientId: 'cid', redirectUri: 'r', state: 's', challenge: ch, origin: ORIGIN }));
@@ -97,7 +97,7 @@ describe('OAuth sign-in (mock provider, full round trip)', () => {
     const b = new Browser(env);
     const loc = await b.mockSignIn('alice');
     expect(loc).toBe('/online?signin=new&via=mock');
-    expect(b.jar.has('__Host-bwm_sid')).toBe(true);
+    expect(b.jar.has('__Host-pp_sid')).toBe(true);
     let me = await b.me();
     expect(me.needsUsername).toBe(true);
     expect(me.identities).toEqual([expect.objectContaining({ provider: 'mock', name: 'Test alice' })]);
@@ -184,7 +184,7 @@ describe('OAuth sign-in (mock provider, full round trip)', () => {
     const done = await b.req(`/api/auth/google/callback?code=abc&state=${state}`);
     expect(done.headers.get('location')).toBe('/?signin=new&via=google');
     const tok = new URLSearchParams(calls[0]!.body);
-    expect(tok.get('redirect_uri')).toBe('https://bid-wit-me.pages.dev/api/auth/google/callback');
+    expect(tok.get('redirect_uri')).toBe('https://pity-party.pages.dev/api/auth/google/callback');
     expect(await pkceChallenge(tok.get('code_verifier')!)).toBe(auth.searchParams.get('code_challenge'));
     expect(tok.get('client_secret')).toBe('gsec');
     expect((await b.me()).suggestion).toBe('DemetriusR');
@@ -232,14 +232,23 @@ describe('progress import', () => {
 });
 
 describe('passkeys', () => {
+  it('RP id / RP name / cookie prefix are configurable per env (deploy), with safe defaults', async () => {
+    const b = new Browser({ ...env, RP_ID: 'pity-party.pages.dev', RP_NAME: 'Pity Party (staging)', COOKIE_PREFIX: 'ppstg' });
+    const r = await (await b.post('/api/auth/passkey/register/options', { username: 'StageFan' })).json() as any;
+    expect(r.options.rp).toEqual({ name: 'Pity Party (staging)', id: 'pity-party.pages.dev' });
+    expect(sessionCookieName('https://x.dev', cookiePrefix({ COOKIE_PREFIX: 'ppstg' }))).toBe('__Host-ppstg_sid');
+    expect(cookiePrefix({ COOKIE_PREFIX: 'bad name;' })).toBe('pp');
+    expect(cookiePrefix({})).toBe('pp');
+    expect(sessionCookieName('http://localhost:8787')).toBe('pp_sid');
+  });
   it('new-account registration needs a valid, free username first; options carry the RP id', async () => {
     const b = new Browser(env);
     expect((await b.post('/api/auth/passkey/register/options', { username: 'admin' })).status).toBe(400);
     const r = await (await b.post('/api/auth/passkey/register/options', { username: 'FaceIdFan' })).json() as any;
-    expect(r.options.rp).toEqual({ name: 'Bid Wit Me', id: 'bid-wit-me.pages.dev' });
+    expect(r.options.rp).toEqual({ name: 'Pity Party', id: 'pity-party.pages.dev' });
     expect(r.options.authenticatorSelection.residentKey).toBe('required');
     const l = await (await b.post('/api/auth/passkey/login/options')).json() as any;
-    expect(l.options.rpId).toBe('bid-wit-me.pages.dev');
+    expect(l.options.rpId).toBe('pity-party.pages.dev');
     // garbage responses are rejected and the challenge is single use
     expect((await b.post('/api/auth/passkey/login/verify', { flow: l.flow, response: { id: 'nope' } })).status).toBe(404);
     expect((await b.post('/api/auth/passkey/login/verify', { flow: l.flow, response: { id: 'nope' } })).status).toBe(400);
@@ -266,7 +275,7 @@ describe('Facebook data deletion callback', () => {
     const fb = new Browser(fbEnv);
     const res = await fb.req('/api/auth/facebook/data-deletion', { method: 'POST', body, headers: { 'content-type': 'application/x-www-form-urlencoded' }, origin: null });
     const j = await res.json() as { url: string; confirmation_code: string };
-    expect(j.url).toBe(`https://bid-wit-me.pages.dev/data-deletion?code=${j.confirmation_code}`);
+    expect(j.url).toBe(`https://pity-party.pages.dev/data-deletion?code=${j.confirmation_code}`);
     expect(await b.me()).toBe(null); // account gone (Facebook was its only login)
     expect(await (await fb.req(`/api/auth/deletion-status?code=${j.confirmation_code}`)).json()).toMatchObject({ found: true, status: 'deleted' });
     const bad = await fb.req('/api/auth/facebook/data-deletion', { method: 'POST', body: new URLSearchParams({ signed_request: 'x.y' }), headers: { 'content-type': 'application/x-www-form-urlencoded' }, origin: null });

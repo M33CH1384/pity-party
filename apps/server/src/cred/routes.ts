@@ -1,3 +1,4 @@
+import { modeStatsFor } from '../stats/mode-stats';
 /**
  * Street Cred HTTP routes (Phase 3a + 3b):
  *   GET  /api/profile/me            → full profile (signed in)
@@ -104,6 +105,7 @@ async function fullProfile(db: D1Database, userId: string, username: string, now
     regionOf(db, userId),
   ]);
   const stats = await myStats(db, userId);
+  const modes = await modeStatsFor(db, userId);
   const card = await cardFor(db, userId, userId, now, { level, stats });
   // after cardFor: the Big Joker latch it maintains is fresh for the upkeep view
   const enrichedChallenges = await enrichChallenges(db, userId, challenges, now);
@@ -118,6 +120,8 @@ async function fullProfile(db: D1Database, userId: string, username: string, now
     season: { id: season.id, name: season.name, endsAt: season.endsAt },
     rank: { team, cutthroat },
     stats,
+    /** Pity Party: generic per-mode stats from mode_games (every registry mode) */
+    modes,
     challenges: enrichedChallenges,
     achievements,
     unlocks,
@@ -244,11 +248,14 @@ export async function handleCredHttp(req: Request, env: CredEnv, url: URL, parts
       balance(db, u.id),
     ]);
     const stats = await myStats(db, u.id);
+    // public: no room codes (which tables someone sat at stays private)
+    const ms = await modeStatsFor(db, u.id, 5);
+    const modes = { ...ms, recent: ms.recent.map(({ room: _room, ...g }) => g) };
     const card = await cardFor(db, u.id, me?.id ?? null, now, { level, stats });
     // coins: the public balance is part of the profile by the owner's call (players see
     // each other's balance on profile cards, 2026-10-20). Read-only: no grants fire here —
     // a user with no coin row yet genuinely sits at 0 until their own profile read grants.
-    return json({ user: { id: u.id, name: u.username ?? 'Player', avatar: u.avatar, avatarUpdatedAt: u.avatarUpdatedAt, tagline: u.tagline, socialLinks: parseSocialLinks(u.socialLinks) }, card, level, season: { id: season.id, name: season.name, endsAt: season.endsAt }, rank: { team, cutthroat }, stats, achievements, coins: { balance: coinBalance } });
+    return json({ user: { id: u.id, name: u.username ?? 'Player', avatar: u.avatar, avatarUpdatedAt: u.avatarUpdatedAt, tagline: u.tagline, socialLinks: parseSocialLinks(u.socialLinks) }, card, level, season: { id: season.id, name: season.name, endsAt: season.endsAt }, rank: { team, cutthroat }, stats, modes, achievements, coins: { balance: coinBalance } });
   }
   if (parts[1] === 'challenges' && parts.length === 2 && req.method === 'GET') {
     if (!me) return json({ error: 'Sign in to see your challenges.' }, 401);

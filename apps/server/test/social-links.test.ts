@@ -96,7 +96,7 @@ async function session(uid: string, tok = `${uid}-tok`) {
 }
 const call = (tok: string | null, path: string, init?: RequestInit) =>
   handleCredHttp(
-    new Request(new URL(path, ORIGIN), { headers: { ...(tok ? { cookie: `__Host-bwm_sid=${tok}` } : {}), 'content-type': 'application/json' }, ...init }),
+    new Request(new URL(path, ORIGIN), { headers: { ...(tok ? { cookie: `__Host-pp_sid=${tok}` } : {}), 'content-type': 'application/json' }, ...init }),
     { DB: db, PUBLIC_ORIGIN: ORIGIN }, new URL(path, ORIGIN), path.split('/').filter(Boolean), NOW);
 const post = (tok: string | null, links: unknown) => call(tok, '/api/profile/me/social-links', { method: 'POST', body: JSON.stringify({ links }) });
 
