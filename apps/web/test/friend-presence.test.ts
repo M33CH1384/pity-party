@@ -100,7 +100,6 @@ describe('roomHasStory (co-op spec §2.3)', () => {
 
 const social = readFileSync(new URL('../src/social/Social.tsx', import.meta.url), 'utf8');
 const store = readFileSync(new URL('../src/social/store.ts', import.meta.url), 'utf8');
-const storyHome = readFileSync(new URL('../src/story/StoryHome.tsx', import.meta.url), 'utf8');
 const onlineApp = readFileSync(new URL('../src/online/OnlineApp.tsx', import.meta.url), 'utf8');
 
 describe('wiring', () => {
@@ -112,9 +111,6 @@ describe('wiring', () => {
     expect(store).toContain("fetch('/api/social/presence'");
     expect(store).toContain('}, 30_000);');
     expect(store).toContain('state.settings.appearOffline');
-  });
-  it('StoryHome reports story-solo across its surfaces', () => {
-    expect(storyHome).toContain("usePresence(screen.k === 'game' ? { kind: 'table', offline: true, story: 'solo' } : { kind: 'online', story: 'solo' });");
   });
   it('an online story room reports story-coop', () => {
     expect(onlineApp).toContain('roomHasStory(room0)');

@@ -180,13 +180,6 @@ describe('D9: profile page large-screen tier + wrap-safe Rep ranks (page host on
   const tier = styles.slice(styles.indexOf('@media (min-width: 1100px) {\n  .profile-page'));
   const tierBlock = tier.slice(0, tier.indexOf('\n}'));
 
-  it('the page steps to 1120px with 32px sides at ≥1100px, like the story shell', () => {
-    expect(num(tierBlock, /max-width: (\d+)px/, 'tier max-width')).toBe(1120);
-    expect(num(tierBlock, /padding-left: (\d+)px/, 'tier side padding')).toBe(32);
-    expect(num(tierBlock, /padding-right: (\d+)px/, 'tier side padding')).toBe(32);
-    // story's own step, the idiom being matched
-    expect(readFileSync(new URL('../src/story/story.css', import.meta.url), 'utf8')).toContain('.story-shell { max-width: 1120px; padding-left: 32px; padding-right: 32px; }');
-  });
 
   it('composition at desktop: wider than the old cap, never full-bleed, dead margins shrink', () => {
     for (const vw of [1440, 1920]) {

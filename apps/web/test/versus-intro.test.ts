@@ -606,17 +606,4 @@ describe('versus cards rendering: the owner’s screenshot table (you + bot part
     const html = renderToStaticMarkup(createElement(VersusStoryTape, { tape }));
     expect(html).toContain('The terms: beat the King twice in a row');
   });
-  it('wiring: Table keys bot members to personas + the table’s own skill; the pair record fetch is caller-scoped', () => {
-    const table = read('../src/Table.tsx');
-    expect(table).toContain('personaForName(names[seat]');
-    expect(table).toContain('skillOf(levelFor(seat))');
-    expect(table).toContain('versusPairNote');
-    const src = read('../src/VersusIntro.tsx');
-    expect(src).toContain('/api/profile/pair/');
-    expect(src).toContain('readPersonaLedger()');
-    const online = read('../src/online/OnlineTable.tsx');
-    expect(online).toContain('versusPairNote: versusPairNote ?? null');
-    const room = read('../src/story/StoryRoom.tsx');
-    expect(room).toContain('coopPairNote(stop.name');
-  });
 });

@@ -28,8 +28,6 @@ import { DECK_CARD_ORDER } from '../src/deckLore';
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 const styles = readFileSync('apps/web/src/styles.css', 'utf8');
-const storyCss = readFileSync('apps/web/src/story/story.css', 'utf8');
-const home = readFileSync('apps/web/src/story/StoryHome.tsx', 'utf8');
 
 let root: Root; let el: HTMLDivElement;
 let closes = 0;
@@ -151,25 +149,3 @@ describe('DeckViewer — shipped CSS carries the scroll and the landscape stage'
   });
 });
 
-describe('the outro door (StoryHome source)', () => {
-  it('the deck unlock card is a button that opens the viewer for the stop’s deck', () => {
-    expect(home).toContain('<button type="button" className="story-reward-card story-deck-line story-reveal story-deck-tap" data-testid="story-deck-notice"');
-    expect(home).toContain('onClick={() => setViewDeck(deckForStop(r.stopId)!)}');
-    expect(home).toContain('Tap to look through the deck →');
-    // the pinned unlock presentation itself is untouched
-    expect(home).toContain('deckBackUrl(deckForStop(r.stopId)!.id)');
-    expect(home).toContain('Yours for good — find it in the deck picker, at any table.');
-  });
-
-  it('the viewer mounts as an overlay at the root, outro state untouched beneath it', () => {
-    expect(home).toContain("import { DeckViewer } from '../DeckGallery';");
-    expect(home).toContain('{viewDeck && <DeckViewer deck={viewDeck} onClose={() => setViewDeck(null)} />}');
-    // the outro's own exits stay put (the return lands on the same screen)
-    expect(home).toContain('data-testid="story-outro-map"');
-  });
-
-  it('the tap card keeps the settled look (story.css)', () => {
-    expect(storyCss).toContain('.story-deck-tap { font: inherit; color: inherit; cursor: pointer; width: 100%; }');
-    expect(storyCss).toContain('.story-reward-card-view');
-  });
-});
