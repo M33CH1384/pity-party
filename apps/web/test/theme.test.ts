@@ -101,13 +101,15 @@ describe('theme store', () => {
 describe('theme plumbing pins', () => {
   const read = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
 
-  it('index.html carries the pre-paint snippet keyed to the same storage key', () => {
+  it('index.html loads the pre-paint script (/theme-boot.js, keyed to the same storage key) before the app', () => {
     const html = read('../index.html');
-    expect(html).toContain(`localStorage.getItem('${KEY}')`);
-    expect(html).toContain("document.documentElement.dataset.theme = 'neon'");
-    expect(html).toContain('#070914');
-    // the snippet sits in <head>, before the module script that boots the app
-    expect(html.indexOf('dataset.theme')).toBeLessThan(html.indexOf('/src/main.tsx'));
+    const boot = read('../public/theme-boot.js');
+    expect(boot).toContain(`localStorage.getItem('${KEY}')`);
+    expect(boot).toContain("document.documentElement.dataset.theme = 'neon'");
+    expect(boot).toContain('#070914');
+    // the blocking script sits in <head>, before the module script that boots the app
+    expect(html.indexOf('/theme-boot.js')).toBeGreaterThan(-1);
+    expect(html.indexOf('/theme-boot.js')).toBeLessThan(html.indexOf('/src/main.tsx'));
   });
 
   it('the toggle lives in Account (Appearance) and is mirrored in MoreOptions', () => {
