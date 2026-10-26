@@ -71,4 +71,26 @@ describe('POST /api/auth/delete', () => {
     expect(rows('SELECT 1 FROM users WHERE id = ?', [uid])).toHaveLength(0);
     for (const { table, col } of refs) expect(rows(`SELECT 1 FROM ${table} WHERE ${col} = ?`, [uid]), `${table}.${col}`).toHaveLength(0);
   });
+  it('also removes the player\'s non-FK rows (coins, push, cred, mutes, invites) and anonymises shared mode_games seats', async () => {
+    const uid = 'u-all';
+    await db.prepare('INSERT INTO users (id, username, username_key, created_at) VALUES (?, ?, ?, 1)').bind(uid, 'Allrows', 'allrows').run();
+    await db.prepare('INSERT INTO sessions (id_hash, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)').bind(await sha256b64('all-tok'), uid, 1, NOW + 1e7).run();
+    // every column that holds a player id but has no FK: seed one row each
+    const PERSON = /^(user_id|muter|muted|from_uid|to_uid)$/;
+    const cols: { table: string; col: string }[] = [];
+    for (const { name } of rows("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")) {
+      const fks = rows(`PRAGMA foreign_key_list(${name})`).map((f) => f.from);
+      for (const c of rows(`PRAGMA table_info(${name})`)) if (PERSON.test(c.name as string) && !fks.includes(c.name)) cols.push({ table: name as string, col: c.name as string });
+    }
+    expect(cols.map((c) => c.table)).toEqual(expect.arrayContaining(['coin_balances', 'push_subscriptions', 'mutes', 'offline_invites']));
+    let n = 1;
+    for (const { table, col } of cols) fill(table, col, uid, 500 + n++);
+    raw.exec("INSERT INTO mode_games (id, room, mode_id, options_json, ended_at, seats_json, placements_json, deltas_json, recap_json) VALUES ('g1','R','tonk','{}',1,?, '[]','[]','{}')", [JSON.stringify([{ seat: 0, uid, name: 'Allrows' }, { seat: 1, uid: 'other', name: 'O' }])]);
+    const du = new URL('/api/auth/delete', ORIGIN);
+    const res = await handleAuth(new Request(du, { method: 'POST', headers: { 'content-type': 'application/json', cookie: '__Host-pp_sid=all-tok', origin: ORIGIN }, body: '{}' }), { DB: db, PUBLIC_ORIGIN: ORIGIN } as never, du, ['api', 'auth', 'delete'], { now: () => NOW } as never);
+    expect(res.status).toBe(200);
+    for (const { table, col } of cols) expect(rows(`SELECT 1 FROM ${table} WHERE ${col} = ?`, [uid]), `${table}.${col}`).toHaveLength(0);
+    const g = rows("SELECT seats_json FROM mode_games WHERE id = 'g1'")[0]!.seats_json as string;
+    expect(g).not.toContain(uid); expect(g).toContain('other');
+  });
 });

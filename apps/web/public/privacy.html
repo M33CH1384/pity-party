@@ -1,49 +1,52 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Privacy Policy · Bid Wit Me</title><link rel="stylesheet" href="/legal.css"><link rel="icon" href="/favicon.svg"></head>
+<title>Privacy Policy · Pity Party</title><link rel="stylesheet" href="/legal.css"><link rel="icon" href="/favicon.svg"></head>
 <body><main>
 <nav><a href="/">← Back to the game</a><a href="/terms">Terms</a><a href="/data-deletion">Delete your data</a></nav>
 <h1>Privacy Policy</h1>
-<p class="muted">Bid Wit Me (bid-wit-me.pages.dev) · Effective October 11, 2026</p>
-<p>Bid Wit Me is a free Spades card game run by Demetrius Robinson. This page explains what the game collects, why, and how to delete it. Short version: you can play without an account, we only keep what the game needs to work, and we never sell your data or show ads.</p>
+<p class="muted">Pity Party (pity-party.pages.dev) · Effective October 26, 2026</p>
+<p>Pity Party is a free card game (Pitty Pat, Tonk and more) in beta, run by Demetrius Robinson. This page explains what the game keeps, why, and how to delete it. Short version: you can play without an account, the game keeps only what it needs to work, coins are play money with no cash value, and we never sell your data or show ads.</p>
 
 <h2>Playing as a guest (no account)</h2>
 <ul>
-<li><b>On your device:</b> your settings, the game you're in, badges, rematch series, team name and display name are saved in your browser's local storage. They never leave your device unless you choose "Save my progress" after signing in.</li>
-<li><b>Online tables:</b> to run a table, our server keeps the table's game state, the display names at the table, chat sent at the table, and a secret seat key per player so you can rejoin. A table is deleted automatically after 24 hours with nobody connected.</li>
-<li><b>Video and voice:</b> camera and microphone are off until you turn them on. Audio and video go directly between players' devices (WebRTC). If a direct connection isn't possible, they may pass through a relay, encrypted. We don't record or store them.</li>
+<li><b>On your device:</b> your settings, theme, the table you're in, your coins and badges and your display name are kept in your browser's local storage. They don't leave your device unless you sign in and choose to save your progress.</li>
+<li><b>Online tables:</b> to run a table, the server keeps the game state, the display names at the table, the table chat and a secret seat key per player so you can rejoin. A table is deleted automatically after 24 hours with nobody connected.</li>
+<li><b>Lobby and social chat:</b> guests can read and post in the public chat under their display name. The server keeps the most recent ~200 lines.</li>
+<li><b>Video and voice:</b> camera and microphone are off until you turn them on. Audio and video go directly between players' devices (WebRTC), or through an encrypted relay if a direct connection isn't possible. We don't record or store them.</li>
 <li><b>Music links:</b> if a host shares a Spotify or Apple Music link and you tap it, it opens in that app under that company's own privacy policy.</li>
 </ul>
 
 <h2>If you create an account (optional)</h2>
-<p>You can sign in with Google, Discord, X, Facebook or a passkey. We keep:</p>
+<p>Accounts use a <b>passkey</b>. (Sign-in with Google, Discord, X or Facebook may be offered later; if it is, we ask only for basic profile access and never receive your password, email address or contacts, and never post for you.) With an account we keep:</p>
 <ul>
-<li>Your <b>username</b> (chosen by you) and when the account was created.</li>
-<li>For each linked sign-in: the provider's <b>user ID</b> for you and your <b>display name</b> from that provider. We ask only for basic profile access (Google: <code>openid profile</code>; Discord: <code>identify</code>; X: <code>users.read tweet.read</code>; Facebook: <code>public_profile</code>). We do <b>not</b> receive your email address, password, friends or contacts, and we never post anything for you.</li>
-<li>For passkeys: the passkey's <b>public key</b> and ID. Your fingerprint or face data stays on your device and is never sent to us.</li>
-<li><b>Sessions:</b> a sign-in cookie (HttpOnly, secure). We store only a one-way hash of it. Sessions expire after 30 days or when you sign out.</li>
-<li><b>Progress</b> you choose to save: badges, your current rematch series and your team name.</li>
+<li>Your <b>username</b> and when the account was created; the passkey's <b>public key</b> and ID (your fingerprint or face data never leaves your device).</li>
+<li><b>Sessions:</b> a sign-in cookie (HttpOnly, Secure). We store only a one-way hash of it; sessions expire after 30 days or when you sign out.</li>
+<li><b>Profile extras you choose to add:</b> a profile picture, a tagline, social links and a self-declared region.</li>
+<li><b>Game records:</b> for online games, the mode, the seats (names and account IDs), finishing places and coin results, used for your profile stats.</li>
+<li><b>Coins and progress:</b> your coin balance and coin history, daily bonus streak, badges, challenges and unlocks. <b>Coins are play money only</b>: they can't be bought, sold, cashed out or exchanged for anything of value.</li>
+<li><b>Social:</b> friends and friend requests, blocks and mutes, direct messages, table invites (offline invites expire after 10 minutes), reports you send, your privacy settings (appear offline, friends-only invites), and what you're doing right now (online, in the lobby, at a table) plus when you were last online, shown only to your friends and never while you appear offline.</li>
+<li><b>Push notifications (only if you turn them on):</b> your browser's push address and keys, which notification types you want, and when we last sent each one (to avoid repeats).</li>
 </ul>
 
 <h2>Feedback</h2>
 <p>If you send feedback from the game, we keep your message, any screenshots you attach, the optional name and email you type, basic technical context (game screen, device and browser type), and a one-way hash of your IP address (used only to limit spam). Feedback may be emailed to the developer through Resend.</p>
 
 <h2>Security and abuse limits</h2>
-<p>To stop spam, the server counts requests per network using a one-way hash of your IP address. These counts live in memory for minutes and are not stored.</p>
+<p>To stop spam, the server counts requests per network using a one-way hash of your IP address. These counts are short-lived and aren't linked to your account.</p>
 
 <h2>Who processes data</h2>
 <ul>
 <li><b>Cloudflare</b> hosts the game, the server and the database.</li>
+<li><b>Your browser's push service</b> (for example Google, Mozilla or Apple) delivers notifications if you turn them on.</li>
 <li><b>Resend</b> delivers feedback emails to the developer.</li>
-<li><b>Google, Discord, X and Meta (Facebook)</b> handle the sign-in step when you choose them, under their own privacy policies.</li>
 </ul>
 <p>There are no ads, no analytics or tracking scripts, and no selling or sharing of personal data.</p>
 
 <h2>Deleting your data</h2>
-<p>In the game, tap your name in the top-left corner of the start screen, then <b>Delete account</b>. This permanently deletes your account, linked sign-ins, passkeys, sessions and saved progress right away. Guest data on your device can be cleared by clearing this site's data in your browser. See <a href="/data-deletion">Delete your data</a> for all options, including removing the app from Facebook.</p>
+<p>In the game, tap your name at the top of the start screen to open <b>Account</b>, then <b>Delete account</b> and type your username to confirm. This permanently deletes your account and everything tied to it right away. In shared game records your seat is anonymised so the other players' results stay correct. Guest data on your device can be cleared by clearing this site's data in your browser. See <a href="/data-deletion">Delete your data</a> for details.</p>
 
 <h2>Children</h2>
-<p>Bid Wit Me isn't directed at children under 13, and we don't knowingly collect personal data from them. If you believe a child created an account, contact us and we'll delete it.</p>
+<p>Pity Party isn't directed at children under 13, and we don't knowingly collect personal data from them. If you believe a child created an account, contact us and we'll delete it.</p>
 
 <h2>Changes and contact</h2>
 <p>If this policy changes, we'll update this page and its date. Questions or requests: use <b>Send feedback</b> in the game (the ⚙ More options menu).</p>

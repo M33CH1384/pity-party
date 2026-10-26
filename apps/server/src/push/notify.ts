@@ -23,7 +23,7 @@ async function guarded(
 export async function notifyTurn(db: D1Database, vapid: VapidKeys, userId: string, code: string, kind: 'bid' | 'play', now: number): Promise<number> {
   return guarded(db, vapid, userId, { kind: 'turn', key: code, ms: 15 * 60_000 }, {
     title: 'Your turn',
-    body: kind === 'bid' ? `Your bid is up at table ${code}` : `Your play is up at table ${code}`,
+    body: `It's your turn at table ${code}`,
     url: `/t/${code}`,
     tag: `turn-${code}`,
     type: 'turn',

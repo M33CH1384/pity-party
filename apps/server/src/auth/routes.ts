@@ -179,6 +179,14 @@ async function deleteUser(db: D1Database, userId: string): Promise<void> {
     db.prepare('DELETE FROM story_room_results WHERE uid_a = ? OR uid_b = ?').bind(userId, userId),
     db.prepare('DELETE FROM wager_challenge_players WHERE user_id = ?').bind(userId),
     db.prepare('DELETE FROM wager_challenges WHERE challenger_id = ?').bind(userId),
+    // everything else keyed to the player (no FK, so it never blocked the delete, but it is theirs): coins,
+    // cred/xp/season, push, mutes, offline invites. Shared game records keep the game with the seat anonymised.
+    ...['coin_balances', 'coin_ledger', 'daily_logins', 'push_subscriptions', 'push_prefs', 'push_cooldowns', 'xp_state',
+      'season_ratings', 'challenge_progress', 'user_achievements', 'unlocks', 'equipped', 'cred_totals', 'cred_venue_stats',
+      'league_power_snapshots', 'big_joker_season_upkeep'].map((t) => db.prepare(`DELETE FROM ${t} WHERE user_id = ?`).bind(userId)),
+    db.prepare('DELETE FROM mutes WHERE muter = ? OR muted = ?').bind(userId, userId),
+    db.prepare('DELETE FROM offline_invites WHERE from_uid = ? OR to_uid = ?').bind(userId, userId),
+    db.prepare("UPDATE mode_games SET seats_json = replace(seats_json, ?, 'deleted') WHERE instr(seats_json, ?) > 0").bind(userId, userId),
     db.prepare("UPDATE games SET seats = replace(seats, ?, 'deleted') WHERE instr(seats, ?) > 0").bind(userId, userId),
     db.prepare('DELETE FROM users WHERE id = ?').bind(userId),
   ]);

@@ -2,21 +2,16 @@
  * Web Push client (Release 13): service-worker registration, permission,
  * subscription management, and per-type preferences.
  */
-export type NotifType =
-  | 'turn' | 'invite' | 'friend_online' | 'achievement'
-  | 'daily' | 'rankup' | 'challenge' | 'season' | 'story_callback'
-  | 'dm' | 'mention';
+export type NotifType = 'turn' | 'invite' | 'friend_online' | 'daily' | 'season' | 'dm' | 'mention';
 
+/** Only what Pity Party really sends (matches the server's NOTIF_TYPES). TODO(rebuild): achievements, challenges,
+ *  rating-up and Big Bank pushes come back with cred/rated play (docs/plan/REBUILD.md P2); story call-backs are gone. */
 export const NOTIF_TYPES: { type: NotifType; label: string; hint: string }[] = [
-  { type: 'turn', label: 'Your turn', hint: 'When your bid or play is up and the app is closed' },
+  { type: 'turn', label: 'Your turn', hint: "When it's your turn at a table and the app is closed" },
   { type: 'invite', label: 'Game invites', hint: 'When someone invites you to a table' },
-  { type: 'friend_online', label: 'Friend online', hint: 'When a friend comes on the block (max hourly)' },
-  { type: 'achievement', label: 'Achievements', hint: 'When you unlock an achievement' },
+  { type: 'friend_online', label: 'Friend online', hint: 'When a friend comes online (max hourly)' },
   { type: 'daily', label: 'Daily bonus', hint: 'When your daily coins are ready' },
-  { type: 'rankup', label: 'Rating up', hint: 'When your rating climbs' },
-  { type: 'challenge', label: 'Challenges', hint: 'When a challenge hits 100%' },
   { type: 'season', label: 'Season ending', hint: 'One reminder before the season ends' },
-  { type: 'story_callback', label: 'Story table calls', hint: 'When a story game sits unfinished, the table calls you back' },
   { type: 'dm', label: 'Messages', hint: 'When a friend messages you and the app is closed' },
   { type: 'mention', label: 'Mentions', hint: 'When someone @mentions you in chat and the app is closed' },
 ];
