@@ -46,7 +46,8 @@ describe('offline registry game (vs bots)', () => {
 describe('web mode views', () => {
   it('looks views up per mode; unknown modes get none', () => {
     expect(modeViews('placeholder')?.title).toBe('High Card');
-    expect(modeViews('pitty-pat')).toBeNull();
+    expect(modeViews('pitty-pat')?.title).toBe('Pitty Pat');
+    expect(modeViews('tonk')).toBeNull();
   });
 
   it('table: only legal cards are tappable, turn line names the player', () => {

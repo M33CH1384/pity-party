@@ -35,13 +35,15 @@ function playHumans(env: FakeEnv, cids: string[]): number {
 }
 
 describe('Pitty Pat through the room (engine adapter)', () => {
-  it('unlisted: refused without PREVIEW_MODES, allowed with it', () => {
-    expect(isMode('pitty-pat')).toBe(false);
-    expect(isMode('pitty-pat', ['pitty-pat'])).toBe(true);
+  it('listed (M7b): a host can pick Pitty Pat with no PREVIEW_MODES; unknown modes are still refused', () => {
+    expect(isMode('pitty-pat')).toBe(true);
     expect(isMode('nope', ['nope'])).toBe(false);
     const env = new FakeEnv();
     env.join('a', 'Host');
     env.send('a', { t: 'mode', modeId: 'pitty-pat' });
+    expect(env.errors('a')).toHaveLength(0);
+    expect(st(env, 'a').room.modeId).toBe('pitty-pat');
+    env.send('a', { t: 'mode', modeId: 'nope' });
     expect(env.errors('a').at(-1)!.code).toBe('BAD_MODE');
   });
 

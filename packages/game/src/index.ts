@@ -11,6 +11,5 @@ import { registerMode } from './registry';
 import { placeholderBot, placeholderRules } from './modes/placeholder';
 import { pittyPatBot, pittyPatRules } from './modes/pittyPat';
 registerMode(placeholderRules, placeholderBot);
-// Mode A engine (milestone 6): registered but unlisted, so Setup keeps Pitty Pat "coming soon" and the server
-// opens no tables for it until the table view + bots land (milestone 7).
-registerMode(pittyPatRules, pittyPatBot, { listed: false });
+// Mode A (milestones 6–7): engine, bot tiers and the web table are in, so Pitty Pat is listed and playable.
+registerMode(pittyPatRules, pittyPatBot);

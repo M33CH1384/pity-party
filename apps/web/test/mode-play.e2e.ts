@@ -3,6 +3,8 @@
  * 1) Offline: Setup → "Deal me in" plays High Card vs 3 bots to the recap, then Play again.
  * 2) Online (needs `wrangler dev --local` on :8787): host creates a table, the picked mode goes up as a
  *    `mode` message, a guest joins, both play through `move` messages with per-seat views, recap shows.
+ * 3) Pitty Pat (M7b): offline vs 3 bots to the points target (with the Next-hand pause), and online
+ *    2 humans + 2 bots to the points target; 390px checks (no horizontal scroll, 44px touch targets).
  * Run: BWM_URL=http://127.0.0.1:4173 npx tsx apps/web/test/mode-play.e2e.ts
  */
 import { chromium, type Browser, type Page } from 'playwright-core';
@@ -22,12 +24,13 @@ async function newPage(b: Browser): Promise<Page> {
 }
 
 /** Tap a legal card whenever it is this page's turn, until the recap shows. */
-async function playToRecap(pages: Page[], shotMid?: string): Promise<void> {
+async function playToRecap(pages: Page[], shotMid?: string, onTick?: (p: Page) => Promise<void>): Promise<void> {
   let shot = false;
-  for (let i = 0; i < 400; i++) {
+  for (let i = 0; i < 3000; i++) {
     for (const p of pages) {
       if (await p.getByTestId('mode-recap').isVisible().catch(() => false)) continue;
-      const card = p.locator('.pcard-btn:not([disabled])').first();
+      const card = p.locator('.pcard-btn:not([disabled]), .pp-move:not([disabled])').first();
+      if (onTick) await onTick(p);
       if (await card.isVisible().catch(() => false)) {
         if (shotMid && !shot) { shot = true; await p.screenshot({ path: `${shots}/${shotMid}` }); }
         await card.click();
@@ -48,6 +51,8 @@ async function guestIn(p: Page) {
 async function offline(b: Browser) {
   console.log('offline');
   const p = await newPage(b);
+  await p.goto(base);
+  await p.evaluate(() => localStorage.setItem('pp.modeChoice', JSON.stringify({ modeId: 'placeholder', options: {} })));
   await p.goto(base);
   await guestIn(p);
   await p.getByTestId("play").waitFor(); await p.waitForTimeout(3500);
@@ -150,8 +155,115 @@ async function online(b: Browser) {
   ok(true, 'rematch deals a new online game');
 }
 
+/** Every visible control in the table is at least 44px tall and the page never scrolls sideways. */
+async function layoutOk(p: Page, what: string) {
+  ok(await p.evaluate(() => document.documentElement.scrollWidth) <= 390, `${what}: no horizontal scroll at 390`);
+  const small = await p.evaluate(() => [...document.querySelectorAll('.mode-screen button')].filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && (r.height < 44 || r.width < 44); }).map((el) => el.textContent));
+  ok(small.length === 0, `${what}: touch targets ≥ 44px${small.length ? ` (small: ${small.join(', ')})` : ''}`);
+}
+
+async function ppPick(p: Page, options: Record<string, unknown>) {
+  await p.evaluate((o) => localStorage.setItem('pp.modeChoice', JSON.stringify({ modeId: 'pitty-pat', options: o })), options);
+}
+
+/** Reload and get back to the vs-bots table step (the app may restore it or start at the menu). */
+async function toBots(p: Page) {
+  await p.reload();
+  await p.locator('[data-testid="start-bots"], [data-testid="play"]').first().waitFor();
+  if (await p.getByTestId('play').isVisible().catch(() => false)) { await p.getByTestId('play').click(); await p.getByTestId('play-bots').click(); }
+  await p.getByTestId('start-bots').waitFor();
+}
+
+async function pittyOffline(b: Browser) {
+  console.log('pitty pat offline');
+  const p = await newPage(b);
+  await p.goto(base);
+  await guestIn(p);
+  await p.evaluate(() => localStorage.removeItem('pp.modeChoice'));
+  await p.goto(base);
+  await p.getByTestId('play').waitFor(); await p.waitForTimeout(1500);
+  await p.getByTestId('play').click();
+  await p.getByTestId('play-bots').click();
+  await p.getByTestId('mode-setup').waitFor();
+  ok(await p.getByTestId('pick-pitty-pat').getAttribute('aria-checked') === 'true' && !(await p.getByTestId('pick-pitty-pat').isDisabled()), 'Pitty Pat is listed and the default pick (no "Coming soon")');
+  await p.getByTestId('mode-setup').scrollIntoViewIfNeeded();
+  await p.waitForTimeout(400);
+  await p.screenshot({ path: `${shots}/7b-setup-390.png` });
+  ok(await p.getByText('Points to win').isVisible(), 'setup options form (from the schema) shows Points to win');
+  ok(await p.evaluate(() => document.documentElement.scrollWidth) <= 390, 'setup: no horizontal scroll at 390');
+  await ppPick(p, { targetPoints: 3, pauseBetweenHands: true });
+  await toBots(p);
+  await p.getByTestId('start-bots').click();
+  await p.getByTestId('mode-screen').waitFor();
+  ok(await p.getByTestId('mode-screen').getAttribute('data-mode') === 'pitty-pat', 'Deal me in opens Pitty Pat vs 3 bots');
+  ok((await p.getByTestId('pp-goal').textContent())?.includes('First to 3 points') === true, 'goal line shows the points target');
+  ok((await p.getByTestId('pp-points-0').textContent())?.replace(/\s/g, '') === '0/3pts', 'your score reads 0 / 3 pts');
+  ok(await p.getByTestId('pp-pot').count() === 0, 'no coins shown (coin pot off by default)');
+  await layoutOk(p, 'table');
+  let resultShot = false, tableShot = false;
+  await playToRecap([p], undefined, async (pg) => {
+    if (!tableShot && await pg.locator('.pp-move:not([disabled]), .pcard-btn:not([disabled])').first().isVisible().catch(() => false)) { tableShot = true; await pg.screenshot({ path: `${shots}/7b-table-390.png` }); }
+    if (!resultShot && await pg.getByTestId('pp-hand-result').isVisible().catch(() => false)) {
+      resultShot = true;
+      await pg.waitForTimeout(300);
+      await pg.screenshot({ path: `${shots}/7b-hand-result-390.png` });
+      await layoutOk(pg, 'hand result');
+    }
+  });
+  ok(resultShot, 'hand result shown between hands (pauseBetweenHands)');
+  const pts = await Promise.all([0, 1, 2, 3].map(async (i) => Number(((await p.getByTestId(`recap-points-${i}`).textContent()) ?? '').replace(/\D/g, ''))));
+  ok(Math.max(...pts) === 3, `full game to the points target: winner has 3 pts (${pts.join('/')})`);
+  ok(await p.getByTestId('pp-recap-hands').locator('li').count() >= 3, 'recap lists hand by hand');
+  await p.waitForTimeout(300);
+  await p.screenshot({ path: `${shots}/7b-recap-390.png` });
+  await layoutOk(p, 'recap');
+  // Neon theme: the table keeps its neutral tokens, so it reads the same
+  await p.evaluate(() => localStorage.setItem('bwm.theme.v1', JSON.stringify({ theme: 'neon' })));
+  await p.getByTestId('mode-again').click();
+  await toBots(p);
+  await p.getByTestId('start-bots').click();
+  await p.getByTestId('mode-screen').waitFor();
+  await p.waitForTimeout(500);
+  await p.screenshot({ path: `${shots}/7b-table-neon-390.png` });
+  ok(await p.evaluate(() => document.documentElement.dataset.theme) === 'neon', 'neon theme: table renders (screenshot)');
+  await p.evaluate(() => localStorage.removeItem('bwm.theme.v1'));
+  await p.context().close();
+}
+
+async function pittyOnline(b: Browser) {
+  console.log('pitty pat online');
+  const r = await fetch(`${server}/api/tables`, { method: 'POST', headers: { origin: base } });
+  if (!r.ok) throw new Error(`create ${r.status}`);
+  const { code } = await r.json() as { code: string };
+  const host = await newPage(b);
+  await host.goto(base);
+  await host.evaluate((c) => { sessionStorage.setItem(`bwm.created.${c}`, '1'); localStorage.setItem('pp.modeChoice', JSON.stringify({ modeId: 'pitty-pat', options: { targetPoints: 2 } })); localStorage.setItem('bwm.online.name', 'Host'); }, code);
+  await host.goto(`${base}/t/${code}`);
+  await guestIn(host);
+  const guest = await newPage(b);
+  await guest.goto(`${base}/t/${code}`);
+  await guestIn(guest);
+  await host.getByTestId('start').waitFor();
+  await host.waitForTimeout(1500);
+  await host.getByTestId('start').click();
+  await host.getByTestId('mode-screen').waitFor();
+  await guest.getByTestId('mode-screen').waitFor();
+  ok(await host.getByTestId('mode-screen').getAttribute('data-mode') === 'pitty-pat' && await guest.getByTestId('mode-screen').getAttribute('data-mode') === 'pitty-pat', 'online: host start puts both humans (+2 bots) on the Pitty Pat table');
+  ok(await host.locator('.pp-seat').count() === 4, 'online: 4 seats (2 humans + 2 bots)');
+  const hostCards = await host.locator('[data-testid^="pp-card-"]').evaluateAll((els) => els.map((e) => e.getAttribute('data-testid')));
+  const guestHtml = await guest.content();
+  ok(hostCards.length > 0 && hostCards.every((t) => !guestHtml.includes(`"${t}"`)), 'online: the guest never sees the host\'s cards');
+  await playToRecap([host, guest], '7b-online-table-390.png');
+  const pts = await Promise.all([0, 1, 2, 3].map(async (i) => Number(((await host.getByTestId(`recap-points-${i}`).textContent()) ?? '').replace(/\D/g, ''))));
+  ok(Math.max(...pts) === 2, `online: full game to the points target (winner 2 pts: ${pts.join('/')})`);
+  await host.screenshot({ path: `${shots}/7b-online-recap-390.png` });
+  await layoutOk(host, 'online recap');
+}
+
 const b = await chromium.launch();
 try {
   await offline(b).catch(async (e) => { for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: '/tmp/fail.png' }); throw e; });
+  await pittyOffline(b).catch(async (e) => { for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: '/tmp/failpp.png' }); throw e; });
+  if (process.env.BWM_SKIP_ONLINE !== '1') await pittyOnline(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/failppo${i++}.png` }); throw e; });
   if (process.env.BWM_SKIP_ONLINE !== '1') await online(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/fail${i++}.png` }); throw e; });
 } finally { await b.close(); }

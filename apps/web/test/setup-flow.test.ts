@@ -45,9 +45,9 @@ describe('start screens', () => {
     await click('play-bots');
     expect($('mode-setup')).not.toBeNull();
     for (const gone of ['house-rules', 'venue-row', 'setup-team-name', 'rules-stats']) expect($(gone)).toBeNull();
-    expect($('setup-bar-summary')!.textContent).toBe('High Card · 2–4 players · Default rules');
+    expect($('setup-bar-summary')!.textContent).toBe('Pitty Pat · 2–4 players · Default rules');
     await click('start-bots');
-    expect(document.querySelector('[data-testid="mode-screen"]')?.getAttribute('data-mode')).toBe('placeholder');
+    expect(document.querySelector('[data-testid="mode-screen"]')?.getAttribute('data-mode')).toBe('pitty-pat');
     await click('mode-leave');
     expect($('play')).not.toBeNull();
   });
