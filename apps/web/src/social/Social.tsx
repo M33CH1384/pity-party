@@ -15,9 +15,7 @@ import { type PlayerTableAction, playerTableAction } from './tableActions';
 import { type MyTable, type SocialTab, type Toast, NOT_FRIENDS_TEXT, badgeCount, globalUnread, isMuted, social, useSocial } from './store';
 import { applyMention, mentionQueryAt, rankMentionCandidates, splitMentionText } from './mentions';
 import { openPlayerProfile, profileTargetOf } from '../profileTap';
-import { Leaderboards, Tournaments } from './Compete';
 import { LeagueTicker } from './LeagueTicker';
-import { WagerChallenges } from './Wager';
 import { UnlockPopups } from './UnlockPopups';
 import { chatStickToBottom } from '../chatScroll';
 import { chatGroupInfo, chatTimeLabel } from './chatTime';
@@ -25,9 +23,11 @@ import { POPOVER_H, POPOVER_H_PALETTE, POPOVER_H_REPLY, popoverPos, useMsgPress,
 import { ReactionChips, ReactionPicker } from '../reactions';
 import GearIcon from '../GearIcon';
 import { ProfileView } from '../profile/ProfileView';
+import { OFFERED_MODE_NAME } from '../offeredModes';
 import './social.css';
 
-export const MODE_NAME: Record<string, string> = { placeholder: 'High Card', 'pitty-pat': 'Pitty Pat', tonk: 'Tonk' };
+/** Mode names for presence lines / invites: the registry catalog (offeredModes.ts). */
+export const MODE_NAME: Record<string, string> = { ...OFFERED_MODE_NAME };
 const modeName = (m: string) => MODE_NAME[m] ?? m;
 
 /** report what you're doing (Online / In lobby / At a table / In tournament) while this component is mounted */
@@ -170,7 +170,8 @@ function InviteToast({ inv }: { inv: InviteMsg }) {
 
 /* ------------------------------------------------------------------ panel */
 
-const TABS: [SocialTab, string][] = [['players', 'Players'], ['chat', 'Chat'], ['friends', 'Friends'], ['leaders', 'Ranks']];
+/** TODO(rebuild): the Ranks tab (Spades Partnership/Cutthroat boards) is off until registry ratings exist (REBUILD.md S1). */
+const TABS: [SocialTab, string][] = [['players', 'Players'], ['chat', 'Chat'], ['friends', 'Friends']];
 /** share a link: native share sheet when there is one, else copy */
 async function shareLink(url: string, text: string) {
   if (navigator.share) { try { await navigator.share({ title: 'Pity Party', text, url }); return; } catch { return; } }
@@ -226,8 +227,7 @@ function SocialPanel() {
             <button type="button" className={`icon-btn ${s.tab === 'tournaments' || s.tab === 'challenges' || s.tab === 'settings' ? 'on' : ''}`} aria-label="Events and settings" aria-expanded={gear} data-testid="social-gear" onClick={() => setGear(!gear)}><GearIcon /></button>
             {gear && (
               <span className="soc-gear-menu" role="menu">
-                <button type="button" role="menuitem" data-testid="soc-tab-tournaments" onClick={() => { social.tab('tournaments'); setGear(false); }}>🏆 Events &amp; tournaments</button>
-                <button type="button" role="menuitem" data-testid="soc-tab-challenges" onClick={() => { social.tab('challenges'); setGear(false); }}>🏦 Big Bank challenges</button>
+                {/* TODO(rebuild): Events & tournaments and Big Bank challenges are off (server 503, REBUILD.md S2/S3) */}
                 <button type="button" role="menuitem" data-testid="soc-tab-settings" onClick={() => { social.tab('settings'); setGear(false); }}><GearIcon size={15} /> Social settings</button>
               </span>
             )}
@@ -254,10 +254,10 @@ function SocialPanel() {
             s.tab === 'chat' ? <GlobalChat signedIn={signedIn} /> :
             s.tab === 'messages' ? <Messages signedIn={signedIn} /> :
             s.tab === 'friends' ? <Friends signedIn={signedIn} /> :
-            s.tab === 'leaders' ? <Leaderboards /> :
-            s.tab === 'tournaments' ? <Tournaments signedIn={signedIn} /> :
-            s.tab === 'challenges' ? <WagerChallenges signedIn={signedIn} /> :
-            <SettingsTab signedIn={signedIn} />}
+            s.tab === 'settings' ? <SettingsTab signedIn={signedIn} /> :
+            // TODO(rebuild): 'leaders' (Ranks), 'tournaments', 'challenges' are off (REBUILD.md S1–S3); a saved/deep-linked
+            // tab lands on Players instead of a dead panel.
+            <Players signedIn={signedIn} />}
         </div>
         {/* The BottomLine as the panel's own footer (league data wave 6a):
             the same shared component as the app-wide root bar, in flow so
@@ -360,7 +360,7 @@ function PlayerRow({ u, me, friend, pending, muted, signedIn, myTable, tables }:
             : <span className="soc-pl-name">{u.name}{me && <em> (you)</em>}{u.guest && <i className="soc-tag">Guest</i>}{friend && <i className="soc-tag friend" title="Friend">★ Friend</i>}{muted && <i className="soc-tag muted" title="You muted this player (they don't know)">Muted</i>}</span>}
           <span className={`soc-pl-status ${u.status.kind}`}>{statusLabel(u.status, modeName)}</span>
         </span>
-        <Rating r={u.rating} />
+        {/* TODO(rebuild): Spades rating chip (⚔/🔪) off, REBUILD.md S1 */}
       </div>
       {!me && (
         <div className="soc-pl-acts">
