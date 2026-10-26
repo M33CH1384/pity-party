@@ -1,8 +1,9 @@
 /**
  * Web mode registry: per-mode table view + recap. The shell (ModeScreen) looks the pair up by modeId;
- * Pitty Pat and Tonk register theirs when their engines land. Neutral placeholder theme.
+ * Pitty Pat's lives in pittyPatView.tsx; Tonk registers its own when its engine lands. Neutral placeholder theme.
  */
 import type { ComponentType } from 'react';
+import { PittyPatRecap, PittyPatTable } from './pittyPatView';
 import { type Card, type HcMove, type HcView, type ModeId, type Results, rankLabel } from '@pp/game';
 
 export interface ModeTableProps {
@@ -92,6 +93,7 @@ function HighCardRecap(p: ModeRecapProps) {
 }
 
 const VIEWS: Partial<Record<ModeId, ModeViews>> = {
+  'pitty-pat': { title: 'Pitty Pat', Table: PittyPatTable, Recap: PittyPatRecap },
   placeholder: { title: 'High Card', Table: HighCardTable, Recap: HighCardRecap },
 };
 

@@ -29,10 +29,10 @@ const conserved = (s: PpState) => { const a = ids(all(s)); return a.length === 5
 const play = (s: PpState, seat: number, m: PpMove) => R.applyMove(s, seat, m);
 
 describe('registry + options', () => {
-  it('is registered (rules + bot) but unlisted: Setup keeps Pitty Pat "coming soon"', () => {
+  it('is registered (rules + bot) and listed (M7b): playable in Setup', () => {
     expect(getRules('pitty-pat')).toBe(R);
     expect(getBot('pitty-pat').modeId).toBe('pitty-pat');
-    expect(listModes().map((m) => m.modeId)).not.toContain('pitty-pat');
+    expect(listModes().map((m) => m.modeId)).toContain('pitty-pat');
   });
   it('options schema: defaults are the documented ones; every [UNVERIFIED] rule is an unverified option', () => {
     const d = defaultsOf(PITTY_PAT_OPTIONS);
