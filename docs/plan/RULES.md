@@ -54,6 +54,7 @@ HAND_OVER → NEXT_DEAL | GAME_OVER
 - Easy: pair if possible; shed random non-paired card.
 - Normal: shed card whose rank is most "dead" (most copies seen) – least likely to be matched by next seat; keep pairs.
 - Hard: track remaining-rank counts; minimise P(next seat matches) using their observed passes (a pass on rank R ⇒ they lack R); with mustPair=may, decline pairs that would expose a needed rank.
+- Deuces wild (all tiers, M7a): never shed a 2 while any other card can go; take a natural pair before spending a 2. Implemented in `packages/game/src/modes/pittyPatBot.ts`; view exposes public `seen` (face-up count per rank) and `passed` (ranks each seat passed on this hand). Measured heads-up hand share vs easy over 1000 seeded games: hard/normal ≈ 53% with deuces wild (wilds add luck), ≈ 57% without; hard ≈ normal (50%). Must-pair Pitty Pat is mostly luck — the only real decision is the shed — so the STRUCTURE.md >60% goal isn't reachable; tests assert > 52–53%.
 ### Edge cases
 Upcard matches two hand cards (only one pairs unless tripsAsOne). 2 players: stock cycles fast → reshuffle often. Multiple dealt-win claims → first in turn order [UNVERIFIED]. Disconnect → bot (BWM behavior). Deck exhaustion with no discards (impossible ≤5 players at 5 cards).
 ### Chosen readings (M6, 2026-10-26: Demetrius "use defaults, everything a setup option")
@@ -64,7 +65,7 @@ Each reading below is the default of a setup option in `PITTY_PAT_OPTIONS` (pack
 | 2 | How "pity" is paid (when `pityPayouts` on) | each loser pays one extra ante, two on a dealt win, never more than they hold | `pityStyle` = perHand | perPair: one ante per pair the winner laid (×2 on a dealt win) |
 | 3 | Dealt win with 7 cards | counts (3 pairs + upcard matching the 7th card) | `dealtWin7` = on | off |
 | 4 | Dead-card steal | window on the hand's first upcard only, for seats (other than the first player) holding a match, asked in turn order; after the steal + shed, play continues from the stealer's left | `stealResume` = stealerLeft | firstPlayer: the first player then takes their normal turn |
-| 5 | Points game coins (no pot) | game winner gets ante × (players − 1), everyone else pays the ante; a tie pays nothing | `handsWonPayout` = antePerOpponent | none |
+| 5 | Points game coins (no pot) | **none** since 2026-10-26 (Demetrius: a points game is pure points, no coins move) | `handsWonPayout` = none | antePerOpponent: game winner gets ante × (players − 1), everyone else pays the ante; a tie pays nothing |
 | 6 | "Last with coins" with no coins in play | superseded 2026-10-26: `handsWonEnd` removed; that combination falls back to first to N points (pick "After N hands" via `gameEnd` instead) | — | — |
 | 7 | may-pair: declining before any flip | you flip instead (after a flip, declining = pass) | `declineAction` = flip | pass |
 | W1 | Deuces wild | on | `deucesWild` | off (a 2 is just a 2) |
