@@ -223,6 +223,83 @@ describe('ending + scoring', () => {
   });
 });
 
+describe('M6 readings are options (Q2–Q7) + pause between hands', () => {
+  it('Q2 pityStyle perPair: losers pay one ante per pair the winner laid', () => {
+    let s = rig([['7C'], ['3C', '3D', '5H']], '7D', { pityPayouts: true, pityStyle: 'perPair', ante: 1 });
+    s = { ...s, pot: 2, chips: [9, 9], shelves: [[C('KS'), C('KH'), C('4C'), C('4D')], []] };
+    s = play(s, 0, { t: 'pair', cardIds: ['7C'] }); // 3 pairs on the shelf now
+    expect(s.history[0]!.deltas).toEqual([1 + 3, -1 - 3]);
+  });
+  it('Q3 dealtWin7 off: no win on the deal with 7 cards', () => {
+    let seed: string | null = null;
+    for (let i = 0; i < 20000 && !seed; i++) { const g = R.newGame({ handSize: '7' }, 4, `d7${i}`); if (g.history[0]?.how === 'dealt') seed = `d7${i}`; }
+    expect(seed).not.toBeNull();
+    expect(R.newGame({ handSize: '7', dealtWin7: false }, 4, seed!).history).toHaveLength(0);
+  });
+  it('Q4 stealResume firstPlayer: after the stealer sheds, the first player takes their turn', () => {
+    let found: PpState | null = null;
+    for (let i = 0; i < 2000 && !found; i++) { const g = R.newGame({ deadCardSteal: true, dealtWinAuto: false, stealResume: 'firstPlayer' }, 4, `sr${i}`); if (g.phase === 'steal' && g.stealQueue[0] !== (g.turn + 1) % 4) found = g; }
+    expect(found).not.toBeNull();
+    const first = found!.turn, who = R.toAct(found!)[0]!;
+    let s = R.applyMove(found!, who, R.legalMoves(found!, who).find((m) => m.t === 'steal')!);
+    if (s.phase !== 'shed') return;
+    s = R.applyMove(s, who, R.legalMoves(s, who)[0]!);
+    if (s.history.length) return;
+    expect(s.turn).toBe(first);
+    const def = R.newGame({ deadCardSteal: true, dealtWinAuto: false }, 4, found!.seed);
+    let d = R.applyMove(def, who, R.legalMoves(def, who).find((m) => m.t === 'steal')!);
+    d = R.applyMove(d, who, R.legalMoves(d, who)[0]!);
+    if (!d.history.length) expect(d.turn).toBe((who + 1) % 4);
+  });
+  it('Q5 handsWonPayout none: no coins move in a hands-won game', () => {
+    const g = runGame({ scoring: 'handsWon', handsWonPayout: 'none', gameTarget: 2 }, 3, 'hwp');
+    expect(R.results(g).deltas).toEqual([0, 0, 0]);
+    const d = runGame({ scoring: 'handsWon', gameTarget: 2 }, 3, 'hwp');
+    expect(R.results(d).deltas.some((x) => x !== 0)).toBe(true);
+  });
+  it('Q6 handsWonEnd fixedHands: hands-won + last-with-coins ends after N hands', () => {
+    const g = runGame({ scoring: 'handsWon', gameEnd: 'lastWithChips', handsWonEnd: 'fixedHands', gameTarget: 3 }, 3, 'hwe');
+    expect(g.history).toHaveLength(3);
+  });
+  it('Q7 declineAction pass: declining a pair before flipping passes the turn', () => {
+    const s = rig([['7C', '2D', '9H', 'KS', '4C'], ['3C', '3D', '5H', '6S', '8C']], '7D', { mustPair: 'may', declineAction: 'pass' });
+    expect(R.legalMoves(s, 0)).toEqual([{ t: 'pair', cardIds: ['7C'] }, { t: 'pass' }]);
+    expect(play(s, 0, { t: 'pass' }).turn).toBe(1);
+  });
+  it('pauseBetweenHands: the hand result stays up until the winner deals on', () => {
+    let s = rig([['7C'], ['3C', '3D', '5H']], '7D', { pauseBetweenHands: true });
+    s = { ...s, pot: 2, chips: [9, 9] };
+    s = play(s, 0, { t: 'pair', cardIds: ['7C'] });
+    expect(s.phase).toBe('handOver');
+    expect(R.toAct(s)).toEqual([0]);
+    expect(R.legalMoves(s, 0)).toEqual([{ t: 'nextHand' }]);
+    expect(R.legalMoves(s, 1)).toEqual([]);
+    expect(R.view(s, 1).lastHand).toMatchObject({ winner: 0, how: 'out' });
+    s = play(s, 0, { t: 'nextHand' });
+    expect(s.phase === 'act' || s.phase === 'steal' || s.history.length === 2).toBe(true);
+    expect(s.handNo).toBe(1);
+  });
+  it('every M6 reading is a changeable, unverified option with the documented default', () => {
+    const d = defaultsOf(PITTY_PAT_OPTIONS);
+    expect(d).toMatchObject({ stack: 10, pityStyle: 'perHand', dealtWin7: true, stealResume: 'stealerLeft', handsWonPayout: 'antePerOpponent', handsWonEnd: 'firstToWins', declineAction: 'flip', pauseBetweenHands: false });
+    for (const k of ['stack', 'pityStyle', 'dealtWin7', 'stealResume', 'handsWonPayout', 'handsWonEnd', 'declineAction']) expect(PITTY_PAT_OPTIONS.find((o) => o.key === k)!.verified).toBe(false);
+  });
+});
+
+describe('stats recap (mode_games.recap_json)', () => {
+  it('hands (winner/how/pot/deltas), pairs per seat, wins, chips, dealtWins — public only', () => {
+    const g = runGame({}, 4, 'recap');
+    const r = R.results(g).recap as import('../src').PpRecap;
+    expect(r.v).toBe(1);
+    expect(r.hands).toHaveLength(g.history.length);
+    expect(r.hands[0]).toEqual({ n: 0, winner: expect.anything(), how: expect.any(String), pot: expect.any(Number), deltas: expect.any(Array) });
+    expect(r.pairs).toHaveLength(4);
+    expect(r.pairs.reduce((a, b) => a + b, 0)).toBeGreaterThan(0);
+    expect(r.wins.reduce((a, b) => a + b, 0)).toBe(g.history.filter((h) => h.winner !== null).length);
+    expect(JSON.stringify(r)).not.toMatch(/"id":"/); // no card ids
+  });
+});
+
 describe('deadCardSteal (out-of-turn match on the first upcard)', () => {
   it('off: no steal window; on: seats holding a match (after the first player) may steal or waive in turn order', () => {
     let found: PpState | null = null;
@@ -278,6 +355,9 @@ const optArb = fc.record({
   tripsAsOne: fc.boolean(), deadCardSteal: fc.boolean(), dealtWinAuto: fc.boolean(), stockEmpty: fc.constantFrom('reshuffle', 'void'),
   scoring: fc.constantFrom('pot', 'handsWon'), stack: fc.integer({ min: 1, max: 30 }), ante: fc.integer({ min: 0, max: 10 }), pityPayouts: fc.boolean(),
   gameEnd: fc.constantFrom('lastWithChips', 'firstToWins', 'fixedHands'), gameTarget: fc.integer({ min: 1, max: 8 }), dealtWinTie: fc.constantFrom('turnOrder', 'redeal'),
+  pityStyle: fc.constantFrom('perHand', 'perPair'), dealtWin7: fc.boolean(), stealResume: fc.constantFrom('stealerLeft', 'firstPlayer'),
+  handsWonPayout: fc.constantFrom('antePerOpponent', 'none'), handsWonEnd: fc.constantFrom('firstToWins', 'fixedHands'), declineAction: fc.constantFrom('flip', 'pass'),
+  pauseBetweenHands: fc.boolean(),
 });
 
 describe('properties (fast-check)', () => {
@@ -306,7 +386,7 @@ describe('properties (fast-check)', () => {
       runGame(opts, seats, seed, (legal, s, rng) => {
         const seat = R.toAct(s)[0]!;
         for (const m of legal) expect(() => R.applyMove(s, seat, m)).not.toThrow();
-        const junk: PpMove[] = [{ t: 'pair', cardIds: ['ZZ'] }, { t: 'discard', cardId: 'ZZ' }, { t: 'flip' }, { t: 'pass' }, { t: 'waive' }];
+        const junk: PpMove[] = [{ t: 'pair', cardIds: ['ZZ'] }, { t: 'discard', cardId: 'ZZ' }, { t: 'flip' }, { t: 'pass' }, { t: 'waive' }, { t: 'nextHand' }];
         for (const j of junk) if (!legal.some((m) => JSON.stringify(m) === JSON.stringify(j))) expect(() => R.applyMove(s, seat, j)).toThrow(RuleError);
         for (let o = 0; o < seats; o++) if (o !== seat) expect(R.legalMoves(s, o)).toEqual([]);
         return legal[Math.floor(rng() * legal.length)]!;

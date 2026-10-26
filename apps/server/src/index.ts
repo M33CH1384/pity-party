@@ -52,6 +52,8 @@ import type { ChatReactions, OpenTable, ReplyRef, SocialChatLine, SocialServerMs
 
 import { D1QueueStore, WriterBreaker, writeVoiceLine, type WorkersAiLike, type WriterRequest } from './voice/writer';
 export interface Env extends LimitEnv, AuthEnv, SocialEnv {
+  /** comma list of built-but-unlisted modes tables may open (local preview only; leave unset in production) */
+  PREVIEW_MODES?: string;
   /** Voice (c) Workers AI binding ([ai] in wrangler.toml); absent in local tests without AI. */
   AI?: WorkersAiLike;
   TABLES: DurableObjectNamespace<TableDO>;
@@ -407,6 +409,7 @@ export class TableDO extends DurableObject<Env> {
       randomId: () => crypto.randomUUID().replace(/-/g, ''),
       // generic stats record per finished mode game (migration 0034). TODO(rebuild): rated games/Elo, cred
       // push events and live highlights hung off the Spades gameOver/highlight hooks (docs/plan/REBUILD.md).
+      previewModes: (this.env.PREVIEW_MODES ?? '').split(',').map((x) => x.trim()).filter(Boolean),
       modeGameOver: (rec) => {
         if (!this.env.DB) return;
         this.ctx.waitUntil(saveModeGame(this.env.DB, rec).catch((e) => console.error('saveModeGame', e)));

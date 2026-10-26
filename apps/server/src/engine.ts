@@ -14,8 +14,15 @@ export interface ModeGame {
   state: unknown;
 }
 
-export function isMode(id: string): id is ModeId {
-  return listModes().some((m) => m.modeId === id);
+/**
+ * A mode a table may pick: listed in the registry, or registered-but-unlisted and named in `preview`
+ * (env PREVIEW_MODES, e.g. "pitty-pat" on a local `wrangler dev`; unset in production, so an engine
+ * that is built but has no table view yet can't be opened there).
+ */
+export function isMode(id: string, preview: readonly string[] = []): id is ModeId {
+  if (listModes().some((m) => m.modeId === id)) return true;
+  if (!preview.includes(id)) return false;
+  try { getRules(id as ModeId); return true; } catch { return false; }
 }
 
 export function modeSeatRange(id: ModeId): { min: number; max: number } {

@@ -216,6 +216,8 @@ export interface RoomIO {
   randomId(): string;
   /** A registry-mode game finished (generic record: placements, coin changes, mode recap). The DO stores it in D1 (mode_games). */
   modeGameOver?(rec: ModeGameRecord): void;
+  /** registered-but-unlisted modes this deployment may open anyway (env PREVIEW_MODES; empty in production) */
+  previewModes?: readonly string[];
   // TODO(rebuild, docs/plan/REBUILD.md): rated games/Elo (gameOver) and live highlights (highlight) were Spades-only and are off.
   /** Release 9b: a tournament match finished (per side: final score and placement, 1 = won) */
   tournamentResult?(t: TournamentSeat, scores: number[], places: number[]): void;
@@ -747,7 +749,7 @@ export class Room {
       case 'mode': {
         this.requireHost(isHost);
         if (d.phase === 'playing') throw new RoomError('IN_GAME', 'Game in progress');
-        if (!isMode(msg.modeId)) throw new RoomError('BAD_MODE', 'Unknown game mode');
+        if (!isMode(msg.modeId, this.io.previewModes ?? [])) throw new RoomError('BAD_MODE', 'Unknown game mode');
         // 3c: switching games fits the table to the new mode's seat range (seats beyond it are vacated)
         const { min, max } = tableSeatRange(msg.modeId);
         const pc = Math.min(max, Math.max(min, d.rules.playerCount));
