@@ -49,6 +49,11 @@ export const TONK_OPTIONS: readonly OptionDef[] = [
   { key: 'spreadBeforeDrop', label: 'Must have a spread down to drop', type: 'bool', default: false, source: 'house', verified: false },
   { key: 'noDiscardPickup', label: 'Can’t discard the card just taken from the pile', type: 'bool', default: false, source: 'house (common rummy rule)', verified: false },
   { key: 'stockOut', label: 'When the stock runs out', type: 'enum', default: 'lowestWins', choices: choices(['lowestWins', 'Lowest count wins'], ['void', 'Void the hand']), source: 'TT', verified: true },
-  { key: 'stake', label: 'Stake (coins)', type: 'int', default: 1, min: 0, max: 10, source: 'PAGAT-T stakes', verified: true },
+  { key: 'caughtLowestCollects', label: 'Caught drop: lowest hand also collects 1 from the rest', type: 'bool', default: true, source: 'TT payout table', verified: false },
+  { key: 'gameEnd', label: 'Game ends', type: 'enum', default: 'firstToPoints', choices: choices(['firstToPoints', 'First to N points'], ['fixedHands', 'After N hands']), source: 'house (RULES.md Mode B: first to 10)', verified: false },
   { key: 'gameTarget', label: 'Points to win', type: 'int', default: 10, min: 5, max: 50, source: 'house', verified: false },
+  { key: 'gameHands', label: 'Hands to play (for "After N hands")', type: 'int', default: 5, min: 1, max: 50, source: 'house', verified: false },
+  { key: 'coinStakes', label: 'Play for coins (stake per point)', type: 'bool', default: false, source: 'PAGAT-T stakes (optional, like Pitty Pat)', verified: false, help: 'Off: points only. On: each point won or lost at the end moves the stake in play coins' },
+  { key: 'stake', label: 'Stake (coins per point)', type: 'int', default: 1, min: 0, max: 10, source: 'PAGAT-T stakes', verified: true },
+  { key: 'pauseBetweenHands', label: 'Pause to show each hand’s result', type: 'bool', default: false, source: 'table pacing', verified: true },
 ];

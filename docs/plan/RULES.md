@@ -135,6 +135,21 @@ Count = cards still in hand (spreads excluded) [V LCG]. Game end: first to N poi
 - Tell-free as Mode A.
 ### Edge cases
 Spreading all cards ⇒ Tonk (no discard). Hit makes hand empty ⇒ Tonk. Drop tie ⇒ caught [V TT]. Multiple 49/50 ⇒ redeal [V]. Stock empty mid-turn ⇒ STOCK_OUT before draw. Discard pile reshuffle never (stock-out ends hand). Hitting a run past A or K invalid (ace low).
+### Engine readings (M8a, defaults where the sources leave it open — every one a setup option or listed as a question)
+| # | Open point | Default reading in the engine | Option |
+|---|---|---|---|
+| T1 | Score | POINTS (1 stake = 1 point, zero-sum payouts); coins optional like Pitty Pat: at game end each point moves `stake` play coins | `coinStakes` (off), `stake` |
+| T2 | Game end | first to 10 points | `gameEnd` firstToPoints / fixedHands, `gameTarget`, `gameHands` |
+| T3 | Caught drop: does the lowest also collect, and from whom? | yes: 1 from every player except the dropper (who already paid the penalty) | `caughtLowestCollects` (on) |
+| T4 | Stock-out with a tie for lowest | hand void (no payouts) | — (question) |
+| T5 | Joker count value (wilds = jokers) | 0; deuces wild count 2 | — (question) |
+| T6 | Wild placement in runs | wilds fill gaps, extra wilds extend up then down; a hit wild goes on the high end, else the low end; every spread needs a natural card | — |
+| T7 | Slap | after a discard, others in turn order may slap it onto any spread (a hit), then must shed one card; play resumes left of the original discarder; no slap chains | `slap` (off) |
+| T8 | Hit lock scope | the hit player can't drop or spread on their next turn (hits still allowed) | `hitLock` (off) |
+| T9 | Dealer / first player | dealer rotates left each hand; play starts left of the dealer | — |
+| T10 | 7 cards | allowed for any seat count (RULES says "for 2p") | `handSize` |
+| T11 | Endless discard pick-up loops | a hand voids after 600 moves (engine bound) | — |
+| T12 | Pause between hands | off; on shows the result until the winner deals on | `pauseBetweenHands` |
 ### Open questions (ranked)
 1. Instant win: 49/50, or 50 or ≤11, or none? 2. Caught penalty 1× or 2×, and does the lowest player also collect? 3. Hit lock rule on? 4. Ace low only, or high too? 5. How many points/coins wins the game? 6. Any wild cards? 7. Slap rule? 8. Must you have a spread down before dropping? 9. 7 cards for 2 players? 10. Can you discard the card you just took from the pile?
 
