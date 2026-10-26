@@ -112,6 +112,8 @@ export interface PpState {
   stealQueue: number[];
   reshuffles: number;
   handMoves: number;
+  /** public: ranks each seat passed on this hand (a pass on R ⇒ they hold no R) */
+  passes: Rank[][];
   log: PpEvent[];
   dealtWin: boolean;
 }
@@ -141,6 +143,10 @@ export interface PpView {
   flips: number;
   lastHand: HandEnd | null;
   log: PpEvent[];
+  /** public face-up cards this hand by rank (index 1–13): shelves + the discard pile + the upcard */
+  seen: number[];
+  /** public: ranks each seat passed on this hand */
+  passed: number[][];
   options: PpOptions;
 }
 
@@ -223,7 +229,7 @@ function startHand(s: PpState): PpState {
   const out: PpState = {
     ...ns, chips, hands, shelves: Array.from({ length: s.seats }, () => []), stock: dealt.stock.slice(1), discards: [], upcard,
     pot: antes * order.length, turn: order[0]!, phase: 'act', flips: 0, stealQueue: [], reshuffles: 0, handMoves: 0, dealtWin: false,
-    resumeAt: null, ackSeat: null,
+    resumeAt: null, ackSeat: null, passes: Array.from({ length: s.seats }, () => []),
     log: [], // the log is per hand: last hand's outcome lives in history/lastHand
   };
   pushLog(out, { e: 'deal', hand: s.handNo, dealer: s.dealer, upcard });
@@ -339,6 +345,12 @@ function doFlip(s: PpState, seat: number): PpState {
 
 const nextTurn = (s: PpState, from: number): PpState => ({ ...s, turn: nextActive(s, from), phase: 'act', flips: 0 });
 
+function publicSeen(s: PpState): number[] {
+  const n = Array(14).fill(0) as number[];
+  for (const c of [...s.shelves.flat(), ...s.discards, ...(s.upcard ? [s.upcard] : [])]) n[c.rank]!++;
+  return n;
+}
+
 /* ------------------------------------------------------------------ rule set */
 const toActOf = (s: PpState): number[] => (s.over ? [] : s.phase === 'steal' ? [s.stealQueue[0]!] : s.phase === 'handOver' ? [s.ackSeat!] : [s.turn]);
 
@@ -377,7 +389,7 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
     const base: PpState = {
       opts, seed, seats, chips: Array(seats).fill(opts.coinPot ? opts.stack : 0), wins: Array(seats).fill(0), pairsTotal: Array(seats).fill(0), active: Array(seats).fill(true),
       handNo: 0, dealer: seats - 1, redeals: 0, over: false, history: [], hands: Array.from({ length: seats }, () => []), shelves: Array.from({ length: seats }, () => []), stock: [], discards: [], upcard: null,
-      pot: 0, turn: 0, phase: 'act', flips: 0, stealQueue: [], reshuffles: 0, handMoves: 0, log: [], dealtWin: false, resumeAt: null, ackSeat: null,
+      pot: 0, turn: 0, phase: 'act', flips: 0, stealQueue: [], reshuffles: 0, handMoves: 0, log: [], dealtWin: false, resumeAt: null, ackSeat: null, passes: Array.from({ length: seats }, () => []),
     };
     return startHand(base);
   },
@@ -415,6 +427,7 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
       case 'nextHand': return startHand({ ...ns, phase: 'act', ackSeat: null, dealer: nextActive(ns, ns.dealer) });
       case 'pass': {
         pushLog(ns, { e: 'pass', seat, upcard: ns.upcard! });
+        ns = { ...ns, passes: ns.passes.map((p, i) => (i === seat ? [...p, ns.upcard!.rank] : p)) };
         return ns.handMoves >= PP_LIMITS.maxHandMoves ? endHand(ns, null, 'void') : nextTurn(ns, seat);
       }
     }
@@ -437,6 +450,8 @@ export const pittyPatRules: RuleSet<PpState, PpMove, PpView> = {
       flips: s.flips,
       lastHand: s.history[s.history.length - 1] ?? null,
       log: s.log.slice(),
+      seen: publicSeen(s),
+      passed: s.passes.map((p) => p.slice()),
       options: { ...s.opts },
     };
   },
@@ -489,21 +504,4 @@ export function ppRecap(s: PpState): PpRecap {
   };
 }
 
-/** Placeholder bot until milestone 7 (tiers): pair when it can, otherwise flip/pass; shed a random card. Tell-free: own view only. */
-export const pittyPatBot: BotStrategy<PpMove, PpView> = {
-  modeId: 'pitty-pat',
-  choose(view, legalMoves, _tier, rng) {
-    if (!legalMoves.length) throw new Error('no legal move');
-    const next = legalMoves.find((m) => m.t === 'nextHand');
-    if (next) return next;
-    // pair when able; spend a wild 2 only if no natural pair is on offer (a held 2 pairs with anything later)
-    const pairs = legalMoves.filter((m): m is Extract<PpMove, { t: 'pair' | 'steal' }> => m.t === 'pair' || m.t === 'steal');
-    if (pairs.length) {
-      const deuce = new Set(view.hand.filter((c) => c.rank === 2).map((c) => c.id));
-      return pairs.find((m) => !m.cardIds.some((id) => deuce.has(id))) ?? pairs[0]!;
-    }
-    const sheds = legalMoves.filter((m) => m.t === 'discard');
-    if (sheds.length) return sheds[Math.floor(rng() * sheds.length)]!;
-    return legalMoves[0]!;
-  },
-};
+export { pittyPatBot } from './pittyPatBot';

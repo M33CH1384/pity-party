@@ -7,8 +7,8 @@
    "targetPoints": 3
   }
  },
- "moves": 274,
- "moveLog": "0:flip 0:pair:AS 0:discard:7D 1:pair:2S 1:discard:9D 2:flip 2:pass 3:pair:3D 3:discard:2C 4:pair:JC 4:discard:QH 0:pair:QS 0:discard:9S 1:pair:9C 1:discard:AH 2:flip 2:pair:4C 2:discard:7H 3:pair:2H 3:discard:QC 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:pair:KC 0:discard:9H 1:flip 1:pass 2:flip 2:pass 3:flip 3:pair:6H 3:discard:JD 4:pair:JS 4:discard:10H 0:flip 0:pass 1:flip 1:pair:8S 1:discard:10S 2:flip 2:pass 3:flip 3:pair:5D 1:pair:2C 1:discard:QS 2:flip 2:pass 3:pair:2D 3:discard:AH 4:pair:2H 4:discard:5C 0:flip 0:pair:JD 0:discard:10C 1:pair:10S 1:discard:7D 2:flip 2:pass 3:pair:KC 3:discard:9D 4:flip 4:pair:8C 4:discard:JH 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:4C 2:discard:3D 3:flip 3:pass 4:flip 4:pass 0:flip 0:pair:3S 0:discard:9S 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pair:9C 3:discard:4D 4:flip 4:pass 0:flip 0:pair:QH 0:discard:10D 1:flip 1:pass 2:pair:AC 2:discard:5H 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:pair:5S 1:discard:6H 2:pair:6D 2:discard:6S 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pair:QD 4:discard:KH 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:pair:6C 2:pair:2H 2:discard:10D 3:pair:2S 3:discard:QS 4:pair:2C 4:discard:10H 0:pair:2D 0:discard:AS 1:flip 1:pair:5H 1:discard:JD 2:flip 2:pair:8H 2:discard:9D 3:pair:9S 3:discard:9C 4:pair:9H 4:discard:7C 0:flip 0:pass 1:flip 1:pass 2:pair:6H 2:discard:3H 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pair:JC 1:discard:QH 2:pair:QC 3:flip 3:pass 4:pair:2S 4:discard:4S 0:flip 0:pass 1:flip 1:pass 2:pair:9H 2:discard:6D 3:flip 3:pair:JH 4:pair:2D 4:discard:KH 0:pair:KS 0:discard:10C 1:pair:2S 1:discard:QC 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pair:5H 0:discard:3C 1:pair:2H 1:discard:8C 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pair:JH 0:discard:10S 1:flip 1:pass 2:flip 2:pair:9H 2:discard:7H 3:flip 3:pass 4:pair:6C 4:discard:3S 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:pair:4D",
+ "moves": 238,
+ "moveLog": "0:flip 0:pair:AS 0:discard:7D 1:pair:2S 1:discard:9D 2:flip 2:pass 3:pair:3D 3:discard:JD 4:pair:JC 4:discard:QH 0:pair:QS 0:discard:9S 1:pair:9C 1:discard:AH 2:flip 2:pair:4C 2:discard:7H 3:pair:2C 3:discard:QC 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:pair:2H 3:discard:6H 4:flip 4:pass 0:flip 0:pair:KC 0:discard:5H 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:pair:8S 1:discard:10S 2:flip 2:pass 3:flip 3:pair:5D 1:pair:2C 1:discard:6H 2:pair:6D 2:discard:5H 3:pair:2D 3:discard:AH 4:pair:2H 4:discard:QD 0:pair:QH 0:discard:9S 1:flip 1:pass 2:flip 2:pass 3:flip 3:pair:KC 3:discard:9D 4:flip 4:pair:8C 4:discard:KH 0:flip 0:pass 1:pair:7D 1:discard:8D 2:flip 2:pass 3:flip 3:pair:4D 3:discard:8S 4:flip 4:pass 0:pair:AS 0:discard:10D 1:pair:10S 1:discard:5S 2:flip 2:pass 3:flip 3:pair:9C 2:pair:2H 2:discard:9D 3:pair:9S 3:discard:9C 4:pair:9H 4:discard:7C 0:pair:2D 0:discard:5D 1:pair:5H 1:discard:3C 2:pair:3H 2:discard:10D 3:pair:2S 3:discard:AD 4:pair:2C 4:discard:4C 0:pair:4S 0:discard:AS 1:flip 1:pair:5C 1:discard:JD 2:flip 2:pair:8H 2:discard:QC 3:pair:QS 3:discard:6C 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:pair:7S 1:discard:JC 2:flip 2:pass 3:flip 3:pass 4:pair:3D 4:discard:10H 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:pair:6H 3:flip 3:pass 4:pair:2S 4:discard:QD 0:pair:QH 0:discard:JD 1:flip 1:pass 2:pair:5C 2:discard:6D 3:flip 3:pass 4:pair:2D 4:discard:6S 0:pair:6C 0:discard:KC 1:flip 1:pair:7S 1:discard:10C 2:pair:2C 2:discard:3H 3:pair:3S 3:discard:AD 4:flip 4:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 4:pair:KD 4:discard:4S 0:flip 0:pair:7D 0:discard:10D 1:pair:10S 1:discard:8C 2:flip 2:pass 3:flip 3:pass 4:flip 4:pass 0:flip 0:pass 1:pair:4H 1:discard:7C 2:flip 2:pass 3:flip 3:pass 4:pair:8D 4:pair:2D 4:discard:KH 0:pair:KS 0:discard:JH 1:pair:2S 1:discard:7S 2:pair:7H 2:discard:9H 3:flip 3:pass 4:flip 4:pass 0:pair:10C 0:discard:10S 1:pair:2H 1:discard:AS 2:pair:AC 2:discard:6D 3:flip 3:pair:4D",
  "results": {
   "placements": [
    3,
@@ -18,11 +18,11 @@
    1
   ],
   "deltas": [
-   -1,
-   -1,
-   -1,
-   4,
-   -1
+   0,
+   0,
+   0,
+   0,
+   0
   ],
   "recap": {
    "v": 2,
@@ -50,7 +50,7 @@
     },
     {
      "n": 1,
-     "winner": 4,
+     "winner": 3,
      "how": "out",
      "pot": 0,
      "deltas": [
@@ -76,7 +76,7 @@
     },
     {
      "n": 3,
-     "winner": 3,
+     "winner": 4,
      "how": "out",
      "pot": 0,
      "deltas": [
@@ -102,10 +102,10 @@
     }
    ],
    "pairs": [
+    12,
+    14,
     10,
-    10,
-    10,
-    17,
+    16,
     11
    ],
    "wins": [

@@ -4,28 +4,28 @@
   "seed": "golden-defaults",
   "options": {}
  },
- "moves": 294,
- "moveLog": "0:flip 0:pass 1:flip 1:pass 2:pair:6C 2:discard:5C 3:pair:2C 3:discard:KH 0:flip 0:pass 1:flip 1:pair:JH 1:discard:4D 2:pair:4S 2:discard:QC 3:flip 3:pair:AC 3:discard:9C 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pair:4C 1:discard:3S 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:pair:7H 0:discard:10H 1:pair:10S 1:pair:10H 1:discard:7S 2:flip 2:pair:AD 2:discard:KC 3:pair:KH 3:discard:8H 0:pair:2H 0:discard:9C 1:pair:2S 1:discard:4C 2:pair:4S 2:discard:JC 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:pair:3D 2:pair:10C 2:discard:4D 3:pair:2S 3:discard:QD 0:pair:QS 0:discard:KD 1:flip 1:pair:5S 1:discard:7S 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pair:9C 1:discard:6S 2:flip 2:pass 3:pair:3H 3:discard:10D 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pair:8H 0:discard:7H 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:QC 2:discard:5H 3:flip 3:pass 0:flip 0:pair:4S 3:flip 3:pair:9S 3:discard:5C 0:pair:5S 0:discard:3H 1:pair:3S 1:discard:7D 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:pair:AH 1:discard:4S 2:pair:4H 2:discard:JC 3:pair:JH 3:discard:10D 0:pair:10S 0:discard:JS 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:8D 2:discard:4D 3:flip 3:pair:9C 0:flip 0:pass 1:flip 1:pair:QC 1:discard:3H 2:flip 2:pair:4D 2:discard:QS 3:pair:QD 3:discard:4S 0:flip 0:pass 1:pair:KD 1:discard:9C 2:flip 2:pass 3:pair:5H 3:discard:3S 0:flip 0:pass 1:pair:10D 2:pair:5S 2:discard:JS 3:pair:2H 3:discard:KH 0:pair:KC 0:discard:QC 1:flip 1:pass 2:flip 2:pair:9D 2:discard:5D 3:pair:5H 3:discard:QS 0:flip 0:pass 1:pair:3C 1:discard:8D 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:pair:JH 0:discard:6S 1:flip 1:pair:4H 1:discard:JD 2:flip 2:pass 3:pair:6D 3:pair:9S 3:discard:4H 0:flip 0:pass 1:flip 1:pair:QD 0:pair:2D 0:discard:2S 1:pair:KD 1:discard:3S 2:pair:3C 2:discard:JH 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pair:QC 0:discard:6C 1:flip 1:pair:KS 1:discard:5C 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pair:AC",
+ "moves": 386,
+ "moveLog": "0:flip 0:pass 1:flip 1:pass 2:pair:6C 2:discard:5C 3:pair:2C 3:discard:KH 0:flip 0:pass 1:flip 1:pair:JH 1:discard:4D 2:pair:4S 2:discard:QC 3:flip 3:pair:AC 3:discard:9C 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pair:4C 1:discard:3S 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:pair:7H 0:discard:10H 1:pair:10S 1:pair:10H 1:discard:7S 2:flip 2:pair:AD 2:discard:KC 3:pair:KH 3:discard:8H 0:pair:2H 0:discard:9C 1:pair:2S 1:discard:4C 2:pair:4S 2:discard:JC 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:pair:3D 2:pair:10C 2:discard:4D 3:pair:2S 3:discard:QD 0:pair:QS 0:discard:KD 1:flip 1:pair:5S 1:discard:7S 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pair:9C 1:discard:6S 2:flip 2:pass 3:pair:3H 3:discard:10D 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pair:8H 0:discard:7H 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:QC 2:discard:5H 3:flip 3:pass 0:flip 0:pair:4S 3:flip 3:pair:9S 3:discard:5C 0:pair:5S 0:discard:3H 1:pair:3S 1:discard:7D 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:pair:AH 1:discard:4S 2:pair:4H 2:discard:JC 3:pair:JH 3:discard:10D 0:pair:10S 0:discard:JS 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:8D 2:discard:4D 3:flip 3:pair:9C 0:flip 0:pass 1:flip 1:pair:QC 1:discard:3H 2:flip 2:pair:4D 2:discard:QS 3:pair:QD 3:discard:4S 0:flip 0:pass 1:pair:KD 1:discard:9C 2:flip 2:pass 3:pair:5H 3:discard:3S 0:flip 0:pass 1:pair:10D 2:pair:5S 2:discard:JS 3:pair:2H 3:discard:KH 0:pair:KC 0:discard:QC 1:flip 1:pass 2:flip 2:pair:9D 2:discard:5D 3:pair:5H 3:discard:QS 0:flip 0:pass 1:pair:3C 1:discard:8D 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:pair:JH 0:discard:6S 1:flip 1:pair:4H 1:discard:JD 2:flip 2:pass 3:pair:6D 3:pair:9S 3:discard:4H 0:flip 0:pass 1:flip 1:pair:QD 0:pair:2D 0:discard:6C 1:flip 1:pass 2:pair:JH 2:discard:9H 3:pair:9S 3:discard:4C 0:pair:2S 0:discard:AH 1:pair:AC 1:discard:KD 2:flip 2:pass 3:flip 3:pair:3H 3:discard:6D 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:6S 2:discard:3C 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:pair:4S 2:flip 2:pass 3:pair:9D 3:discard:4S 0:flip 0:pair:5D 0:discard:AH 1:flip 1:pass 2:pair:AS 2:discard:10S 3:pair:2S 3:discard:5S 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pair:JD 0:discard:KS 1:flip 1:pass 2:pair:JS 2:discard:8D 3:flip 3:pass 0:flip 0:pair:6C 3:pair:6H 3:discard:AD 0:flip 0:pass 1:pair:2S 1:discard:JS 2:flip 2:pair:5C 2:discard:4D 3:pair:2H 3:discard:8H 0:pair:8D 0:discard:9S 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:pair:3H 1:discard:AS 2:pair:AC 2:discard:7H 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:pair:9D 0:discard:6C 1:flip 1:pass 2:flip 2:pair:4C",
  "results": {
   "placements": [
-   1,
    2,
-   0,
-   3
+   1,
+   3,
+   0
   ],
   "deltas": [
-   -1,
-   3,
-   -1,
-   -1
+   0,
+   0,
+   0,
+   0
   ],
   "recap": {
    "v": 2,
    "points": [
-    2,
-    5,
     3,
-    2
+    4,
+    5,
+    4
    ],
    "coinPot": false,
    "hands": [
@@ -127,7 +127,7 @@
     },
     {
      "n": 8,
-     "winner": 1,
+     "winner": 3,
      "how": "out",
      "pot": 0,
      "deltas": [
@@ -172,19 +172,67 @@
       0,
       0
      ]
+    },
+    {
+     "n": 12,
+     "winner": 2,
+     "how": "dealt",
+     "pot": 0,
+     "deltas": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "n": 13,
+     "winner": 3,
+     "how": "dealt",
+     "pot": 0,
+     "deltas": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "n": 14,
+     "winner": 0,
+     "how": "out",
+     "pot": 0,
+     "deltas": [
+      0,
+      0,
+      0,
+      0
+     ]
+    },
+    {
+     "n": 15,
+     "winner": 2,
+     "how": "out",
+     "pot": 0,
+     "deltas": [
+      0,
+      0,
+      0,
+      0
+     ]
     }
    ],
    "pairs": [
-    14,
-    23,
     19,
-    14
+    23,
+    28,
+    24
    ],
    "wins": [
-    2,
-    5,
     3,
-    2
+    4,
+    5,
+    4
    ],
    "chips": [
     0,
@@ -192,7 +240,7 @@
     0,
     0
    ],
-   "dealtWins": 4
+   "dealtWins": 6
   }
  }
 }

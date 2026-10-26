@@ -277,10 +277,10 @@ describe('M6 readings are options (Q2–Q7) + pause between hands', () => {
     d = R.applyMove(d, who, R.legalMoves(d, who)[0]!);
     if (!d.history.length) expect(d.turn).toBe((who + 1) % 4);
   });
-  it('Q5 handsWonPayout none: no coins move in a points game', () => {
-    const g = runGame({ handsWonPayout: 'none', targetPoints: 2 }, 3, 'hwp');
+  it('Q5 handsWonPayout: default none, a points game is pure points (no coins move); antePerOpponent still pays', () => {
+    const g = runGame({ targetPoints: 2 }, 3, 'hwp');
     expect(R.results(g).deltas).toEqual([0, 0, 0]);
-    const d = runGame({ targetPoints: 2 }, 3, 'hwp');
+    const d = runGame({ handsWonPayout: 'antePerOpponent', targetPoints: 2 }, 3, 'hwp');
     expect(R.results(d).deltas.some((x) => x !== 0)).toBe(true);
   });
   it('Q7 declineAction pass: declining a pair before flipping passes the turn', () => {
@@ -303,7 +303,7 @@ describe('M6 readings are options (Q2–Q7) + pause between hands', () => {
   });
   it('every M6 reading is a changeable, unverified option with the documented default', () => {
     const d = defaultsOf(PITTY_PAT_OPTIONS);
-    expect(d).toMatchObject({ stack: 10, pityStyle: 'perHand', dealtWin7: true, stealResume: 'stealerLeft', handsWonPayout: 'antePerOpponent', declineAction: 'flip', pauseBetweenHands: false });
+    expect(d).toMatchObject({ stack: 10, pityStyle: 'perHand', dealtWin7: true, stealResume: 'stealerLeft', handsWonPayout: 'none', declineAction: 'flip', pauseBetweenHands: false });
     for (const k of ['stack', 'pityStyle', 'dealtWin7', 'stealResume', 'handsWonPayout', 'declineAction']) expect(PITTY_PAT_OPTIONS.find((o) => o.key === k)!.verified).toBe(false);
   });
 });

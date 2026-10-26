@@ -7,8 +7,8 @@
    "gameEnd": "lastWithChips"
   }
  },
- "moves": 3700,
- "moveLog": "0:pair:2S 0:discard:AC 1:flip 1:pass 2:pair:2H 2:discard:4S 3:pair:4H 3:discard:QC 0:pair:QH 1:flip 1:pass 2:pair:QC 2:discard:AS 3:pair:AH 3:discard:5H 0:pair:2C 0:discard:4H 1:flip 1:pass 2:flip 2:pair:3C 2:discard:JH 3:flip 3:pair:5D 3:discard:3D 0:flip 0:pass 1:pair:7C 1:discard:KH 2:flip 2:pair:AD 3:pair:2S 3:discard:9S 0:pair:2C 0:discard:3D 1:pair:3H 1:discard:7D 2:pair:7S 2:discard:QH 3:flip 3:pair:JD 3:discard:AD 0:flip 0:pair:8S 0:discard:3C 1:flip 1:pass 2:flip 2:pass 3:pair:4S 0:flip 0:pass 1:pair:2H 1:discard:9C 2:flip 2:pair:6C 2:discard:KD 3:pair:2C 3:discard:7S 0:flip 0:pair:JC 0:discard:10H 1:flip 1:pair:KS 1:discard:4S 2:pair:4C 2:discard:5S 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:AC 1:pair:2S 1:discard:4C 2:flip 2:pass 3:flip 3:pass 0:pair:2H 0:discard:8H 1:flip 1:pass 2:flip 2:pair:6S 2:discard:7D 3:pair:7C 3:discard:4D 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:7S 2:discard:AD 3:flip 3:pair:10C 3:discard:4H 0:flip 0:pass 1:flip 1:pair:3C 1:discard:KS 2:flip 2:pass 3:pair:QH 2:pair:9C 2:discard:2S 3:pair:8H 3:discard:JH 0:flip 0:pass 1:pair:QC 1:discard:AH 2:flip 2:pass 3:flip 3:pair:4H 3:discard:9D 0:pair:9S 0:discard:10C 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:pair:5H 0:discard:6D 1:flip 1:pass 2:pair:7C 2:discard:JC 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:pair:4S 1:discard:QD 2:flip 2:pass 3:flip 3:pair:8S 3:pair:9C 3:discard:10D 0:pair:2H 0:discard:5S 1:flip 1:pair:JD 1:discard:KD 2:pair:2S 2:discard:3D 3:pair:3C 3:discard:10C 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:pair:7H 0:discard:JS 1:flip 1:pair:8D 1:discard:QD 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:AS 1:pair:8C 1:discard:7S 2:flip 2:pass 3:pair:2D 3:discard:4H 0:pair:4D 0:discard:AD 1:pair:AC 1:discard:JD 2:flip 2:pass 3:flip 3:pass 0:pair:2C 0:discard:5H 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:9H 2:discard:QS 3:pair:QD 0:flip 0:pair:QD 0:discard:7C 2:flip 2:pass 3:pair:2C 3:discard:KH 0:flip 0:pass 2:pair:AS 2:discard:JH 3:flip 3:pass 0:pair:6D 0:discard:4D 2:pair:4H 2:discard:KS 3:flip 3:pass 0:pair:3C 2:flip 2:pair:10S 2:discard:QC 3:flip 3:pass 0:flip 0:pair:3S 0:discard:QH 2:pair:QS 2:discard:8S 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:pair:AD 3:discard:3D 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:7C 3:discard:5C 0:pair:5H 0:discard:9C 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:pair:9H 3:flip 3:pass 0:pair:6H 0:discard:9S 2:pair:9H 2:discard:7S 3:pair:7H 3:discard:4D 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:4C 3:discard:7D 0:flip 0:pass 2:flip 2:pair:5H 2:discard:7C 3:flip 3:pass 0:flip 0:pair:JS 0:discard:10H 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:pair:8H 0:flip 0:pair:8C 0:discard:4D 2:pair:2H 2:discard:AH 3:flip 3:pair:JC 3:discard:10S 0:flip 0:pass 2:flip 2:pass 3:pair:6D 3:discard:7S 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:pair:5C 0:discard:4H 2:flip 2:pair:9H 2:pair:5C 2:discard:AH 3:flip 3:pair:10S 3:discard:5S 0:pair:2H 0:discard:AC 2:pair:2S 2:discard:6D 3:flip 3:pass 0:flip 0:pass 2:flip 2:pair:8S 3:flip 3:pass 0:flip 0:pair:KD 0:discard:9D 2:flip 2:pair:QS 2:discard:8S 3:flip 3:pass 0:flip 0:pass 2:pair:10S 2:discard:4H 3:pair:4C 3:discard:7S 0:flip 0:pass 2:flip 2:pass 3:pair:KS 3:discard:7C 0:flip 0:pair:QC 0:discard:6D 2:flip 2:pair:3D 2:flip 2:pass 3:flip 3:pair:10S 3:discard:AC 2:flip 2:pass 3:pair:7H 3:discard:JH 2:pair:JD 2:discard:6H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:KS 2:discard:4S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QC 3:flip 3:pair:JS 3:discard:4H 2:flip 2:pair:10D 2:discard:5H 3:flip 3:pass 2:flip 2:pair:9D 2:discard:KH 3:pair:KC 3:discard:3D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:9H 2:flip 2:pass 3:flip 3:pair:QC 3:discard:10C 2:pair:10S 2:discard:5C 3:pair:5D 3:discard:QS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:9S 2:pair:6C 2:discard:3H 3:flip 3:pass 2:pair:AC 3:flip 3:pass 2:pair:2C 2:discard:5C 3:flip 3:pair:QD 3:discard:8S 2:flip 2:pass 3:pair:10D 3:discard:6C 2:flip 2:pass 3:flip 3:pair:3H 2:pair:8H 2:discard:AC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QH 2:discard:QD 3:flip 3:pair:6S 3:discard:7D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:10S 3:discard:10D 2:pair:10C 3:pair:KH 3:discard:3S 2:pair:2H 2:discard:AC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9H 2:discard:QC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6H 3:discard:KS 2:flip 2:pair:5C 2:flip 2:pair:9C 2:discard:5H 3:pair:5C 3:discard:QC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6S 3:discard:AC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8C 2:discard:7D 3:pair:7C 3:flip 3:pass 2:pair:2D 2:discard:KC 3:pair:KD 3:discard:4C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10D 2:discard:9D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:AS 3:pair:5C 3:discard:3D 2:pair:3C 2:discard:7C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9C 2:discard:AH 3:pair:AD 3:discard:6D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:10H 2:flip 2:pass 3:flip 3:pair:8H 3:discard:QC 2:flip 2:pair:JS 2:discard:JH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KD 3:flip 3:pass 2:pair:2S 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:pair:4H 3:discard:AD 2:pair:AH 2:flip 2:pass 3:pair:8D 3:discard:QS 2:flip 2:pass 3:pair:2H 3:discard:JD 2:flip 2:pair:4S 2:discard:5D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:KH 2:discard:9S 3:flip 3:pass 2:flip 2:pass 3:pair:3H 3:flip 3:pair:8H 3:discard:JC 2:pair:2H 2:discard:3S 3:pair:3C 3:discard:KH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10C 2:discard:AD 3:flip 3:pass 2:flip 2:pair:5D 2:flip 2:pass 3:pair:2H 3:discard:8D 2:flip 2:pair:9S 2:discard:10S 3:flip 3:pass 2:pair:QD 2:discard:10D 3:flip 3:pair:8S 3:discard:KS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:AS 3:pair:4H 3:discard:2H 2:pair:JH 2:discard:6H 3:flip 3:pass 2:flip 2:pair:9S 2:discard:10H 3:flip 3:pass 2:flip 2:pass 3:pair:AC 3:discard:KS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:QH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:4H 2:discard:8C 3:flip 3:pair:9C 3:discard:QH 2:pair:QS 2:discard:3D 3:flip 3:pair:AH 3:discard:KD 2:pair:KH 2:flip 2:pass 3:pair:3C 3:discard:3S 2:flip 2:pass 3:pair:2C 3:discard:4C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QC 2:discard:QS 3:pair:QD 3:flip 3:pair:4C 3:discard:8H 2:pair:2D 2:discard:2C 3:pair:9H 3:discard:5C 2:flip 2:pass 3:flip 3:pair:QH 2:pair:KH 2:discard:4C 3:pair:2C 3:discard:9D 2:pair:9S 2:discard:JD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:7C 2:flip 2:pass 3:pair:4S 3:discard:4D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:AC 2:discard:10D 3:pair:10H 3:discard:JH 2:flip 2:pair:3H 2:discard:6S 3:flip 3:pass 2:flip 2:pair:8H 3:pair:8S 3:discard:3C 2:pair:3D 2:discard:AD 3:pair:2D 3:discard:KC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:AC 2:discard:QD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:10C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5C 2:discard:3S 3:pair:3D 3:discard:QH 2:flip 2:pass 3:flip 3:pass 2:pair:6C 2:discard:8D 3:pair:8C 3:discard:5H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JD 3:pair:3D 3:discard:5H 2:pair:2S 2:discard:QD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:JD 3:discard:9C 2:pair:9S 2:discard:KC 3:pair:KS 2:pair:2D 2:discard:AD 3:flip 3:pair:6C 3:discard:8H 2:pair:8D 2:discard:9S 3:flip 3:pass 2:flip 2:pair:5D 3:flip 3:pair:3D 3:discard:JD 2:pair:2S 2:discard:2H 3:pair:7S 3:discard:KS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5H 2:discard:AS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7H 2:discard:6H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9D 2:discard:3S 3:pair:3H 3:discard:4C 2:flip 2:pass 3:flip 3:pair:QS 3:discard:8D 2:pair:8H 3:pair:AS 3:discard:JD 2:pair:JH 2:flip 2:pass 3:flip 3:pass 2:pair:4C 2:discard:5C 3:pair:5H 3:discard:9D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:8D 3:discard:9H 2:flip 2:pair:JH 2:discard:10H 3:flip 3:pair:QD 3:pair:2D 3:discard:6D 2:pair:2C 2:discard:10C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:AD 2:discard:QS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4S 3:discard:7S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:5H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4H 3:discard:5S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JS 2:discard:JH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:8C 3:discard:QD 2:flip 2:pass 3:flip 3:pass 2:pair:7S 2:discard:7D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:5D 3:pair:3H 3:discard:10S 2:flip 2:pair:AS 2:discard:8C 3:pair:2S 3:discard:QH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JD 2:discard:KD 3:flip 3:pair:9D 2:flip 2:pass 3:pair:8S 3:discard:5S 2:flip 2:pass 3:pair:2S 3:discard:JD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7C 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:KD 3:pair:5D 3:discard:10C 2:pair:2S 2:discard:KS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6S 3:discard:9S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7S 2:discard:3D 3:flip 3:pair:QH 2:pair:2D 2:discard:10S 3:flip 3:pass 2:pair:3S 2:discard:9H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8S 3:discard:AS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:7D 3:pair:9C 3:discard:9S 2:flip 2:pass 3:flip 3:pass 2:pair:QS 2:discard:KS 3:flip 3:pass 2:pair:KH 2:discard:6C 3:pair:6H 2:flip 2:pair:KD 2:discard:10D 3:flip 3:pair:4D 3:discard:6D 2:flip 2:pass 3:flip 3:pair:8C 3:discard:QD 2:pair:QH 2:discard:10H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7C 3:flip 3:pass 2:pair:4H 2:discard:3C 3:pair:3H 3:discard:QH 2:pair:2S 2:discard:7S 3:flip 3:pair:JD 3:discard:9C 2:flip 2:pair:6S 2:pair:2S 2:discard:10D 3:pair:2D 3:discard:5D 2:flip 2:pass 3:pair:8C 3:discard:7C 2:flip 2:pass 3:pair:KD 3:pair:3D 3:discard:2H 2:pair:10H 2:discard:2D 3:pair:AS 3:discard:3C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:JS 2:discard:6S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4S 3:flip 3:pass 2:flip 2:pass 3:pair:JS 3:discard:6S 2:flip 2:pass 3:flip 3:pair:8D 3:discard:4C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:7H 2:discard:5C 3:flip 3:pass 2:flip 2:pair:KS 2:discard:8S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5H 2:pair:JS 2:discard:10S 3:flip 3:pass 2:flip 2:pair:5D 3:pair:AC 3:discard:JS 2:pair:2C 2:discard:9C 3:flip 3:pass 2:flip 2:pair:7S 2:discard:6H 3:flip 3:pass 2:flip 2:pair:4S 2:pair:2H 2:discard:7S 3:flip 3:pass 2:pair:8D 2:discard:6S 3:flip 3:pass 2:flip 2:pass 3:pair:3D 3:discard:5C 2:flip 2:pair:JD 3:pair:2C 3:discard:3D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KH 2:pair:KS 2:discard:10C 3:pair:10D 3:discard:3D 2:flip 2:pass 3:flip 3:pass 2:pair:8C 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:JC 2:flip 2:pass 3:flip 3:pair:6D 3:discard:6H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:10C 2:discard:3H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:3C 2:discard:10H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:5C 3:pair:JS 3:discard:KD 2:flip 2:pass 3:pair:QH 3:discard:8C 2:flip 2:pass 3:flip 3:pass 2:pair:3H 2:discard:5S 3:flip 3:pass 2:pair:AC 2:pair:7H 2:discard:JS 3:pair:JH 3:flip 3:pass 2:pair:2S 2:discard:3C 3:pair:3S 3:discard:KS 2:flip 2:pair:9C 2:discard:AH 3:flip 3:pair:9S 2:pair:2D 2:discard:10S 3:flip 3:pass 2:flip 2:pair:9C 2:discard:3H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5C 3:discard:QC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5H 3:pair:6C 3:discard:KC 2:pair:KH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6S 3:discard:7S 2:pair:7H 2:discard:JD 3:flip 3:pass 2:pair:KH 2:discard:7C 3:flip 3:pass 2:flip 2:pass 3:pair:AD 3:discard:QH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JC 3:flip 3:pair:KS 3:discard:AH 2:flip 2:pair:3C 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4S 3:discard:10D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:QS 2:pair:5S 2:discard:7H 3:flip 3:pass 2:pair:2H 2:discard:6D 3:pair:6H 3:discard:9H 2:flip 2:pass 3:flip 3:pair:3C 3:discard:8D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:10C 3:flip 3:pass 2:flip 2:pass 3:pair:JH 3:discard:4S 2:pair:4C 2:discard:10H 3:flip 3:pass 2:flip 2:pass 3:pair:8H 3:discard:3C 2:pair:3S 2:discard:7C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:QH 2:pair:2S 2:discard:AH 3:flip 3:pair:3D 3:discard:9D 2:flip 2:pair:7H 2:discard:4S 3:flip 3:pair:6H 3:discard:QC 2:flip 2:pass 3:flip 3:pair:9C 3:pair:KH 3:discard:QC 2:pair:QD 2:discard:9H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5D 3:discard:10S 2:flip 2:pair:JC 2:discard:6S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8H 2:discard:7C 3:flip 3:pair:3S 3:discard:8S 2:flip 2:pass 3:flip 3:pair:KD 3:discard:3C 2:flip 2:pass 3:flip 3:pair:10C 3:flip 3:pair:7S 3:discard:10S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9H 2:discard:QD 3:pair:QH 3:discard:5D 2:pair:5H 2:discard:3S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7C 2:pair:9D 2:discard:JH 3:flip 3:pass 2:pair:AH 3:pair:2C 3:discard:4C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:5C 3:discard:6D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:10S 2:discard:9S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JS 2:pair:2C 2:discard:KD 3:pair:KH 3:discard:AD 2:flip 2:pair:7S 2:discard:3D 3:pair:3H 3:discard:8H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6C 3:pair:10D 3:discard:KC 2:pair:KS 2:discard:7S 3:flip 3:pair:8H 3:discard:4C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:8C 2:discard:KH 3:flip 3:pass 2:flip 2:pair:6C 2:flip 2:pass 3:pair:2H 3:discard:8D 2:pair:8C 2:discard:7H 3:pair:7C 3:discard:JH 2:pair:JC 2:discard:5C 3:flip 3:pair:3S 3:pair:3S 3:discard:9H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6H 2:discard:10D 3:pair:10C 3:discard:QD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7S 2:discard:JC 3:pair:JH 2:pair:3D 2:discard:6S 3:flip 3:pass 2:pair:2C 2:discard:8S 3:flip 3:pass 2:flip 2:pair:9H 3:pair:6C 3:discard:10H 2:pair:2H 2:discard:KS 3:pair:KC 3:discard:AC 2:flip 2:pass 3:flip 3:pass 2:pair:KH 2:discard:9S 3:flip 3:pair:4S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8D 2:discard:QD 3:flip 3:pair:6H 3:discard:7S 2:flip 2:pair:10D 2:discard:4H 3:pair:4S 3:discard:5D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8C 3:flip 3:pass 2:pair:2D 2:discard:AS 3:pair:AC 3:discard:KS 2:pair:KC 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:9S 3:discard:4S 2:pair:4C 2:pair:2C 2:discard:4S 3:pair:4H 3:discard:3H 2:pair:2S 2:discard:7S 3:pair:7D 3:discard:8D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10H 3:flip 3:pass 2:flip 2:pair:4H 2:discard:10D 3:flip 3:pair:AH 3:discard:7D 2:flip 2:pair:3H 2:discard:JD 3:pair:JC 3:discard:QH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KD 2:pair:5C 2:discard:9S 3:pair:9C 3:pair:9H 3:discard:6C 2:pair:6H 2:discard:10C 3:flip 3:pass 2:pair:2S 2:discard:KD 3:flip 3:pair:AD 3:discard:5C 2:pair:5D 2:pair:2C 2:discard:AS 3:pair:2D 3:discard:QD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7S 3:discard:8C 2:pair:8H 2:discard:AH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:3D 3:pair:3C 3:discard:9S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:AH 2:discard:KH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:QS 3:discard:10H 2:flip 2:pass 3:flip 3:pass 2:pair:QC 2:discard:AS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5S 2:pair:QC 2:discard:10C 3:pair:10H 3:discard:JC 2:flip 2:pair:AS 2:discard:8D 3:pair:2C 3:discard:6H 2:flip 2:pass 3:pair:9D 3:pair:AC 3:discard:6H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:KS 3:discard:KD 2:flip 2:pair:4H 2:discard:AH 3:flip 3:pass 2:pair:10C 2:flip 2:pass 3:flip 3:pair:4H 3:discard:10S 2:flip 2:pair:5S 2:discard:AS 3:flip 3:pair:JS 3:discard:7C 2:flip 2:pair:KC 2:discard:JH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:QC 3:pair:2D 3:discard:10H 2:flip 2:pass 3:flip 3:pass 2:pair:KD 2:discard:QH 3:pair:QC 3:discard:9H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6D 2:discard:6S 3:flip 3:pass 2:flip 2:pass 3:pair:AD 2:pair:3H 2:discard:4C 3:flip 3:pair:7C 3:discard:3D 2:flip 2:pair:JS 3:pair:2C 3:discard:3S 2:pair:3H 2:discard:4D 3:pair:4H 3:discard:6S 2:pair:6D 2:discard:9S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10C 2:pair:2H 2:discard:QC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8S 3:discard:4C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9H 2:discard:QS 3:flip 3:pass 2:flip 2:pair:8C 3:flip 3:pair:JH 3:discard:KH 2:pair:2C 2:discard:2D 3:pair:AH 3:discard:8H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:10S 2:pair:4C 2:discard:2S 3:pair:KD 3:discard:9H 2:pair:9D 2:discard:3S 3:flip 3:pass 2:flip 2:pass 3:pair:8D 3:discard:10S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5H 3:pair:2S 3:discard:JC 2:pair:2H 2:discard:9C 3:flip 3:pass 2:flip 2:pass 3:pair:QS 3:discard:5H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4C 2:discard:10H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4H 2:pair:2S 2:discard:AC 3:pair:2D 3:discard:4S 2:flip 2:pass 3:flip 3:pair:5H 3:discard:7H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:8H 3:flip 3:pass 2:flip 2:pair:QH 2:discard:3C 3:flip 3:pass 2:flip 2:pass 3:pair:10C 3:discard:JC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:9H 3:discard:AD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:9C 2:pair:AD 2:discard:7D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:6H 2:discard:3C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8S 3:discard:KD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:9S 3:discard:4H 2:flip 2:pair:7S 3:flip 3:pair:JH 3:discard:KH 2:pair:2D 2:discard:JC 3:flip 3:pass 2:pair:4D 2:discard:QS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7S 3:discard:8S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5S 2:pair:2C 2:discard:3S 3:flip 3:pair:JC 3:discard:4S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7C 2:discard:AS 3:pair:AH 3:discard:QH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9D 3:pair:AC 3:discard:3D 2:flip 2:pair:8S 2:discard:6S 3:pair:6D 3:discard:7H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KH 2:discard:9S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:KD 2:flip 2:pass 3:flip 3:pair:3H 3:discard:4D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QC 2:discard:5H 3:pair:5S 3:discard:8S 2:pair:8D 2:discard:10D 3:pair:10S 2:flip 2:pair:3D 2:discard:KC 3:pair:KH 3:pair:2S 3:discard:9H 2:flip 2:pair:4D 2:discard:10H 3:pair:10C 3:discard:AC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JD 2:discard:JC 3:flip 3:pass 2:flip 2:pass 3:pair:7D 2:pair:2S 2:discard:8D 3:pair:8C 3:discard:7C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:3C 2:discard:3H 3:flip 3:pass 2:flip 2:pass 3:pair:9C 3:discard:10C 2:pair:10D 3:flip 3:pass 2:pair:2C 2:discard:2H 3:pair:8C 3:discard:AD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:KS 3:discard:4S 2:flip 2:pair:QD 2:discard:JD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:8H 2:flip 2:pair:KS 2:discard:QH 3:flip 3:pair:AS 3:discard:3S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:9S 3:discard:7S 2:flip 2:pass 3:flip 3:pair:8H 3:pair:10H 3:discard:6S 2:flip 2:pair:QD 2:discard:10C 3:flip 3:pass 2:flip 2:pair:5C 2:discard:AD 3:pair:AH 3:discard:6C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9C 2:discard:6H 3:flip 3:pair:3C 3:discard:4H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JS 2:discard:JH 3:pair:JD 3:discard:10D 2:flip 2:pass 3:flip 3:pair:KD 3:pair:2H 3:discard:10S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7S 3:discard:KD 2:pair:KC 2:discard:QC 3:pair:QH 2:pair:KC 2:discard:8C 3:pair:8H 3:discard:QD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5C 2:discard:AS 3:flip 3:pair:4H 3:discard:QS 2:flip 2:pass 3:flip 3:pair:KH 3:pair:KC 3:discard:5D 2:pair:5S 2:discard:QS 3:flip 3:pair:JD 3:discard:3C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6S 2:discard:9D 3:flip 3:pass 2:pair:AS 3:pair:2C 3:discard:QS 2:pair:QH 2:discard:AD 3:flip 3:pair:JC 3:discard:4C 2:flip 2:pass 3:pair:KS 2:pair:3C 2:discard:2H 3:pair:KD 3:pair:2C 3:discard:7C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6H 3:discard:7D 2:flip 2:pair:9S 2:discard:8H 3:pair:8S 3:flip 3:pass 2:pair:2C 2:discard:9H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:JH 3:discard:KH 2:flip 2:pass 3:flip 3:pair:4S 3:discard:5C 2:pair:5S 2:discard:6C 3:flip 3:pair:3C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7H 3:flip 3:pass 2:pair:3H 2:discard:8C 3:pair:8S 3:discard:10C 2:flip 2:pair:4H 2:discard:KS 3:pair:KH 2:pair:2D 2:discard:KH 3:flip 3:pass 2:pair:2S 2:discard:6D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:AH 3:discard:QC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8D 3:flip 3:pass 2:flip 2:pass 3:pair:QD 3:discard:8D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6D 2:discard:5S 3:flip 3:pass 2:pair:4C 2:discard:KH 3:flip 3:pass 2:flip 2:pass 3:pair:AS 3:discard:QC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5D 2:flip 2:pair:10H 2:discard:6S 3:flip 3:pair:9D 3:discard:3H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:QC 3:discard:3D 2:flip 2:pair:6C 2:discard:AC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8H 2:flip 2:pass 3:pair:5D 3:discard:KD 2:flip 2:pass 3:pair:2S 3:discard:3S 2:pair:3H 2:discard:6S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4H 3:pair:9S 3:discard:KS 2:flip 2:pass 3:flip 3:pass 2:pair:6S 2:discard:8C 3:flip 3:pair:AS 3:discard:AH 2:pair:AC 2:discard:6D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4H 2:pair:2D 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:7S 2:discard:5D 3:flip 3:pass 2:flip 2:pair:JC 3:flip 3:pass 2:pair:9S 2:discard:AH 3:flip 3:pass 2:flip 2:pair:QS 2:discard:7H 3:pair:7C 3:discard:10S 2:flip 2:pass 3:flip 3:pair:3S 3:discard:10H 2:flip 2:pass 3:flip 3:pass 2:pair:KH 2:pair:2C 2:discard:8C 3:pair:8S 3:discard:JD 2:pair:JS 2:discard:10H 3:flip 3:pair:JC 3:discard:QS 2:flip 2:pass 3:pair:KC 3:pair:2S 3:discard:JH 2:pair:JS 2:discard:7C 3:flip 3:pair:6D 3:discard:AD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KD 2:flip 2:pair:3S 2:discard:7S 3:pair:7H 3:discard:10D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7C 2:discard:QH 3:flip 3:pass 2:flip 2:pair:AD 3:flip 3:pair:7H 3:discard:3S 2:flip 2:pass 3:pair:KD 3:flip 3:pair:5C 3:discard:6D 2:flip 2:pair:7H 2:discard:KC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:JS 3:discard:8S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9H 2:discard:JD 3:flip 3:pair:AC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5S 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:AC 3:discard:QH 2:pair:QD 2:discard:3S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:9D 3:flip 3:pair:8H 3:discard:3S 2:flip 2:pair:9D 2:discard:7S 3:flip 3:pass 2:flip 2:pass 3:pair:6C 3:discard:KS 2:flip 2:pair:10H 2:discard:4D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5C 3:flip 3:pass 2:pair:2C 2:discard:10D 3:flip 3:pass 2:pair:2S 2:discard:4C 3:flip 3:pair:9D 3:discard:KH 2:flip 2:pass 3:flip 3:pass 2:pair:JS 3:flip 3:pass 2:pair:9S 2:discard:8C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:5D 3:discard:AD 2:pair:AH 2:discard:6S 3:pair:6D 3:discard:QS 2:pair:QH 2:pair:2H 2:discard:AC 3:pair:2D 3:discard:JC 2:flip 2:pass 3:pair:10H 3:pair:2D 3:discard:JD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:4D 3:discard:7H 2:flip 2:pass 3:flip 3:pass 2:pair:8H 2:discard:QD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:3S 2:discard:KS 3:pair:KH 2:flip 2:pass 3:pair:AS 3:discard:9C 2:pair:9H 2:discard:5D 3:flip 3:pass 2:pair:9D 3:pair:10S 3:discard:9H 2:pair:9D 2:pair:3C 2:discard:4H 3:pair:2D 3:discard:2C 2:pair:QS 2:discard:AH 3:flip 3:pair:KH 3:discard:10D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KS 3:pair:7D 3:discard:3C 2:flip 2:pair:9H 2:discard:6S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5C 2:flip 2:pass 3:pair:2D 3:discard:7S 2:pair:7D 2:discard:3D 3:flip 3:pair:KC 3:discard:10S 2:flip 2:pair:4C 2:discard:9D 3:flip 3:pass 2:flip 2:pair:KS 3:flip 3:pass 2:flip 2:pass 3:pair:9D 3:discard:7D 2:pair:7H 2:discard:3C 3:pair:3S 3:discard:10C 2:flip 2:pass 3:flip 3:pass 2:pair:JS 2:discard:4S 3:flip 3:pair:8S 3:pair:6H 3:discard:AH 2:flip 2:pass 3:flip 3:pair:QD 3:discard:AC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:JC 2:pair:2D 2:discard:JD 3:pair:2H 3:discard:AH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4H 2:discard:7C 3:flip 3:pass 2:flip 2:pass 3:pair:QH 3:discard:AC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:KC 3:flip 3:pair:5H 3:discard:10H 2:pair:10C 2:discard:4C 3:pair:4D 3:discard:3C 2:pair:2D 2:discard:8H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6S 2:pair:2C 2:discard:4H 3:pair:4C 3:discard:7S 2:flip 2:pair:5S 2:discard:QC 3:flip 3:pass 2:flip 2:pass 3:pair:JH 3:discard:9S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:KH 3:pair:3C 3:discard:QS 2:flip 2:pass 3:pair:7S 3:discard:9S 2:flip 2:pass 3:flip 3:pair:QC 2:pair:3H 2:discard:10S 3:flip 3:pass 2:flip 2:pair:KS 3:flip 3:pair:6H 3:discard:7C 2:pair:2D 2:discard:4S 3:flip 3:pair:7S 3:discard:7D 2:flip 2:pass 3:flip 3:pair:3C 2:flip 2:pass 3:pair:QH 3:pair:2C 3:discard:10C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:3H 3:discard:4C 2:pair:4S 2:discard:9D 3:flip 3:pass 2:flip 2:pair:5C 2:discard:9C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:JD 2:pair:JS 2:discard:KD 3:pair:2S 3:discard:6D 2:pair:6C 2:discard:4D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:3C 3:pair:QS 3:discard:6S 2:pair:2S 2:discard:9S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:3D 3:discard:8C 2:pair:8S 3:flip 3:pair:9S 3:discard:AS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7C 2:discard:10D 3:flip 3:pair:JS 3:discard:3H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5S 2:pair:2S 2:discard:9H 3:pair:2D 3:discard:7H 2:flip 2:pair:10D 2:discard:4S 3:pair:4H 3:discard:3S 2:flip 2:pair:9D 3:flip 3:pair:10S 3:discard:3C 2:flip 2:pair:JH 2:flip 2:pair:8C 2:discard:7S 3:pair:7D 3:discard:10D 2:flip 2:pair:KD 2:discard:QD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:6D 3:discard:8S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:JH 3:flip 3:pass 2:pair:AH 2:discard:8C 3:pair:8D 3:discard:5C 2:pair:5D 2:discard:10H 3:flip 3:pair:KC 3:discard:6C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JD 2:pair:2S 2:discard:KC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7C 3:discard:5S 2:flip 2:pair:KD 2:discard:10S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6C 3:pair:AD 3:discard:KH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6C 2:discard:AS 3:flip 3:pass 2:flip 2:pair:7S 2:pair:10H 2:discard:5S 3:flip 3:pass 2:pair:5H 2:discard:9H 3:pair:9S 3:discard:QD 2:pair:QC 2:pair:2C 2:discard:AD 3:pair:2H 3:discard:KS 2:flip 2:pair:QC 2:discard:3H 3:pair:3D 3:discard:10C 2:flip 2:pass 3:pair:4C 3:pair:KC 3:discard:6H 2:pair:2C 2:discard:5D 3:flip 3:pass 2:pair:3C 2:discard:10C 3:flip 3:pass 2:flip 2:pass 3:pair:4H 3:discard:JD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9C 2:pair:2D 2:discard:3C 3:flip 3:pair:JD 3:discard:10S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9C 3:pair:2S 3:discard:8C 2:pair:2D 2:discard:3D 3:flip 3:pair:4S 3:discard:6C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:AC 3:flip 3:pair:5C 3:discard:10H 2:flip 2:pass 3:flip 3:pass 2:pair:8D 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7H 2:discard:7D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8S 2:flip 2:pass 3:pair:2S 3:discard:9D 2:flip 2:pair:KC 2:discard:KH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:AD 3:discard:QD 2:flip 2:pair:4H 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:4C 3:pair:4H 3:discard:2D 2:pair:7C 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:3D 3:discard:KS 2:flip 2:pass 3:flip 3:pair:AD 2:pair:2D 2:discard:10D 3:flip 3:pass 2:pair:2H 2:discard:9D 3:flip 3:pair:6H 3:discard:5S 2:flip 2:pair:KS",
+ "moves": 3576,
+ "moveLog": "0:pair:2S 0:discard:AC 1:flip 1:pass 2:pair:2H 2:discard:4S 3:pair:4H 3:discard:QC 0:pair:QH 1:flip 1:pass 2:pair:QC 2:discard:AS 3:pair:AH 3:discard:5H 0:pair:2C 0:discard:4H 1:flip 1:pass 2:flip 2:pair:3C 2:discard:JH 3:flip 3:pair:5D 3:discard:3D 0:flip 0:pass 1:pair:7C 1:discard:KH 2:flip 2:pair:AD 3:pair:2S 3:discard:9S 0:pair:2C 0:discard:3D 1:pair:3H 1:discard:7D 2:pair:7S 2:discard:QH 3:flip 3:pair:JD 3:discard:AD 0:flip 0:pair:8S 0:discard:3C 1:flip 1:pass 2:flip 2:pass 3:pair:4S 0:flip 0:pass 1:pair:2H 1:discard:9C 2:flip 2:pair:6C 2:discard:KD 3:pair:2C 3:discard:7S 0:flip 0:pair:JC 0:discard:10H 1:flip 1:pair:KS 1:discard:4S 2:pair:4C 2:discard:5S 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:AC 1:pair:2S 1:discard:4C 2:flip 2:pass 3:flip 3:pass 0:pair:2H 0:discard:8H 1:flip 1:pass 2:flip 2:pair:6S 2:discard:7D 3:pair:7C 3:discard:4D 0:flip 0:pass 1:flip 1:pass 2:flip 2:pair:7S 2:discard:AD 3:flip 3:pair:10C 3:discard:4H 0:flip 0:pass 1:flip 1:pair:3C 1:discard:KS 2:flip 2:pass 3:pair:QH 2:pair:9C 2:discard:JC 3:pair:JH 3:discard:8S 0:flip 0:pass 1:pair:QC 1:discard:AH 2:pair:2S 2:discard:KH 3:flip 3:pass 0:flip 0:pair:6D 0:discard:5H 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 1:flip 1:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pair:10C 0:discard:AC 1:pair:AD 1:discard:QD 2:flip 2:pass 3:flip 3:pair:4H 3:discard:9D 0:pair:9S 3:pair:9C 3:discard:3C 0:pair:2H 0:discard:JS 1:pair:JD 1:discard:8D 2:pair:2S 2:discard:4H 3:pair:4S 1:pair:8C 1:discard:9S 2:pair:9H 2:discard:QS 3:pair:QD 0:flip 0:pair:QD 0:discard:4D 2:pair:4H 2:discard:KS 3:pair:KH 3:discard:9H 0:flip 0:pass 2:flip 2:pair:AS 2:discard:JH 3:pair:2C 3:discard:AD 0:flip 0:pair:6D 0:discard:3C 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:pair:4C 2:flip 2:pair:10S 2:discard:QS 3:flip 3:pass 0:flip 0:pair:3S 0:discard:JC 2:pair:JS 2:discard:8S 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:pair:AD 3:discard:9H 0:pair:9C 0:discard:5H 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:7C 3:discard:3D 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pair:QH 3:flip 3:pass 0:pair:6H 0:discard:JS 2:flip 2:pass 3:pair:4C 3:discard:8D 0:flip 0:pass 2:flip 2:pair:8H 2:discard:9H 3:flip 3:pass 0:flip 0:pair:5S 0:discard:10H 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:pair:9S 0:flip 0:pair:8C 0:discard:5C 2:pair:2H 2:discard:9H 3:flip 3:pair:JC 3:discard:6D 0:flip 0:pass 2:pair:AH 2:pair:5C 2:discard:8S 3:flip 3:pair:10S 3:discard:3D 0:pair:2H 0:discard:AS 2:pair:AH 3:flip 3:pass 0:flip 0:pair:KD 0:discard:5C 2:flip 2:pair:QS 2:discard:10S 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:KS 3:discard:7S 0:flip 0:pair:9D 0:discard:QC 2:flip 2:pair:3D 2:discard:8S 3:flip 3:pass 0:flip 0:pass 2:flip 2:pair:4H 0:flip 0:pass 2:flip 2:pair:JH 2:discard:QC 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:pair:KS 3:discard:5S 0:flip 0:pass 2:pair:9C 2:discard:10S 3:flip 3:pass 0:pair:4S 0:discard:10C 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:7S 3:discard:5D 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:pair:AC 0:discard:JD 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:pair:7H 2:pair:3D 2:discard:10H 3:pair:10D 3:discard:4H 0:pair:2S 0:discard:KC 2:flip 2:pair:JS 2:discard:9D 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:pair:AC 3:discard:KH 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:7C 3:flip 3:pair:KS 3:discard:JS 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:5D 2:flip 2:pass 3:flip 3:pair:4C 3:discard:7C 0:flip 0:pass 2:flip 2:pair:4H 2:discard:6C 3:pair:6D 3:discard:6H 0:flip 0:pair:AC 0:discard:10S 2:pair:10D 2:discard:8S 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:3H 0:pair:AC 0:discard:10D 2:pair:10C 2:discard:6S 3:flip 3:pass 0:pair:JC 0:discard:10S 2:pair:2D 2:discard:7D 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:QH 3:discard:3S 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:pair:4S 2:pair:3S 2:discard:6H 3:pair:2H 3:discard:AC 0:flip 0:pair:5D 0:discard:JC 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pair:5C 0:discard:KS 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pair:9H 2:discard:QC 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:pair:8S 3:flip 3:pass 0:pair:KS 0:discard:10D 2:pair:10H 2:discard:6S 3:flip 3:pass 0:flip 0:pass 2:pair:2C 2:discard:5H 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:9C 3:discard:AC 0:flip 0:pass 2:flip 2:pair:8S 0:pair:3C 0:discard:10D 2:flip 2:pass 3:pair:8C 3:discard:KC 0:pair:KD 2:pair:5D 2:discard:KS 3:pair:2H 3:discard:3S 0:flip 0:pair:4S 0:discard:KH 2:pair:KD 2:discard:3C 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:pair:8D 3:discard:8H 0:flip 0:pass 2:flip 2:pass 3:pair:10C 3:flip 3:pass 0:pair:JD 0:pair:JS 0:discard:8C 2:pair:2H 2:discard:KD 3:flip 3:pair:9C 3:discard:JH 0:flip 0:pass 2:flip 2:pass 3:pair:5D 3:discard:AD 0:pair:AS 0:discard:QD 2:pair:QC 2:flip 2:pair:AD 2:discard:3C 3:pair:3D 3:flip 3:pass 0:pair:2H 0:discard:3C 2:flip 2:pass 3:pair:7C 3:discard:4S 0:pair:4D 0:discard:8D 2:pair:8C 2:discard:JD 3:flip 3:pair:KH 3:discard:3H 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:pair:5S 0:pair:2H 0:discard:AD 2:flip 2:pair:5D 2:discard:JS 3:pair:JC 3:discard:10H 0:flip 0:pass 2:flip 2:pass 3:flip 3:pair:KH 3:discard:10C 0:flip 0:pass 2:pair:5S 2:discard:3S 3:flip 3:pass 0:flip 0:pass 2:flip 2:pair:8H 2:flip 2:pass 3:pair:2H 3:discard:QH 0:pair:QD 0:discard:JC 2:flip 2:pair:KS 2:discard:9H 3:pair:9S 3:discard:8D 0:pair:2D 0:discard:AS 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:pair:8S 2:discard:9C 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pair:10D 3:flip 3:pass 0:pair:10H 0:discard:JH 2:pair:JD 2:discard:AC 3:flip 3:pair:9C 3:discard:6H 0:pair:2H 0:discard:8H 2:flip 2:pass 3:pair:QH 3:discard:KS 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:flip 2:pass 3:flip 3:pass 0:flip 0:pass 2:pair:AS 2:discard:4H 3:flip 3:pair:7C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:4H 2:discard:KH 3:pair:KD 3:discard:9C 2:flip 2:pass 3:flip 3:pair:AH 3:discard:5S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:3D 2:discard:QS 3:pair:QH 2:flip 2:pass 3:pair:3C 3:discard:4C 2:flip 2:pass 3:pair:2C 3:discard:3S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QC 2:discard:AC 3:flip 3:pass 2:flip 2:pair:9H 2:discard:QS 3:pair:QD 3:flip 3:pair:4C 3:discard:QH 2:pair:QD 2:pair:KH 2:discard:AS 3:pair:2C 3:discard:8C 2:flip 2:pass 3:flip 3:pair:9D 3:discard:7C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4C 2:discard:9S 3:flip 3:pass 2:flip 2:pair:JD 2:flip 2:pass 3:pair:4S 3:discard:10H 2:pair:10D 2:discard:AC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:3H 2:discard:8H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:JH 3:discard:5S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4D 3:pair:8S 3:discard:3C 2:pair:3D 2:discard:AD 3:pair:2D 3:discard:KC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:AC 2:discard:10C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5C 2:discard:3S 3:pair:3D 3:discard:8C 2:pair:8D 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:5H 3:discard:7D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JD 3:pair:3D 3:discard:JD 2:pair:2S 2:discard:QD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5H 3:discard:KS 2:pair:KC 2:discard:7S 3:flip 3:pair:9C 2:pair:2D 2:discard:8D 3:pair:8H 3:discard:5S 2:pair:5D 2:discard:9S 3:flip 3:pair:6C 3:discard:5H 2:flip 2:pass 3:flip 3:pair:JD 3:flip 3:pair:3D 3:discard:10C 2:pair:2S 2:discard:5H 3:flip 3:pass 2:pair:2H 2:discard:AS 3:flip 3:pass 2:flip 2:pass 3:pair:7S 3:discard:JD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:9H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7H 2:discard:6H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9D 2:discard:8H 3:pair:8D 3:discard:4C 2:flip 2:pass 3:flip 3:pair:QS 3:discard:AS 2:flip 2:pass 3:flip 3:pair:3H 3:pair:AS 3:discard:5S 2:flip 2:pass 3:flip 3:pair:6D 3:discard:4H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:9S 2:discard:9D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JH 2:flip 2:pass 3:flip 3:pass 2:pair:4C 2:discard:KS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8D 3:discard:9D 2:flip 2:pair:JH 2:discard:5C 3:pair:5H 3:discard:QD 2:flip 2:pair:10H 3:pair:2D 3:discard:7S 2:pair:2C 2:discard:QS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:AD 2:discard:KH 3:flip 3:pass 2:pair:10C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4H 3:discard:5S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JS 2:discard:4S 3:flip 3:pass 2:pair:JH 3:pair:3H 3:discard:10S 2:flip 2:pair:AS 2:discard:8C 3:pair:2S 3:discard:QH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JD 2:discard:KD 3:flip 3:pair:9D 2:flip 2:pass 3:pair:8S 3:discard:5S 2:flip 2:pass 3:pair:2S 3:discard:JD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7C 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:KD 3:pair:5D 3:discard:6S 2:pair:2S 2:discard:8C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:10C 3:discard:9S 2:flip 2:pair:7S 2:discard:3D 3:flip 3:pair:QH 2:pair:2D 2:discard:10S 3:flip 3:pass 2:pair:3S 2:discard:9H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8S 3:discard:AS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:7D 3:pair:9C 3:discard:8S 2:flip 2:pass 3:flip 3:pass 2:pair:QS 2:discard:6C 3:pair:6H 3:discard:8D 2:flip 2:pair:KH 2:discard:AH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KS 2:flip 2:pair:KD 2:discard:QH 3:pair:QD 3:discard:6D 2:flip 2:pair:10H 2:discard:7C 3:flip 3:pair:4D 3:discard:8C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10D 3:flip 3:pass 2:pair:4H 2:discard:3C 3:pair:3H 3:discard:QH 2:pair:2S 2:discard:7S 3:flip 3:pair:JD 3:discard:9C 2:flip 2:pair:6S 2:pair:2S 2:discard:6S 3:pair:2D 3:discard:5D 2:flip 2:pass 3:pair:8C 3:discard:KD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7C 3:pair:3D 3:discard:AS 2:pair:2D 2:discard:JS 3:pair:2H 3:discard:3C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10H 2:discard:4H 3:pair:4S 3:flip 3:pass 2:flip 2:pass 3:pair:JS 3:discard:4C 2:flip 2:pass 3:flip 3:pair:8D 3:discard:6S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:7H 2:discard:5C 3:flip 3:pass 2:flip 2:pair:KS 2:discard:8S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5H 2:pair:JS 2:discard:4D 3:flip 3:pass 2:pair:10S 2:discard:5D 3:flip 3:pass 2:flip 2:pair:4H 3:pair:AC 3:discard:JC 2:pair:2C 2:discard:4S 3:pair:4D 3:discard:JS 2:flip 2:pass 3:flip 3:pass 2:pair:7S 2:discard:6H 3:flip 3:pass 2:flip 2:pair:9C 2:pair:2H 2:discard:7S 3:flip 3:pass 2:pair:8D 2:discard:JD 3:flip 3:pass 2:flip 2:pass 3:pair:3D 3:discard:5S 2:flip 2:pass 3:flip 3:pair:AH 3:discard:KD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6S 3:pair:2C 3:discard:6D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KH 2:pair:KS 2:discard:6C 3:flip 3:pass 2:flip 2:pair:8C 2:discard:JC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10C 2:flip 2:pass 3:flip 3:pair:6D 3:discard:6H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:10C 2:discard:10H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:3C 2:discard:5C 3:flip 3:pass 2:flip 2:pair:3H 3:pair:JS 3:discard:KD 2:flip 2:pass 3:pair:QH 3:discard:KC 2:flip 2:pass 3:flip 3:pass 2:pair:3H 2:discard:7H 3:flip 3:pass 2:pair:AC 2:discard:5S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8C 2:pair:7H 2:discard:JS 3:pair:JH 3:flip 3:pass 2:pair:2S 2:discard:AH 3:flip 3:pair:9S 3:discard:4D 2:flip 2:pair:9C 2:discard:3C 3:pair:3S 3:discard:4H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:8C 2:pair:2D 2:discard:9C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5C 3:discard:KD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10S 2:discard:3H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5H 3:pair:6C 3:discard:QD 2:pair:2C 2:discard:JC 3:flip 3:pass 2:flip 2:pair:4H 2:discard:KH 3:pair:KC 3:discard:KS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6S 3:discard:AD 2:flip 2:pair:KH 3:flip 3:pair:KS 3:discard:10D 2:flip 2:pair:3C 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4S 3:discard:QS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JH 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:5C 2:pair:5S 2:discard:6D 3:pair:6H 3:discard:AS 2:pair:2H 2:discard:10C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:3C 3:discard:9H 2:flip 2:pair:7H 3:flip 3:pass 2:flip 2:pass 3:pair:JH 3:discard:4S 2:pair:4C 2:discard:7C 3:flip 3:pass 2:flip 2:pass 3:pair:8H 3:discard:4H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:3S 2:discard:10H 3:flip 3:pass 2:flip 2:pair:QH 2:pair:2S 2:discard:7H 3:flip 3:pair:3D 3:discard:6H 2:flip 2:pass 3:flip 3:pair:9C 3:discard:QC 2:flip 2:pass 3:flip 3:pair:9D 3:pair:KH 3:discard:QC 2:pair:QD 2:discard:4H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5D 3:discard:10S 2:flip 2:pair:JC 2:discard:9H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8H 2:discard:10D 3:pair:10C 3:discard:8S 2:flip 2:pair:QS 2:discard:4D 3:flip 3:pass 2:flip 2:pass 3:pair:KD 3:flip 3:pair:7S 3:discard:QH 2:pair:QD 2:discard:3S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5D 3:discard:10S 2:flip 2:pass 3:flip 3:pass 2:pair:5H 2:discard:7C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9H 2:pair:9D 2:discard:AH 3:flip 3:pass 2:pair:2D 2:discard:5D 3:pair:5S 3:discard:8S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:10C 3:discard:9C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:JH 3:pair:2C 3:discard:4C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:5C 3:discard:JC 2:pair:JS 2:discard:9H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10S 2:pair:2C 2:discard:KD 3:pair:KH 3:discard:5C 2:flip 2:pair:7S 2:discard:3D 3:pair:3H 3:discard:AD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6C 3:pair:10D 3:discard:6D 2:pair:6C 2:discard:7S 3:flip 3:pair:8H 3:discard:KC 2:pair:KS 2:discard:8C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:4C 2:flip 2:pass 3:pair:2H 3:discard:JH 2:pair:JC 2:discard:8C 3:pair:8D 3:discard:7C 2:pair:7H 2:discard:5C 3:flip 3:pair:3S 3:pair:3S 3:discard:9H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:6H 2:discard:JC 3:pair:JH 3:discard:QD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7S 2:discard:10D 3:pair:10C 2:pair:3D 2:discard:9H 3:flip 3:pass 2:pair:2C 2:discard:8S 3:flip 3:pass 2:flip 2:pair:6S 3:pair:6C 3:discard:4S 2:pair:2H 2:discard:KS 3:pair:KC 3:discard:AC 2:flip 2:pass 3:pair:10H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8D 2:discard:10D 3:flip 3:pair:6H 3:discard:4S 2:pair:4H 2:discard:QD 3:flip 3:pair:5D 3:discard:7S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8C 3:flip 3:pass 2:pair:2D 2:discard:4C 3:pair:4S 3:discard:KS 2:pair:KC 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:9S 3:discard:AC 2:pair:AS 2:pair:2C 2:discard:10H 3:pair:10S 3:discard:7D 2:pair:7S 3:flip 3:pass 2:flip 2:pair:4H 2:discard:JD 3:pair:JC 3:discard:AH 2:flip 2:pass 3:flip 3:pair:4D 3:discard:QH 2:flip 2:pair:10D 2:discard:KD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:7D 2:pair:5C 2:discard:4D 3:pair:2D 3:discard:7C 2:flip 2:pass 3:flip 3:pair:9C 3:discard:7D 2:flip 2:pair:6C 2:discard:9S 3:flip 3:pair:3C 3:pair:9H 3:discard:6C 2:pair:6H 2:discard:5D 3:pair:5C 3:discard:AD 2:pair:2S 2:discard:10C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KD 2:pair:2C 2:discard:7C 3:pair:7S 3:discard:3D 2:flip 2:pass 3:pair:2D 3:discard:QD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:AH 2:discard:8H 3:pair:8C 3:pair:3C 3:discard:10H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:AH 2:discard:AS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:QS 3:discard:9S 2:flip 2:pass 3:flip 3:pass 2:pair:QC 2:discard:KH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5S 2:pair:QC 2:discard:8D 3:pair:2C 3:discard:9D 2:flip 2:pair:AS 2:discard:7S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:10C 3:pair:AC 3:discard:KS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:KD 3:discard:6H 2:flip 2:pair:4H 2:discard:3H 3:flip 3:pass 2:pair:10C 2:discard:3S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:AH 2:flip 2:pass 3:flip 3:pair:4H 3:discard:7C 2:flip 2:pair:5S 2:discard:QC 3:flip 3:pair:10S 3:discard:JS 2:pair:JH 2:discard:AS 3:flip 3:pair:6H 3:pair:2D 3:discard:QC 2:pair:QH 2:discard:6S 3:flip 3:pass 2:flip 2:pair:KD 2:discard:6D 3:flip 3:pass 2:flip 2:pass 3:pair:9H 3:discard:10H 2:flip 2:pair:JH 2:pair:3H 2:discard:AH 3:flip 3:pair:7C 3:discard:QS 2:flip 2:pair:JS 2:discard:4C 3:flip 3:pair:10H 3:discard:9D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:AC 3:pair:2C 3:discard:4H 2:pair:4D 2:discard:9S 3:flip 3:pass 2:flip 2:pair:3H 2:discard:6D 3:pair:6S 3:discard:AH 2:flip 2:pass 3:flip 3:pass 2:pair:10C 2:pair:2H 2:discard:QS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8S 3:discard:5C 2:flip 2:pass 3:flip 3:pair:4C 3:discard:7H 2:flip 2:pair:9H 2:discard:8C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QC 3:flip 3:pair:JH 3:discard:AH 2:pair:AD 2:pair:4C 2:discard:5H 3:flip 3:pass 2:pair:2S 2:discard:3S 3:flip 3:pair:8D 3:discard:KD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9D 3:pair:2S 3:discard:QS 2:pair:2H 2:discard:4H 3:pair:4D 3:discard:JC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:9C 2:discard:4C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:5H 2:pair:2S 2:discard:AC 3:pair:2D 3:discard:5H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:7H 3:discard:4S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8H 3:flip 3:pass 2:flip 2:pair:QH 2:discard:6S 3:flip 3:pass 2:flip 2:pass 3:pair:10C 3:discard:9C 2:flip 2:pair:3C 2:discard:KH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:9H 3:discard:JC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:AD 2:pair:AD 2:discard:7D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:6H 2:discard:3C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8S 3:discard:4H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:KD 3:discard:QS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7S 3:flip 3:pair:JH 3:discard:8S 2:pair:2D 2:discard:4D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:QS 2:discard:5S 3:pair:5C 3:discard:7S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JC 2:pair:2C 2:discard:AS 3:pair:AH 3:discard:7S 2:pair:7C 2:discard:3S 3:flip 3:pair:JC 3:discard:4S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:QH 3:pair:AC 3:discard:3D 2:flip 2:pair:8S 2:discard:KH 3:pair:KD 3:discard:6D 2:pair:6S 2:discard:9S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JC 2:flip 2:pass 3:flip 3:pair:3H 3:discard:8S 2:pair:8D 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:QC 2:discard:5H 3:pair:5S 3:discard:10S 2:pair:10D 2:flip 2:pair:3D 2:discard:KC 3:pair:KH 3:pair:2S 3:discard:7D 2:flip 2:pair:4D 2:discard:JD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:9H 3:discard:AC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4H 2:discard:10H 3:pair:10C 2:pair:2S 2:discard:3H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:3C 2:discard:8D 3:pair:8C 3:discard:6H 2:flip 2:pass 3:flip 3:pair:9C 3:discard:10C 2:pair:10D 3:flip 3:pass 2:pair:2C 2:discard:QD 3:flip 3:pass 2:pair:2H 2:discard:JD 3:flip 3:pair:AD 3:discard:KS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:4S 3:discard:6C 2:flip 2:pass 3:flip 3:pair:8C 2:flip 2:pair:KS 2:discard:5D 3:flip 3:pair:AS 3:discard:3S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:QH 2:discard:5S 3:flip 3:pass 2:flip 2:pair:10S 3:pair:10H 3:discard:AH 2:pair:AD 2:discard:10C 3:flip 3:pass 2:pair:QD 2:discard:QC 3:flip 3:pass 2:flip 2:pair:5C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9C 2:discard:JS 3:pair:JD 3:discard:4H 2:flip 2:pass 3:pair:3C 3:discard:10D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JH 2:discard:QD 3:flip 3:pass 2:flip 2:pass 3:pair:KD 3:pair:2H 3:discard:10S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7S 3:discard:QH 2:pair:QC 2:discard:8D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:8C 2:discard:AS 3:flip 3:pair:KD 2:pair:KC 2:discard:5C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:4H 3:discard:8H 2:pair:8C 2:discard:AS 3:flip 3:pass 2:flip 2:pass 3:pair:KH 3:pair:KC 3:discard:3C 2:flip 2:pass 3:pair:JD 3:pair:2C 3:discard:QS 2:pair:QH 2:discard:3H 3:flip 3:pair:JC 3:discard:4C 2:flip 2:pass 3:pair:KS 2:pair:3C 2:discard:JD 3:pair:2S 3:discard:10D 2:pair:2H 2:discard:AH 3:flip 3:pass 2:flip 2:pass 3:pair:KD 3:discard:10S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:7S 3:pair:2C 3:discard:7D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6H 3:discard:8S 2:pair:8H 2:discard:9D 3:flip 3:pair:7C 3:flip 3:pass 2:pair:2C 2:discard:6C 3:flip 3:pass 2:flip 2:pair:9H 2:discard:5S 3:pair:5C 3:discard:4S 2:flip 2:pass 3:pair:JH 3:discard:3C 2:flip 2:pass 3:pair:KH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7H 3:flip 3:pass 2:pair:3H 2:discard:JD 3:flip 3:pair:7C 3:discard:7H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KS 2:discard:8C 3:pair:8S 3:discard:10C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:4H 2:pair:2D 2:discard:KH 3:flip 3:pass 2:pair:2S 2:discard:8D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:AH 3:discard:JD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:QC 3:discard:10C 2:flip 2:pass 3:flip 3:pair:4S 3:flip 3:pass 2:flip 2:pass 3:pair:QD 3:discard:AS 2:flip 2:pass 3:pair:8D 3:discard:QC 2:flip 2:pass 3:flip 3:pair:6H 2:flip 2:pair:10H 2:discard:8H 3:pair:8S 3:discard:QC 2:flip 2:pass 3:pair:9D 2:flip 2:pass 3:pair:5D 3:discard:KD 2:flip 2:pass 3:pair:2S 3:discard:3S 2:pair:3H 2:discard:9D 3:flip 3:pass 2:pair:6S 2:discard:QC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4S 3:pair:9S 3:discard:4H 2:pair:4S 2:discard:6D 3:flip 3:pass 2:flip 2:pair:6S 2:discard:AC 3:pair:AS 3:discard:KS 2:flip 2:pair:8C 2:pair:2D 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:7S 2:discard:5D 3:flip 3:pass 2:flip 2:pair:JC 3:flip 3:pass 2:pair:9S 2:discard:AH 3:flip 3:pass 2:flip 2:pair:QS 2:discard:KH 3:flip 3:pass 2:flip 2:pass 3:pair:3S 3:discard:7C 2:pair:7H 2:pair:2C 2:discard:JS 3:pair:JC 3:discard:JD 2:flip 2:pair:8C 2:discard:10H 3:flip 3:pair:KC 3:discard:8S 2:flip 2:pass 3:pair:QS 3:pair:2S 3:discard:6D 2:flip 2:pass 3:flip 3:pass 2:pair:7C 2:discard:JS 3:pair:JH 3:discard:AD 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:KD 2:flip 2:pair:3S 2:discard:QH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7H 3:discard:8C 2:flip 2:pass 3:flip 3:pass 2:pair:AD 3:flip 3:pair:7H 3:discard:9D 2:flip 2:pass 3:pair:KD 3:discard:9H 2:flip 2:pass 3:flip 3:pass 2:pair:6S 2:discard:QD 3:flip 3:pair:3S 3:flip 3:pair:5C 3:discard:AC 2:flip 2:pair:7H 2:discard:KC 3:flip 3:pair:6D 3:discard:8S 2:flip 2:pass 3:flip 3:pair:JS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:5S 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:AC 3:discard:AH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9D 2:discard:3S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:AD 3:discard:QH 2:pair:QD 3:flip 3:pair:8H 3:discard:KS 2:flip 2:pair:9D 2:discard:7S 3:flip 3:pass 2:flip 2:pass 3:pair:6C 3:discard:3S 2:flip 2:pair:10H 2:discard:AC 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:5C 3:flip 3:pass 2:pair:2C 2:discard:4C 3:flip 3:pass 2:pair:10D 3:flip 3:pass 2:pair:9S 2:discard:8C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:5D 3:discard:AD 2:pair:AH 2:discard:6S 3:pair:6D 3:discard:QS 2:pair:QH 2:pair:2H 2:discard:7H 3:pair:2D 3:discard:10H 2:flip 2:pass 3:pair:2C 3:discard:JC 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8S 3:pair:2D 3:discard:4D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:JD 3:discard:KH 2:pair:KS 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:8H 2:discard:3S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:QD 2:flip 2:pass 3:pair:AS 3:discard:3D 2:flip 2:pair:9H 2:discard:KC 3:flip 3:pass 2:pair:5D 2:discard:KH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:pair:QH 3:discard:7C 2:flip 2:pass 3:flip 3:pair:9C 3:pair:10S 3:discard:9H 2:pair:9D 2:pair:3C 2:discard:QS 3:pair:2D 3:discard:KH 2:pair:KS 2:discard:AH 3:pair:2C 3:discard:10D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:4H 3:pair:7D 3:discard:3C 2:flip 2:pair:9H 2:discard:5C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:6S 2:flip 2:pass 3:pair:2D 3:discard:KC 2:pair:KS 2:discard:9D 3:flip 3:pass 2:flip 2:pair:4C 2:discard:3D 3:flip 3:pass 2:flip 2:pair:7D 3:flip 3:pass 2:flip 2:pass 3:pair:9D 3:discard:3S 2:pair:3C 2:discard:JS 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8S 3:discard:7D 2:pair:7H 2:discard:8H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4S 3:pair:6H 3:discard:AH 2:flip 2:pass 3:flip 3:pair:QD 3:discard:JC 2:flip 2:pass 3:flip 3:pair:AC 2:pair:2D 2:discard:KC 3:pair:2H 3:discard:AH 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4H 2:discard:JD 3:flip 3:pass 2:flip 2:pass 3:pair:QH 3:discard:3S 2:flip 2:pass 3:flip 3:pair:AC 3:flip 3:pair:5H 3:discard:6S 2:pair:2D 2:discard:10D 3:pair:10H 3:discard:3C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4C 2:discard:10C 3:flip 3:pair:4D 2:pair:2C 2:discard:4H 3:pair:4C 3:discard:9S 2:flip 2:pair:5S 2:discard:QC 3:flip 3:pass 2:flip 2:pass 3:pair:JH 3:discard:7S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:KH 3:pair:3C 3:discard:9S 2:flip 2:pass 3:pair:7S 2:pair:3H 2:discard:10S 3:flip 3:pass 2:flip 2:pair:KS 3:flip 3:pair:6H 3:discard:7S 2:pair:2D 2:discard:10S 3:flip 3:pair:7C 3:discard:3C 2:pair:3H 2:discard:4S 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KC 2:flip 2:pass 3:pair:QH 3:pair:2C 3:discard:4C 2:pair:4S 2:discard:5C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9C 2:discard:9D 3:flip 3:pair:10C 3:discard:3H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:JD 2:pair:JS 2:discard:3C 3:pair:2S 3:discard:9D 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:4D 2:discard:KD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:8H 3:discard:6D 2:pair:6C 3:pair:QS 3:discard:3D 2:pair:2S 2:discard:4D 3:flip 3:pass 2:flip 2:pair:9S 2:discard:4C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6S 3:discard:JS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:8S 3:flip 3:pair:9S 3:discard:5S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7C 2:discard:QD 3:flip 3:pair:JS 3:discard:AS 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:10D 2:discard:QH 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:KD 2:pair:2S 2:discard:4S 3:pair:4H 3:discard:3S 2:flip 2:pair:10D 3:flip 3:pair:10S 3:discard:3C 2:flip 2:pair:JH 2:flip 2:pair:8C 2:discard:7S 3:pair:7D 3:discard:6D 2:flip 2:pair:KD 2:discard:7H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:QD 3:flip 3:pass 2:pair:AH 2:discard:10H 3:flip 3:pair:KC 3:discard:6C 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:JD 2:discard:5D 3:pair:5C 3:discard:8D 2:pair:8C 2:pair:2S 2:discard:KD 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:7C 3:discard:5S 2:flip 2:pair:10S 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:KC 3:pair:AD 3:discard:7C 2:pair:7S 2:discard:6C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:KC 3:discard:KH 2:flip 2:pass 3:flip 3:pair:8D 2:pair:10H 2:discard:9H 3:pair:9S 3:discard:QH 2:pair:QC 2:pair:2C 2:discard:QC 3:pair:2H 3:discard:3D 2:pair:3H 2:discard:7C 3:flip 3:pass 2:flip 2:pass 3:pair:4C 3:discard:10C 2:flip 2:pass 3:flip 3:pair:KS 3:pair:KC 3:discard:4H 2:pair:2C 2:discard:9C 3:flip 3:pass 2:pair:3C 2:discard:5D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:6H 3:discard:8C 2:flip 2:pass 3:flip 3:pair:JD 2:pair:2D 2:discard:3C 3:flip 3:pair:JD 3:discard:10S 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:9C 3:pair:2S 3:discard:4S 2:pair:4D 2:discard:3D 3:flip 3:pass 2:pair:4C 3:flip 3:pair:5C 3:discard:9S 2:flip 2:pass 3:flip 3:pass 2:pair:8D 2:discard:3D 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:flip 2:pair:7H 2:discard:8S 3:flip 3:pair:10H 3:discard:9H 2:flip 2:pass 3:flip 3:pass 2:flip 2:pass 3:flip 3:pass 2:pair:7D 2:flip 2:pass 3:pair:2S 3:discard:10D 2:flip 2:pair:KC 2:discard:4C 3:flip 3:pass 2:pair:KH 2:discard:4H 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:AD 3:discard:9D 2:flip 2:pair:6C 3:pair:4H 3:discard:AD 2:flip 2:pass 3:pair:2D 3:discard:3D 2:pair:3C 2:discard:7C 3:flip 3:pass 2:flip 2:pass 3:flip 3:pair:KS 2:pair:2D 2:discard:9D 3:flip 3:pass 2:pair:10D",
  "results": {
   "placements": [
    2,
@@ -19,16 +19,16 @@
   "deltas": [
    -10,
    -10,
-   27,
-   -7
+   29,
+   -9
   ],
   "recap": {
    "v": 2,
    "points": [
-    2,
+    8,
     0,
-    108,
-    90
+    107,
+    85
    ],
    "coinPot": true,
    "hands": [
@@ -106,6 +106,18 @@
     },
     {
      "n": 6,
+     "winner": 0,
+     "how": "out",
+     "pot": 4,
+     "deltas": [
+      3,
+      -1,
+      -1,
+      -1
+     ]
+    },
+    {
+     "n": 7,
      "winner": 3,
      "how": "out",
      "pot": 4,
@@ -114,18 +126,6 @@
       -1,
       -1,
       3
-     ]
-    },
-    {
-     "n": 7,
-     "winner": 2,
-     "how": "out",
-     "pot": 4,
-     "deltas": [
-      -1,
-      -1,
-      3,
-      -1
      ]
     },
     {
@@ -166,6 +166,18 @@
     },
     {
      "n": 11,
+     "winner": 2,
+     "how": "out",
+     "pot": 3,
+     "deltas": [
+      -1,
+      0,
+      2,
+      -1
+     ]
+    },
+    {
+     "n": 12,
      "winner": 0,
      "how": "out",
      "pot": 3,
@@ -177,26 +189,14 @@
      ]
     },
     {
-     "n": 12,
-     "winner": 3,
-     "how": "out",
-     "pot": 3,
-     "deltas": [
-      -1,
-      0,
-      -1,
-      2
-     ]
-    },
-    {
      "n": 13,
-     "winner": 2,
+     "winner": 0,
      "how": "out",
      "pot": 3,
      "deltas": [
-      -1,
-      0,
       2,
+      0,
+      -1,
       -1
      ]
     },
@@ -238,13 +238,13 @@
     },
     {
      "n": 17,
-     "winner": 2,
+     "winner": 0,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      2,
       0,
-      0,
-      1,
+      -1,
       -1
      ]
     },
@@ -252,228 +252,228 @@
      "n": 18,
      "winner": 3,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
-      0,
+      -1,
       0,
       -1,
-      1
+      2
      ]
     },
     {
      "n": 19,
      "winner": 3,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
-      0,
+      -1,
       0,
       -1,
-      1
+      2
      ]
     },
     {
      "n": 20,
-     "winner": 2,
+     "winner": 3,
      "how": "dealt",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      -1,
       0,
-      0,
-      1,
-      -1
+      -1,
+      2
      ]
     },
     {
      "n": 21,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      -1,
       0,
-      0,
-      1,
-      -1
+      -1,
+      2
      ]
     },
     {
      "n": 22,
      "winner": 3,
-     "how": "out",
-     "pot": 2,
+     "how": "dealt",
+     "pot": 3,
      "deltas": [
-      0,
+      -1,
       0,
       -1,
-      1
+      2
      ]
     },
     {
      "n": 23,
      "winner": 2,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      -1,
       0,
-      0,
-      1,
+      2,
       -1
      ]
     },
     {
      "n": 24,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      -1,
       0,
-      0,
-      1,
-      -1
+      -1,
+      2
      ]
     },
     {
      "n": 25,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
-      0,
-      0,
       -1,
-      1
+      0,
+      2,
+      -1
      ]
     },
     {
      "n": 26,
-     "winner": 2,
+     "winner": 0,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      2,
       0,
-      0,
-      1,
+      -1,
       -1
      ]
     },
     {
      "n": 27,
      "winner": 3,
-     "how": "dealt",
-     "pot": 2,
+     "how": "out",
+     "pot": 3,
      "deltas": [
-      0,
+      -1,
       0,
       -1,
-      1
+      2
      ]
     },
     {
      "n": 28,
-     "winner": 3,
+     "winner": 0,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
-      0,
+      2,
       0,
       -1,
-      1
+      -1
      ]
     },
     {
      "n": 29,
      "winner": 2,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      -1,
       0,
-      0,
-      1,
+      2,
       -1
      ]
     },
     {
      "n": 30,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      -1,
       0,
-      0,
-      1,
-      -1
+      -1,
+      2
      ]
     },
     {
      "n": 31,
-     "winner": 3,
+     "winner": 0,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
-      0,
+      2,
       0,
       -1,
-      1
+      -1
      ]
     },
     {
      "n": 32,
      "winner": 2,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      -1,
       0,
-      0,
-      1,
+      2,
       -1
      ]
     },
     {
      "n": 33,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
-      0,
-      0,
       -1,
-      1
+      0,
+      2,
+      -1
      ]
     },
     {
      "n": 34,
      "winner": 3,
      "how": "out",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
-      0,
+      -1,
       0,
       -1,
-      1
+      2
      ]
     },
     {
      "n": 35,
      "winner": 2,
      "how": "dealt",
-     "pot": 2,
+     "pot": 3,
      "deltas": [
+      -1,
       0,
-      0,
-      1,
+      2,
       -1
      ]
     },
     {
      "n": 36,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -490,26 +490,26 @@
     },
     {
      "n": 38,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
      "n": 39,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -526,14 +526,14 @@
     },
     {
      "n": 41,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -574,14 +574,14 @@
     },
     {
      "n": 45,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -598,14 +598,14 @@
     },
     {
      "n": 47,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -622,26 +622,26 @@
     },
     {
      "n": 49,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
      "n": 50,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -658,14 +658,14 @@
     },
     {
      "n": 52,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -730,14 +730,14 @@
     },
     {
      "n": 58,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -898,14 +898,14 @@
     },
     {
      "n": 72,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -922,14 +922,14 @@
     },
     {
      "n": 74,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -970,14 +970,14 @@
     },
     {
      "n": 78,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -1090,14 +1090,14 @@
     },
     {
      "n": 88,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -1186,14 +1186,14 @@
     },
     {
      "n": 96,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -1246,14 +1246,14 @@
     },
     {
      "n": 101,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -1270,18 +1270,6 @@
     },
     {
      "n": 103,
-     "winner": 2,
-     "how": "out",
-     "pot": 2,
-     "deltas": [
-      0,
-      0,
-      1,
-      -1
-     ]
-    },
-    {
-     "n": 104,
      "winner": 3,
      "how": "out",
      "pot": 2,
@@ -1290,6 +1278,18 @@
       0,
       -1,
       1
+     ]
+    },
+    {
+     "n": 104,
+     "winner": 2,
+     "how": "out",
+     "pot": 2,
+     "deltas": [
+      0,
+      0,
+      1,
+      -1
      ]
     },
     {
@@ -1330,14 +1330,14 @@
     },
     {
      "n": 108,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -1354,14 +1354,14 @@
     },
     {
      "n": 110,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -1438,6 +1438,18 @@
     },
     {
      "n": 117,
+     "winner": 3,
+     "how": "out",
+     "pot": 2,
+     "deltas": [
+      0,
+      0,
+      -1,
+      1
+     ]
+    },
+    {
+     "n": 118,
      "winner": 2,
      "how": "out",
      "pot": 2,
@@ -1449,27 +1461,15 @@
      ]
     },
     {
-     "n": 118,
-     "winner": 3,
-     "how": "out",
-     "pot": 2,
-     "deltas": [
-      0,
-      0,
-      -1,
-      1
-     ]
-    },
-    {
      "n": 119,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -1522,18 +1522,6 @@
     },
     {
      "n": 124,
-     "winner": 2,
-     "how": "out",
-     "pot": 2,
-     "deltas": [
-      0,
-      0,
-      1,
-      -1
-     ]
-    },
-    {
-     "n": 125,
      "winner": 3,
      "how": "out",
      "pot": 2,
@@ -1542,6 +1530,18 @@
       0,
       -1,
       1
+     ]
+    },
+    {
+     "n": 125,
+     "winner": 2,
+     "how": "out",
+     "pot": 2,
+     "deltas": [
+      0,
+      0,
+      1,
+      -1
      ]
     },
     {
@@ -1594,14 +1594,14 @@
     },
     {
      "n": 130,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -1690,6 +1690,18 @@
     },
     {
      "n": 138,
+     "winner": 2,
+     "how": "out",
+     "pot": 2,
+     "deltas": [
+      0,
+      0,
+      1,
+      -1
+     ]
+    },
+    {
+     "n": 139,
      "winner": 3,
      "how": "out",
      "pot": 2,
@@ -1701,39 +1713,27 @@
      ]
     },
     {
-     "n": 139,
-     "winner": 2,
-     "how": "out",
-     "pot": 2,
-     "deltas": [
-      0,
-      0,
-      1,
-      -1
-     ]
-    },
-    {
      "n": 140,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
      "n": 141,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -1750,26 +1750,26 @@
     },
     {
      "n": 143,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
      "n": 144,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -1978,18 +1978,6 @@
     },
     {
      "n": 162,
-     "winner": 3,
-     "how": "out",
-     "pot": 2,
-     "deltas": [
-      0,
-      0,
-      -1,
-      1
-     ]
-    },
-    {
-     "n": 163,
      "winner": 2,
      "how": "out",
      "pot": 2,
@@ -1998,6 +1986,18 @@
       0,
       1,
       -1
+     ]
+    },
+    {
+     "n": 163,
+     "winner": 3,
+     "how": "out",
+     "pot": 2,
+     "deltas": [
+      0,
+      0,
+      -1,
+      1
      ]
     },
     {
@@ -2050,14 +2050,14 @@
     },
     {
      "n": 168,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -2086,14 +2086,14 @@
     },
     {
      "n": 171,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -2146,14 +2146,14 @@
     },
     {
      "n": 176,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -2218,14 +2218,14 @@
     },
     {
      "n": 182,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -2254,14 +2254,14 @@
     },
     {
      "n": 185,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -2290,14 +2290,14 @@
     },
     {
      "n": 188,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -2338,14 +2338,14 @@
     },
     {
      "n": 192,
-     "winner": 2,
+     "winner": 3,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      1,
-      -1
+      -1,
+      1
      ]
     },
     {
@@ -2362,14 +2362,14 @@
     },
     {
      "n": 194,
-     "winner": 3,
+     "winner": 2,
      "how": "out",
      "pot": 2,
      "deltas": [
       0,
       0,
-      -1,
-      1
+      1,
+      -1
      ]
     },
     {
@@ -2434,22 +2434,22 @@
     }
    ],
    "pairs": [
-    26,
-    12,
-    449,
-    415
+    51,
+    10,
+    444,
+    407
    ],
    "wins": [
-    2,
+    8,
     0,
-    108,
-    90
+    107,
+    85
    ],
    "chips": [
     0,
     0,
-    37,
-    3
+    39,
+    1
    ],
    "dealtWins": 26
   }
