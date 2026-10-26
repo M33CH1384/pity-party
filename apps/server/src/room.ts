@@ -1701,7 +1701,78 @@ export class Room {
       d.seq = (d.seq ?? 0) + 1;
       changed = true;
     }
-    if (this.modeCheckOver()) changed = true;
+    if (this.modeCheckOver()) { this.clearTimers(); return true; }
+    if (this.modeHumanClock()) changed = true;
+    return changed;
+  }
+
+  /**
+   * Turn clock for a human in a registry mode. The table's play timer (learning mode ×1.5)
+   * runs from the turn start; a disconnected player gets the shorter of that and the same
+   * length from the drop. On expiry the mode's own bot interface makes one move for them
+   * (easy tier) and it counts as a timeout. After `afkLimit` timeouts in a row the seat
+   * goes to a bot for the rest of the game; the player stays as a spectator and may retake it.
+   * Nobody connected = the clock is frozen.
+   */
+  private modeHumanClock(): boolean {
+    const d = this.data;
+    const g = d.mg!;
+    let changed = false;
+    for (let guard = 0; guard < 50; guard++) {
+      if (d.phase !== 'playing' || modeResults(g).done) { this.clearTimers(); return true; }
+      const seat = modeToAct(g).find((x) => d.seats[x]?.kind === 'human');
+      if (seat === undefined) { d.deadline = null; d.turnKey = null; this.io.setAlarm(null); return changed; }
+      const slot = d.seats[seat] as Extract<SeatSlot, { kind: 'human' }>;
+      const member = d.members[slot.playerId];
+      const now = this.io.now();
+      if (!Object.keys(d.members).some((id) => this.isConnected(id))) {
+        if (d.deadline !== null) changed = true;
+        d.deadline = null; d.turnKey = null; this.io.setAlarm(null);
+        return changed;
+      }
+      const key = `m${d.seq ?? 0}:${seat}`;
+      if (d.turnKey !== key) { d.turnKey = key; d.turnStartedAt = now; d.deadline = null; changed = true; }
+      const timerMs = this.turnLimitMs('play', !!member?.learning);
+      const full = (d.turnStartedAt ?? now) + timerMs;
+      if (!this.isConnected(slot.playerId)) {
+        if (member && member.disconnectedAt == null) member.disconnectedAt = now;
+        const want = Math.min(full, (member?.disconnectedAt ?? now) + timerMs);
+        if (d.deadline === null || want < d.deadline) { d.deadline = want; changed = true; }
+      } else {
+        if (member) delete member.disconnectedAt;
+        if (d.deadline === null || d.deadline < full) { d.deadline = full; changed = true; }
+      }
+      if (now < d.deadline!) { this.io.setAlarm(d.deadline); return changed; }
+      // expired: one auto-move through the mode's bot, then count it
+      try { modeApply(g, seat, modeBotMove(g, seat, 'easy')); } catch (e) {
+        console.error('mode auto-move failed', e);
+        this.io.setAlarm(now + 1000);
+        return changed;
+      }
+      d.seq = (d.seq ?? 0) + 1;
+      d.deadline = null;
+      changed = true;
+      this.system(`${this.seatName(seat)} ran out of time`);
+      if (member) {
+        member.timeouts = (member.timeouts ?? 0) + 1;
+        if (member.timeouts >= (d.afkLimit ?? DEFAULT_AFK_LIMIT)) {
+          d.seats[seat] = this.handSeatToBot(seat, member.name, slot.playerId, 'leave');
+          member.seat = null;
+          member.timeouts = 0;
+          this.system(`${member.name} is away — a bot takes the seat`);
+        }
+      }
+      // bots after the auto-move, then loop for the next human
+      for (let b = 0; b < 500; b++) {
+        if (modeResults(g).done) break;
+        const bs = modeToAct(g).find((x) => d.seats[x]?.kind === 'bot');
+        if (bs === undefined) break;
+        const bslot = d.seats[bs] as Extract<SeatSlot, { kind: 'bot' }>;
+        modeApply(g, bs, modeBotMove(g, bs, tierForLevel(bslot.level === 'mixed' ? 'normal' : bslot.level)));
+        d.seq = (d.seq ?? 0) + 1;
+      }
+      this.modeCheckOver();
+    }
     return changed;
   }
 
