@@ -22,9 +22,6 @@ import { useAccount } from './account/api';
 import { SocialButton } from './social/Social';
 import { OpenTables } from './social/OpenTables';
 import { OFFLINE_PAIR_KEY, TeamNameField, pairTeamNames, useTeamNameFor } from './TeamName';
-import { STORY_OWNER_ONLY, fetchStoryAccess, storyLockedFor } from './story/storyApi';
-import { loadStoryGame, storySaveSummary, type StorySaveSummary } from './story/storySave';
-import { storyPairLabel } from './story/storySettings';
 
 /**
  * Start flow as a wizard: splash (logo + Play Online / Play vs Bots + Resume) → mode → essentials → go.
@@ -171,47 +168,6 @@ export function VenueSetupRow({ value, onChange }: { value: VenueChoice; onChang
 
 export default function Setup({ settings: s, onChange, tips, onTips, onStart, onResume, resumeLabel }: Props) {
   const [{ step, path, kind, view }, setWiz] = useState(readWiz);
-  // Story-mode owner lock: the home row is locked until the story-access
-  // flag says otherwise (admins + the server's named player allowlist —
-  // keyed off storyAccess, never dev, so an allowlisted player gets the
-  // player row with no dev surface anywhere).
-  const [storyAccess, setStoryAccess] = useState<boolean | null | undefined>(undefined);
-  // Re-read whenever the signed-in identity changes: the flag rides the
-  // profile fetch, which the account store invalidates at the same
-  // transition, so an in-page sign-in (passkey) converges to the server's
-  // truth without a restart. Until the fresh flag lands the state resets
-  // to undefined, which renders locked — fail closed, never a stale open.
-  const storyUserId = useAccount().user?.id ?? null;
-  useEffect(() => {
-    let live = true;
-    setStoryAccess(undefined);
-    void fetchStoryAccess().then((a) => { if (live) setStoryAccess(a); });
-    return () => { live = false; };
-  }, [storyUserId]);
-  // A story match in progress on this device (owner, 2026-10-21): the home
-  // story row becomes its resume signpost. The facts come from the SAME
-  // summary derivation the /story map card renders (storySaveSummary over
-  // the story save slot) so Home and the map can never disagree about the
-  // game that's waiting. Re-read on mount and whenever the app returns to
-  // the front — finishing, discarding, or resetting the match (the reset
-  // tool clears this same slot) must never leave a ghost resume behind.
-  // The signpost is a SHORTCUT, never the only door (owner, 2026-10-24):
-  // while a save stood here alone, the front door offered nothing but
-  // resuming the solo match — no way into the mode gate, no way to
-  // start a co-op run. So a plain Story Mode entry row stands beside
-  // the signpost whenever it shows: it opens /story itself, where the
-  // Solo/Co-op gate asks like it does for everyone else.
-  const [storySave, setStorySave] = useState<StorySaveSummary | null>(() => storySaveSummary(loadStoryGame()));
-  useEffect(() => {
-    const reread = () => setStorySave(storySaveSummary(loadStoryGame()));
-    const onVisibility = () => { if (document.visibilityState === 'visible') reread(); };
-    window.addEventListener('focus', reread);
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => {
-      window.removeEventListener('focus', reread);
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
-  }, []);
   const offlineTeamName = useTeamNameFor(OFFLINE_PAIR_KEY);
   const [dir, setDir] = useState<'fwd' | 'back'>('fwd');
   const [ask, setAsk] = useState(isFirstVisit);
@@ -316,16 +272,6 @@ export default function Setup({ settings: s, onChange, tips, onTips, onStart, on
           <button type="button" className="hero-btn gold" data-testid="play" {...choose(() => go('door'))}><b>PLAY</b><small>Team Game or Cutthroat</small></button>
         )}
         {onlineSeat && <button type="button" className="quiet-row" data-testid="resume-online" onClick={() => navigate(`/t/${onlineSeat}`)}><span>Rejoin your online table</span><span className="value-chip">{onlineSeat}</span></button>}
-        {STORY_OWNER_ONLY && storyLockedFor(storyAccess === undefined ? null : storyAccess) ? (
-          <button type="button" className="quiet-row" data-testid="story-mode-locked" disabled aria-disabled="true"><span>🔒 Story mode</span><span className="value-chip">Coming soon</span></button>
-        ) : storySave ? (
-          <>
-            <button type="button" className="quiet-row story-resume-row" data-testid="story-mode" data-resume-stop={storySave.stop.id} onClick={() => navigate(`/story?resume=${storySave.stop.id}`)}><span>Resume — {storySave.stop.name}</span><span className="value-chip">{storyPairLabel(storySave.stop)} · Hand {storySave.handNo}</span></button>
-            <button type="button" className="quiet-row" data-testid="story-mode-entry" onClick={() => navigate('/story')}><span>Story mode</span><span className="value-chip">Solo or co-op</span></button>
-          </>
-        ) : (
-          <button type="button" className="quiet-row" data-testid="story-mode" onClick={() => navigate('/story')}><span>Story mode</span><span className="value-chip">Run the block</span></button>
-        )}
       </div>
     );
     body = (

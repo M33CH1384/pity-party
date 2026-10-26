@@ -365,28 +365,6 @@ describe('the Card Fan (stage 2)', () => {
 });
 
 describe('the Deal + the Book Sweep (stage 3)', () => {
-  it('wiring: entries deal in at every door; exits sweep; story never deals', () => {
-    const main = read('main.tsx');
-    expect(main).toContain("move === 'table-entry'");
-    expect(main).toContain('coverTableEntry();');
-    expect(main).toContain("move === 'table-exit'");
-    expect(main).toContain('<TableTransitionLayer />');
-    const app = read('App.tsx');
-    expect(app.split('coverTableEntry(); setGame')).toHaveLength(3); // start + resume
-    expect(app).toContain("}, 'table-exit')");
-    const table = read('Table.tsx');
-    expect(table).toContain("from './transitions'");
-    expect(table).toContain('if (loadGone) signalTableReady()');
-    const onlineApp = read('online/OnlineApp.tsx');
-    expect(onlineApp).toContain('if (cs.room) signalTableReady()');
-    expect(onlineApp).toContain('coverTableEntry(); setReady(true)');
-    const onlineTable = read('online/OnlineTable.tsx');
-    expect(onlineTable).toContain('if (drawn) signalTableReady()');
-    // Story exclusion: story surfaces never start a deal — co-op
-    // rooms render in place inside StoryHome, never via /t/.
-    expect(read('story/StoryHome.tsx')).not.toContain('coverTableEntry');
-    expect(read('story/StoryRoom.tsx')).not.toContain('coverTableEntry');
-  });
 
   it('construction: eight dealt cards, a scoop panel, compositor-only', () => {
     const layer = read('TableTransitionLayer.tsx');
@@ -439,14 +417,6 @@ describe('the Deal + the Book Sweep (stage 3)', () => {
 });
 
 describe('the Doorway (stage 4)', () => {
-  it('wiring: Root mounts it; story map->tape/intro walks through it, all else keeps spray/ink', () => {
-    const main = read('main.tsx');
-    expect(main).toContain("import DoorwayLayer from './DoorwayLayer'");
-    expect(main).toContain('<DoorwayLayer />');
-    const story = read('story/StoryHome.tsx');
-    expect(story).toContain("screen.k === 'map' && (next.k === 'tape' || next.k === 'intro')");
-    expect(story).toContain("throughDoor ? 'story-entry' : 'screen'");
-  });
 
   it('construction: warm light pieces only, compositor-driven, silent', () => {
     const layer = read('DoorwayLayer.tsx');

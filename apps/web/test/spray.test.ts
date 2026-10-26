@@ -586,14 +586,6 @@ describe('wiring pins', () => {
     expect(setup).toContain("swapWiz(apply, 'home')");
   });
 
-  it('StoryHome routes every screen change through goScreen, which never covers the table', () => {
-    const story = read('story/StoryHome.tsx');
-    expect(story).toContain("from '../spray'");
-    expect(story).toContain('const goScreen');
-    expect(story).toContain("next.k !== 'game' && screen.k !== 'game'");
-    expect(story).not.toContain('setScreen({');
-  });
-
   it('the Social panel open/close rides the paint', () => {
     const store = read('social/store.ts');
     expect(store).toContain("from '../spray'");

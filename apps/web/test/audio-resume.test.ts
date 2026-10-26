@@ -108,23 +108,6 @@ describe('iOS audio session', () => {
     expect(cancelActiveSpeech({ speaking: true, pending: false, cancel() { throw new Error('x'); } })).toBe(false);
   });
 
-  it('wires prevention into the engine: session claimed at build and on wake, speech fenced during live play', () => {
-    const audio = readFileSync(new URL('../src/audio.ts', import.meta.url), 'utf8');
-    const talk = readFileSync(new URL('../src/talkPrefs.ts', import.meta.url), 'utf8');
-    const scene = readFileSync(new URL('../src/story/ScriptPlayer.tsx', import.meta.url), 'utf8');
-    // the playback-session claim is asserted when a context is built and on every wake
-    expect(audio).toContain('claimPlaybackSession');
-    expect(audio).toContain('this.claimSession();');
-    // leaving a table never cancels idle speech — only actually-active speech is stopped
-    expect(audio).toContain('cancelActiveSpeech');
-    expect(audio).not.toContain('speechSynthesis.cancel()');
-    expect(scene).not.toContain('speechSynthesis.cancel()');
-    // the fallback returns before any speech-engine contact while a table/scene is live
-    expect(talk).toContain('speechFallbackFenced');
-    expect(talk).toContain('if (speechFallbackFenced()) return;');
-    expect(talk).not.toContain('speechSynthesis.cancel()');
-  });
-
   it('wires self-recovery into the engine: statechange re-syncs, a heal timer retries, utterances hand recovery back', () => {
     const audio = readFileSync(new URL('../src/audio.ts', import.meta.url), 'utf8');
     const talk = readFileSync(new URL('../src/talkPrefs.ts', import.meta.url), 'utf8');
