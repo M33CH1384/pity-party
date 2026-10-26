@@ -12,6 +12,9 @@ import {
 } from '@pp/rules';
 import { voiceGender } from '@pp/bots';
 import { BUCKET_THIN } from './voice/writer';
+import type { ModeId, OptionValues } from '@pp/game';
+import { RuleError as ModeRuleError } from '@pp/game';
+import { type ModeGame, cleanModeOptions, isMode, modeApply, modeBotMove, modeLegal, modeResults, modeSeatRange, modeToAct, modeView, newModeGame, tierForLevel } from './engine';
 import { type TalkEvent, type TalkLine, type TalkState, type TalkTable, botTalk, chooseBotAction, loudLoser, parseHint, leanBid, botSkillFor, personaSkillFloor, seatSkill, leanNil, momentsFor, newTalkState, noteTalkHand, pickBotNames, platePersona, prePlayLine, activeCatalog, bucketFor } from '@pp/bots';
 import {
   type BotLevel, type ChatLine, type ClientMsg, type HostMusic, type MediaState, type RoomInfo, type RoomPhase, type RunPlayback, type SeatInfo, type ServerMsg,
@@ -64,6 +67,11 @@ export interface Member {
 
 /** Everything that survives hibernation / restarts. Plain JSON. */
 export interface RoomData {
+  /** registry mode (@pp/game) for this table; absent = the legacy Spades engine */
+  modeId?: ModeId;
+  modeOptions?: OptionValues;
+  /** the live registry-mode game (null/absent between games and on Spades tables) */
+  mg?: ModeGame | null;
   v: number;
   code: string;
   createdAt: number;
@@ -946,11 +954,37 @@ export class Room {
         if (d.challenge) throw new RoomError('LOCKED', 'Big Bank matches have no rematch: send a new challenge');
         if (d.phase !== 'over') throw new RoomError('WRONG_PHASE', 'The game is not over');
         this.startGame(true);
-        this.talk({ kind: 'rematch' });
+        if (!d.modeId) this.talk({ kind: 'rematch' });
         break;
       }
       case 'act':
+        if (d.modeId) throw new RoomError('WRONG_MODE', 'This table plays a registry mode: send move');
         return this.act(connId, me, msg);
+      case 'mode': {
+        this.requireHost(isHost);
+        if (d.tournament || d.challenge) throw new RoomError('LOCKED', 'Tournament and Big Bank tables play the classic game');
+        if (d.phase === 'playing') throw new RoomError('IN_GAME', 'Game in progress');
+        if (!isMode(msg.modeId)) throw new RoomError('BAD_MODE', 'Unknown game mode');
+        const { min, max } = modeSeatRange(msg.modeId);
+        if (d.rules.playerCount < min || d.rules.playerCount > max) throw new RoomError('BAD_MODE', `This mode seats ${min}–${max}`);
+        d.modeId = msg.modeId;
+        d.modeOptions = cleanModeOptions(msg.modeId, msg.options);
+        d.mg = null;
+        break;
+      }
+      case 'move': {
+        if (!d.modeId || !d.mg || d.phase !== 'playing') throw new RoomError('WRONG_PHASE', 'No game in progress');
+        if (me.seat === null) throw new RoomError('NOT_SEATED', 'Spectators cannot move');
+        if (msg.seq !== undefined && msg.seq !== (d.seq ?? 0)) { this.sendState(connId); return; }
+        try { modeApply(d.mg, me.seat, msg.move); } catch (e) {
+          if (e instanceof ModeRuleError) throw new RoomError(e.code, e.message);
+          throw e;
+        }
+        me.timeouts = 0;
+        d.seq = (d.seq ?? 0) + 1;
+        this.modeCheckOver();
+        break;
+      }
       case 'next': {
         if (d.phase !== 'playing' || d.game?.phase !== 'handOver' || me.seat === null) return;
         if (!d.ready.includes(pid)) d.ready.push(pid);
@@ -1330,6 +1364,7 @@ export class Room {
 
   private startGame(rematch = false): void {
     const d = this.data;
+    if (d.modeId) { this.startModeGame(); return; }
     if (d.phase === 'playing' && d.game && d.game.phase !== 'gameOver') this.reportAbandoned(d.hostId);
     const prevGame = d.game;
     const n = d.rules.playerCount;
@@ -1624,6 +1659,63 @@ export class Room {
     this.io.gameOver(rec, isRated(rec, d.rules), { endReason: 'finished', family, venue: d.venueNow ?? d.venue ?? 'classic' });
   }
 
+  /* ------------------------------------------------- registry modes (@pp/game) */
+
+  /** Start a registry-mode game: fill empty seats with bots, deal from a fresh seed. Spades extras (series, talk, stats) stay off. */
+  private startModeGame(): void {
+    const d = this.data;
+    const id = d.modeId!;
+    const n = d.rules.playerCount;
+    const seats = d.seats.slice(0, n);
+    if (!seats.some((s) => s.kind === 'human')) throw new RoomError('NO_PLAYERS', 'Sit down first');
+    for (let s = 0; s < n; s++) if (d.seats[s]!.kind === 'empty') d.seats[s] = { kind: 'bot', name: this.botName(), level: d.botLevel };
+    const { min, max } = modeSeatRange(id);
+    if (n < min || n > max) throw new RoomError('BAD_MODE', `This mode seats ${min}–${max}`);
+    d.mg = newModeGame(id, d.modeOptions ?? {}, n, secureSeed());
+    d.game = null;
+    d.rated = false;
+    d.seq = (d.seq ?? 0) + 1;
+    d.phase = 'playing';
+    d.ready = [];
+    d.turnKey = null;
+    d.deadline = null;
+    d.dealAt = null;
+    d.gamesPlayed++;
+    d.votes = {};
+    for (const m of Object.values(d.members)) m.timeouts = 0;
+    this.system(`Game ${d.gamesPlayed} started`);
+  }
+
+  /** Bots move until a human is to act or the game ends. Human turns have no clock yet (milestone 2.2b). */
+  private driveMode(): boolean {
+    const d = this.data;
+    const g = d.mg;
+    if (d.phase !== 'playing' || !g) { this.clearTimers(); return false; }
+    let changed = false;
+    for (let guard = 0; guard < 500; guard++) {
+      if (modeResults(g).done) break;
+      const seat = modeToAct(g).find((s) => d.seats[s]?.kind === 'bot');
+      if (seat === undefined) break;
+      const slot = d.seats[seat] as Extract<SeatSlot, { kind: 'bot' }>;
+      modeApply(g, seat, modeBotMove(g, seat, tierForLevel(slot.level === 'mixed' ? 'normal' : slot.level)));
+      d.seq = (d.seq ?? 0) + 1;
+      changed = true;
+    }
+    if (this.modeCheckOver()) changed = true;
+    return changed;
+  }
+
+  /** The mode says the game is done: close it out (no rated record for registry modes yet). */
+  private modeCheckOver(): boolean {
+    const d = this.data;
+    if (d.phase !== 'playing' || !d.mg || !modeResults(d.mg).done) return false;
+    const r = modeResults(d.mg);
+    d.phase = 'over';
+    const top = r.placements[0];
+    this.system(top === undefined || r.deltas.every((x) => x === 0) ? 'Game over: a tie' : `Game over: ${this.seatName(top)} wins`);
+    return true;
+  }
+
   private sideLabel(side: number): string {
     const d = this.data;
     const seatName = (s: number) => this.seatName(s);
@@ -1788,6 +1880,7 @@ export class Room {
   /** Advances bots / timeouts that are due. Returns true if the state changed. */
   private drive(): boolean {
     const d = this.data;
+    if (d.modeId) return this.driveMode();
     let changed = false;
     for (let guard = 0; guard < 400; guard++) {
       const g = d.game;
@@ -2091,6 +2184,7 @@ export class Room {
       return { kind: 'human', playerId: s.playerId, name: m?.name ?? 'Player', connected: this.isConnected(s.playerId), media: m?.media ?? { cam: false, mic: false }, ...(m?.uid ? { uid: m.uid } : {}) };
     });
     return {
+      ...(d.modeId ? { modeId: d.modeId, modeOptions: { ...(d.modeOptions ?? {}) } } : {}),
       code: d.code, hostId: d.hostId ?? '', phase: d.phase, rules: d.rules, botLevel: d.botLevel, seats,
       members: Object.entries(d.members).map(([playerId, m]) => ({ playerId, name: m.name, connected: this.isConnected(playerId), seat: m.seat })),
       deadline: d.deadline, turnClockStart: this.turnClockStart(), turnSec: this.clockSeconds(), ready: [...d.ready], rev: d.rev, seq: d.seq ?? 0, game: d.gamesPlayed, dealAt: d.dealAt ?? null, now: this.io.now(),
@@ -2162,6 +2256,13 @@ export class Room {
       else this.sentHistory.set(cid, key);
     }
     const run = d.runPlayback && view && d.runPlayback.handNo === view.handNo ? d.runPlayback : undefined;
+    if (d.modeId && d.mg) {
+      const g = d.mg;
+      const mySeat = seat !== null && seat < d.rules.playerCount ? seat : null;
+      const mode = { modeId: g.modeId, view: modeView(g, mySeat ?? 'spectator'), toAct: modeToAct(g), legal: mySeat === null ? [] : modeLegal(g, mySeat), results: modeResults(g) };
+      this.io.send(cid, mySeat === null ? { t: 'state', room, seat, view: null, spectator: true, mode } : { t: 'state', room, seat, view: null, mode });
+      return;
+    }
     this.io.send(cid, watching ? { t: 'state', room, seat, view, spectator: true, ...(run ? { run } : {}) } : { t: 'state', room, seat, view, ...(run ? { run } : {}) });
   }
 
