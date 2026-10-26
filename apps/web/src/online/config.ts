@@ -1,6 +1,6 @@
 /**
  * Online config. The game server URL is baked in at build time:
- *   VITE_SERVER_URL=https://bid-wit-me-server.<subdomain>.workers.dev pnpm build
+ *   VITE_SERVER_URL=https://pity-party-server.<subdomain>.workers.dev pnpm build
  * Local dev falls back to `wrangler dev` on :8787. `?server=` overrides it (tests / debugging).
  */
 export function serverUrl(): string {

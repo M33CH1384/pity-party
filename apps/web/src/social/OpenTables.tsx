@@ -1,8 +1,7 @@
 /**
  * Release 10: "Open tables" in the online lobby (wizard 'table' step). Live from the Social hub (every
- * public table reports itself on each change): host, mode, venue, target, seats, status, spectators, Join / Watch.
- * Filters + mode names derive from the modes the wizard actually offers (offeredModes.ts) — the engine's
- * legacy 3-player cutthroat has no chip here (owner, 2026-10-20 lobby restructure).
+ * public table reports itself on each change): host, mode, venue, seats, status, spectators, Join / Watch.
+ * Filters + mode names come from the mode registry (offeredModes.ts → modes/catalog.ts).
  */
 import { useEffect, useState } from 'react';
 import type { OpenTable } from '@pp/protocol';
@@ -13,8 +12,8 @@ import { OFFERED_MODES, OFFERED_MODE_NAME, type OfferedMode, offeredKindOf, open
 
 type Filter = 'all' | OfferedMode;
 const FILTERS: [Filter, string][] = [['all', 'All'], ...OFFERED_MODES.map((o) => [o.key, o.label] as [Filter, string])];
-/** Back-compat for older imports: the offered kind of a table, or 'cutthroat3' for a legacy 3-player table. */
-export const tableKind = (t: Pick<OpenTable, 'mode' | 'playerCount'>): Filter | 'cutthroat3' => offeredKindOf(t) ?? 'cutthroat3';
+/** The registry mode of a table ('other' = a mode id this build doesn't know). */
+export const tableKind = (t: Pick<OpenTable, 'mode'>): Filter | 'other' => offeredKindOf(t) ?? 'other';
 export const MODE_NAME: Record<string, string> = { ...OFFERED_MODE_NAME };
 
 function venueName(id: string): string {
@@ -56,7 +55,7 @@ export function OpenTables({ selected }: { selected: string }) {
 
 function TableRow({ t }: { t: OpenTable }) {
   const seated = t.humans + t.bots;
-  const status = t.status === 'waiting' ? 'Waiting' : t.status === 'playing' ? `In progress · hand ${t.hand ?? 1}` : 'Between games';
+  const status = t.status === 'waiting' ? 'Waiting' : t.status === 'playing' ? 'In progress' : 'Between games';
   const canJoin = t.open > 0 && !t.tournament;
   return (
     <li className={`ot-row ${t.status}`} data-testid={`ot-row-${t.code}`}>
@@ -64,7 +63,6 @@ function TableRow({ t }: { t: OpenTable }) {
         <div className="ot-title"><b>{openTableModeName(t)}</b><span className={`ot-status ${t.status}`}>{status}</span></div>
         <div className="ot-meta">
           <span>Host <b>{t.host || '—'}</b></span>
-          <span>to {t.target}</span>
           <span>{venueName(t.venue)}</span>
           {t.tournament && <span className="ot-tour">🏆 {t.tournament}</span>}
         </div>

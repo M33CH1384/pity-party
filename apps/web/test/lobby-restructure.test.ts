@@ -83,16 +83,14 @@ async function toOnlineLobby() {
 
 
 
-describe('offered modes vs engine kinds', () => {
-  it('a legacy 3-player cutthroat table still classifies, but is never an offered filter', () => {
-    const legacy = { mode: 'cutthroat', playerCount: 3 } as never;
-    expect(tableKind(legacy)).toBe('cutthroat3'); // engine/legacy support intact
-    expect(offeredKindOf(legacy)).toBeNull(); // …but not offered/filterable
-    expect(openTableModeName(legacy)).toBe('Cutthroat · 3 players');
-    expect(offeredKindOf({ mode: 'joker', playerCount: 4 } as never)).toBe('joker');
-    expect(offeredKindOf({ mode: 'aceDown', playerCount: 4 } as never)).toBe('aceDown');
-    expect(offeredKindOf({ mode: 'cutthroat', playerCount: 4 } as never)).toBe('cutthroat4');
-    expect(openTableModeName({ mode: 'cutthroat', playerCount: 4 } as never)).toBe('Cutthroat');
+describe('open tables modes come from the registry', () => {
+  it('filters and names are the registry catalog; an unknown mode id is listed under All only', () => {
+    expect(OFFERED_MODES.map((o) => o.key)).toEqual(['pitty-pat', 'tonk', 'placeholder']);
+    expect(openTableModeName({ mode: 'placeholder' })).toBe('High Card');
+    expect(openTableModeName({ mode: 'tonk' })).toBe('Tonk');
+    expect(offeredKindOf({ mode: 'joker' })).toBeNull();
+    expect(tableKind({ mode: 'joker' } as never)).toBe('other');
+    expect(openTableModeName({ mode: 'joker' })).toBe('joker');
   });
 });
 
