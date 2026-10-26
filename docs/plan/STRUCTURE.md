@@ -43,7 +43,8 @@ and come back on the registry. See `docs/plan/REBUILD.md`.
 
 1. Snapshot copy, renames, strip story/voice/Spades UI, build green (3 PRs, done: #1–#3).
 2. game/core + registry + placeholder mode; room.ts on registry (4 PRs: #4 core, #5 adapter, #6 turn clock, 2.2b-2 registry-only room).
-3. Web TableShell + GameViews/Recaps registry; schema-driven Setup with mode picker (2 PRs).
+3. Web TableShell + GameViews/Recaps registry; schema-driven Setup with mode picker (2 PRs, done: #8, #9).
+3+. Spades cleanup (4 PRs): 3a web Spades removal (#10), 3b table rules → seats + turn timer, drop `@pp/rules`/`@pp/bots` (this PR), 3c lobby (turn timer + game options shown, per-mode seat limits, host changes mode), 3d neutral re-style.
 4. Online rooms/chat/spectators on new worker (1 PR). ← skeleton boots
 5. Accounts, social, push on new D1/secrets (1–2 PRs).
 6. Mode A (Pitty Pat) engine + options + tests (2 PRs).
@@ -52,11 +53,12 @@ and come back on the registry. See `docs/plan/REBUILD.md`.
 8. Mode B (Tonk) engine (spreads, hit, drop, payouts) + meld solver + tests (3 PRs).
 9. Mode B bots (3 tiers) + table view (spread areas, hit targets) + recap (3 PRs). ← **Mode B playable**
 9R. **Rebuild (b), before visuals/deploy:** tournaments on placements + coin deltas (2), Big Bank escrow/wagers (2), leagues/season challenges (1), challenges (1, shares Big Bank plumbing), bot chat/trash talk + highlights per mode (1–2), hand log/Run It equivalents per mode (1–2). **8–10 PRs.**
-10. Desi visuals/palette, venues, PWA (2 PRs).
-11. Cloudflare provisioning + first deploy after Yoda confirms (1 PR). **(c) Every rebuild item must be back before this.**
+10. Desi visuals/palette, PWA (2 PRs).
+10R. **Rebuild (c), web experience removed in #10/3b** (REBUILD.md rows W1–W8), in this order: 3D table + venues/scenes on the registry (2), deck + venue pickers (1), trash talk/bot voices (1, after 9R bot chat), bid coach → per-mode hints + locked-rules sheet (1), Run It/animations (1–2, after 9R hand log), Story Mode + story badges + Dee's guide (2–3, last). Summary bar folds into the M7/M9 table-view PRs. **8–10 PRs.**
+11. Cloudflare provisioning + first deploy after Yoda confirms (1 PR). **Every rebuild item (7R, 9R, 10R) must be back before this.**
 
-Total ≈ **33–38 PRs** (was 20–22): +2 because milestones 1 and 2 each took one PR more than planned, +3–4 for rebuild (a), +8–10 for rebuild (b).
-Done so far: 6 merged plus this one. Skeleton = steps 1–4. Mode A can still ship first internally with Mode B
+Total ≈ **45–52 PRs** (was 33–38): +4 for the Spades cleanup 3a–3d, +8–10 for rebuild (c) web experience (10R; venues moved there from 10).
+Done so far: 10 merged plus this one (3b). Skeleton = steps 1–4. Mode A can still ship first internally with Mode B
 hidden behind a setup flag, but launch (11) waits for everything.
 
 ## Risks

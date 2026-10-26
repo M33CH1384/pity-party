@@ -1,8 +1,6 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { AvatarCircle, useAvatar } from './avatar';
-import PersonaFace from './PersonaFace';
-import StoryFace from './story/StoryFace';
 import tips from './data/loading-tips.json';
 
 /** Copy that rotates while the table is still coming up. The first line is the one tests and the first paint use. */
@@ -77,25 +75,21 @@ function LoadingSeatFace({ seat, faceFailed, onFaceError }: {
   onFaceError: () => void;
 }) {
   const pic = useAvatar(seat.uid ?? null, seat.direct ?? null);
-  if (seat.storyId) return <StoryFace characterId={seat.storyId} name={seat.name} />;
-  if (seat.bot) {
-    // The bot's persona portrait; the designed nameplate is its fallback
-    // if the art ever fails to load — never the bare letter circle.
-    if (faceFailed) {
-      return (
-        <span className="bwm-seat-plate" aria-hidden>
-          <span className="bwm-seat-plate-name">{seat.name}</span>
-        </span>
-      );
-    }
-    return <PersonaFace name={seat.name} onError={onFaceError} />;
+  // TODO(rebuild): bot persona portraits and Story faces (REBUILD.md). Bots show the nameplate for now.
+  void faceFailed; void onFaceError;
+  if (seat.bot || seat.storyId) {
+    return (
+      <span className="bwm-seat-plate" aria-hidden>
+        <span className="bwm-seat-plate-name">{seat.name}</span>
+      </span>
+    );
   }
   return <AvatarCircle pic={pic} name={seat.name} className="bwm-seat-face-circle" />;
 }
 
 function LoadingSeatCard({ seat, index, reduced }: { seat: LoadingSeat; index: number; reduced: boolean }) {
   const [faceFailed, setFaceFailed] = useState(false);
-  const plate = !!seat.bot && !seat.storyId && faceFailed;
+  const plate = !!seat.bot || !!seat.storyId || faceFailed;
   return (
     <div
       className="bwm-seat"

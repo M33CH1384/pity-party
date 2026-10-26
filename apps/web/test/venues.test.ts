@@ -65,12 +65,6 @@ describe('venues', () => {
     // the not-the-last-one exclusion still applies on top of the entitlement
     expect(rollVenue(0.999, AFTER_DARK_VENUE, true)).not.toBe(AFTER_DARK_VENUE);
   });
-  it('settings default to the classic table and drop unknown venues', () => {
-    expect(DEFAULT_SETTINGS.venue).toBe('classic');
-    expect(normalizeSettings({ venue: 'random' } as never).venue).toBe('random');
-    expect(normalizeSettings({ venue: 'moon' } as never).venue).toBe('classic');
-    expect(normalizeSettings({}).venue).toBe('classic');
-  });
   it('protocol: venue message validated', () => {
     expect(parseClientMsg(JSON.stringify({ t: 'venue', venue: 'vegas' }))).toEqual({ t: 'venue', venue: 'vegas' });
     expect(parseClientMsg(JSON.stringify({ t: 'venue', venue: 'random' }))).toEqual({ t: 'venue', venue: 'random' });

@@ -1,11 +1,14 @@
 /** Big Bank Take Lil Bank (Phase 1): challenge lifecycle over a fake WIO — create/accept/decline/cancel/check-in/alarms and EVERY settlement branch, with real D1 coin balances as the assertion surface. */
 import { beforeEach, describe, expect, it } from 'vitest';
-import { makeRules } from '@pp/rules';
 import { makeD1 } from './d1';
 import { balance, move } from '../src/cred/coins';
 import { awardXp, xpAtLevel } from '../src/cred/xp';
 import { accept, alarm, cancel, checkin, create, decline, result, view, type WData, type WIO, type WPerson } from '../src/wager/service';
 import { parseCreate } from '../src/wager/routes';
+const makeRules = (mode: 'joker' | 'aceDown' | 'cutthroat', o: { playerCount?: number } = {}) => ({
+  // TODO(rebuild): Spades-labelled rules for the switched-off tournament/wager services (REBUILD.md)
+  mode, deck: mode === 'aceDown' ? 'aceDown' as const : 'joker' as const, targetScore: 500, partnerships: mode !== 'cutthroat', playerCount: o.playerCount ?? 4, turnTimerSec: 30,
+});
 
 const T0 = 1_800_000_000_000;
 let db: D1Database;
@@ -466,7 +469,7 @@ describe('parseCreate (routes)', () => {
     if (r.ok) {
       expect(r.v.rules.mode).toBe('aceDown');
       expect(r.v.rules.targetScore).toBe(750);
-      expect(r.v.rules.turnTimerSec).toEqual({ bid: 45, play: 45 });
+      expect(r.v.rules.turnTimerSec).toBe(45);
     }
   });
   it('accepts cutthroat with its own menu (Joker deck, 4P, target 250/300/500)', () => {

@@ -11,8 +11,8 @@ import type { ModeId, OptionValues } from '@pp/game';
 import { RuleError as ModeRuleError, pickBotName } from '@pp/game';
 import { type ModeGame, cleanModeOptions, isMode, modeApply, modeBotMove, modeLegal, modeResults, modeSeatRange, modeToAct, modeView, newModeGame, tierForLevel } from './engine';
 import {
-  type BotLevel, type ChatLine, type ClientMsg, type HostMusic, type MediaState, type RoomInfo, type RoomPhase, type RunPlayback, type SeatInfo, type ServerMsg,
-  DEFAULT_AFK_LIMIT, LIMITS, PROTOCOL_VERSION, parseClientMsg, toggleReaction,
+  type BotLevel, type ChatLine, type ClientMsg, type HostMusic, type MediaState, type RoomInfo, type RoomPhase, type SeatInfo, type ServerMsg,
+  DEFAULT_AFK_LIMIT, DEFAULT_TABLE_RULES, TURN_TIMER_LIMITS, LIMITS, PROTOCOL_VERSION, parseClientMsg, toggleReaction,
   HAND_END_HOLD_MS, NUKE_ALLOWANCE_MS, handEndLeadMs, type NukeIntensity, type TalkIntensity, cleanTeamName, pickTeamName, type VenueChoice, type VenueId, isLockedVenue, rollVenue,
 } from '@pp/protocol';
 import type { OpenTable } from '@pp/protocol';
@@ -279,9 +279,8 @@ function clampRules(prev: TableRules, r: unknown): TableRules {
   const x = (r && typeof r === 'object' ? r : {}) as Partial<TableRules>;
   const pc = typeof x.playerCount === 'number' && Number.isInteger(x.playerCount) ? Math.min(4, Math.max(2, x.playerCount)) : prev.playerCount;
   const t = x.turnTimerSec;
-  const sec = (v: unknown, dflt: number | undefined) => (typeof v === 'number' && Number.isFinite(v) ? Math.min(120, Math.max(5, Math.round(v))) : dflt);
-  const timer = t && typeof t === 'object' ? { bid: sec((t as { bid?: unknown }).bid, prev.turnTimerSec?.bid), play: sec((t as { play?: unknown }).play, prev.turnTimerSec?.play) } : prev.turnTimerSec;
-  return { ...prev, playerCount: pc as TableRules['playerCount'], ...(timer ? { turnTimerSec: timer as TableRules['turnTimerSec'] } : {}) };
+  const timer = typeof t === 'number' && Number.isFinite(t) ? Math.min(TURN_TIMER_LIMITS.max, Math.max(TURN_TIMER_LIMITS.min, Math.round(t))) : prev.turnTimerSec;
+  return { playerCount: pc, turnTimerSec: timer };
 }
 
 export class Room {
@@ -717,17 +716,9 @@ export class Room {
         break;
       }
       case 'teamName': {
-        if (!d.rules.partnerships) throw new RoomError('NO_TEAMS', 'No teams in Cutthroat');
-        if (me.seat === null || me.seat >= d.rules.playerCount) throw new RoomError('NOT_SEATED', 'Sit down to name your team');
-        const name = cleanTeamName(msg.name);
-        if (name === null) throw new RoomError('BAD_NAME', "That team name isn't allowed");
-        const side = me.seat % 2;
-        const names = [...(d.teamNames ?? [null, null])];
-        if ((names[side] ?? '') === name) return;
-        names[side] = name || null;
-        d.teamNames = names;
-        this.system(name ? `${me.name} named their team “${name}”` : `${me.name} reset their team name`);
-        break;
+        void cleanTeamName;
+        // TODO(rebuild): team names return with a partnership mode (docs/plan/REBUILD.md)
+        throw new RoomError('NO_TEAMS', 'This game has no teams');
       }
       case 'start': {
         this.requireHost(isHost);
@@ -741,9 +732,6 @@ export class Room {
         this.startGame(true);
         break;
       }
-      case 'act':
-        // Legacy Spades move message: every table now plays a registry mode.
-        throw new RoomError('WRONG_MODE', 'This table plays a registry mode: send move');
       case 'mode': {
         this.requireHost(isHost);
         if (d.phase === 'playing') throw new RoomError('IN_GAME', 'Game in progress');
@@ -1184,15 +1172,10 @@ export class Room {
     return this.data.members[s.playerId]?.name ?? 'Player';
   }
 
-  /**
-   * The host's timer for this kind of turn. A missing value keeps Normal
-   * (bid 20 / play 30). Play is the longer of the two. That is not a new length.
-   */
-  private turnSeconds(kind: string): number {
+  /** The host's per-turn timer (seconds); a missing or bad value keeps the 30 s default. */
+  private turnSeconds(_kind?: string): number {
     const t = this.data.rules.turnTimerSec;
-    const sec = kind === 'bid' ? t?.bid : t?.play;
-    if (typeof sec === 'number' && Number.isFinite(sec)) return sec;
-    return kind === 'bid' ? 20 : 30;
+    return typeof t === 'number' && Number.isFinite(t) ? t : DEFAULT_TABLE_RULES.turnTimerSec;
   }
 
   /** Milliseconds the table allows for this turn, including learning mode's stretch. */
@@ -1296,7 +1279,7 @@ export class Room {
       deadline: d.deadline, turnClockStart: this.turnClockStart(), turnSec: this.clockSeconds(), ready: [...d.ready], rev: d.rev, seq: d.seq ?? 0, game: d.gamesPlayed, dealAt: null, now: this.io.now(),
       talkSec: d.talkSec ?? Math.round(this.timing.handOverMs / 1000), afkLimit: d.afkLimit ?? DEFAULT_AFK_LIMIT, partnerMicMute: d.partnerMicMute ?? false, nukeIntensity: d.nukeIntensity ?? 'full', talkIntensity: d.talkIntensity ?? 'cookout', botTalk: d.botTalk ?? true, aiTalk: !!d.aiTalk,
       venue: d.venue ?? 'classic', ...(d.venueNow ? { venueNow: d.venueNow } : {}),
-      teamNames: d.rules.partnerships ? [...(d.teamNames ?? [null, null])] : undefined, series: null, revealed: [], // TODO(rebuild): series, tournament, challenge room info (REBUILD.md)
+      teamNames: undefined, revealed: [], // TODO(rebuild): teams, series, tournament, challenge room info (REBUILD.md)
       private: !!d.private, replaceBots: this.replaceBotsOn(), takeable: this.takeable(),
       spectators: d.phase === 'lobby' ? [] : Object.entries(d.members).filter(([id, m]) => m.seat === null && this.isConnected(id)).map(([playerId, m]) => ({ playerId, name: m.name })),
       ...(d.votes && Object.keys(d.votes).length ? { votes: Object.entries(d.votes).map(([target, by]) => ({ target, by: [...by], need: this.votesNeeded(target) })) } : {}), ...(d.music && d.music.mode !== 'off' ? { music: d.music } : {}),
@@ -1333,7 +1316,7 @@ export class Room {
     const spectators = room.spectators?.length ?? 0;
     return {
       code: d.code, host: d.hostId ? d.members[d.hostId]?.name ?? '' : '', mode: d.modeId, playerCount: d.rules.playerCount,
-      target: d.rules.targetScore, venue: d.venueNow ?? (d.venue && d.venue !== 'random' ? d.venue : d.venue ?? 'classic'),
+      target: 0, venue: d.venueNow ?? (d.venue && d.venue !== 'random' ? d.venue : d.venue ?? 'classic'),
       humans, bots: room.seats.filter((s) => s.kind === 'bot').length, open: open.length,
       status: d.phase === 'lobby' ? 'waiting' : d.phase === 'playing' ? 'playing' : 'over',
       spectators, ...(spectators >= LIMITS.spectators ? { watchFull: true } : {}),
@@ -1352,7 +1335,7 @@ export class Room {
     const mySeat = seat !== null && seat < d.rules.playerCount ? seat : null;
     const mode = g && d.phase !== 'lobby' ? { modeId: g.modeId, view: modeView(g, mySeat ?? 'spectator'), toAct: modeToAct(g), legal: mySeat === null ? [] : modeLegal(g, mySeat), results: modeResults(g) } : undefined;
     const watching = mySeat === null && !!mode;
-    this.io.send(cid, { t: 'state', room, seat, view: null, ...(watching ? { spectator: true as const } : {}), ...(mode ? { mode } : {}) });
+    this.io.send(cid, { t: 'state', room, seat, ...(watching ? { spectator: true as const } : {}), ...(mode ? { mode } : {}) });
   }
 
   private system(text: string): void {
@@ -1402,10 +1385,6 @@ export class Room {
     let text = 'Something went wrong';
     if (e instanceof ModeRuleError || e instanceof RoomError) { code = e.code; text = e.message; }
     else console.error('room message failed', e);
-    if (msg?.t === 'act' && msg.id) {
-      this.io.send(connId, { t: 'ack', id: msg.id, ok: false, code, message: text });
-      return;
-    }
     this.err(connId, code, text);
   }
 
@@ -1413,7 +1392,7 @@ export class Room {
   summary() {
     const d = this.data;
     return {
-      code: d.code, phase: d.phase, mode: d.rules.mode, playerCount: d.rules.playerCount,
+      code: d.code, phase: d.phase, mode: d.modeId, playerCount: d.rules.playerCount,
       seats: this.roomInfo().seats.map((s) => (s.kind === 'human' ? { kind: s.kind, name: s.name } : s.kind === 'bot' ? { kind: s.kind, name: s.name } : { kind: s.kind })),
       host: d.hostId ? d.members[d.hostId]?.name ?? null : null,
     };

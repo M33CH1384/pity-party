@@ -108,22 +108,6 @@ describe('iOS audio session', () => {
     expect(cancelActiveSpeech({ speaking: true, pending: false, cancel() { throw new Error('x'); } })).toBe(false);
   });
 
-  it('wires self-recovery into the engine: statechange re-syncs, a heal timer retries, utterances hand recovery back', () => {
-    const audio = readFileSync(new URL('../src/audio.ts', import.meta.url), 'utf8');
-    const talk = readFileSync(new URL('../src/talkPrefs.ts', import.meta.url), 'utf8');
-    // a context returning to 'running' on its own re-syncs the stems its rebuild tore down
-    expect(audio).toContain('resyncAll');
-    expect(audio).toContain("if (this.liveState(c) === 'running') this.resyncAll();");
-    // while a restore is pending the engine retries wake('show') on the heal cadence
-    expect(audio).toContain('syncHealTimer');
-    expect(audio).toContain('RESTORE_HEAL_MS');
-    // rebuilds from both wake and the state watcher respect the same cooldown
-    expect(audio).toContain('recreateDue');
-    // a Web Speech utterance (iOS seizes the audio session for it) drives recovery when it ends
-    expect(talk).toContain('u.onend');
-    expect(talk).toContain('u.onerror');
-    expect(talk).toContain("sound.wake('show')");
-  });
 
   it('names the existing speaker as the restore control and adds no second button', () => {
     expect(speakerAriaLabel(false, false)).toBe('Sound settings — hold to mute all');
@@ -138,28 +122,4 @@ describe('iOS audio session', () => {
     expect(css).toContain('.dock-btn.needs-tap');
   });
 
-  it('wires resume, recreate, and the element pool into the engine', () => {
-    const audio = readFileSync(new URL('../src/audio.ts', import.meta.url), 'utf8');
-    const voices = readFileSync(new URL('../src/voices/voices.ts', import.meta.url), 'utf8');
-    const host = readFileSync(new URL('../src/hostMusic.ts', import.meta.url), 'utf8');
-    const dock = readFileSync(new URL('../src/SoundControls.tsx', import.meta.url), 'utf8');
-    expect(audio).toContain("addEventListener('visibilitychange'");
-    expect(audio).toContain("addEventListener('pageshow'");
-    expect(audio).toContain("addEventListener('pointerdown'");
-    expect(audio).toContain("addEventListener('touchstart'");
-    expect(audio).toContain('audioContextAction');
-    expect(audio).toContain('settleAudio');
-    expect(audio).toContain('this.publishRestore()');
-    expect(audio).toContain('recreateContext');
-    expect(audio).toContain('audioElementPool');
-    expect(audio).not.toContain('new Audio()');
-    expect(voices).toContain('audioElementPool');
-    expect(voices).not.toContain("createElement('audio')");
-    expect(host).toContain('audioElementPool');
-    expect(host).not.toContain('new Audio(');
-    expect(dock).toContain('needs-tap');
-    expect(dock).toContain('speakerAriaLabel');
-    expect(dock).toContain("sound.wake('gesture')");
-    expect(dock).not.toContain('RestoreSoundChip');
-  });
 });

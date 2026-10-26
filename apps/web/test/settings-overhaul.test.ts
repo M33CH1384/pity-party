@@ -173,7 +173,7 @@ describe('chat sounds — one shared row', () => {
 
   it('the merged sheet renders each sound control exactly once', async () => {
     const c = await renderSheet();
-    for (const tid of ['chat-sounds-switch', 'quality-seg', 'spatial-switch', 'music-switch', 'bot-voices', 'bot-voice-quick', 'mute-all', 'venue-sound-switch']) {
+    for (const tid of ['chat-sounds-switch', 'quality-seg', 'spatial-switch', 'music-switch', 'mute-all', 'venue-sound-switch']) {
       expect(c.querySelectorAll(`[data-testid="${tid}"]`).length, tid).toBe(1);
     }
   });

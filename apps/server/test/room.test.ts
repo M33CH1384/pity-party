@@ -1,6 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { type Card, type Seat, bidOrder, checkGameEnd, handSize, legalPlays, makeRules, scoreHand, viewFor } from '@pp/rules';
-import { chooseBotAction } from '@pp/bots';
 import type { GameAction } from '@pp/protocol';
 import { HAND_END_HOLD_MS } from '@pp/protocol';
 import { BOT_NAMES } from '@pp/game';
@@ -24,23 +22,6 @@ function fourHumans(env = new FakeEnv(undefined, FAST)) {
     return { cid, ...p };
   });
   return { env, ps };
-}
-
-/** Acts for whoever's turn it is via the client protocol, using the bot brain on that client's own view. */
-function playTurn(env: FakeEnv, cids: string[]): boolean {
-  for (const cid of cids) {
-    const st = env.last(cid, 'state');
-    const v = st?.view;
-    if (!v || st.room.phase !== 'playing') continue;
-    if (v.phase === 'handOver') { env.send(cid, { t: 'next' }); continue; }
-    if (v.turn !== v.seat) continue;
-    const a = chooseBotAction(v, 'normal');
-    if (!a) continue;
-    const action: GameAction = a.type === 'reveal' ? { type: 'reveal' } : a.type === 'bid' ? { type: 'bid', bid: a.bid } : a.type === 'play' ? { type: 'play', card: a.card } : a.type === 'runIt' ? { type: 'runIt' } : { type: 'exchange', cards: (a as { cards: Card[] }).cards };
-    env.send(cid, { t: 'act', action, seq: st.room.seq });
-    return true;
-  }
-  return false;
 }
 
 describe('lobby', () => {
@@ -83,7 +64,7 @@ describe('lobby', () => {
     env.join('a', 'Host'); env.join('b', 'Guest');
     env.send('b', { t: 'addBot', seat: 1 });
     env.send('b', { t: 'start' });
-    env.send('b', { t: 'config', rules: makeRules('aceDown') });
+    env.send('b', { t: 'config', rules: { playerCount: 4, turnTimerSec: 30 } });
     expect(env.errors('b').map((e) => e.code)).toEqual(['NOT_HOST', 'NOT_HOST', 'NOT_HOST']);
     env.send('a', { t: 'addBot', seat: 1 });
     expect(env.last('a', 'state')!.room.seats[1]).toMatchObject({ kind: 'bot' });
@@ -214,11 +195,11 @@ describe('nuke intensity (table setting)', () => {
     env.join('a', 'Host'); env.join('b', 'Guest');
     env.send('a', { t: 'sit', seat: 0 }); env.send('b', { t: 'sit', seat: 2 });
     expect(env.last('b', 'state')!.room.nukeIntensity).toBe('full');
-    env.send('b', { t: 'config', rules: makeRules('joker'), nukeIntensity: 'off' });
+    env.send('b', { t: 'config', rules: { playerCount: 4, turnTimerSec: 30 }, nukeIntensity: 'off' });
     expect(env.errors('b').at(-1)!.code).toBe('NOT_HOST');
-    env.send('a', { t: 'config', rules: makeRules('joker'), nukeIntensity: 'classic' });
+    env.send('a', { t: 'config', rules: { playerCount: 4, turnTimerSec: 30 }, nukeIntensity: 'classic' });
     expect(env.last('b', 'state')!.room.nukeIntensity).toBe('classic');
-    env.send('a', { t: 'config', rules: makeRules('joker'), nukeIntensity: 'mega' } as never);
+    env.send('a', { t: 'config', rules: { playerCount: 4, turnTimerSec: 30 }, nukeIntensity: 'mega' } as never);
     expect(env.last('b', 'state')!.room.nukeIntensity).toBe('classic');
   });
 });
@@ -254,7 +235,7 @@ describe('AFK + kicking', () => {
     const env = new FakeEnv(undefined, FAST);
     const a = env.join('a', 'Slow');
     env.send('a', { t: 'sit', seat: 0 });
-    env.send('a', { t: 'config', rules: makeRules('joker', { turnTimerSec: { bid: 5, play: 5 }, firstHandBidsItself: false }), ...(afkLimit !== undefined ? { afkLimit } : {}) });
+    env.send('a', { t: 'config', rules: { playerCount: 4, turnTimerSec: 5 }, ...(afkLimit !== undefined ? { afkLimit } : {}) });
     env.send('a', { t: 'start' });
     return { env, a };
   };

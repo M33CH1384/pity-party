@@ -3,7 +3,7 @@
  * Registration → check-in (10 min before the start) → start (DO alarm, or the host) → tables auto-seated per round →
  * results from the tables advance the bracket → champion + awards. D1 keeps a listing row in sync.
  */
-import type { TableRules } from '@pp/rules';
+import type { TableRules } from '@pp/protocol';
 import { type Entry, type Format, type TState, newState, pendingMatches, report, standings, start } from './engine';
 
 export const CHECKIN_MS = 10 * 60_000;

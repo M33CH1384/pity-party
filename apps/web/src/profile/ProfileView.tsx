@@ -64,12 +64,8 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { presenceLine } from '@pp/protocol';
-import { STORY_SECRETS } from '@pp/bots';
-
-/** Story Mode collectibles (storySecrets) read by name here, not raw id. */
-const COLLECTIBLE_NAMES: Record<string, string> = Object.fromEntries(
-  Object.values(STORY_SECRETS).map((s) => [s.unlockable.itemId, s.unlockable.name]),
-);
+/** Story Mode collectibles by name. TODO(rebuild): Story Mode (REBUILD.md); until then ids show raw. */
+const COLLECTIBLE_NAMES: Record<string, string> = {};
 import { useAccount } from '../account/api';
 import { noteDailyBonus } from '../dailyBonus';
 import { accountUidOf, AvatarCircle, compressAvatarFile, forgetAvatar, useAvatar, validateAvatarDataUrl } from '../avatar';

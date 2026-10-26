@@ -23,7 +23,6 @@
  * (cleanText + maskProfanity from @pp/protocol, via ../filter) — the
  * same treatment chat text gets; there is no second filter.
  */
-import { STORY_STOPS, storyBadgesFor, type StoryBadgeFacts } from '@pp/bots';
 import { cleanText, maskProfanity } from '../filter';
 import { myStats, personalStats, type MyModeStats } from '../stats/boards';
 import { ACHIEVEMENTS, achievementStates } from './achievements';
@@ -76,8 +75,7 @@ export const badgeKey = (b: { kind: BadgeKind; id: string }): string => `${b.kin
  * EXACT set this derivation uses — auditable, owner-vetoable:
  *   - the Rep achievements: all 18 defs in cred/achievements.ts
  *     (ACHIEVEMENTS: first-dub … after-dark), AND
- *   - the story badges: all 13 defs in @pp/bots STORY_BADGE_DEFS
- *     (porch-graduate … run-it-back).
+ *   - the story badges: none for now (Story Mode is a rebuild item, REBUILD.md).
  * Total earnable = 31. The third pool — synced progress badges
  * (progress.data, e.g. storm-chaser) — is deliberately EXCLUDED: it is an
  * open-ended device-synced list with no closed server-side earnable set
@@ -105,11 +103,10 @@ export function badgeCompletionFor(badges: BadgeSummary[]): BadgeCompletion {
   };
 }
 
-/** Pity Party: Story Mode was removed, so there are no story facts and no
- *  story_* table reads. Every stop reads as never attempted. */
-async function storyFactsFor(_db: D1Database, _userId: string): Promise<{ facts: StoryBadgeFacts; stopsCleared: number; completed: boolean }> {
-  const stops = STORY_STOPS.map((s) => ({ stopId: s.id, attempts: 0, clears: 0 }));
-  return { facts: { stops, finds: { eggs: [], feats: [] }, completed: false }, stopsCleared: 0, completed: false };
+/** Pity Party: Story Mode was removed (TODO(rebuild), REBUILD.md), so no stops are cleared and no story badges are earned. */
+const STORY_STOP_COUNT = 0;
+async function storyFactsFor(_db: D1Database, _userId: string): Promise<{ stopsCleared: number; completed: boolean }> {
+  return { stopsCleared: 0, completed: false };
 }
 
 /** Every badge the player has actually earned, across all three sets —
@@ -124,9 +121,7 @@ export async function earnedBadgesFor(db: D1Database, userId: string): Promise<B
   for (const a of achievements) {
     if (a.unlockedAt != null) out.push({ kind: 'achievement', id: a.id, name: a.title, icon: null, earnedAt: a.unlockedAt });
   }
-  for (const b of storyBadgesFor(story.facts)) {
-    if (b.earned) out.push({ kind: 'story', id: b.id, name: b.name, icon: b.icon, earnedAt: null });
-  }
+  void story; // no story badges until Story Mode is rebuilt
   try {
     const p = prog ? JSON.parse(prog.data) as { badges?: { id: string; earnedAt: number }[] } : null;
     for (const b of p?.badges ?? []) {
@@ -315,7 +310,7 @@ export async function cardFor(
     tags,
     showcase,
     badges,
-    story: { stopsCleared: story.stopsCleared, stopsTotal: STORY_STOPS.length, completed: story.completed },
+    story: { stopsCleared: story.stopsCleared, stopsTotal: STORY_STOP_COUNT, completed: story.completed },
     stats: {
       games, wins, losses: games - wins,
       winPct: pctOf(wins, games),

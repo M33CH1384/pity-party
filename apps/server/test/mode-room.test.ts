@@ -45,7 +45,7 @@ describe('registry-mode rooms (placeholder via @pp/game)', () => {
     env.send('a', { t: 'start' });
     let s = st(env, 'a');
     expect(s.room.phase).toBe('playing');
-    expect(s.view).toBeNull();
+    expect('view' in s).toBe(false);
     expect((s.mode!.view as HcView).hand).toHaveLength(3);
     const moves = playHumans(env, ps.map((p) => p.cid));
     expect(moves).toBe(6); // 3 rounds × 2 humans; bots moved on their own
@@ -80,7 +80,7 @@ describe('registry-mode rooms (placeholder via @pp/game)', () => {
     env.send(onTurn, { t: 'move', move: { t: 'play', cardId: 'ZZ' }, seq: sb.room.seq });
     expect(env.errors(onTurn).at(-1)!.code).toBe('ILLEGAL');
     env.send(onTurn, { t: 'act', action: { type: 'bid', seat: 0, bid: 3 } as never, seq: sb.room.seq });
-    expect(env.errors(onTurn).at(-1)!.code).toBe('WRONG_MODE');
+    expect(env.errors(onTurn).at(-1)!.code).toBe('BAD_MESSAGE');
     env.join('w', 'Watcher');
     env.send('w', { t: 'move', move: { t: 'play', cardId: 'AS' } });
     expect(env.errors('w').at(-1)!.code).toBe('NOT_SEATED');

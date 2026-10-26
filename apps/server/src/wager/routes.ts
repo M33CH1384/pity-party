@@ -1,7 +1,7 @@
 /** Big Bank Take Lil Bank (Phase 1): /api/wager-challenges — create, list mine, detail + actions (the challenge's Durable Object).
  * (Not /api/challenges — that path already belongs to the daily/weekly cred challenges.)
  * Ships dark: while the wager_challenges_enabled flag is off, creates 404 and lists read empty. */
-import { makeRules, type TableRules } from '@pp/rules';
+import type { WagerRules } from './service';
 import { cleanTeamName } from '@pp/protocol';
 import { type AuthEnv, currentUser } from '../auth/routes';
 import { type SocialEnv, isAdmin } from '../social/routes';
@@ -34,7 +34,7 @@ export function parseTeamName(v: unknown): { ok: true; name: string | null } | {
 }
 
 export function parseCreate(b: Record<string, unknown>, now: number, horizonMs: number):
-  | { ok: true; v: { format: 'partnership' | 'cutthroat'; rules: TableRules; wager: number; startAt: number; opponentName: string; partnerName: string | null; inviteeNames: string[]; teamName: string | null } }
+  | { ok: true; v: { format: 'partnership' | 'cutthroat'; rules: WagerRules; wager: number; startAt: number; opponentName: string; partnerName: string | null; inviteeNames: string[]; teamName: string | null } }
   | { ok: false; error: string } {
   const format = b.format;
   if (format !== 'partnership' && format !== 'cutthroat') return { ok: false, error: 'Format: partnership or cutthroat.' };
@@ -47,7 +47,7 @@ export function parseCreate(b: Record<string, unknown>, now: number, horizonMs: 
   if (startAt > now + horizonMs) return { ok: false, error: 'Start within the scheduling window (7 days).' };
   const opponentName = format === 'partnership' ? name(b.opponent) : '';
   if (format === 'partnership' && !opponentName) return { ok: false, error: 'Name your opponent.' };
-  let rules: TableRules;
+  let rules: WagerRules;
   let partnerName: string | null = null;
   let inviteeNames: string[] = [];
   let teamName: string | null = null;
@@ -62,7 +62,7 @@ export function parseCreate(b: Record<string, unknown>, now: number, horizonMs: 
       const tn = parseTeamName(b.teamName);
       if (!tn.ok) return tn;
       teamName = tn.name;
-      rules = makeRules(deck, { targetScore: target, turnTimerSec: { ...timers } });
+      rules = { mode: deck, deck, targetScore: target, partnerships: true, playerCount: 4, turnTimerSec: timers.play };
     } else {
       if (b.deck !== undefined && b.deck !== 'joker') return { ok: false, error: 'Cutthroat plays the Joker deck.' };
       const target = b.target === undefined ? 300 : Number(b.target);
@@ -70,7 +70,7 @@ export function parseCreate(b: Record<string, unknown>, now: number, horizonMs: 
       if (!Array.isArray(b.invitees) || b.invitees.length !== 3) return { ok: false, error: 'Cutthroat invites exactly three players.' };
       inviteeNames = b.invitees.map(name);
       if (inviteeNames.some((n) => !n)) return { ok: false, error: 'Name all three players.' };
-      rules = makeRules('cutthroat', { playerCount: 4, targetScore: target, turnTimerSec: { ...timers } });
+      rules = { mode: 'cutthroat', deck: 'joker', targetScore: target, partnerships: false, playerCount: 4, turnTimerSec: timers.play };
     }
   } catch { return { ok: false, error: 'Bad rules.' }; }
   return { ok: true, v: { format, rules, wager, startAt, opponentName, partnerName, inviteeNames, teamName } };

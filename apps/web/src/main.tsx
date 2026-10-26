@@ -169,12 +169,8 @@ function Root() {
 initTheme();
 
 const rootEl = document.getElementById('root')!;
-if (new URLSearchParams(location.search).get('preview') === 'turn-ring') {
-  void import('./turnRingPreview').then(({ mountTurnRingPreview }) => mountTurnRingPreview(rootEl));
-} else {
-  createRoot(rootEl).render(
-    <StrictMode>
-      <Root />
-    </StrictMode>,
-  );
-}
+createRoot(rootEl).render(
+  <StrictMode>
+    <Root />
+  </StrictMode>,
+);

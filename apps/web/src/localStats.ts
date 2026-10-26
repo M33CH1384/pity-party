@@ -2,7 +2,6 @@
  * Offline games for a signed-in player: queue in localStorage and POST /api/stats/local.
  * The server rebuilds the record. A failed post stays queued and retries when the browser is online again.
  */
-import type { GameState } from '@pp/rules';
 import { account } from './account/api';
 
 const KEY = 'bwm.offlineQueue';
@@ -14,7 +13,8 @@ export interface LocalGamePost {
   endedAt: number;
   names: string[];
   teamNames: (string | null)[] | null;
-  game: GameState;
+  /** the finished game. TODO(rebuild): offline stats for registry modes (the server endpoint is off, REBUILD.md) */
+  game: unknown;
 }
 
 /** The client game id for an offline match seed — one derivation shared by the game report, the rewards stash, and the pending-claim slot. */

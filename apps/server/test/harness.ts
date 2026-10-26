@@ -1,6 +1,6 @@
-import { defaultRules } from '@pp/rules';
+import { DEFAULT_TABLE_RULES } from '@pp/protocol';
 import type { ClientMsg, ServerMsg } from '@pp/protocol';
-import { createRng } from '@pp/rules';
+import { seededRng } from '@pp/game';
 import { DEFAULT_TIMING, Room, type RoomData, type RoomIO, type RoomTiming, newRoomData } from '../src/room';
 
 /** Fake Durable Object environment: manual clock, captured messages, timers, alarm, save counter. */
@@ -13,7 +13,7 @@ export class FakeEnv {
   alarmSets = 0;
   persists = 0;
   raw: ServerMsg[] = [];
-  rng = createRng('test-ids');
+  rng = seededRng('test-ids');
   room: Room;
   tourResults: { match: string; scores: number[]; places: number[] }[] = [];
   challengeResults: import('../src/room').ChallengeResult[] = [];
@@ -27,7 +27,7 @@ export class FakeEnv {
     // The suite was written against instant first deals: the pre-deal setup window
     // defaults OFF here and is exercised explicitly by pre-deal.test.ts.
     this.timing = { preDealMs: 0, ...timing };
-    this.room = new Room(data ?? newRoomData('ABCDE', this.t, defaultRules('joker')), this.io(), this.timing);
+    this.room = new Room(data ?? newRoomData('ABCDE', this.t, { ...DEFAULT_TABLE_RULES }), this.io(), this.timing);
   }
 
   io(): RoomIO {
@@ -48,7 +48,7 @@ export class FakeEnv {
       modeGameOver: (rec) => { this.records.push(rec); },
       tournamentResult: (t, scores, places) => { this.tourResults.push({ match: t.match, scores, places }); },
       challengeResult: (_c, r) => { this.challengeResults.push(r); },
-      randomId: () => Array.from({ length: 4 }, () => this.rng.nextUint32().toString(16).padStart(8, '0')).join(''),
+      randomId: () => Array.from({ length: 4 }, () => Math.floor(this.rng() * 0x1_0000_0000).toString(16).padStart(8, '0')).join(''),
     };
   }
 

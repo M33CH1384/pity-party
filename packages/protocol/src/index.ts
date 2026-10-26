@@ -3,7 +3,6 @@
  * Plain TS types + small hand-written guards (no runtime schema lib, to keep the Worker bundle and CPU tiny).
  * Every client message is validated on the server with `parseClientMsg`; anything malformed is dropped.
  */
-import type { Card, PlayerView, RunPlayout, Series, TableRules } from '@pp/rules';
 import { isReactionEmoji, type ChatReactions } from './filter';
 export * from './filter';
 export * from './social';
@@ -104,13 +103,18 @@ export type BotLevel = 'mixed' | 'novice' | 'regular' | 'pro' | 'shark' | 'easy'
 export const BOT_LEVELS: readonly BotLevel[] = ['mixed', 'novice', 'regular', 'pro', 'shark', 'easy', 'normal'];
 
 /* ------------------------------------------------------------ client → server */
-export type GameAction =
-  | { type: 'reveal' }
-  | { type: 'bid'; bid: number | 'nil' | 'blindNil' }
-  | { type: 'exchange'; cards: Card[] }
-  | { type: 'play'; card: Card; slam?: number; rel?: [number, number] }
-  | { type: 'runIt' }
-  | { type: 'misdeal' };
+/**
+ * Generic table settings every mode shares (milestone 3b): seats and the per-turn clock.
+ * Game rules are the mode's own options (RoomInfo.modeOptions, @pp/game schemas).
+ */
+export interface TableRules {
+  /** seats at the table (the mode's seat range applies on top: see @pp/game RuleSet.minSeats/maxSeats) */
+  playerCount: number;
+  /** seconds per turn before the bot moves for you (learning mode stretches it) */
+  turnTimerSec: number;
+}
+export const DEFAULT_TABLE_RULES: TableRules = { playerCount: 4, turnTimerSec: 30 };
+export const TURN_TIMER_LIMITS = { min: 5, max: 120 } as const;
 
 export interface MediaState { cam: boolean; mic: boolean }
 
@@ -149,7 +153,7 @@ export type ClientMsg =
   | { t: 'removeBot'; seat: number }
   /** host: the table's venue (lobby / between games); everyone sees the same one */
   | { t: 'venue'; venue: VenueChoice }
-  | { t: 'config'; rules: TableRules; botLevel?: BotLevel; talkSec?: number; afkLimit?: number; partnerMicMute?: boolean; nukeIntensity?: NukeIntensity; botTalk?: boolean; talkIntensity?: TalkIntensity; aiTalk?: boolean }
+  | { t: 'config'; rules: Partial<TableRules>; botLevel?: BotLevel; talkSec?: number; afkLimit?: number; partnerMicMute?: boolean; nukeIntensity?: NukeIntensity; botTalk?: boolean; talkIntensity?: TalkIntensity; aiTalk?: boolean }
   /** rename your own team (team modes); '' resets to the partner names */
   | { t: 'teamName'; name: string }
   /** host only: what plays for the whole table (the server stamps `startAt` for beats) */
@@ -161,7 +165,6 @@ export type ClientMsg =
    * and answers `ack {stale}` + a fresh state instead of an error. `id` = client-chosen idempotency key: re-sending
    * the same id (e.g. after a reconnect) never applies twice.
    */
-  | { t: 'act'; action: GameAction; seq?: number; id?: string }
   | { t: 'next' }
   | { t: 'rematch' }
   /** all typed chat is public to the whole table (partners talk books out loud on their mics during bidding) */
@@ -285,8 +288,6 @@ export interface RoomInfo {
   teamNames?: (string | null)[];
   /** bot seats whose Hustler act is over (their lines drop the newbie cover; the plate tag does not) */
   revealed?: number[];
-  /** rematch series at this table (survives reconnects; resets when the teams change) */
-  series?: Series | null;
   /** open vote-kicks: target player, who voted, votes needed */
   votes?: { target: string; by: string[]; need: number }[];
   /** Release 9b: this table plays a tournament match */
@@ -360,18 +361,9 @@ export function rollVenue(r: number, not?: VenueId, includeLocked = false): Venu
   return pool[Math.min(pool.length - 1, Math.floor(r * pool.length))]!;
 }
 
-/**
- * Public play-out of a resolved 'Run it!', real seats, kept until the next hand.
- * `seq` is the room version of the claim so each client starts the show once.
- */
-export interface RunPlayback extends RunPlayout {
-  seq: number;
-}
-
 export type ServerMsg =
   | { t: 'welcome'; you: string; token: string; code: string; chat: ChatLine[]; v: number }
-  /** `view.history` is null when unchanged since the last state sent on this connection (keep the previous one) */
-  | { t: 'state'; room: RoomInfo; seat: number | null; view: PlayerView | null; /** Release 10: you're watching (view = a redacted table view from seat 0: no hand, no legal moves) */ spectator?: boolean; /** registry-mode tables: the mode game as this viewer sees it */ mode?: ModeState; /** remaining tricks of a resolved Run it!, so every client can play them out */ run?: RunPlayback }
+  | { t: 'state'; room: RoomInfo; seat: number | null; /** you're watching (unseated mid-game): the mode view is the redacted spectator view */ spectator?: boolean; /** the mode game as this viewer sees it (absent in the lobby) */ mode?: ModeState }
   | { t: 'chat'; line: ChatLine }
   /** a chat line's reactions changed (toggle): `id` names the line, the client upserts the map (not a new line) */
   | { t: 'chatReact'; id: number; reactions: ChatReactions }
@@ -389,30 +381,6 @@ const isObj = (x: unknown): x is Record<string, unknown> => typeof x === 'object
 const isInt = (x: unknown): x is number => typeof x === 'number' && Number.isInteger(x);
 const isStr = (x: unknown, max = 10_000): x is string => typeof x === 'string' && x.length <= max;
 
-function parseAction(a: unknown): GameAction | null {
-  if (!isObj(a)) return null;
-  switch (a.type) {
-    case 'reveal': return { type: 'reveal' };
-    case 'bid':
-      if (isInt(a.bid) && a.bid >= 0 && a.bid <= 17) return { type: 'bid', bid: a.bid };
-      if (a.bid === 'nil' || a.bid === 'blindNil') return { type: 'bid', bid: a.bid };
-      return null;
-    case 'exchange':
-      return Array.isArray(a.cards) && a.cards.length <= 2 && a.cards.every((c) => isStr(c, 2)) ? { type: 'exchange', cards: a.cards as Card[] } : null;
-    case 'play':
-      if (!isStr(a.card, 2)) return null;
-      {
-        const out: { type: 'play'; card: Card; slam?: number; rel?: [number, number] } = { type: 'play', card: a.card as Card };
-        if (typeof a.slam === 'number' && Number.isFinite(a.slam)) out.slam = Math.max(0, Math.min(1, a.slam));
-        const r = a.rel;
-        if (Array.isArray(r) && r.length === 2 && r.every((x) => typeof x === 'number' && Number.isFinite(x))) out.rel = [Math.max(-20, Math.min(20, r[0] as number)), Math.max(-20, Math.min(20, r[1] as number))];
-        return out;
-      }
-    case 'runIt': return { type: 'runIt' };
-    case 'misdeal': return { type: 'misdeal' };
-    default: return null;
-  }
-}
 
 /** Validates the shape of a client message (semantic checks happen in the room). Returns null if malformed. */
 export function parseClientMsg(raw: unknown): ClientMsg | null {
@@ -446,7 +414,10 @@ export function parseClientMsg(raw: unknown): ClientMsg | null {
     }
     case 'config': {
       if (!isObj(m.rules)) return null;
-      const out: Extract<ClientMsg, { t: 'config' }> = { t: 'config', rules: m.rules as unknown as TableRules, botLevel: typeof m.botLevel === 'string' && (BOT_LEVELS as readonly string[]).includes(m.botLevel) ? (m.botLevel as BotLevel) : undefined };
+      const rules: Partial<TableRules> = {};
+      if (isInt(m.rules.playerCount)) rules.playerCount = m.rules.playerCount;
+      if (isInt(m.rules.turnTimerSec)) rules.turnTimerSec = m.rules.turnTimerSec;
+      const out: Extract<ClientMsg, { t: 'config' }> = { t: 'config', rules, botLevel: typeof m.botLevel === 'string' && (BOT_LEVELS as readonly string[]).includes(m.botLevel) ? (m.botLevel as BotLevel) : undefined };
       if (isInt(m.talkSec) && (TALK_SECS as readonly number[]).includes(m.talkSec)) out.talkSec = m.talkSec;
       if (isInt(m.afkLimit) && (AFK_LIMITS as readonly number[]).includes(m.afkLimit)) out.afkLimit = m.afkLimit;
       if (typeof m.partnerMicMute === 'boolean') out.partnerMicMute = m.partnerMicMute;
@@ -464,14 +435,6 @@ export function parseClientMsg(raw: unknown): ClientMsg | null {
       if (mu.mode === 'link' && isStr(mu.url, 300) && isMusicLink(mu.url)) return { t: 'music', music: { mode: 'link', url: mu.url, title: isStr(mu.title, 200) ? mu.title : '' } };
       if (mu.mode === 'stream') return { t: 'music', music: { mode: 'stream', by: '', title: isStr(mu.title, 200) ? mu.title : '' } };
       return null;
-    }
-    case 'act': {
-      const action = parseAction(m.action);
-      if (!action) return null;
-      const out: Extract<ClientMsg, { t: 'act' }> = { t: 'act', action };
-      if (isInt(m.seq) && m.seq >= 0) out.seq = m.seq;
-      if (isStr(m.id, 40) && m.id.length > 0) out.id = m.id;
-      return out;
     }
     case 'chat':
       return isStr(m.text, 1000) ? { t: 'chat', text: m.text } : null;

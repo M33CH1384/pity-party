@@ -998,7 +998,7 @@ class Engine {
     this.venuePlaying = 'none';
   }
 
-  /* ---------- recorded bot voices (see voices/voices.ts) ---------- */
+  /* ---------- recorded bot voices (see removed in 3b, REBUILD.md) ---------- */
   private voiceDuck: GainNode | null = null;
   /** Phase 7: human WebRTC voice chat bus. The playerVoice category is applied ONLY here. */
   private voiceChatBus: GainNode | null = null;

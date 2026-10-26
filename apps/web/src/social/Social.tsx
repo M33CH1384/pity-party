@@ -4,13 +4,12 @@
  */
 import { Fragment, type FormEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { type DmLine, type InviteMsg, type OpenTable, type PresenceEntry, type PresenceStatus, REACT_PALETTE_EXTRA, SOCIAL_LIMITS, statusLabel } from '@pp/protocol';
-import { storyStopById } from '@pp/bots';
 import { useAccount } from '../account/api';
 import { AvatarCircle, socialUidOf, useAvatar } from '../avatar';
 import { createTable } from '../online/connection';
 import { inviteLink, serverUrl } from '../online/config';
 import { navigate } from '../online/nav';
-import { loadSettings } from '../settings';
+import { loadModeChoice } from '../modes/catalog';
 import { shownPlayers, friendPresenceView } from './presence';
 import { type PlayerTableAction, playerTableAction } from './tableActions';
 import { type MyTable, type SocialTab, type Toast, NOT_FRIENDS_TEXT, badgeCount, globalUnread, isMuted, social, useSocial } from './store';
@@ -157,7 +156,7 @@ function InviteToast({ inv }: { inv: InviteMsg }) {
   return (
     <div className="soc-invite glass slant" role="alertdialog" aria-label={`Invite from ${inv.fromName}`} data-testid={story ? 'invite-toast-story' : 'invite-toast'}>
       <div className="soc-invite-txt"><b>{inv.fromName}</b> {story
-        ? <>invited you to run <b>Story Mode</b> together{inv.stopId ? <> — starting at {storyStopById(inv.stopId)?.name ?? 'the Porch'}</> : ''}<small>Story table {inv.code} · {left}s</small></>
+        ? <>invited you to run <b>Story Mode</b> together<small>Story table {inv.code} · {left}s</small></>
         : <>invited you to {inv.mode ? modeName(inv.mode) : 'a table'}<small>Table {inv.code} · {left}s</small></>}
       </div>
       <div className="soc-invite-btns">
@@ -296,11 +295,9 @@ function SignInNote({ what }: { what: string }) {
 export async function inviteTo(pid: string, mine: MyTable | null) {
   if (mine) { social.invite(pid, mine); return; }
   try {
-    const st = loadSettings();
     const code = await createTable(serverUrl());
     sessionStorage.setItem(`bwm.created.${code}`, '1');
-    const mode = st.mode === 'joker' ? 'joker' : st.mode === 'aceDown' ? 'aceDown' : 'cutthroat';
-    social.invite(pid, { code, mode, seat: st.mode === 'joker' || st.mode === 'aceDown' ? 2 : 1, open: 3 });
+    social.invite(pid, { code, mode: loadModeChoice().modeId, seat: 1, open: 3 });
     social.close();
     navigate(`/t/${code}`);
   } catch { social.toast("Couldn't create a table. Try again.", 'error'); }

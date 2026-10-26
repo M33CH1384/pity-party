@@ -1,5 +1,5 @@
 /** Release 9b: /api/tournaments — list (D1), create, detail + actions (the tournament's Durable Object). */
-import { makeRules } from '@pp/rules';
+import { DEFAULT_TABLE_RULES } from '@pp/protocol';
 import { type AuthEnv, currentUser } from '../auth/routes';
 import { isProfane } from '../auth/username';
 import { type SocialEnv, isAdmin } from '../social/routes';
@@ -35,7 +35,9 @@ export function parseCreate(b: Record<string, unknown>, now: number, test: boole
   if (!Number.isFinite(regOpenAt) || !Number.isFinite(regCloseAt) || regOpenAt > regCloseAt || regCloseAt > startAt) return { ok: false, error: 'Registration must close by the start.' };
   const target = [150, 250, 300, 500].includes(Number(b.target)) ? Number(b.target) : undefined;
   let rules;
-  try { rules = makeRules(mode, { playerCount: pc as 3 | 4, ...(test && b.target === 50 ? { targetScore: 50 } : target ? { targetScore: target } : {}) }); } catch { return { ok: false, error: 'Bad rules.' }; }
+  // TODO(rebuild): tournaments carried Spades rules (target score); they return on the registry (REBUILD.md).
+  void target;
+  rules = { playerCount: pc, turnTimerSec: DEFAULT_TABLE_RULES.turnTimerSec };
   return { ok: true, v: { name, mode, rules, format, rounds, team, max, startAt, regOpenAt, regCloseAt, bots: b.bots !== false, ...(test && b.fast ? { fast: true } : {}) } };
 }
 
