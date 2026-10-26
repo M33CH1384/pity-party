@@ -169,7 +169,7 @@ export function TableLoading({ progress, leaving, onBack, onRetry, fault, room, 
   const node = (
     <div className={`bwm-loading${leaving ? ' leaving' : ''}`} role={fault ? 'alert' : 'status'} data-testid="table-loading">
       <div className="bwm-loading-card">
-        <img className="bwm-loading-mark" src="/assets/bwm-wordmark-white.svg" alt="Bid Wit Me" />
+        <span className="bwm-loading-mark pp-wordmark">Pity Party</span>
         <span className="beta-tag">BETA</span>
         {room && <div className="bwm-loading-room" data-testid="loading-room">{room}</div>}
         {fault ? (

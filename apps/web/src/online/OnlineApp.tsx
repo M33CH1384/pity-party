@@ -93,8 +93,8 @@ function Entry({ code, name, onName, onGo }: { code: string | null; name: string
   return (
     <div className="setup online-entry" data-testid="online-entry">
       <header className="setup-hero">
-        <img className="logo" src="/assets/bwm-wordmark-white.svg" alt="" />
-        <h1 className="sr-only">Bid Wit Me online</h1>
+        <span className="logo pp-wordmark" aria-hidden>Pity Party</span>
+        <h1 className="sr-only">Pity Party online</h1>
         <p className="tagline">Play online with friends</p>
         {code && info?.exists && <p>You're invited to table <b>{code}</b>{info.host ? ` (host: ${info.host})` : ''} · {info.mode === 'joker' ? 'Joker Spades' : info.mode === 'aceDown' ? 'Ace Down' : 'Cutthroat'}</p>}
         {code && info && !info.exists && <p className="err">Table {code} doesn't exist (or has expired).</p>}

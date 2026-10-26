@@ -13,7 +13,7 @@ import { describe, expect, it } from 'vitest';
 const read = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
 const esc = (css: string) => css.slice(css.indexOf('escalation pass'));
 
-const RIM = 'linear-gradient(135deg, rgba(196,160,255,.9) 0%, rgba(var(--purple-rgb), .55) 30%, rgba(var(--blue-rgb), .5) 68%, rgba(var(--cyan-rgb), .85) 100%) border-box';
+const RIM = 'linear-gradient(135deg, rgba(203,207,212,.9) 0%, rgba(var(--purple-rgb), .55) 30%, rgba(var(--blue-rgb), .5) 68%, rgba(var(--cyan-rgb), .85) 100%) border-box';
 
 describe('glass v3 — shared panels (styles.css escalation section)', () => {
   const sec = esc(read('../src/styles.css'));
@@ -88,7 +88,7 @@ describe('glass v3 — Social floats on the ink (social.css escalation section)'
     expect(sec).toContain('html[data-theme="neon"] .soc-bubble');
     expect(sec).toContain('rgba(var(--purple-rgb), .14), rgba(var(--glass-strong-rgb), .72)');
     expect(sec).toContain('html[data-theme="neon"] .soc-line.mine .soc-bubble');
-    expect(sec).toContain('rgba(var(--gold-rgb), .34), rgba(201,150,42,.22)');
+    expect(sec).toContain('rgba(var(--gold-rgb), .34), rgba(109,119,134,.22)');
   });
 
   it('the profile modal card and Ranks card take the v3 rim', () => {

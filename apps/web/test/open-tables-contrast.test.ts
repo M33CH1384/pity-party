@@ -44,7 +44,10 @@ const hexRgb = (hex: string): Rgb => {
   return [parseInt(h.slice(0, 2), 16), parseInt(h.slice(2, 4), 16), parseInt(h.slice(4, 6), 16)];
 };
 
+const themeCss = read('../src/theme.css');
 const varHex = (block: string, name: string): string => {
+  const alias = block.match(new RegExp(`${name}:\\s*var\\((--pp-[\\w-]+)\\)`));
+  if (alias) return varHex(themeCss, alias[1]!);
   const m = block.match(new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})`));
   expect(m, `${name} in block`).toBeTruthy();
   return m![1]!;

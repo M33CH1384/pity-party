@@ -27,7 +27,7 @@ import GearIcon from '../GearIcon';
 import { ProfileView } from '../profile/ProfileView';
 import './social.css';
 
-export const MODE_NAME: Record<string, string> = { joker: 'Joker Spades', aceDown: 'Ace Down', cutthroat: 'Cutthroat' };
+export const MODE_NAME: Record<string, string> = { placeholder: 'High Card', 'pitty-pat': 'Pitty Pat', tonk: 'Tonk' };
 const modeName = (m: string) => MODE_NAME[m] ?? m;
 
 /** report what you're doing (Online / In lobby / At a table / In tournament) while this component is mounted */
@@ -173,7 +173,7 @@ function InviteToast({ inv }: { inv: InviteMsg }) {
 const TABS: [SocialTab, string][] = [['players', 'Players'], ['chat', 'Chat'], ['friends', 'Friends'], ['leaders', 'Ranks']];
 /** share a link: native share sheet when there is one, else copy */
 async function shareLink(url: string, text: string) {
-  if (navigator.share) { try { await navigator.share({ title: 'Bid Wit Me', text, url }); return; } catch { return; } }
+  if (navigator.share) { try { await navigator.share({ title: 'Pity Party', text, url }); return; } catch { return; } }
   try { await navigator.clipboard.writeText(url); social.toast('Link copied', 'info'); } catch { social.toast(url, 'info'); }
 }
 
@@ -272,7 +272,7 @@ function SocialPanel() {
 function AloneEmpty() {
   const s = useSocial();
   const shareCode = async () => {
-    if (s.myTable) await shareLink(inviteLink(s.myTable.code), `Pull up to my Spades table on Bid Wit Me 🃏 Code ${s.myTable.code}`);
+    if (s.myTable) await shareLink(inviteLink(s.myTable.code), `Pull up to my table on Pity Party 🃏 Code ${s.myTable.code}`);
   };
   return (
     <div className="soc-alone" data-testid="soc-alone">
@@ -280,7 +280,7 @@ function AloneEmpty() {
       <p><b>It's just you right now.</b><br />Bring your people to the table.</p>
       {s.myTable
         ? <button type="button" className="primary" data-testid="alone-share-code" onClick={() => void shareCode()}>Share table code {s.myTable.code}</button>
-        : <button type="button" className="primary" data-testid="alone-invite" onClick={() => void shareLink(location.origin, 'Come play Spades with me on Bid Wit Me 🃏')}>Invite friends</button>}
+        : <button type="button" className="primary" data-testid="alone-invite" onClick={() => void shareLink(location.origin, 'Come play cards with me on Pity Party 🃏')}>Invite friends</button>}
     </div>
   );
 }

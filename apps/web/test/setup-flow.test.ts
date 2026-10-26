@@ -45,7 +45,7 @@ describe('start screens', () => {
     await click('play-bots');
     expect($('mode-setup')).not.toBeNull();
     for (const gone of ['house-rules', 'venue-row', 'setup-team-name', 'rules-stats']) expect($(gone)).toBeNull();
-    expect($('setup-bar-summary')!.textContent).toBe('High Card · 2–5 players · Default rules');
+    expect($('setup-bar-summary')!.textContent).toBe('High Card · 2–4 players · Default rules');
     await click('start-bots');
     expect(document.querySelector('[data-testid="mode-screen"]')?.getAttribute('data-mode')).toBe('placeholder');
     await click('mode-leave');
@@ -65,6 +65,6 @@ describe('start screens', () => {
 
   it('summary counts options changed from the defaults', () => {
     const c = defaultChoice('placeholder');
-    expect(modeSummary({ ...c, options: { handSize: 5 } })).toBe('High Card · 2–5 players · 1 option changed');
+    expect(modeSummary({ ...c, options: { handSize: 5 } })).toBe('High Card · 2–4 players · 1 option changed');
   });
 });

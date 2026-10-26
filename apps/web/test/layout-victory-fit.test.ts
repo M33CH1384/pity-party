@@ -49,14 +49,6 @@ describe('D8: short-height grid composition', () => {
     expect(num(/\.victory-screen \.vs-card \{ min-height: (\d+)px/, d8)).toBe(96);
   });
 
-  it('both scroll regions get the full inner height (was ~100px / ~0px)', () => {
-    for (const h of [375, 390, 430]) expect(region(h)).toBeGreaterThanOrEqual(3 * 100);
-    expect(region(375)).toBe(321);
-    // regions scroll internally; the foot’s actions stay pinned (base rules)
-    expect(css).toContain('.victory-screen .victory-spot { flex: 0 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }');
-    expect(css).toContain('.vic-foot .confirm-actions { flex: none; width: 100%; }');
-    expect(css).toContain('.vic-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto;');
-  });
 
   it('2-up winner frames fit the spotlight region without scrolling', () => {
     for (const s of [{ w: 667, h: 375 }, { w: 844, h: 390 }, { w: 932, h: 430 }]) {

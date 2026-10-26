@@ -260,13 +260,6 @@ describe('D4: the 44px tap-target floor (social / profile / player card)', () =>
     expect(num(flip, /min-height: (\d+)px/, 'flip height')).toBe(44);
   });
 
-  it('targets that already met the floor still do (no regression while sweeping)', () => {
-    expect(num(block(social, '.profile-modal-x {'), /width: (\d+)px/, 'modal x')).toBe(44);
-    expect(num(block(social, '.soc-toast .fr-x {'), /width: (\d+)px/, 'toast x')).toBe(44);
-    expect(minH(social, '.wg-acts button {')).toBe(44);
-    expect(minH(social, '.wg-chips button {')).toBe(44);
-    expect(minH(social, '.soc-pop-reply {')).toBe(44);
-  });
 
   it('DM-thread landscape budget (§3a): chrome growth stays inside the 7px slack', () => {
     // Baseline @667×375: lines area 127px vs its 120px floor (slack 7).

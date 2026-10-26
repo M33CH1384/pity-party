@@ -190,9 +190,9 @@ describe('the BottomLine renders: bug + lines from the rating board fetch', () =
     for (let i = 0; i < 4; i++) await act(async () => { await new Promise((r) => setTimeout(r, 5)); });
     const bar = el.querySelector('[data-testid="ranks-ticker"]');
     expect(bar).not.toBeNull();
-    const bug = el.querySelector('.ticker-bug img') as HTMLImageElement | null;
+    const bug = el.querySelector('.ticker-bug');
     expect(bug).not.toBeNull();
-    expect(bug!.getAttribute('src')).toBe('/assets/bwm-wordmark-white.svg');
+    expect(bug!.textContent).toContain('Pity Party');
     expect(el.textContent).toContain('Top rated · Partnership — Alpha 1500 · Bravo 1420');
     for (const n of DIVISION_NAMES) expect(el.textContent ?? '').not.toContain(n);
   });
@@ -202,7 +202,7 @@ describe('the BottomLine renders: bug + lines from the rating board fetch', () =
     expect(css).toContain('.ticker-beta {');
     // the block is fully opaque in BOTH themes — a solid hex fill, and the
     // old translucent gold / neon-tinted bug backgrounds are gone
-    expect(css).toContain('background: #1d0b38');
+    expect(css).toContain('background: #1e2125');
     expect(css).not.toContain('.ticker-bug { flex: none; display: grid; place-items: center; width: 44px; background: rgba');
     expect(css).not.toContain('html[data-theme="neon"] .ticker-bug { background: rgba');
     // the marquee track lives inside its own clipped viewport beside the bug

@@ -1,0 +1,51 @@
+/* ===================== Pity Party theme tokens =====================
+   ONE neutral placeholder theme (milestone 3d). Every color the app
+   paints comes from these tokens (directly, or through the legacy aliases
+   in styles.css :root), so Desi's palette drops in by editing THIS file:
+   swap the values below, nothing else. Keep each *-rgb triplet in step
+   with its hex (rgba(var(--x-rgb), a) uses the triplet).
+
+   Roles
+     bg / surface*   page and panel backgrounds (dark → lighter)
+     ink / muted     text: primary, secondary
+     accent*         the brand hue: selection, outlines, toggles, glows
+     primary*        main call-to-action fill (Start, Deal me in) + its ink
+     danger/success  functional colors (leave table, ready ✓) — not brand
+   ==================================================================== */
+:root {
+  --pp-bg: #111317;
+  --pp-bg-rgb: 17, 19, 23;
+  --pp-surface: #171a1f;
+  --pp-surface-2: #1d2027;
+  --pp-surface-hi: #252932;
+  --pp-field: #1a1d23;
+  --pp-ink: #f1f3f6;
+  --pp-ink-deep: #0c0d10;
+  --pp-muted: #a4abb7;
+  --pp-soft: #c9ced8;
+
+  --pp-accent: #7d8899;
+  --pp-accent-rgb: 125, 136, 153;
+  --pp-accent-hot: #a3adbd;
+  --pp-accent-deep-rgb: 72, 80, 94;
+  --pp-edge-rgb: 150, 160, 176;
+
+  --pp-primary: #dfe3e9;
+  --pp-primary-rgb: 223, 227, 233;
+  --pp-primary-deep: #a9b0bc;
+  --pp-primary-hi: #f2f4f7;
+  --pp-primary-hi-rgb: 242, 244, 247;
+  --pp-primary-ink: #14161a;
+  --pp-primary-grad: linear-gradient(180deg, #f2f4f7, #dfe3e9 45%, #a9b0bc);
+
+  --pp-info-rgb: 125, 165, 205;
+  --pp-cyan-rgb: 130, 190, 210;
+  --pp-danger: #e5484d;
+  --pp-success: #4cc38a;
+
+  --pp-glass-rgb: 22, 24, 29;
+  --pp-glass-strong-rgb: 18, 20, 24;
+}
+
+/* Text wordmark (placeholder until Desi's logo): neutral, display face. */
+.pp-wordmark { font-family: var(--display); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--pp-ink); }

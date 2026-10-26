@@ -67,7 +67,7 @@ const REASONS: Record<string, string> = {
   cancelled: 'Sign-in was cancelled.',
   exchange: "Couldn't finish signing in with that provider. Try again.",
   no_code: "Couldn't finish signing in with that provider. Try again.",
-  linked_elsewhere: 'That login is already linked to a different Bid Wit Me account.',
+  linked_elsewhere: 'That login is already linked to a different Pity Party account.',
   signed_out: 'You were signed out. Sign in and try again.',
   provider_off: "That sign-in option isn't available yet.",
 };

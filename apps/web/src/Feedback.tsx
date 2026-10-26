@@ -56,7 +56,7 @@ export default function Feedback({ onClose }: { onClose: () => void }) {
         const j = (await r.json().catch(() => ({}))) as { error?: string };
         setError(r.status === 429 ? (j.error ?? 'Too many messages: try again in an hour.') : `Couldn't send that (${j.error ?? r.status}).`);
       }
-    } catch { setError("Couldn't reach the Bid Wit Me server. Check your connection and try again."); }
+    } catch { setError("Couldn't reach the Pity Party server. Check your connection and try again."); }
     setBusy('');
   };
 

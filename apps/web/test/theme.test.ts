@@ -94,7 +94,7 @@ describe('theme store', () => {
     expect(meta.attrs.get('content')).toBe('#070914');
     t.themeStore.set('classic');
     expect(doc.documentElement.dataset.theme).toBeUndefined();
-    expect(meta.attrs.get('content')).toBe('#0c0712');
+    expect(meta.attrs.get('content')).toBe('#111317');
   });
 });
 
@@ -148,7 +148,7 @@ describe('token parity', () => {
   it('the anchor values are the spec values', () => {
     const rootBody = block(/:root \{([\s\S]*?)\n\}/);
     const neonBody = block(/html\[data-theme="neon"\] \{([\s\S]*?)\n\}/);
-    expect(rootBody).toContain('--bg: #0c0712');
+    expect(rootBody).toContain('--bg: var(--pp-bg)');
     expect(neonBody).toContain('--bg: #070914');
     expect(neonBody).toContain('--ink: #f5f4ff');
     expect(neonBody).toContain('--purple: #8054ff');
