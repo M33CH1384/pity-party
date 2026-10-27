@@ -10,8 +10,8 @@ const LIT = /#[0-9a-fA-F]{3,8}\b|rgba?\(\s*\d/g;
 const EXEMPT = new Set(['theme.css', 'theme.ts', 'accent.ts', 'fonts.css']); // accent.ts holds Desi's preset table + colour maths (V2)
 /** Ratchet ceilings (V1). Lower these as V1b sweeps; never raise. */
 const CEILING: Record<string, number> = {
-  'venues.ts': 108, // venue art palettes (BWM-era scenery), V1b
-  'styles.css': 71, 'profile/playercard.css': 69, 'social/social.css': 43, 'transitions.css': 14, 'online/online.css': 11, 'account/account.css': 6,
+  'venues.ts': 108, // BWM-era 3D venue scenery palettes; not drawn by Pity Party's 2D tables. Explicit art exception, pending a delete-vs-keep decision
+  // V1b-1: every stylesheet is at zero (styles, playercard, social, transitions, online, account) — new code: zero.
   'SprayLayer.tsx': 19, 'sprayTextures.ts': 8, 'inkTextures.ts': 8, // canvas paint colours
   'online/useOnline.ts': 7, 'RepBlock.tsx': 6, 'account/AccountUI.tsx': 4, 'ink/splat.ts': 3, 'spatial.ts': 1, 'feedbackContext.ts': 1, 'audio.ts': 1,
 };

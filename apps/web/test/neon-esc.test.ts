@@ -32,7 +32,7 @@ describe('glass v3 — shared panels (styles.css escalation section)', () => {
     expect(sec).toContain('backdrop-filter: blur(20px) saturate(175%) brightness(1.08)');
     expect(sec).toContain('inset 0 1px 0 rgba(var(--pp-hi-rgb),.32)');
     // the refraction illusion: a bright band offset just inside the top rim
-    expect(sec).toContain('inset 0 3px 3px -2px rgba(190,215,255,.4)');
+    expect(sec).toContain('inset 0 3px 3px -2px rgba(var(--pp-x-blue-12-rgb), .4)');
     expect(sec).toContain('inset 0 -2px 3px -2px rgba(var(--cyan-rgb), .3)');
     // inner glow where the glass meets the ink
     expect(sec).toContain('inset 0 0 26px rgba(var(--purple-rgb), .09)');
