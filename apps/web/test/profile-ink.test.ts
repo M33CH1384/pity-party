@@ -38,7 +38,7 @@ describe('Neon: the profile page carries an ink variation', () => {
   it('the header zone pools an ink-toned glow (page host only — .profile-page scope)', () => {
     expect(css).toContain('html[data-fx="neon"] .profile-page .soc-prof-head {');
     expect(css).toContain('rgba(var(--purple-rgb), .22)');
-    expect(css).toContain('rgba(38, 156, 255, .14)');
+    expect(css).toContain('rgba(var(--pp-x-blue-6-rgb), .14)');
   });
   it('Classic is untouched: the base .profile-page rule still paints no background', () => {
     expect(css).toContain('.profile-page { min-height: 100dvh; padding: calc(12px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); max-width: 720px; margin: 0 auto; }');

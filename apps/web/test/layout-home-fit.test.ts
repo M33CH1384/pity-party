@@ -307,30 +307,12 @@ describe('home backdrop art: the Neon layer covers the stage (owner, 2026-10-26)
   });
 
   it('the painting covers hero + breath and reaches into the actions zone', () => {
+    // V1b: the BWM spade-emblem picture is retired. The stage backdrop is now a token-coloured accent glow
+    // behind the neon sign (no image file), and the BWM ace-card overlay is gone.
     const rule = beforeRule();
-    const sizeM = rule.match(/\/ auto (\d+(?:\.\d+)?)%/);
-    expect(sizeM, 'the emblem paints height-driven off the stage box').toBeTruthy();
-    const pct = parseFloat(sizeM![1]);
-    const posM = rule.match(/no-repeat 50% -(\d+(?:\.\d+)?)px/);
-    const lift = posM ? parseFloat(posM[1]) : 0;
-    const tracks = parseStageTracks();
-    // the phone portrait matrix from the grid suite (stage height,
-    // splash height, actions height per state)
-    const CASES: [string, number, number, number][] = [
-      ['plain 375×667', 541, 109.1, 149], ['story 375×667', 541, 109.1, 235],
-      ['plain 390×844', 718, 112.3, 149], ['story 390×844', 718, 112.3, 235],
-      ['full 390×844', 718, 112.3, 332],
-      ['story 430×932', 806, 121, 235], ['full 430×932', 806, 121, 332],
-    ];
-    for (const [label, homeH, splashH, actionsH] of CASES) {
-      const sizes = resolveFlex(tracks, homeH - splashH - actionsH);
-      const actionsTop = sizes[0] + splashH + sizes[2];
-      const paintedBottom = (pct / 100) * homeH - lift;
-      // the art must paint PAST the top of the actions block — the
-      // whole breath is art-covered, and the fade (mask, below) is
-      // what ends it inside the actions zone, never a bare gap
-      expect(paintedBottom, `${label}: painted art bottom vs actions top`).toBeGreaterThan(actionsTop + 24);
-    }
+    expect(rule).not.toContain('url(');
+    expect(rule).toMatch(/radial-gradient\([^;]*var\(--pp-accent\)/);
+    expect(css).toMatch(/\.wiz-home::after \{ content: none; \}/);
   });
 
   it('the mask grades the art out inside the stage: strong core, gone before the bottom', () => {
@@ -366,8 +348,8 @@ describe('home backdrop art: the Neon layer covers the stage (owner, 2026-10-26)
     const maskM = seg![1].match(/transparent (\d+(?:\.\d+)?)%/);
     expect(maskM).toBeTruthy();
     expect(parseFloat(maskM![1])).toBeLessThanOrEqual(80);
-    // the ace accent sits in the splash column, not over the actions
-    expect(land![1]).toMatch(/\.wiz-home::after \{[^}]*right: calc\(50% \+ 8px\)/);
+    // V1b: no ace-card overlay to re-seat any more
+    expect(land![1]).not.toMatch(/\.wiz-home::after/);
   });
 
   it('the art layer is Neon-only: Classic carries no home art layer to strand', () => {
