@@ -1,0 +1,56 @@
+/* V4 button system (stage2 html/buttons.html + app.css). Tokens live in theme.css (--btn-*, --h-btn*, --r-btn).
+   Variants: primary (.primary / .btn.pri), secondary (.btn.sec + the wizard's outline buttons),
+   ghost (.ghost / .btn.ghost), danger (.danger / .btn.dng). Sizes: .big / default 52px, .sm / .small-btn 44px.
+   Every button is ≥44px. Surfaces scoped out in S2 (bidding, victory, rewards, lobby, story) keep their looks. */
+:is(.btn, .primary, .danger, .ghost):not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell, .prof-pic-btn) *):not(.prof-pic-btn, .link) {
+  min-height: var(--h-btn-sm); padding: 0 18px; border: 0; border-radius: var(--r-btn); clip-path: none;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--display); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap;
+  transition: transform .08s ease, box-shadow .12s ease, filter .12s ease;
+}
+:is(.btn, .primary, .danger, .ghost).big:not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell) *) {
+  min-height: var(--h-btn); font-size: 17px; border-radius: var(--r-btn); clip-path: none;
+}
+.btn.sm { min-height: var(--h-btn-sm); font-size: 15px; padding: 0 16px; border-radius: 15px; }
+
+/* primary */
+:is(.btn.pri, .primary, .primary.big):not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell) *) {
+  background: var(--btn-pri-bg); color: var(--btn-pri-ink);
+  box-shadow: 0 4px 0 var(--btn-pri-lip), 0 10px 26px var(--btn-pri-glow), inset 0 1px 0 var(--btn-pri-hl);
+}
+/* secondary */
+.btn.sec { background: var(--btn-sec-fill); color: var(--btn-sec-ink); box-shadow: inset 0 0 0 2px var(--btn-sec-ink); }
+/* ghost */
+:is(.btn.ghost, button.ghost):not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell) *):not(.prof-pic-btn) {
+  background: var(--btn-ghost-bg); color: var(--btn-ghost-ink); box-shadow: none;
+}
+:is(.btn.ghost, button.ghost):not(.prof-pic-btn):hover:not(:disabled) { background: var(--btn-ghost-bg-hover); }
+/* danger */
+:is(.btn.dng, .danger):not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell) *) {
+  background: var(--btn-dng-fill); color: var(--btn-dng-ink); box-shadow: inset 0 0 0 2px var(--btn-dng-ink);
+}
+
+/* states: press / focus / disabled (shared) */
+:is(.btn, .primary, .danger, button.ghost):not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell) *):not(.prof-pic-btn):active:not(:disabled) {
+  transform: translateY(var(--btn-press-y));
+}
+:is(.btn.pri, .primary):not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell) *):active:not(:disabled) {
+  transform: translateY(var(--btn-press-y)); box-shadow: 0 1px 0 var(--btn-pri-lip), inset 0 1px 0 var(--btn-pri-hl);
+}
+:is(.btn, .primary, .danger, button.ghost):not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell) *):focus-visible {
+  outline: 3px solid var(--btn-focus); outline-offset: 3px;
+}
+:is(.btn, .primary, .danger, button.ghost):not(:is(.bid-panel, .bid-row, .victory-screen, .rw-actions, .rewards-page, .lobby, .story-shell) *):disabled,
+.btn.is-disabled {
+  opacity: var(--btn-disabled-op); filter: saturate(.3); box-shadow: none; transform: none; pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) { :is(.btn, .primary, .danger, button.ghost) { transition: none; } }
+
+/* secondary, as already used by the wizard / join row (was the gold chevron outline) */
+:is(.setup .join-row .micro-action, .wizard .micro-action, .wizard .team-name-edit button) {
+  clip-path: none; border-radius: 15px; min-height: var(--h-btn-sm); padding: 0 16px;
+  background: var(--btn-sec-fill); color: var(--btn-sec-ink); box-shadow: inset 0 0 0 2px var(--btn-sec-ink);
+}
+:is(.setup .join-row .micro-action, .wizard .micro-action, .wizard .team-name-edit button)::before { content: none; }
+:is(.setup .join-row .micro-action, .wizard .micro-action, .wizard .team-name-edit button):focus-visible { outline: 3px solid var(--btn-focus); outline-offset: 3px; }
+:is(.setup .join-row .micro-action, .wizard .micro-action, .wizard .team-name-edit button):disabled { opacity: var(--btn-disabled-op); filter: saturate(.3); }

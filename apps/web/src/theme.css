@@ -352,6 +352,35 @@ html[data-theme="K"] { --pp-card-back: #1A0F2B; --pp-card-back-ink: #F6F1FF; }
 .so-four .so-glyphs i:nth-child(3) { color: var(--pp-suit-d); }
 .so-four .so-glyphs i:nth-child(4) { color: var(--pp-suit-c); }
 
+/* V4 button tokens (stage2 buttons.html). One component sheet (buttons.css) reads only these. */
+:root {
+  --btn-pri-bg: linear-gradient(180deg, color-mix(in srgb, var(--pp-accent) 78%, #ffffff), var(--pp-accent) 55%, color-mix(in srgb, var(--pp-accent) 85%, #000000));
+  --btn-pri-ink: var(--pp-accent-on);
+  --btn-pri-lip: color-mix(in srgb, var(--pp-accent) 50%, #000000);
+  --btn-pri-glow: color-mix(in srgb, var(--pp-accent) 45%, transparent);
+  --btn-pri-hl: rgba(255, 255, 255, .5);
+  --btn-sec-fill: var(--pp-btn-fill);
+  --btn-sec-ink: var(--pp-accent-2);
+  --btn-ghost-bg: rgba(255, 255, 255, .06);
+  --btn-ghost-bg-hover: rgba(255, 255, 255, .11);
+  --btn-ghost-ink: var(--pp-ink);
+  --btn-dng-fill: var(--pp-btn-fill);
+  --btn-dng-ink: var(--pp-danger);
+  --btn-focus: #ffffff;
+  --btn-disabled-op: .38;
+  --btn-press-y: 3px;
+}
+html[data-theme="B"] {
+  --btn-pri-hl: rgba(255, 255, 255, .35);
+  --btn-pri-glow: color-mix(in srgb, var(--pp-accent) 25%, transparent);
+  --btn-ghost-bg: rgba(43, 33, 24, .07);
+  --btn-ghost-bg-hover: rgba(43, 33, 24, .12);
+  --btn-focus: var(--pp-ink);
+  --btn-disabled-op: .45;
+}
+html[data-theme="A"] { --btn-focus: var(--pp-accent-2); }
+html[data-theme="K"] { --btn-focus: var(--pp-accent); }
+
 /* ---- Wordmark: Desi's option C neon sign cabinet (NeonSign.tsx, /public/logo/*.webp). The renders include
    their own glow margin, so sizes are set on the image box; text styling no longer applies. */
 .neon-sign { display: block; height: auto; max-width: 100%; }
