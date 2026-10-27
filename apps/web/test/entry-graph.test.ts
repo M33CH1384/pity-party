@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -52,5 +52,26 @@ describe('first script on a reload', () => {
     }
     const heavy = [...pkgs].filter((p) => p === 'three' || p.startsWith('@react-three') || p === 'postprocessing');
     expect(heavy).toEqual([]);
+  });
+
+  it('V10: src/three3d/** keeps three behind the lazy PPScene import', () => {
+    const dir = join(src, 'three3d');
+    const files = readdirSync(dir, { recursive: true }).map(String).filter((f) => /\.tsx?$/.test(f)).map((f) => join(dir, f));
+    expect(files.length).toBeGreaterThan(0);
+    // walk the first-load graph again and collect every three3d file it reaches statically
+    const seen = new Set<string>(); const queue = [join(src, 'main.tsx')];
+    while (queue.length) {
+      const path = queue.pop()!;
+      if (seen.has(path)) continue; seen.add(path);
+      for (const spec of valueImports(path)) { const next = resolve(path, spec); if (next && next.startsWith('/')) queue.push(next); }
+    }
+    const reached = files.filter((f) => seen.has(f));
+    const imports3 = (f: string) => valueImports(f).some((p) => p === 'three' || p.startsWith('three/') || p.startsWith('@react-three'));
+    // the three-importing files exist (PPScene) but none is on the first-load graph
+    expect(files.filter(imports3).map((f) => f.slice(dir.length + 1))).toEqual(['PPScene.tsx']);
+    expect(reached.filter(imports3)).toEqual([]);
+    expect(reached.map((f) => f.slice(dir.length + 1)).sort()).toEqual(['Table3DLayer.tsx', 'preload.ts', 'renderer.ts']);
+    // preload reaches PPScene only through a dynamic import()
+    expect(readFileSync(join(dir, 'preload.ts'), 'utf8')).toMatch(/import\('\.\/PPScene'\)/);
   });
 });
