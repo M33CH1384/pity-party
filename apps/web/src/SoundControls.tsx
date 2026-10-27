@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { setTablePref, useTablePref, useTableRenderer } from './three3d/renderer';
 import { createPortal } from 'react-dom';
 import { sound, useSoundSettings } from './audio';
 import { speakerAriaLabel } from './audioSession';
@@ -262,6 +263,20 @@ export function ReduceEffectsRow() {
       <span>Reduce effects<small className="sf-note"> · no shake / flash, calm nuke (your device's Reduce motion only drops the shake)</small></span>
       <button type="button" role="switch" aria-checked={on} aria-label="Reduce effects" data-testid="reduce-fx" className={`switch ${on ? 'on' : ''}`} onClick={() => fx.setReduce(!on)}><i /></button>
     </label>
+  );
+}
+
+/** V10 "Table: 3D / 2D": 2D is always offered; 3D also needs WebGL2, a capable GPU and motion allowed. */
+export function Table3DRow() {
+  const pref = useTablePref();
+  const r = useTableRenderer();
+  const note = pref === '2d' ? 'flat table' : r === '3d' ? '3D table' : 'using 2D on this device or setting';
+  return (
+    <div className="sf-row seg-stack"><span>Table<small className="sf-note"> · {note}</small></span>
+      <span className="seg" role="radiogroup" aria-label="Table" data-testid="table3d-seg">
+        {(['3d', '2d'] as const).map((q) => <button key={q} type="button" role="radio" aria-label={q === '3d' ? '3D' : '2D'} aria-checked={pref === q} className={pref === q ? 'on' : ''} onClick={() => setTablePref(q)}>{q === '3d' ? '3D' : '2D'}</button>)}
+      </span>
+    </div>
   );
 }
 

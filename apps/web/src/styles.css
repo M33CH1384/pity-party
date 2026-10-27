@@ -3029,3 +3029,16 @@ button.tk-spread { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+
+/* V10a 3D shell: the canvas sits under the always-mounted 2D table (HUD + fallback) at z -1 in the root
+   stacking context (no isolation: fixed HUD bits like the chat tab keep their global z-index). The screen
+   background and the 2D felt go see-through only after the first 3D frame (data-renderer="3d"). */
+.mode-screen[data-renderer="3d"] { background: transparent; }
+.table3d-layer { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+.table3d-layer canvas { display: block; }
+.mode-screen[data-renderer="3d"] .pp-center,
+html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { background: transparent; box-shadow: none; }
+/* the background ink shares z -1 and comes later in the DOM: hide it while the 3D table is up (it would cover the felt) */
+html:has(.mode-screen[data-renderer="3d"]) :is(.ink-canvas, .ink-fallback) { visibility: hidden; }
+/* body paints over z -1 when it has its own background (theme B); the html background stays under the canvas */
+html:has(.mode-screen[data-renderer="3d"]) body { background: transparent; }

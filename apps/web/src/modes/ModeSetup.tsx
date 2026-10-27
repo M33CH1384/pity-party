@@ -1,4 +1,7 @@
+import { useEffect } from 'react';
 import type { OptionDef, OptionValues } from '@pp/game';
+import { currentRenderer } from '../three3d/renderer';
+import { preloadTable } from '../three3d/preload';
 import { Seg, Toggle } from '../MoreOptions';
 import { type ModeChoice, type ModeEntry, defaultChoice, modeCatalog } from './catalog';
 
@@ -69,6 +72,8 @@ export function ModeOptionsForm({ schema, values, onChange, disabled }: { schema
 
 /** The whole "Game" card body: picker + the selected mode's options (coming-soon modes preview theirs, disabled). */
 export function ModeSetup({ value, onChange }: { value: ModeChoice; onChange: (c: ModeChoice) => void }) {
+  // V10a: warm the 3D chunk on an idle tick while the player picks a game (no-op when the table will be 2D).
+  useEffect(() => { if (currentRenderer() === '3d') preloadTable(); }, []);
   const modes = modeCatalog();
   const cur = modes.find((m) => m.modeId === value.modeId) ?? modes.find((m) => m.available)!;
   return (

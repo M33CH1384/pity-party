@@ -2,7 +2,7 @@ import { type ReactNode, type Ref, useEffect, useRef, useState } from 'react';
 import { useEscapeClose } from './useEscapeClose';
 import Credits from './Credits';
 import Feedback, { AboutRow } from './Feedback';
-import { ChatSoundsRow, ReduceEffectsRow, SoundFields, SoundQuickActions } from './SoundControls';
+import { ChatSoundsRow, ReduceEffectsRow, Table3DRow, SoundFields, SoundQuickActions } from './SoundControls';
 import ThemeToggle from './ThemeToggle';
 import { type SectionOpenMap, type SettingsSectionId, loadSectionOpen, saveSectionOpen } from './settingsSections';
 
@@ -107,6 +107,7 @@ export default function MoreOptions({ onClose, initialSection, anchorSeq }: {
             <ThemeToggle />
           </Row>
           <ReduceEffectsRow />
+          <Table3DRow />
           </SectionGroup>
           <SectionGroup label="Beta feedback & support" open={isOpen('beta')} onToggle={() => toggleSection('beta')}>
           <AboutRow onFeedback={() => setFeedback(true)} />
