@@ -189,7 +189,7 @@
 
 .seat-card { --tc: rgba(var(--edge-rgb),.55); width: 100%; max-width: 104px; height: 120px; min-height: 0; padding: 7px 4px; gap: 3px; justify-content: flex-start; overflow: hidden; position: relative; clip-path: none; border-radius: 12px;
   background: rgba(var(--pp-glass-strong-rgb),.88); box-shadow: inset 0 0 0 2px var(--tc), 0 6px 14px rgba(var(--pp-shade-rgb),.45); }
-.seat-card.taken { animation: seat-pop .35s cubic-bezier(.3,1.6,.5,1) both; }
+.seat-card.taken { animation: seat-pop .35s cubic-bezier(.3,1.3,.5,1) both; }
 .seat-card.mine { box-shadow: inset 0 0 0 3px var(--gold), 0 0 18px rgba(var(--gold-rgb),.45); }
 .seat-card .seat-top .chip { font-size: 11px; padding: 1px 5px; border-radius: 6px; }
 .seat-card.open { background: rgba(var(--pp-glass-strong-rgb),.35); box-shadow: none; outline: 2px dashed var(--tc); outline-offset: -2px; animation: seat-pulse 2.6s ease-in-out infinite; padding: 0; }
@@ -352,7 +352,7 @@
      the font size) at every stage height — before this the label lived in
      the card's top padding (as little as 1.8px on compact stages) with a
      9.35px line box for ~11px of ink, glued to the card's frame line */
-  .seat-top { line-height: 1.1; font-size: 11px; height: clamp(12.5px, 3.8cqh, 15.5px); min-height: 0; flex: none; }
+  .seat-top { line-height: 1.1; font-size: clamp(11px, 2.8cqh, 11.5px); height: clamp(14.5px, 3.8cqh, 15.5px); min-height: 0; flex: none; }
   .seat-top .chip { font-size: 11px; }
   .seat-plate .seat-name { line-height: 1.15; }
   /* a taken card's sub-action (Remove / Take over / Replace) rides the
@@ -373,7 +373,7 @@
   .seat-ring .av-initial { font-size: min(21px, 5cqh); }
   .seat-plate { padding: min(3px, .7cqh) min(8px, 1.9cqh); margin-top: min(2px, .3cqh); }
   .seat-plate.empty { font-size: clamp(11px, 3cqh, 12px); }
-  .seat-plate .seat-name { font-size: clamp(11px, 3.4cqh, 14px); }
+  .seat-plate .seat-name { font-size: clamp(11px, 3.4cqh, 14px); letter-spacing: 0; }
   .seat-card .seat-name { font-size: clamp(11px, 3.2cqh, 13px); }
   .seat-bot { font-size: 11px; line-height: 1.1; padding: min(1px, .3cqh) min(6px, 1.4cqh); bottom: min(5px, .45cqh); }
   .seat-avatar { width: min(48px, 11.4cqh); height: min(48px, 11.4cqh); }
@@ -381,7 +381,7 @@
   .seat-card .sit { font-size: clamp(11px, 3.2cqh, 13px); padding: min(6px, 1.4cqh) min(10px, 2.4cqh); }
   .seat-sub { font-size: 11px !important; }
   .ready-check { width: min(17px, 4cqh); height: min(17px, 4cqh); font-size: min(11px, 2.6cqh); }
-  .host-tag { font-size: 11px; }
+  .host-tag { font-size: 11px; letter-spacing: 0; padding: 0 2px; }
   .felt-center { padding: min(10px, 2.4cqh) min(8px, 1.9cqh); }
   .felt-center span { font-size: clamp(11px, 3.6cqh, 14px); }
   .felt-center small { font-size: 12px; }
@@ -399,7 +399,7 @@
   /* compact floors for the label contract: the zone still contains the ink
      and the label still clears the frame (taken: the 2–3px inset shadow;
      open: the dashed outline now inset 2px + its 2px stroke) */
-  .seat-top { height: 12px; }
+  .seat-top { height: 15px; }
   .seat-card { padding-top: clamp(5px, 1.6cqh, 7px); }
   /* the open card's stack is the tallest (label + ring + plate + the + BOT
      overlay at its foot): at compact heights its ring and plate run one
@@ -410,7 +410,7 @@
   .seat-plate.empty { font-size: 11px; }
   .seat-bot { bottom: 0; }
   .share-code { padding: 4px 14px 2px; }
-  .share-code small { font-size: 11px !important; }
+  .share-code small { font-size: 9px !important; } /* small-text exception: short-landscape lobby head; 11px wraps the ticket's small print to 3 lines and overflows the head (layout-lobby-fit). The same text is 11px everywhere else. */
   .room-code b { font-size: 21px; }
   /* the label's reserved zone (below) costs vertical room the shortest stage
      doesn't have; the felt's own padding/gaps give some of it back so every
