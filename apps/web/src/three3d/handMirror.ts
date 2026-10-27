@@ -75,7 +75,9 @@ export function useHandMirror(root: HTMLElement | null): MirrorCard[] {
 }
 
 /** V10d: the public Pitty Pat table snapshot (`data-t3d` on the mode table), parsed; null when absent. */
-export interface TableSnap { n: number; me: number | null; turn: number | null; ph: string; up: [string, boolean] | null; st: number; hc: number[]; sh: string[][]; pt: number[]; tg: number | null; on: boolean[]; nm: string[]; ev: [string, number | null, number] | null }
+export interface TableSnap { n: number; me: number | null; turn: number | null; ph: string; up: [string, boolean] | null; st: number; hc: number[]; sh: string[][]; pt: number[]; tg: number | null; on: boolean[]; nm: string[]; ev: [string, number | null, string, (number | null)?] | null;
+  /** V10e Tonk: k 'tk', spreads per seat [id, card texts][], hit-lock next turn, the hand-end reveal [how, winner, dropper, counts] */
+  k?: 'tk'; sp?: [number, string[]][][]; lk?: boolean[]; end?: [string, number | null, number | null, number[]] | null }
 export function useTableMirror(root: HTMLElement | null): TableSnap | null {
   const [raw, setRaw] = useState<string | null>(null);
   useEffect(() => {

@@ -41,14 +41,16 @@ export function HandFan({ cards, u, onDrawn }: { cards: MirrorCard[]; u: ThemeUn
       card.position.set((c.rect.x + c.rect.w / 2 - size.width / 2) * px, (size.height / 2 - (c.rect.y + c.rect.h / 2)) * px, -D);
       card.rotation.z = (-fanTilt(i, row.length) * Math.PI) / 180;
       const ring = (grow: number, col: Color, z: number) => {
-        const m = new Mesh(faceGeometry(h / w), new MeshBasicMaterial({ color: col, toneMapped: false, depthTest: false }));
+        const m = new Mesh(faceGeometry(h / w), new MeshBasicMaterial({ color: col, toneMapped: false, depthTest: false, transparent: true }));
         m.scale.set(w + grow * 2 * px, w + grow * 2 * px, 1); m.position.z = z; m.renderOrder = 1000 + order * 4; card.add(m);
       };
       if (c.lifted) ring(6, u.accent, -0.0003);
       else if (c.live) ring(3, primary, -0.0003);
       if (ink) ring(1.5, ink, -0.0002);
       const tex = faceTexture(parsed, c.text, c.wild, c.rect.w <= 90);
-      const face = new Mesh(faceGeometry(h / w), new MeshBasicMaterial({ map: tex, toneMapped: false, depthTest: false, transparent: c.dim, opacity: c.dim ? 0.45 : 1 }));
+      // transparent pass on purpose: three draws every transparent mesh (felt glow shells, plates) after the opaque pass, so the
+      // hand must be in that pass too for its high renderOrder to keep it on top. dim (not playable now) = an opaque grey tint, not alpha: a see-through face read as half-greyed where it crossed the rail
+      const face = new Mesh(faceGeometry(h / w), new MeshBasicMaterial({ map: tex, toneMapped: false, depthTest: false, transparent: true, color: new Color().setScalar(c.dim ? 0.62 : 1) }));
       face.scale.set(w, w, 1); face.renderOrder = 1001 + order * 4; card.add(face);
       card.userData.key = c.key; card.name = 'hand-card';
       group.add(card); order++;

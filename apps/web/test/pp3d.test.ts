@@ -1,7 +1,7 @@
 // V10d: Pitty Pat felt layout (V10-3D-SPEC §3/§4) and the table-face texture budget
 import { describe, expect, it } from 'vitest';
 import { CARD_SCALE, opponents, pairX, PAIR_DX, ppLayout } from '../src/three3d/ppLayout';
-import { FACE_BUDGET_BYTES, TABLE_FACE_BUDGET_BYTES, TABLE_FACE_BYTES, TT_H, TT_W } from '../src/three3d/cardTextures';
+import { FACE_BUDGET_BYTES, SPREAD_FACE_BUDGET_BYTES, ST_H, ST_W, TABLE_FACE_BUDGET_BYTES, TABLE_FACE_BYTES, TT_H, TT_W } from '../src/three3d/cardTextures';
 
 describe('V10d Pitty Pat 3D layout', () => {
   it('opponents run clockwise from the seat after mine, never include me', () => {
@@ -35,5 +35,10 @@ describe('V10d Pitty Pat 3D layout', () => {
     expect(TABLE_FACE_BYTES).toBe(143360);
     expect(TABLE_FACE_BUDGET_BYTES).toBeLessThanOrEqual(2.3e6);
     expect(FACE_BUDGET_BYTES + TABLE_FACE_BUDGET_BYTES).toBeLessThanOrEqual(6.7e6);
+  });
+  it('V10e Tonk spread faces: 112×157, LRU 40 ≈ 2.8 MB; all faces together stay under 10 MB', () => {
+    expect([ST_W, ST_H]).toEqual([112, 157]);
+    expect(SPREAD_FACE_BUDGET_BYTES).toBeLessThanOrEqual(2.82e6);
+    expect(FACE_BUDGET_BYTES + TABLE_FACE_BUDGET_BYTES + SPREAD_FACE_BUDGET_BYTES).toBeLessThanOrEqual(9.6e6);
   });
 });

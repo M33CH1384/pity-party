@@ -29,3 +29,8 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 .mode-screen[data-renderer="3d"][data-table3d="on"] :is(.pp-seats, .pp-pile) { opacity: 0; pointer-events: none; }
 /* portrait: the event / turn lines sit under the 3D stock + upcard instead of over them (spec §4 stock/upcard 384–475) */
 @media (max-aspect-ratio: 3/4) { .mode-screen[data-renderer="3d"][data-table3d="on"] .pp-center { margin-bottom: 56px; } }
+/* V10e Tonk: opponents' spreads are on the felt; the DOM list keeps only your own spreads and any spread you can hit
+   right now (the input layer). The rest stay in the a11y tree, visually hidden. */
+.mode-screen[data-renderer="3d"][data-table3d="on"] .tk-spreads { background: transparent; border-color: transparent; box-shadow: none; }
+.mode-screen[data-renderer="3d"][data-table3d="on"] .tk-spread-seat:not(.is-me):not(:has(button)) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.mode-screen[data-renderer="3d"][data-table3d="on"] .tk-spreads:not(:has(.tk-spread-seat.is-me, button)) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
