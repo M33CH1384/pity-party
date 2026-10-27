@@ -22,7 +22,7 @@ const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile
 await ctx.addInitScript(() => { localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} }));
   const w = window as unknown as { __seen: Set<string> }; w.__seen = new Set(); new MutationObserver(() => document.querySelectorAll<HTMLElement>('[data-testid="my-hand"] .pcard[data-card]').forEach((e) => w.__seen.add(e.dataset.card!))).observe(document, { subtree: true, childList: true, attributes: true });
   // V10d: every PUBLIC card the 2D table showed (upcard + shelves)
-  const v = window as unknown as { __pub: Set<string> }; v.__pub = new Set(); new MutationObserver(() => { document.querySelectorAll<HTMLElement>('[data-testid="pp-upcard"] .pcard[data-card]').forEach((e) => v.__pub.add(e.dataset.card!)); document.querySelectorAll('.pp-shelf .pp-mini').forEach((e) => v.__pub.add(e.textContent!)); }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true }); });
+  const v = window as unknown as { __pub: Set<string> }; v.__pub = new Set(); new MutationObserver(() => { document.querySelectorAll<HTMLElement>('[data-testid="pp-upcard"] .pcard[data-card]').forEach((e) => v.__pub.add(e.dataset.card!)); document.querySelectorAll('.pp-shelf .pp-mini, .tk-spread .pp-mini').forEach((e) => v.__pub.add(e.textContent!)); document.querySelectorAll<HTMLElement>('[data-testid="tk-discard"] .pcard[data-card]').forEach((e) => v.__pub.add(e.dataset.card!)); }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true }); });
 const p = await ctx.newPage();
 const scene: string[] = []; p.on('request', (r) => { if (/PPScene-/.test(r.url())) scene.push(r.url()); });
 
@@ -61,6 +61,23 @@ const rm = await b.newContext({ viewport: { width: 390, height: 844 }, reducedMo
 await rm.addInitScript(() => { localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} })); });
 const p2 = await rm.newPage(); await toTable(p2); await p2.waitForTimeout(1500);
 ok(await renderer(p2) === '2d' && await p2.locator('.table3d-layer canvas').count() === 0, 'OS reduced motion: 2D');
+
+// V10e: Tonk on the 3D felt: plates/piles/spreads drawn, felt faces only public cards (discard + spreads), hand faces own only
+{
+  const tc = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  await tc.addInitScript(() => { localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} })); localStorage.setItem('pp.modeChoice', JSON.stringify({ modeId: 'tonk', options: {} }));
+    const w = window as unknown as { __seen: Set<string>; __pub: Set<string> }; w.__seen = new Set(); w.__pub = new Set();
+    new MutationObserver(() => { document.querySelectorAll<HTMLElement>('[data-testid="my-hand"] .pcard[data-card]').forEach((e) => w.__seen.add(e.dataset.card!)); document.querySelectorAll('.tk-spread .pp-mini').forEach((e) => w.__pub.add(e.textContent!)); document.querySelectorAll<HTMLElement>('[data-testid="tk-discard"] .pcard[data-card]').forEach((e) => w.__pub.add(e.dataset.card!)); }).observe(document, { subtree: true, childList: true, characterData: true, attributes: true }); });
+  const pt = await tc.newPage(); await toTable(pt);
+  await pt.waitForFunction(() => document.querySelector('[data-testid="mode-screen"]')?.getAttribute('data-table3d') === 'on', null, { timeout: 10000 }).catch(() => {});
+  for (let i = 0; i < 30; i++) { const bt = pt.locator('.pp-actions button:not([disabled]), [data-testid="my-hand"] .pcard-btn:not(:disabled)').first(); if (await bt.isVisible().catch(() => false)) await bt.click({ timeout: 1500 }).catch(() => {}); await pt.waitForTimeout(300); }
+  const tk = await pt.evaluate(() => { const w = window as unknown as { __pp3dTableFaces?: string[]; __pp3dFaces?: string[]; __pub: Set<string>; __seen: Set<string> }; return { t3d: document.querySelector('[data-testid="mode-screen"]')?.getAttribute('data-table3d'), felt: w.__pp3dTableFaces ?? [], hand: w.__pp3dFaces ?? [], pub: [...w.__pub], seen: [...w.__seen], seats: document.querySelectorAll('li[data-testid^="seat-"]').length }; });
+  ok(tk.t3d === 'on' && tk.seats === 4, 'Tonk: 3D felt drew plates, piles and spreads; DOM seat plates stay in the tree');
+  ok(tk.felt.length > 0 && tk.felt.every((f) => tk.pub.includes(f)), `Tonk felt faces (${tk.felt.length}) are all public (discard + spreads) (${tk.felt.filter((f) => !tk.pub.includes(f)).join(',') || 'none outside'})`);
+  ok(tk.hand.every((f) => tk.seen.includes(f)), `Tonk 3D hand faces are this seat's own (${tk.hand.filter((f) => !tk.seen.includes(f)).join(',') || 'none outside'})`);
+  ok(await pt.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'Tonk 3D: no horizontal scroll at 390');
+  await tc.close();
+}
 
 // V10d: forced 3D under reduced motion: no flights, no gather beat
 const rm3 = await b.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
