@@ -37,7 +37,7 @@
 .soc-pl-name em { font-weight: 400; color: var(--muted); font-style: normal; }
 .soc-pl-status { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .soc-pl-status.table { color: var(--pp-x-green-16); } .soc-pl-status.lobby { color: var(--pp-x-blue-8); } .soc-pl-status.tournament { color: var(--gold); }
-.soc-tag { font-style: normal; font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-left: 6px; padding: 1px 6px; border-radius: 6px; background: rgba(var(--pp-hi-rgb),.1); color: var(--muted); vertical-align: 2px; }
+.soc-tag { font-style: normal; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-left: 6px; padding: 1px 6px; border-radius: 6px; background: rgba(var(--pp-hi-rgb),.1); color: var(--muted); vertical-align: 2px; }
 .soc-tag.friend { background: rgba(var(--gold-rgb),.18); color: var(--gold); }
 .soc-tag.mod { background: rgba(var(--pp-x-red-7-rgb), .2); color: var(--pp-x-red-21); }
 .soc-rating { font-size: 12px; color: var(--gold); white-space: nowrap; flex: none; }
@@ -265,7 +265,7 @@ html[data-fx="neon"] .soc-wire-byline { color: var(--pp-x-cyan-1); }
 .soc-lb-table td.rk { width: 2.2em; text-align: center; font-weight: 700; }
 .soc-lb-table td.v { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
 .soc-lb-table tr.soc-me td { background: rgba(var(--pp-muted-rgb),.12); }
-.soc-lb-table th { font-size: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--gold); text-align: right; padding: 2px 4px 4px; }
+.soc-lb-table th { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--gold); text-align: right; padding: 2px 4px 4px; }
 .soc-lb-table th:first-child, .soc-lb-table th:nth-child(2) { text-align: left; }
 .soc-lb > .soc-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 0; margin: 0 0 6px; }
 .soc-lb > .soc-seg > button { min-width: 0; }
@@ -411,7 +411,7 @@ html[data-fx="neon"] .soc-wire-byline { color: var(--pp-x-cyan-1); }
 .ranks-you-rating small { font-size: 12px; line-height: 1.2; color: var(--muted); font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ranks-you-stats { display: grid; grid-template-columns: repeat(3, 1fr); align-items: end; }
 .ranks-you-stats b { display: block; font-family: var(--display); font-weight: 800; font-size: 16px; line-height: 1; font-variant-numeric: tabular-nums; }
-.ranks-you-stats small { font-size: 10px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.ranks-you-stats small { font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
 .ranks-controls { display: flex; align-items: center; gap: 8px; margin: 2px 0 4px; }
 .ranks-kind { flex: 1; display: flex; padding: 3px; border-radius: 12px; background: rgba(var(--pp-hi-rgb),.06); min-height: 40px; }
 .ranks-kind button, .ranks-filters-btn, .ranks-pills button, .ranks-done, .ranks-row {
@@ -442,8 +442,8 @@ html[data-fx="neon"] .soc-wire-byline { color: var(--pp-x-cyan-1); }
 .ranks-cat button:disabled { opacity: .35; }
 .ranks-cat button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 /* Stat-table column header (mirrors the row flex exactly). */
-.ranks-head { display: flex; align-items: center; gap: 10px; padding: 4px 2px 5px; border-bottom: 1px solid rgba(var(--pp-hi-rgb),.14); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-.ranks-head .ranks-name { font-size: 10px; font-weight: 800; }
+.ranks-head { display: flex; align-items: center; gap: 10px; padding: 4px 2px 5px; border-bottom: 1px solid rgba(var(--pp-hi-rgb),.14); font-size: 11px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.ranks-head .ranks-name { font-size: 11px; font-weight: 800; }
 .ranks-av-sp { width: 44px; flex: none; }
 .ranks-val-h { flex: none; }
 .ranks-gp-h { width: 30px; flex: none; text-align: right; }
@@ -493,7 +493,7 @@ div.ranks-row { cursor: default; }
    the 32px lockup centers inside it, so the chip anchors to the lockup:
    its bottom edge sits 4px above the lockup's bottom edge at any bar
    height (calc(50% - 12px) = half the bar − half the lockup + 4px). */
-.ticker-beta { position: absolute; right: 4px; bottom: calc(50% - 12px); font-family: var(--display); font-weight: 800; font-size: 8px; letter-spacing: .08em; line-height: 1; color: var(--pp-primary-ink); background: var(--gold); padding: 1.5px 3px; border-radius: 2px; }
+.ticker-beta { position: absolute; right: 4px; bottom: calc(50% - 12px); font-family: var(--display); font-weight: 800; font-size: 11px; letter-spacing: .08em; line-height: 1; color: var(--pp-primary-ink); background: var(--gold); padding: 1.5px 3px; border-radius: 2px; }
 .ticker-viewport { flex: 1; min-width: 0; overflow: hidden; display: flex; align-items: stretch; }
 /* App-wide root bar (league data wave 6a): the same bar fixed at the foot
    of the page. The component renders its variant as the bare class `bar`
@@ -591,7 +591,7 @@ html[data-fx="neon"] .ranks-ticker { background: var(--pp-x-blue-2); border-top-
   padding: 8px 4px; text-align: center; min-height: 56px; display: flex; flex-direction: column; justify-content: center;
 }
 .ranks-grid b { font-family: var(--display); font-size: 18px; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.ranks-grid small { font-size: 10px; color: var(--muted); line-height: 1.25; }
+.ranks-grid small { font-size: 12px; color: var(--muted); line-height: 1.35; }
 .ranks-split { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
 .ranks-split div { border-radius: 12px; padding: 8px 10px; background: rgba(var(--pp-hi-rgb),.04); border: 1px solid rgba(var(--edge-rgb),.2); display: flex; flex-direction: column; gap: 2px; }
 .ranks-split div.on { border-color: rgba(var(--gold-rgb),.65); }
@@ -876,7 +876,7 @@ html[data-fx="neon"] .ranks-you {
 .power-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
 .power-head h3 { margin: 0; font-size: 15px; }
 .power-move { min-width: 38px; text-align: right; font-style: normal; }
-.power-new { font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .06em; color: var(--gold, var(--pp-muted)); }
+.power-new { font-style: normal; font-size: 11px; font-weight: 800; letter-spacing: .06em; color: var(--gold, var(--pp-muted)); }
 .power-note { font-size: 12px; margin-top: 6px; }
 
 /* Record Book (league P-F). */

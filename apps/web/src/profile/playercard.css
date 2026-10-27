@@ -495,7 +495,7 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
 .plcard .pcard-stats col.pcard-col-games { width: 17%; }
 .plcard .pcard-stats th, .plcard .pcard-stats td { padding: 4.5px 5px; padding: 4.8cqw .6cqw; }
 .plcard .pcard-stats thead th {
-  font-size: 9.5px; font-size: 2.8cqw; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  font-size: 11px; font-size: max(11px, 2.8cqw); font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
   color: var(--pp-x-steel-20); text-align: right; white-space: nowrap;
   padding-top: 7px; padding-top: 2.6cqw; padding-bottom: 7px; padding-bottom: 2.6cqw;
   border-bottom: 1.5px solid rgba(var(--pp-x-steel-10-rgb), .35);
