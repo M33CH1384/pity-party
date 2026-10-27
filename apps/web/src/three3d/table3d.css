@@ -68,3 +68,5 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
   .mode-screen[data-renderer="3d"][data-hand3d="on"]:has(.my-hand.is-posed) .pp-actions { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 3; }
 }
 .v3-chip.is-me { flex: none; }
+/* the hand's own notes (Tonk count, "No cards") leave the posed layer as a small plate at the upper left */
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand.is-posed > :not(.pp-card-slot) { position: absolute; left: 12px; right: auto; width: fit-content; top: 148px; margin: 0; padding: 2px 8px; border-radius: 8px; background: var(--pp-plate); color: var(--pp-ink); pointer-events: none; }
