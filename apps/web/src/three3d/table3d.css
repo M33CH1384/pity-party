@@ -42,7 +42,7 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 @media (min-aspect-ratio: 4/3) and (max-height: 600px) {
   .mode-screen[data-renderer="3d"][data-table3d="on"] .pp-seats { position: absolute; top: 0; inset-inline: 0; height: 1px; overflow: hidden; }
   /* the fan sits on the bottom edge, its lower third cropped like the table-v2 landscape board */
-  .mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand { position: fixed; left: 0; right: 0; margin-inline: auto; width: fit-content; bottom: calc(var(--pp-card-h) * -.12); right: 200px; z-index: 2; }
+  .mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand { position: fixed; left: 0; right: 0; margin-inline: auto; width: fit-content; bottom: calc(var(--pp-card-h) * -.12); right: 320px; z-index: 2; --pp-card-w: clamp(56px, min(26vw, 20vh), 116px); }
   /* actions: the bottom-right column (table-v2 landscape), clear of the fan */
   .mode-screen[data-renderer="3d"][data-table3d="on"] .pp-actions { position: fixed; right: 12px; bottom: 12px; width: 184px; flex-direction: column; align-items: stretch; z-index: 3; }
 }
@@ -51,9 +51,8 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 @media (max-aspect-ratio: 3/4), (min-height: 700px) {
   .mode-screen[data-renderer="3d"][data-table3d="on"] .v3-chips { display: flex; gap: 4px; justify-content: center; flex-wrap: nowrap; position: fixed; top: 106px; left: 8px; right: 8px; z-index: 2; pointer-events: none; }
 }
-.v3-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 3px; border-radius: 999px; min-width: 0; flex: 0 1 auto; background: var(--pp-plate); color: var(--pp-ink); box-shadow: 0 0 0 1.5px var(--pp-muted); font-size: 13px; line-height: 1; }
+.v3-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px 2px 2px; border-radius: 999px; min-width: 0; flex: 0 1 auto; background: var(--pp-plate); color: var(--pp-ink); box-shadow: 0 0 0 1.5px var(--pp-muted); font-size: 13px; line-height: 1; }
 .v3-chip.is-turn { box-shadow: 0 0 0 2px var(--pp-accent); }
-.v3-chip i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-style: normal; font-weight: 800; color: var(--pp-plate); background: linear-gradient(135deg, var(--pp-accent), var(--pp-accent-2)); }
+.v3-chip i { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-style: normal; font-weight: 800; color: var(--pp-plate); background: linear-gradient(135deg, var(--pp-accent), var(--pp-accent-2)); }
 .v3-chip b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
 .v3-chip em { font-style: normal; font-weight: 800; }
-.v3-chip small { font-size: 12px; opacity: .8; }

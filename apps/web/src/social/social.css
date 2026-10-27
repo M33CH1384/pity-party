@@ -509,6 +509,8 @@ div.ranks-row { cursor: default; }
    scrolling pages end with their last content clear of the bar. The bar
    is not rendered at all at a live table (no safe bottom slot there). */
 .ranks-ticker.bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; height: calc(38px + env(safe-area-inset-bottom)); box-sizing: border-box; }
+/* the table owns the bottom edge (hand + actions): no bar on a game screen; Home / Social / Lobby keep it */
+html:has(.mode-screen) .ranks-ticker.bar { display: none; }
 html.bwm-ticker-on .wizard { padding-bottom: calc(38px + env(safe-area-inset-bottom)); }
 html.bwm-ticker-on .setup { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
 html.bwm-ticker-on .profile-page { padding-bottom: calc(62px + env(safe-area-inset-bottom)); }
