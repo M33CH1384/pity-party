@@ -21,9 +21,7 @@ import ReactiveGlow from './neon/ReactiveGlow';
 import { initTheme } from './theme';
 import IdleGuard from './IdleGuard';
 import EntryFlow from './EntryFlow';
-import '@fontsource/barlow-condensed/600.css';
-import '@fontsource/barlow-condensed/700.css';
-import '@fontsource/barlow-condensed/800.css';
+import './fonts.css';
 import './theme.css';
 import './styles.css';
 

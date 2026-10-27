@@ -66,9 +66,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@fontsource/barlow-condensed':
-        specifier: ^5.3.0
-        version: 5.3.0
       '@pp/game':
         specifier: workspace:*
         version: link:../../packages/game
@@ -512,9 +509,6 @@ packages:
     engines: {node: '>=18'}
     cpu: [x64]
     os: [win32]
-
-  '@fontsource/barlow-condensed@5.3.0':
-    resolution: {integrity: sha512-RA7MmIx0v3eQ6Gcf74qLVLOwLB0GpPOzx+eU9iG/AmCnSJGcIWYeU8y6CEMGZ210MGwGg5CZhzLkkvyZdTTk1g==}
 
   '@hexagon/base64@1.1.28':
     resolution: {integrity: sha512-lhqDEAvWixy3bZ+UOYbPwUbBkwBq5C1LAJ/xPC8Oi+lL54oyakv/npbA0aU2hgCsx/1NUd4IBvV03+aUBWxerw==}
@@ -1797,8 +1791,6 @@ snapshots:
 
   '@esbuild/win32-x64@0.28.2':
     optional: true
-
-  '@fontsource/barlow-condensed@5.3.0': {}
 
   '@hexagon/base64@1.1.28': {}
 

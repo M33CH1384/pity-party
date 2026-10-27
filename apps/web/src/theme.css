@@ -221,8 +221,6 @@ html[data-theme="K"] {
   --pp-suit-d: #0066cc;
   --pp-suit-c: #0e6e78;
   /* fonts are V2: today's faces */
-  --pp-font-disp: var(--display);
-  --pp-font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
   --r-btn: 18px; --r-plate: 20px; --r-pill: 999px;
   --h-btn: 52px; --h-btn-sm: 44px; --h-ico: 44px;
@@ -259,7 +257,8 @@ html[data-theme="B"] .pcard { box-shadow: 0 0 0 1.5px #2b2118, 0 2px 0 rgba(43, 
 .tt-B .theme-tile-swatch { background: #3a5f9a repeating-linear-gradient(90deg, rgba(255, 255, 255, .2) 0 6px, transparent 6px 12px); } .tt-B .theme-tile-swatch i { background: #b4532a; }
 .tt-C .theme-tile-swatch { background: #3a0d1a; } .tt-C .theme-tile-swatch i { background: #ff2eb8; }
 .tt-K .theme-tile-swatch { background: #1d5a3c; } .tt-K .theme-tile-swatch i { background: #f5c542; }
-.theme-accent-row { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; font-size: 13px; color: var(--pp-ink); }
+.theme-accent-row { display: flex; flex-direction: column; align-items: stretch; gap: 8px; min-height: 44px; margin: 0; font-size: 13px; color: var(--pp-ink); }
+.theme-accent-row.off { flex-direction: row; align-items: center; justify-content: space-between; flex-wrap: wrap; }
 .theme-accent-row.off { color: var(--pp-muted); opacity: .8; }
 .theme-accent-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--pp-accent); box-shadow: 0 0 10px var(--pp-accent-glow); }
 .wiz-home { position: relative; }
@@ -278,3 +277,53 @@ html[data-theme="B"] .pcard { box-shadow: 0 0 0 1.5px #2b2118, 0 2px 0 rgba(43, 
 /* B is a light UI: no white glows or text-shadows (Desi, stage2b §9). */
 html[data-theme="B"] body * { text-shadow: none !important; }
 html[data-theme="B"] :focus-visible { outline-color: var(--pp-ink); }
+
+/* ---- V2 fonts: one display + UI pair per theme (stage1b theme.js), Atkinson on card indices.
+   --pp-font-label is the compact label face behind the legacy --display alias (buttons, chips, plates);
+   the display face is kept for the wordmark and headings so wide faces (Unbounded, Shrikhand) never
+   squeeze 390px rows. Fallback stacks are metric-close system faces. */
+:root, html[data-theme="C"] {
+  --pp-font-disp: 'Unbounded', 'Arial Black', system-ui, sans-serif; --pp-disp-w: 800;
+  --pp-font-ui: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --pp-font-label: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+html[data-theme="A"] {
+  --pp-font-disp: 'Shrikhand', 'Georgia', serif; --pp-disp-w: 400;
+  --pp-font-ui: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --pp-font-label: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+html[data-theme="B"] {
+  --pp-font-disp: 'Fraunces', 'Georgia', serif; --pp-disp-w: 800;
+  --pp-font-ui: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --pp-font-label: 'Figtree', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+html[data-theme="K"] {
+  --pp-font-disp: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', system-ui, sans-serif; --pp-disp-w: 800;
+  --pp-font-ui: 'Barlow', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --pp-font-label: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', system-ui, sans-serif;
+}
+:root { --pp-font-card: 'Atkinson Hyperlegible', system-ui, sans-serif; }
+.pp-wordmark, .modal h2 { font-family: var(--pp-font-disp); font-weight: var(--pp-disp-w); }
+html:not([data-theme="K"]) .pp-wordmark { text-transform: none; letter-spacing: .01em; }
+.pcard-corner { font-family: var(--pp-font-card); }
+
+/* ---- V2 Lounge colour (Neon Lounge only). Preset swatch colours = the spec presets (CENTER-AND-ACCENT.md). */
+.accent-head { display: flex; align-items: center; gap: 8px; min-height: 24px; }
+.accent-swatches { display: grid; grid-template-columns: repeat(6, minmax(44px, 48px)); gap: 6px; }
+.accent-swatch { width: 100%; aspect-ratio: 1; min-width: 44px; min-height: 44px; border-radius: 50%; border: 2px solid var(--pp-line); background: var(--pp-btn-fill); display: grid; place-items: center; padding: 0; cursor: pointer; }
+.accent-swatch i { width: 30px; height: 30px; border-radius: 50%; display: block; }
+.accent-swatch.on { border-color: var(--pp-ink); box-shadow: 0 0 0 2px var(--pp-accent), 0 0 12px var(--pp-accent-glow); }
+.as-magenta i { background: #FF2EB8; } .as-blue i { background: #2E8BFF; } .as-violet i { background: #9B5CFF; }
+.as-ember i { background: #FF6A2E; } .as-mint i { background: #2EF2C0; } .as-crimson i { background: #FF3355; }
+.accent-hue { display: flex; flex-direction: column; gap: 2px; }
+.accent-hue small { color: var(--pp-muted); }
+.accent-hue input[type="range"] { width: 100%; height: 44px; margin: 0; accent-color: var(--pp-accent); cursor: pointer;
+  background: linear-gradient(90deg, #FF4F6E, #FF7A2E 9%, #C9A000 22%, #6E7B6E 26%, #6E7B6E 47%, #00C2C7 50%, #2E8BFF 70%, #9B5CFF 82%, #FF2EB8 92%, #FF4F6E) center / 100% 8px no-repeat; border-radius: 4px; }
+.accent-follow { display: flex; align-items: center; gap: 10px; min-height: 44px; cursor: pointer; }
+.accent-follow input { width: 22px; height: 22px; accent-color: var(--pp-accent); }
+.accent-preview { display: flex; align-items: center; gap: 8px; padding: 8px; border-radius: 14px; background: var(--pp-plate); }
+.ap-pri, .ap-sec { min-height: 44px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: var(--r-btn); font-weight: 700; }
+.ap-pri { background: var(--pp-accent); color: var(--pp-accent-on); }
+.ap-sec { box-shadow: inset 0 0 0 2px var(--pp-accent-2); color: var(--pp-ink); }
+.ap-felt { flex: 1; min-width: 36px; height: 44px; border-radius: 10px; background: var(--pp-felt); }
+.accent-switch { min-height: 44px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--pp-line); background: var(--pp-plate); color: var(--pp-ink); font: inherit; font-weight: 700; cursor: pointer; }

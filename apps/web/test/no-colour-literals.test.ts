@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 const SRC = join(__dirname, '../src');
 const LIT = /#[0-9a-fA-F]{3,8}\b|rgba?\(\s*\d/g;
-const EXEMPT = new Set(['theme.css', 'theme.ts']);
+const EXEMPT = new Set(['theme.css', 'theme.ts', 'accent.ts', 'fonts.css']); // accent.ts holds Desi's preset table + colour maths (V2)
 /** Ratchet ceilings (V1). Lower these as V1b sweeps; never raise. */
 const CEILING: Record<string, number> = {
   'venues.ts': 108, // venue art palettes (BWM-era scenery), V1b
