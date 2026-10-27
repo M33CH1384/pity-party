@@ -65,15 +65,21 @@ function canvasTex(w: number, h: number, paintFn: (g: CanvasRenderingContext2D) 
   const t = new CanvasTexture(c); t.colorSpace = SRGBColorSpace; t.generateMipmaps = false; t.minFilter = LinearFilter; t.magFilter = LinearFilter; t.anisotropy = 4;
   return t;
 }
-export function tableFaceTexture(text: string, wild: boolean): Texture | null {
+/** V10e Tonk spread cards (shown at .72 table scale, ~45–70 CSS px tall): 112×157 (≈70 KB), own LRU of 40 (≈2.8 MB). */
+export const ST_W = 112, ST_H = 157;
+export const SPREAD_FACE_BYTES = ST_W * ST_H * 4;
+export const SPREAD_FACE_BUDGET_BYTES = 40 * SPREAD_FACE_BYTES;
+const scache = new Map<string, Texture>();
+export function tableFaceTexture(text: string, wild: boolean, small = false): Texture | null {
   const card = parse(text); if (!card) return null;
   const key = faceKey(text, wild, false);
-  const hit = tcache.get(key);
-  if (hit) { tcache.delete(key); tcache.set(key, hit); return hit; }
-  const t = canvasTex(TT_W, TT_H, (g) => drawCard(g as never, card, { suits: cardPrefs.get().suits, wild, ...accentHex() }, TT_W / FACE_W));
-  tcache.set(key, t); tablePainted.push(text);
+  const [c, w, h, budget, each] = small ? [scache, ST_W, ST_H, SPREAD_FACE_BUDGET_BYTES, SPREAD_FACE_BYTES] : [tcache, TT_W, TT_H, TABLE_FACE_BUDGET_BYTES, TABLE_FACE_BYTES];
+  const hit = c.get(key);
+  if (hit) { c.delete(key); c.set(key, hit); return hit; }
+  const t = canvasTex(w, h, (g) => drawCard(g as never, card, { suits: cardPrefs.get().suits, wild, ...accentHex() }, w / FACE_W));
+  c.set(key, t); tablePainted.push(text);
   if (typeof window !== 'undefined') (window as unknown as { __pp3dTableFaces?: string[] }).__pp3dTableFaces = tablePainted;
-  while (tcache.size * TABLE_FACE_BYTES > TABLE_FACE_BUDGET_BYTES) { const [k, old] = tcache.entries().next().value as [string, Texture]; tcache.delete(k); old.dispose(); }
+  while (c.size * each > budget) { const [k, old] = c.entries().next().value as [string, Texture]; c.delete(k); old.dispose(); }
   return t;
 }
 export const residentTableFaces = () => tcache.size;
@@ -90,15 +96,15 @@ export function backTexture(): Texture {
   return back.t;
 }
 
-export interface PlateInfo { name: string; pts: string; sub: string; turn: boolean; out: boolean; me: boolean }
+export interface PlateInfo { name: string; pts: string; sub: string; turn: boolean; out: boolean; me: boolean; hi?: boolean }
 export const PLATE_W = 320, PLATE_H = 112;
 /** A seat plate (name, points, cards · pairs) painted in the theme's plate tokens. Caller disposes. */
 export function plateTexture(p: PlateInfo): CanvasTexture {
   return canvasTex(PLATE_W, PLATE_H, (g) => {
-    const r = 22, ring = p.turn ? 7 : 3;
+    const r = 22, ring = p.turn || p.hi ? 7 : 3;
     g.globalAlpha = p.out ? 0.6 : 1;
     g.fillStyle = cssv('--pp-plate') || cssv('--pp-surface-2'); g.beginPath(); g.roundRect(ring, ring, PLATE_W - 2 * ring, PLATE_H - 2 * ring, r); g.fill();
-    g.lineWidth = ring; g.strokeStyle = p.turn ? cssv('--pp-primary') : cssv('--pp-ink'); g.stroke();
+    g.lineWidth = ring; g.strokeStyle = p.hi ? cssv('--pp-accent') : p.turn ? cssv('--pp-primary') : cssv('--pp-ink'); g.stroke();
     g.fillStyle = cssv('--pp-ink'); g.textBaseline = 'alphabetic';
     g.font = `700 34px ${FONT_CARD}`; g.fillText(fit(g, p.name, 190), 22, 50);
     if (p.me) g.fillRect(22, 56, Math.min(190, g.measureText(p.name).width), 3);

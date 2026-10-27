@@ -48,7 +48,8 @@ export function HandFan({ cards, u, onDrawn }: { cards: MirrorCard[]; u: ThemeUn
       else if (c.live) ring(3, primary, -0.0003);
       if (ink) ring(1.5, ink, -0.0002);
       const tex = faceTexture(parsed, c.text, c.wild, c.rect.w <= 90);
-      const face = new Mesh(faceGeometry(h / w), new MeshBasicMaterial({ map: tex, toneMapped: false, depthTest: false, transparent: c.dim, opacity: c.dim ? 0.45 : 1 }));
+      // dim (not playable now) = an opaque grey tint, not alpha: a see-through face read as half-greyed where it crossed the rail
+      const face = new Mesh(faceGeometry(h / w), new MeshBasicMaterial({ map: tex, toneMapped: false, depthTest: false, color: new Color().setScalar(c.dim ? 0.62 : 1) }));
       face.scale.set(w, w, 1); face.renderOrder = 1001 + order * 4; card.add(face);
       card.userData.key = c.key; card.name = 'hand-card';
       group.add(card); order++;

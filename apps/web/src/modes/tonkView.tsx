@@ -95,8 +95,14 @@ export function TonkTable({ view, legal, mySeat, names, onMove, busy }: ModeTabl
       ? <button key={s.id} type="button" className="tk-spread pp-move pp-primary" data-testid={`tk-hit-${s.id}`} disabled={busy} aria-label={`Hit ${pickedCard ? cardText(pickedCard) : ''} on this spread`} onClick={() => act({ t: 'hit', cardId: picked!, spreadId: s.id })}>{inner}<span className="tk-hit-tag">Hit</span></button>
       : <span key={s.id} className="tk-spread" data-testid={`tk-spread-${s.id}`}>{inner}</span>;
   };
+  // V10e: the PUBLIC table for the 3D felt (discard, stock, spreads, counts, plates, the hand-end reveal); never a hand's faces
+  const lh = (v.phase === 'handOver' || v.phase === 'over') && v.lastHand ? v.lastHand : null;
+  const t3d = JSON.stringify({ k: 'tk', n, me: mySeat, turn: v.phase === 'over' ? null : v.turn, ph: v.phase, up: v.discardTop && [cardText(v.discardTop), isWildCard(v.discardTop, v.options)], st: v.stockCount,
+    hc: v.handCounts, sh: [], sp: Array.from({ length: n }, (_, i) => spreadsOf(i).map((x) => [x.id, x.cards.map(cardText)])), pt: v.points, tg: v.options.gameEnd === 'firstToPoints' ? v.gameTarget : null,
+    on: v.handCounts.map(() => true), lk: v.lockNext, nm: Array.from({ length: n }, (_, i) => who(i, mySeat, names)),
+    end: lh && [lh.how, lh.winner, lh.dropper, lh.counts], ev: lastEvent ? [lastEvent.e, 'seat' in lastEvent ? lastEvent.seat : null, `${v.handNo}:${v.log.length}:${v.stockCount}:${v.discardCount}:${v.spreads.length}`, 'spreadId' in lastEvent ? lastEvent.spreadId : null] : null });
   return (
-    <div className="mode-table pp-table tk-table" data-testid="mode-table" data-tk-phase={v.phase} data-my-turn={myTurn ? 'yes' : 'no'}>
+    <div className="mode-table pp-table tk-table" data-testid="mode-table" data-t3d={t3d} data-tk-phase={v.phase} data-my-turn={myTurn ? 'yes' : 'no'}>
       <div className="pp-goal" data-testid="pp-goal"><b>{goalText(v)}</b><span>Hand {v.phase === 'handOver' && v.lastHand ? v.lastHand.hand + 1 : v.handNo + 1}{v.options.wilds === 'jokers' ? ' · jokers wild' : v.options.wilds === 'deuces' ? ' · 2s wild' : ''}</span></div>
       <ol className="pp-seats" data-testid="seat-strip">
         {Array.from({ length: n }, (_, i) => (
