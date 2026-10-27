@@ -3,9 +3,10 @@
  * coins show only when the coin ante & pot option is on. iPhone-first at 390px, neutral --pp-* tokens.
  * Everything here comes from the seat's own view (own hand + public table), never another hand.
  */
+import { CardBack } from '../cards/CardFace';
 import { type Card, type PpEvent, type PpMove, type PpRecap, type PpView, rankLabel } from '@pp/game';
 import { ReshuffleBeat, useReshuffleBeat } from './reshuffle';
-import { type ModeRecapProps, type ModeTableProps, PlainCard, cardText } from './views';
+import { MiniCard, type ModeRecapProps, type ModeTableProps, PlainCard, cardText } from './views';
 
 const who = (seat: number, mySeat: number | null, names: readonly string[]) => (seat === mySeat ? 'You' : names[seat] ?? `Seat ${seat + 1}`);
 const pts = (n: number) => `${n} pt${n === 1 ? '' : 's'}`;
@@ -79,7 +80,7 @@ export function PittyPatTable({ view, legal, mySeat, names, onMove, busy }: Mode
               <span className="pp-seat-sub">{v.handCounts[i] ?? 0} card{v.handCounts[i] === 1 ? '' : 's'} · {pairs} pair{pairs === 1 ? '' : 's'}{v.coinPot ? ` · ${v.chips[i] ?? 0}c` : ''}</span>
               {(v.shelves[i]?.length ?? 0) > 0 && (
                 <span className="pp-shelf" aria-label={`Pairs laid down by ${who(i, mySeat, names)}`}>
-                  {v.shelves[i]!.map((c) => <i key={c.id} className={`pp-mini${c.suit === 'D' || c.suit === 'H' ? ' red' : ''}`}>{cardText(c)}</i>)}
+                  {v.shelves[i]!.map((c) => <MiniCard key={c.id} c={c} />)}
                 </span>
               )}
             </li>
@@ -89,11 +90,11 @@ export function PittyPatTable({ view, legal, mySeat, names, onMove, busy }: Mode
       <div className="pp-center" data-testid="trick-area" aria-live="polite">
         <div className="pp-pile">
           <span className="pp-label">Upcard</span>
-          {v.upcard ? <span className="pp-up" data-testid="pp-upcard"><PlainCard card={v.upcard} />{isWild(v.upcard, v) && <em className="pp-wild">WILD</em>}</span> : <span className="pp-up empty">—</span>}
+          {v.upcard ? <span className="pp-up" data-testid="pp-upcard"><PlainCard card={v.upcard} wild={isWild(v.upcard, v)} /></span> : <span className="pp-up empty">—</span>}
         </div>
         <div className="pp-pile">
           <span className="pp-label">Stock</span>
-          <span className="pp-stock" data-testid="pp-stock">{v.stockCount}</span>
+          <span className="pp-stock" data-testid="pp-stock"><CardBack /><b className="pp-stock-n">{v.stockCount}</b></span>
           {v.coinPot && <span className="pp-pot" data-testid="pp-pot">Pot {v.pot}c</span>}
         </div>
       </div>
@@ -126,8 +127,7 @@ export function PittyPatTable({ view, legal, mySeat, names, onMove, busy }: Mode
         <div className="my-hand pp-hand" data-testid="my-hand">
           {v.hand.map((c) => (
             <span key={c.id} className="pp-card-slot">
-              <PlainCard card={c} testid={`pp-card-${c.id}`} disabled={busy || !shed.has(c.id)} onClick={shed.has(c.id) ? () => onMove({ t: 'discard', cardId: c.id } satisfies PpMove) : undefined} />
-              {isWild(c, v) && <em className="pp-wild">WILD</em>}
+              <PlainCard card={c} testid={`pp-card-${c.id}`} wild={isWild(c, v)} disabled={busy || !shed.has(c.id)} onClick={shed.has(c.id) ? () => onMove({ t: 'discard', cardId: c.id } satisfies PpMove) : undefined} />
             </span>
           ))}
           {v.hand.length === 0 && v.phase !== 'over' && <p className="trick-empty">No cards</p>}
