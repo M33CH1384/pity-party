@@ -26,7 +26,9 @@ export function ppLayout(n: number, me: number | null, aspect: number, cz: numbe
     const xs = opp.length >= 3 ? [-0.52, 0, 0.52] : opp.length === 2 ? [-0.3, 0.3] : [0];
     anchors = xs.map((x) => [x, -0.6]);
   } else {
-    const L: XZ = [-1.0, -0.12], A: XZ = [opp.length === 1 ? 0 : 0.25, -0.72], R: XZ = [0.95, -0.5];
+    // hand-v2 §E: at 667 and iPad (aspect < 1.9) the side seats move .10 toward the centre so their plates stay on screen
+    const k = aspect < 1.9 ? 0.1 : 0;
+    const L: XZ = [-1.0 + k, -0.12], A: XZ = [opp.length === 1 ? 0 : 0.25, -0.72], R: XZ = [0.95 - k, -0.5];
     anchors = opp.length >= 3 ? [L, A, R] : opp.length === 2 ? [L, R] : [A];
   }
   opp.forEach((s, i) => {
