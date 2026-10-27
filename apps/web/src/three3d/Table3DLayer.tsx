@@ -6,9 +6,10 @@
 import { useEffect, useRef, useState, type ComponentType } from 'react';
 import { markRendererFailed } from './renderer';
 import { loadScene } from './preload';
+import { loadSettings } from '../settings';
 
 export const FIRST_FRAME_TIMEOUT_MS = 6000;
-type SceneProps = { onFirstFrame: () => void; onContextLost: () => void };
+type SceneProps = { onFirstFrame: () => void; onContextLost: () => void; quality?: 'high' | 'low' };
 
 export function Table3DLayer({ onReady }: { onReady: (ready: boolean) => void }) {
   const [Scene, setScene] = useState<ComponentType<SceneProps> | null>(null);
@@ -23,6 +24,7 @@ export function Table3DLayer({ onReady }: { onReady: (ready: boolean) => void })
   return (
     <div className="table3d-layer" data-testid="table3d" aria-hidden="true">
       <Scene
+        quality={loadSettings().quality}
         onFirstFrame={() => { window.clearTimeout(timer.current); onReady(true); }}
         onContextLost={() => { onReady(false); markRendererFailed('context-lost'); }}
       />

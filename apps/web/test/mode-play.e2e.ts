@@ -17,7 +17,8 @@ const ok = (c: unknown, msg: string) => { if (!c) throw new Error(msg); console.
 
 async function newPage(b: Browser): Promise<Page> {
   const ctx = await b.newContext(IPHONE);
-  await ctx.addInitScript(() => { if (!localStorage.getItem('bwm.online.name')) localStorage.setItem('bwm.online.name', 'Guest'); localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} })); });
+  await ctx.addInitScript(() => { if (!localStorage.getItem('bwm.online.name')) localStorage.setItem('bwm.online.name', 'Guest'); localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} })); }); // V10: BWM_TABLE=2d forces the 2D table (Settings Table: 2D)
+  if (process.env.BWM_TABLE === '2d') await ctx.addInitScript(() => localStorage.setItem('pp.table3d.v1', '2d'));
   const p = await ctx.newPage();
   p.setDefaultTimeout(20000);
   return p;
