@@ -4,10 +4,11 @@
  * fit), spreads stack per seat and scroll inside their own box. Tap a card to select it, then Hit (on a spread
  * that lights up) or Discard. Everything comes from the seat's own view, never another hand.
  */
+import { CardBack } from '../cards/CardFace';
 import { useState } from 'react';
 import { type Card, type Spread, type TkEvent, type TkHandEnd, type TkMove, type TkRecap, type TkView, isWildCard, tkCount } from '@pp/game';
 import { ReshuffleBeat, useReshuffleBeat } from './reshuffle';
-import { type ModeRecapProps, type ModeTableProps, PlainCard, cardText } from './views';
+import { MiniCard, type ModeRecapProps, type ModeTableProps, PlainCard, cardText } from './views';
 
 const who = (seat: number, mySeat: number | null, names: readonly string[]) => (seat === mySeat ? 'You' : names[seat] ?? `Seat ${seat + 1}`);
 const pts = (n: number) => `${n} pt${n === 1 ? '' : 's'}`;
@@ -44,9 +45,7 @@ function eventText(e: TkEvent, mySeat: number | null, names: readonly string[]):
   }
 }
 
-function MiniCard({ c, v }: { c: Card; v: TkView }) {
-  return <i className={`pp-mini${c.suit === 'D' || c.suit === 'H' ? ' red' : ''}${isWildCard(c, v.options) ? ' wild' : ''}`}>{cardText(c)}</i>;
-}
+const TkMini = ({ c, v }: { c: Card; v: TkView }) => <MiniCard c={c} wild={isWildCard(c, v.options)} />;
 
 export function TonkTable({ view, legal, mySeat, names, onMove, busy }: ModeTableProps) {
   const v = view as TkView;
@@ -91,7 +90,7 @@ export function TonkTable({ view, legal, mySeat, names, onMove, busy }: ModeTabl
   const spreadsOf = (seat: number) => v.spreads.filter((s) => s.owner === seat);
   const spreadRow = (s: Spread) => {
     const hit = hitTargets.has(s.id);
-    const inner = <>{s.cards.map((c) => <MiniCard key={c.id} c={c} v={v} />)}</>;
+    const inner = <>{s.cards.map((c) => <TkMini key={c.id} c={c} v={v} />)}</>;
     return hit
       ? <button key={s.id} type="button" className="tk-spread pp-move pp-primary" data-testid={`tk-hit-${s.id}`} disabled={busy} aria-label={`Hit ${pickedCard ? cardText(pickedCard) : ''} on this spread`} onClick={() => act({ t: 'hit', cardId: picked!, spreadId: s.id })}>{inner}<span className="tk-hit-tag">Hit</span></button>
       : <span key={s.id} className="tk-spread" data-testid={`tk-spread-${s.id}`}>{inner}</span>;
@@ -111,11 +110,11 @@ export function TonkTable({ view, legal, mySeat, names, onMove, busy }: ModeTabl
       <div className="pp-center" data-testid="trick-area" aria-live="polite">
         <div className="pp-pile">
           <span className="pp-label">Discard</span>
-          {v.discardTop ? <span className="pp-up" data-testid="tk-discard"><PlainCard card={v.discardTop} />{isWildCard(v.discardTop, v.options) && <em className="pp-wild">WILD</em>}</span> : <span className="pp-up empty">—</span>}
+          {v.discardTop ? <span className="pp-up" data-testid="tk-discard"><PlainCard card={v.discardTop} wild={isWildCard(v.discardTop, v.options)} /></span> : <span className="pp-up empty">—</span>}
         </div>
         <div className="pp-pile">
           <span className="pp-label">Stock</span>
-          <span className="pp-stock" data-testid="tk-stock">{v.stockCount}</span>
+          <span className="pp-stock" data-testid="tk-stock"><CardBack /><b className="pp-stock-n">{v.stockCount}</b></span>
           {v.options.coinStakes && <span className="pp-pot" data-testid="tk-stake">{v.options.stake}c / pt</span>}
         </div>
       </div>
@@ -154,8 +153,7 @@ export function TonkTable({ view, legal, mySeat, names, onMove, busy }: ModeTabl
         <div className="my-hand pp-hand tk-hand" data-testid="my-hand">
           {hand.map((c) => (
             <span key={c.id} className={`pp-card-slot${picked === c.id ? ' tk-picked' : ''}`}>
-              <PlainCard card={c} testid={`tk-card-${c.id}`} disabled={busy || !selectable.has(c.id) || picked === c.id} onClick={selectable.has(c.id) ? () => setSel(c.id) : undefined} />
-              {isWildCard(c, v.options) && <em className="pp-wild">WILD</em>}
+              <PlainCard card={c} testid={`tk-card-${c.id}`} wild={isWildCard(c, v.options)} disabled={busy || !selectable.has(c.id) || picked === c.id} onClick={selectable.has(c.id) ? () => setSel(c.id) : undefined} />
             </span>
           ))}
           {hand.length === 0 && v.phase !== 'over' && <p className="trick-empty">No cards</p>}

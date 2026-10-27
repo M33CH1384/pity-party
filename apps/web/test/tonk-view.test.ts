@@ -51,7 +51,7 @@ describe('Tonk table', () => {
     const start = screen(newLocalGame('tonk', {}, 2, 't3b'));
     expect(start).toMatch(/tk-drawStock|Waiting|turn/);
     const wild = playOut({ wilds: 'jokers' }, 't3c', (x) => view0(x).hand.some((c) => c.rank === 0));
-    if (view0(wild).hand.some((c) => c.rank === 0)) expect(screen(wild)).toContain('WILD');
+    if (view0(wild).hand.some((c) => c.rank === 0)) expect(screen(wild)).toContain('(wild)');
   });
   it('slap window: slap and let-it-go buttons', () => {
     const g = playOut({ slap: true }, 't4', (x) => localToAct(x)[0] === 0 && (localLegal(x, 0) as TkMove[]).some((m) => m.t === 'slap'));

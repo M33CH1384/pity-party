@@ -5,6 +5,10 @@
 import type { ComponentType } from 'react';
 import { PittyPatRecap, PittyPatTable } from './pittyPatView';
 import { TonkRecap, TonkTable } from './tonkView';
+import { CardFace } from '../cards/CardFace';
+import { useWideCards } from '../cards/useWideCards';
+import { useCardPrefs } from '../cards/cardPrefs';
+import { SUIT_INK } from '../cards/cardArt';
 import { type Card, type HcMove, type HcView, type ModeId, type Results, rankLabel } from '@pp/game';
 
 export interface ModeTableProps {
@@ -24,10 +28,22 @@ const SUIT: Record<string, string> = { C: '♣', D: '♦', H: '♥', S: '♠' };
 export const cardText = (c: Card) => (c.suit ? `${rankLabel(c.rank)}${SUIT[c.suit]}` : 'JK');
 const red = (c: Card) => c.suit === 'D' || c.suit === 'H';
 
-export function PlainCard({ card, onClick, disabled, testid }: { card: Card; onClick?: () => void; disabled?: boolean; testid?: string }) {
-  const body = <span className={`pcard${red(card) ? ' red' : ''}`}>{cardText(card)}</span>;
+const SUIT_NAME: Record<string, string> = { C: 'clubs', D: 'diamonds', H: 'hearts', S: 'spades' };
+/** Spoken name: "8 of hearts", "Joker"; "(wild)" when the table's wild rule makes it wild. */
+export const cardName = (c: Card, wild?: boolean) => `${c.suit ? `${rankLabel(c.rank)} of ${SUIT_NAME[c.suit]}` : 'Joker'}${wild ? ' (wild)' : ''}`;
+
+/** A face-up card the viewer is allowed to see (V3: drawn by cards/cardArt via SVG). Hidden cards use <CardBack/>. */
+export function PlainCard({ card, onClick, disabled, testid, wild }: { card: Card; onClick?: () => void; disabled?: boolean; testid?: string; wild?: boolean }) {
+  const full = useWideCards();
+  const body = <span className={`pcard${red(card) ? ' red' : ''}${wild ? ' is-wild' : ''}`} data-card={cardText(card)}><CardFace card={card} wild={wild} compact={!full} label={onClick ? '' : cardName(card, wild)} /></span>;
   if (!onClick) return <span className="pcard-wrap" data-testid={testid}>{body}</span>;
-  return <button type="button" className="pcard-btn" disabled={disabled} onClick={onClick} data-testid={testid} aria-label={`Play ${cardText(card)}`}>{body}</button>;
+  return <button type="button" className="pcard-btn" disabled={disabled} onClick={onClick} data-testid={testid} aria-label={`Play ${cardName(card, wild)}`}>{body}</button>;
+}
+
+/** Small face-up chip (shelves, spreads, recaps): same suit inks as the big face (cardArt SUIT_INK). */
+export function MiniCard({ c, wild }: { c: Card; wild?: boolean }) {
+  const { suits } = useCardPrefs();
+  return <i className={`pp-mini${wild ? ' wild' : ''}`} style={{ color: c.suit ? SUIT_INK[suits][c.suit] : undefined }}>{cardText(c)}</i>;
 }
 
 /** Seats around the top, in order; whose turn is ringed. */

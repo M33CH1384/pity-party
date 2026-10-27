@@ -42,7 +42,7 @@ describe('Pitty Pat table', () => {
     const st = g.state as PpState;
     for (const c of st.hands[1]!) expect(html).not.toContain(`pp-card-${c.id}"`);
     const spect = screen(g, null);
-    expect(spect).not.toContain('pp-card-');
+    expect(spect).not.toContain('data-testid="pp-card-');
   });
   it('move controls: pair / flip / pass buttons and tappable shed cards come from the legal list; deuces flagged WILD', () => {
     let found: ReturnType<typeof newLocalGame> | null = null;
@@ -53,7 +53,7 @@ describe('Pitty Pat table', () => {
     }
     expect(found).not.toBeNull();
     const html = screen(found!);
-    expect(html).toContain('WILD');
+    expect(html).toContain('(wild)');
     expect(html).toContain('data-testid="pp-actions"');
     for (const m of localLegal(found!, 0) as { t: string; cardIds?: string[] }[]) {
       if (m.t === 'pair') expect(html).toContain(`data-testid="pp-pair-${m.cardIds!.join('-')}"`);

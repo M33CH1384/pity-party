@@ -240,10 +240,9 @@ html[data-theme="B"] .pp-center {
   padding: 18px;
 }
 .pp-center .pp-label { color: var(--pp-ink); }
-html[data-theme="B"] .pp-center .pp-label, html[data-theme="B"] .pp-center .pp-stock, html[data-theme="B"] .pp-center .pp-pot { color: #ffffff; }
-html[data-theme="B"] .pp-center .pp-stock { background: repeating-linear-gradient(45deg, var(--pp-accent-2), var(--pp-accent-2) 6px, var(--pp-ink) 6px, var(--pp-ink) 12px); border: 1.5px solid var(--pp-card-ink); text-shadow: 0 1px 2px rgba(var(--pp-shade-rgb), .8) !important; }
+html[data-theme="B"] .pp-center .pp-label, html[data-theme="B"] .pp-center .pp-pot { color: #ffffff; }
 /* Cards on B: 1.5px ink edge + Desi's two-layer shadow. */
-html[data-theme="B"] .pcard { box-shadow: 0 0 0 1.5px #2b2118, 0 2px 0 rgba(43, 33, 24, .35), 0 6px 14px rgba(20, 30, 60, .35); }
+html[data-theme="B"] .pcard, html[data-theme="B"] .pp-stock { box-shadow: 0 0 0 1.5px #2b2118, 0 2px 0 rgba(43, 33, 24, .35), 0 6px 14px rgba(20, 30, 60, .35); }
 
 /* Settings > Theme tiles (4 × 64px, mini felt/accent preview) + Home chip. */
 .theme-picker { display: flex; flex-direction: column; gap: 8px; }
@@ -327,3 +326,28 @@ html:not([data-theme="K"]) .pp-wordmark { text-transform: none; letter-spacing: 
 .ap-sec { box-shadow: inset 0 0 0 2px var(--pp-accent-2); color: var(--pp-ink); }
 .ap-felt { flex: 1; min-width: 36px; height: 44px; border-radius: 10px; background: var(--pp-felt); }
 .accent-switch { min-height: 44px; padding: 0 14px; border-radius: var(--r-pill); border: 1px solid var(--pp-line); background: var(--pp-plate); color: var(--pp-ink); font: inherit; font-weight: 700; cursor: pointer; }
+
+/* ---- V3 cards (drawn by cards/cardArt.ts → SVG). Faces are white on every theme; backs re-tint per theme
+   (stripes follow the accent, so the Neon Lounge back follows the Lounge colour). Sizes keep the index ≥ 14px
+   on phones (compact face) and switch to the full pip/court face on big screens (cards/useWideCards.ts). */
+:root { --pp-card-w: 56px; --pp-card-h: 80px; }
+@media (min-width: 900px) and (min-height: 700px) { :root { --pp-card-w: 88px; --pp-card-h: 123px; } }
+:root, html[data-theme="C"] { --pp-card-back: #15151B; --pp-card-back-ink: #F4F4F8; }
+html[data-theme="A"] { --pp-card-back: #2A1D3A; --pp-card-back-ink: #FFF4E2; }
+html[data-theme="B"] { --pp-card-back: #1F2A44; --pp-card-back-ink: #F3E9DA; }
+html[data-theme="K"] { --pp-card-back: #1A0F2B; --pp-card-back-ink: #F6F1FF; }
+:root { --pp-card-back-stripe: rgba(var(--pp-accent-rgb), .55); }
+.card-face, .card-back { display: block; width: 100%; height: 100%; border-radius: inherit; }
+.cf-card { font-family: var(--pp-font-card); }
+.cf-disp { font-family: var(--pp-font-card); font-weight: 700; }
+.pp-mini { background: var(--pp-card); font-family: var(--pp-font-card); }
+.suit-colours { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 13px; color: var(--pp-ink); }
+.suit-colours > span { flex: 1 0 100%; }
+.suit-opt { min-height: 44px; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--pp-line); background: var(--pp-btn-fill); color: var(--pp-ink); font: inherit; font-weight: 700; cursor: pointer; }
+.suit-opt.on { border-color: var(--pp-accent); box-shadow: 0 0 0 2px var(--pp-accent); }
+.so-glyphs { display: inline-flex; gap: 1px; padding: 2px 5px; border-radius: 6px; background: var(--pp-card); font-style: normal; }
+.so-glyphs i { font-style: normal; }
+.so-four .so-glyphs i:nth-child(1), .so-classic .so-glyphs i:nth-child(1), .so-classic .so-glyphs i:nth-child(4) { color: var(--pp-suit-s); }
+.so-glyphs i:nth-child(2), .so-classic .so-glyphs i:nth-child(3) { color: var(--pp-suit-h); }
+.so-four .so-glyphs i:nth-child(3) { color: var(--pp-suit-d); }
+.so-four .so-glyphs i:nth-child(4) { color: var(--pp-suit-c); }
