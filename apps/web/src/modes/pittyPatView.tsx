@@ -67,8 +67,12 @@ export function PittyPatTable({ view, legal, mySeat, names, onMove, busy }: Mode
     : v.phase === 'handOver' ? (next ? 'Your deal: tap Next hand' : `Waiting for ${who(v.turn ?? 0, mySeat, names)} to deal`)
     : v.phase === 'steal' ? (myTurn ? 'Steal chance: take the pair or let it go' : 'Steal chance…')
     : myTurn ? (shed.size ? 'Shed a card: tap one' : 'Your turn') : v.turn !== null ? `${who(v.turn, mySeat, names)}'s turn` : '';
+  // V10d: the PUBLIC table for the 3D layer (upcard, stock, shelves, counts, plates); never a hand's faces
+  const t3d = JSON.stringify({ n, me: mySeat, turn: v.phase === 'over' ? null : v.turn, ph: v.phase, up: v.upcard && [cardText(v.upcard), isWild(v.upcard, v)], st: v.stockCount,
+    hc: v.handCounts, sh: v.shelves.map((s) => s.map(cardText)), pt: v.points, tg: v.options.gameEnd === 'firstToPoints' ? v.targetPoints : null, on: v.active,
+    nm: Array.from({ length: n }, (_, i) => who(i, mySeat, names)), ev: lastEvent ? [lastEvent.e, 'seat' in lastEvent ? lastEvent.seat : null, v.log.length] : null });
   return (
-    <div className="mode-table pp-table" data-testid="mode-table" data-pp-phase={v.phase} data-my-turn={myTurn ? 'yes' : 'no'}>
+    <div className="mode-table pp-table" data-testid="mode-table" data-t3d={t3d} data-pp-phase={v.phase} data-my-turn={myTurn ? 'yes' : 'no'}>
       <div className="pp-goal" data-testid="pp-goal"><b>{goalText(v)}</b><span>Hand {v.phase === 'handOver' && v.lastHand ? v.lastHand.hand + 1 : v.handNo + 1}{v.options.deucesWild ? ' · 2s wild' : ''}</span></div>
       <ol className="pp-seats" data-testid="seat-strip">
         {Array.from({ length: n }, (_, i) => {

@@ -3056,3 +3056,5 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 .mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard-btn { position: relative; opacity: 1; }
 .mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard-btn::after { content: ""; position: absolute; inset: -4px; min-height: 60px; }
 .mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard-btn:focus-visible { outline: 3px solid var(--pp-accent); outline-offset: 3px; }
+/* V10d: the 3D felt draws the seat plates, stock, upcard and shelves; the DOM ones stay (a11y, tests) but step aside */
+.mode-screen[data-renderer="3d"][data-table3d="on"] :is(.pp-seats, .pp-pile) { opacity: 0; pointer-events: none; }

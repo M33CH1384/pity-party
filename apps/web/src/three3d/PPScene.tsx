@@ -13,7 +13,8 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { buildTable, FD, FELTY, FW, type Quality, type Table, type TableTextures } from './table';
 import { themeUniforms, watchTheme, type ThemeId, type ThemeUniforms } from './themeUniforms';
 import { HandFan } from './HandFan';
-import type { MirrorCard } from './handMirror';
+import type { MirrorCard, TableSnap } from './handMirror';
+import { PPTable3D } from './PPTable3D';
 
 export { FELTY, FW, FD };
 
@@ -82,7 +83,7 @@ function Rig() {
   return null;
 }
 
-function World({ quality, onReady, hand, onHand }: { quality: Quality; onReady: () => void; hand: MirrorCard[]; onHand: (on: boolean) => void }) {
+function World({ quality, onReady, hand, onHand, snap, onTable }: { quality: Quality; onReady: () => void; hand: MirrorCard[]; onHand: (on: boolean) => void; snap: TableSnap | null; onTable: (on: boolean) => void }) {
   const { scene, gl, size, invalidate } = useThree();
   const aspect = size.width / Math.max(1, size.height);
   const cz = cloverZ(aspect);
@@ -137,12 +138,14 @@ function World({ quality, onReady, hand, onHand }: { quality: Quality; onReady: 
       <primitive object={lights.key} />
       <primitive object={lights.key.target} />
       <primitive object={table.group} />
+      <PPTable3D snap={snap} u={u} cz={cz} aspect={aspect} onDrawn={onTable} />
       <HandFan cards={hand} u={u} onDrawn={onHand} />
     </>
   );
 }
 
-export function PPScene({ onFirstFrame, onContextLost, quality = 'high', hand = [], onHand = () => {} }: { onFirstFrame: () => void; onContextLost: () => void; quality?: Quality; hand?: MirrorCard[]; onHand?: (on: boolean) => void }) {
+const noop = () => {};
+export function PPScene({ onFirstFrame, onContextLost, quality = 'high', hand = [], onHand = noop, table = null, onTable = noop }: { onFirstFrame: () => void; onContextLost: () => void; quality?: Quality; hand?: MirrorCard[]; onHand?: (on: boolean) => void; table?: TableSnap | null; onTable?: (on: boolean) => void }) {
   const high = quality === 'high';
   return (
     <Canvas
@@ -158,7 +161,7 @@ export function PPScene({ onFirstFrame, onContextLost, quality = 'high', hand = 
       }}
     >
       <Rig />
-      <World quality={quality} onReady={onFirstFrame} hand={hand} onHand={onHand} />
+      <World quality={quality} onReady={onFirstFrame} hand={hand} onHand={onHand} snap={table} onTable={onTable} />
     </Canvas>
   );
 }
