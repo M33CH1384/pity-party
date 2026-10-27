@@ -72,9 +72,9 @@
  * for spades) and --suit-line draws the keyline in the ink's own tint
  * (spades additionally keep their gold hairline). The Joker stands in
  * gold. */
-.plcard[data-suit="hearts"] { --suit: #ff647c; --suit-deep: #b91f32; --suit-wash: #fbe3e8; --suit-line: rgba(185, 31, 50, .5); }
-.plcard[data-suit="clubs"] { --suit: #57d992; --suit-deep: var(--pp-surface); --suit-wash: var(--pp-ink); --suit-line: rgba(var(--pp-glass-strong-rgb), .48); }
-.plcard[data-suit="diamonds"] { --suit: #5bdfff; --suit-deep: #b91f32; --suit-wash: var(--pp-ink); --suit-line: rgba(185, 31, 50, .48); }
+.plcard[data-suit="hearts"] { --suit: var(--pp-x-red-10); --suit-deep: var(--pp-x-red-4); --suit-wash: var(--pp-x-red-25); --suit-line: rgba(var(--pp-x-red-4-rgb), .5); }
+.plcard[data-suit="clubs"] { --suit: var(--pp-x-green-12); --suit-deep: var(--pp-surface); --suit-wash: var(--pp-ink); --suit-line: rgba(var(--pp-glass-strong-rgb), .48); }
+.plcard[data-suit="diamonds"] { --suit: var(--pp-x-cyan-1); --suit-deep: var(--pp-x-red-4); --suit-wash: var(--pp-ink); --suit-line: rgba(var(--pp-x-red-4-rgb), .48); }
 .plcard[data-suit="spades"] { --suit: var(--pp-ink); --suit-deep: var(--pp-surface); --suit-wash: var(--pp-ink); --suit-line: rgba(var(--pp-glass-strong-rgb), .5); }
 .plcard[data-suit="joker"] { --suit: var(--gold); --suit-deep: var(--gold); --suit-wash: rgba(var(--gold-rgb), .16); --suit-line: rgba(var(--gold-rgb), .55); }
 
@@ -156,8 +156,8 @@ html[data-fx="neon"] .plcard.pcard {
 .plcard .pcard-front {
   background:
     radial-gradient(115% 80% at 50% 0%, var(--suit-wash), rgba(var(--pp-hi-rgb), 0) 62%),
-    linear-gradient(168deg, #f6f7f8, #dbdee2);
-  border: 1px solid rgba(28,30,34, .38);
+    linear-gradient(168deg, var(--pp-x-steel-35), var(--pp-x-steel-31));
+  border: 1px solid rgba(var(--pp-x-steel-10-rgb), .38);
 }
 /* The keyline: the classic thin inner frame line, in the suit's ink. */
 .plcard .pcard-front::before {
@@ -176,15 +176,15 @@ html[data-fx="neon"] .plcard.pcard {
  * register (deep violet for the Little, black-and-gold for the Big). */
 .plcard[data-treatment="little-joker"] .pcard-front {
   background:
-    radial-gradient(115% 80% at 50% 0%, rgba(165,172,182, .3), rgba(var(--pp-shade-rgb), 0) 60%),
-    linear-gradient(165deg, #2a2e33, #141618);
-  border-color: rgba(185,190,198, .5);
+    radial-gradient(115% 80% at 50% 0%, rgba(var(--pp-x-steel-24-rgb), .3), rgba(var(--pp-shade-rgb), 0) 60%),
+    linear-gradient(165deg, var(--pp-x-steel-16), var(--pp-x-steel-2));
+  border-color: rgba(var(--pp-x-steel-26-rgb), .5);
 }
-.plcard[data-treatment="little-joker"] .pcard-front::before { border-color: rgba(216,219,223, .55); }
+.plcard[data-treatment="little-joker"] .pcard-front::before { border-color: rgba(var(--pp-x-steel-30-rgb), .55); }
 .plcard[data-treatment="big-joker"] .pcard-front {
   background:
     radial-gradient(115% 80% at 50% 0%, rgba(var(--gold-rgb), .22), rgba(var(--pp-shade-rgb), 0) 58%),
-    linear-gradient(165deg, #1d1507, #070509);
+    linear-gradient(165deg, var(--pp-x-amber-4), var(--pp-x-ink-1));
   border-color: rgba(var(--gold-rgb), .8);
 }
 .plcard[data-treatment="big-joker"] .pcard-front::before { border: 2px solid rgba(var(--gold-rgb), .85); }
@@ -231,9 +231,9 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
  * stays readable over any photo. */
 .plcard[data-treatment="court"] .pcard-field { top: 3%; bottom: 3%; left: 3%; right: 3%; }
 .plcard[data-treatment="court"] .pcard-corner {
-  background: rgba(246,247,248, .92);
+  background: rgba(var(--pp-x-steel-35-rgb), .92);
   border-radius: 5px; padding: 3px 4px 4px;
-  box-shadow: 0 1px 5px rgba(25,28,31, .28);
+  box-shadow: 0 1px 5px rgba(var(--pp-x-steel-5-rgb), .28);
 }
 /* Number pips, placed by PIP_LAYOUTS; lower-half pips print inverted.
  * Classic pip scale: the glyph box is ~21% of the card's width (a fifth,
@@ -264,8 +264,8 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
 .plcard .pcard-artwin {
   position: absolute; z-index: 2; overflow: hidden; border-radius: 6px;
   border: 2px solid var(--suit-deep);
-  background: linear-gradient(160deg, var(--suit-wash), #f6f7f8);
-  box-shadow: 0 3px 12px rgba(25,28,31, .28), inset 0 0 0 2px #f6f7f8, inset 0 0 0 3.5px rgba(var(--gold-rgb), .55);
+  background: linear-gradient(160deg, var(--suit-wash), var(--pp-x-steel-35));
+  box-shadow: 0 3px 12px rgba(var(--pp-x-steel-5-rgb), .28), inset 0 0 0 2px var(--pp-x-steel-35), inset 0 0 0 3.5px rgba(var(--gold-rgb), .55);
   display: flex; align-items: center; justify-content: center;
 }
 .plcard .pcard-artwin img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -321,16 +321,16 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
 .plcard .pcard-artwin.ace { left: 50%; top: 37%; transform: translate(-50%, -50%); width: 56%; aspect-ratio: 4 / 4.7; }
 .plcard .pcard-artwin.deuce { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 46%; aspect-ratio: 4 / 4.6; }
 .plcard .pcard-artwin.court { inset: 0; border-width: 2.5px; }
-.plcard .pcard-artwin.joker { top: 0; bottom: 0; right: 0; left: 9%; border-color: rgba(216,219,223, .7); background: linear-gradient(160deg, #3d424a, #1a1c1f); }
-.plcard[data-treatment="big-joker"] .pcard-artwin.joker { border-color: rgba(var(--gold-rgb), .85); background: linear-gradient(160deg, #171a1d, #0a0705); }
+.plcard .pcard-artwin.joker { top: 0; bottom: 0; right: 0; left: 9%; border-color: rgba(var(--pp-x-steel-30-rgb), .7); background: linear-gradient(160deg, var(--pp-x-steel-18), var(--pp-x-steel-6)); }
+.plcard[data-treatment="big-joker"] .pcard-artwin.joker { border-color: rgba(var(--gold-rgb), .85); background: linear-gradient(160deg, var(--pp-x-steel-4), var(--pp-x-ink-2)); }
 .plcard .pcard-artwin.joker .pcard-artletter { color: var(--corner); }
 /* The royal tab riding the court frame's top edge. */
 .plcard .pcard-royaltab {
   position: absolute; z-index: 3; top: -12px; left: 50%; transform: translateX(-50%);
   padding: 2px 11px 3px; border-radius: 999px;
   background: linear-gradient(180deg, var(--gold-hi), var(--gold-deep));
-  color: #241a02; font-size: 15px; line-height: 1.1;
-  box-shadow: 0 2px 7px rgba(25,28,31, .35);
+  color: var(--pp-x-amber-5); font-size: 15px; line-height: 1.1;
+  box-shadow: 0 2px 7px rgba(var(--pp-x-steel-5-rgb), .35);
 }
 /* On the keyline-to-keyline court field (v4) the tab sits INSIDE the
  * figure's top edge — at the old -12px it would ride off the card. */
@@ -341,7 +341,7 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
   transform: translateY(-50%) rotate(180deg);
   writing-mode: vertical-rl;
   font-family: var(--display); font-weight: 800; font-size: 13px; letter-spacing: .42em;
-  color: #d5d8dc; pointer-events: none;
+  color: var(--pp-x-steel-29); pointer-events: none;
 }
 .plcard[data-treatment="big-joker"] .pcard-jokerword { color: var(--gold-hi); }
 
@@ -357,26 +357,26 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
   position: absolute; z-index: 5; left: 9%; right: 24%; bottom: 3%;
   display: flex; align-items: center; gap: 9px; gap: 3cqw;
   padding: 8px 11px; padding: 2.7cqw 3.7cqw; border-radius: 8px;
-  background: linear-gradient(180deg, #272b30, #16191c);
-  box-shadow: inset 0 0 0 1px rgba(var(--gold-rgb), .5), 0 3px 10px rgba(19,21,23, .35);
-  color: #e8eaed;
+  background: linear-gradient(180deg, var(--pp-x-steel-15), var(--pp-x-steel-3));
+  box-shadow: inset 0 0 0 1px rgba(var(--gold-rgb), .5), 0 3px 10px rgba(var(--pp-x-steel-1-rgb), .35);
+  color: var(--pp-x-steel-33);
 }
 .plcard[data-treatment="little-joker"] .pcard-plate {
-  box-shadow: inset 0 0 0 1px rgba(185,190,198, .55), 0 3px 10px rgba(19,21,23, .35);
+  box-shadow: inset 0 0 0 1px rgba(var(--pp-x-steel-26-rgb), .55), 0 3px 10px rgba(var(--pp-x-steel-1-rgb), .35);
 }
 .plcard[data-treatment="big-joker"] .pcard-plate {
-  background: linear-gradient(180deg, #aeb4bc, #6d7785);
-  box-shadow: inset 0 0 0 1px rgba(33,36,41, .55), 0 3px 10px rgba(var(--pp-shade-rgb), .45);
+  background: linear-gradient(180deg, var(--pp-x-steel-25), var(--pp-x-steel-21));
+  box-shadow: inset 0 0 0 1px rgba(var(--pp-x-steel-12-rgb), .55), 0 3px 10px rgba(var(--pp-shade-rgb), .45);
 }
 .plcard .pcard-plate-id { min-width: 0; flex: 1; }
 .plcard .pcard-name {
   margin: 0; font-family: var(--display); font-weight: 800;
-  font-size: 20px; font-size: 6.7cqw; line-height: 1.12; color: #e8eaed;
+  font-size: 20px; font-size: 6.7cqw; line-height: 1.12; color: var(--pp-x-steel-33);
   overflow-wrap: anywhere;
 }
-.plcard[data-treatment="big-joker"] .pcard-name { color: #171106; }
-.plcard .pcard-handle { margin: 1px 0 0; font-size: 11.5px; font-size: 3.8cqw; color: #c2c7cd; }
-.plcard[data-treatment="big-joker"] .pcard-handle { color: #2b2f35; }
+.plcard[data-treatment="big-joker"] .pcard-name { color: var(--pp-x-amber-1); }
+.plcard .pcard-handle { margin: 1px 0 0; font-size: 11.5px; font-size: 3.8cqw; color: var(--pp-x-steel-27); }
+.plcard[data-treatment="big-joker"] .pcard-handle { color: var(--pp-x-steel-17); }
 /* Showcased badges ride the band as medal seals — a glyph in a ringed
  * disc, the badge's name on its title, never a text pill. */
 .plcard .pcard-seals { display: flex; gap: 5px; gap: 1.7cqw; flex: none; }
@@ -388,8 +388,8 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
   border: 1.5px solid rgba(var(--gold-rgb), .85);
 }
 .plcard[data-treatment="big-joker"] .pcard-seal {
-  border-color: rgba(33,36,41, .7);
-  background: radial-gradient(circle at 35% 30%, rgba(var(--pp-hi-rgb), .55), rgba(33,36,41, .18));
+  border-color: rgba(var(--pp-x-steel-12-rgb), .7);
+  background: radial-gradient(circle at 35% 30%, rgba(var(--pp-hi-rgb), .55), rgba(var(--pp-x-steel-12-rgb), .18));
 }
 
 /* ------------------------------------------- above the card (v4) */
@@ -439,13 +439,13 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
  * house violet, gold keyline — with the stats as an ivory inset panel. */
 .plcard .pcard-back {
   background:
-    repeating-linear-gradient(45deg, rgba(185,190,198, .07) 0 2px, rgba(var(--pp-shade-rgb), 0) 2px 15px),
-    repeating-linear-gradient(-45deg, rgba(185,190,198, .07) 0 2px, rgba(var(--pp-shade-rgb), 0) 2px 15px),
-    linear-gradient(160deg, #212429, #0d0a1e);
+    repeating-linear-gradient(45deg, rgba(var(--pp-x-steel-26-rgb), .07) 0 2px, rgba(var(--pp-shade-rgb), 0) 2px 15px),
+    repeating-linear-gradient(-45deg, rgba(var(--pp-x-steel-26-rgb), .07) 0 2px, rgba(var(--pp-shade-rgb), 0) 2px 15px),
+    linear-gradient(160deg, var(--pp-x-steel-12), var(--pp-x-blue-1));
   background:
     repeating-linear-gradient(45deg, color-mix(in srgb, var(--suit) 13%, transparent) 0 2px, rgba(var(--pp-shade-rgb), 0) 2px 15px),
     repeating-linear-gradient(-45deg, color-mix(in srgb, var(--suit) 13%, transparent) 0 2px, rgba(var(--pp-shade-rgb), 0) 2px 15px),
-    linear-gradient(160deg, #212429, #0d0a1e);
+    linear-gradient(160deg, var(--pp-x-steel-12), var(--pp-x-blue-1));
   border: 1px solid rgba(var(--gold-rgb), .5);
 }
 .plcard .pcard-back::before {
@@ -464,13 +464,13 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
   position: absolute; inset: 7% 6%; inset: 4.5cqw; z-index: 1;
   display: flex; flex-direction: column; gap: 8px; gap: 3.2cqw;
   padding: 14px 15px; padding: 4.7cqw 4cqw; border-radius: 9px; overflow-y: auto;
-  background: linear-gradient(170deg, #ebedef, #dbdee2);
-  color: #222529;
-  box-shadow: inset 0 0 0 1px rgba(28,30,34, .22), 0 4px 14px rgba(var(--pp-shade-rgb), .35);
+  background: linear-gradient(170deg, var(--pp-x-steel-34), var(--pp-x-steel-31));
+  color: var(--pp-x-steel-13);
+  box-shadow: inset 0 0 0 1px rgba(var(--pp-x-steel-10-rgb), .22), 0 4px 14px rgba(var(--pp-shade-rgb), .35);
 }
 .plcard .pcard-back-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.plcard .pcard-back-head b { font-size: 16.5px; font-size: 5.5cqw; overflow-wrap: anywhere; color: #222529; }
-.plcard .pcard-back-head span { color: #6a6284; font-size: 11px; font-size: 3.7cqw; text-transform: uppercase; letter-spacing: .09em; }
+.plcard .pcard-back-head b { font-size: 16.5px; font-size: 5.5cqw; overflow-wrap: anywhere; color: var(--pp-x-steel-13); }
+.plcard .pcard-back-head span { color: var(--pp-x-steel-20); font-size: 11px; font-size: 3.7cqw; text-transform: uppercase; letter-spacing: .09em; }
 /* The career line as a baseball-card stat table (owner, 2026-10-23):
  * ONE aligned system in place of the old block grid + prose split
  * lines — column headers, ruled rows, numbers right-aligned in
@@ -478,7 +478,7 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
  * row; the streak rides its own ruled row in the same grid language.
  * A mode with no games gets an honest "No games yet" row — its seeded
  * rating never prints as if it were earned. */
-.plcard .pcard-stats { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; font-size: 4.05cqw; color: #222529; }
+.plcard .pcard-stats { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; font-size: 4.05cqw; color: var(--pp-x-steel-13); }
 /* The colgroup IS the fit contract (back fit pass): the five columns
  * divide the panel's content box in fixed shares — Mode takes the
  * widest share for its fixed vocabulary ("Partnership"), the value
@@ -496,26 +496,26 @@ html[data-fx="neon"] .plcard[data-treatment="big-joker"] .pcard-front { border-c
 .plcard .pcard-stats th, .plcard .pcard-stats td { padding: 4.5px 5px; padding: 4.8cqw .6cqw; }
 .plcard .pcard-stats thead th {
   font-size: 9.5px; font-size: 2.8cqw; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-  color: #6a6284; text-align: right; white-space: nowrap;
+  color: var(--pp-x-steel-20); text-align: right; white-space: nowrap;
   padding-top: 7px; padding-top: 2.6cqw; padding-bottom: 7px; padding-bottom: 2.6cqw;
-  border-bottom: 1.5px solid rgba(28,30,34, .35);
+  border-bottom: 1.5px solid rgba(var(--pp-x-steel-10-rgb), .35);
 }
 .plcard .pcard-stats thead th:first-child { text-align: left; }
 .plcard .pcard-stats tbody th { text-align: left; font-weight: 600; font-size: 12.5px; font-size: 3.95cqw; white-space: nowrap; }
 .plcard .pcard-stats tbody td { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.plcard .pcard-stats tbody tr > * { border-top: 1px solid rgba(28,30,34, .14); }
+.plcard .pcard-stats tbody tr > * { border-top: 1px solid rgba(var(--pp-x-steel-10-rgb), .14); }
 .plcard .pcard-stats tbody tr:first-child > * { border-top: none; }
-.plcard .pcard-stats tbody tr.totals > * { border-top: 1.5px solid rgba(28,30,34, .35); font-weight: 700; }
-.plcard .pcard-stats td.pcard-nogames-cell { text-align: left; color: #6a6284; font-style: italic; font-weight: 400; }
+.plcard .pcard-stats tbody tr.totals > * { border-top: 1.5px solid rgba(var(--pp-x-steel-10-rgb), .35); font-weight: 700; }
+.plcard .pcard-stats td.pcard-nogames-cell { text-align: left; color: var(--pp-x-steel-20); font-style: italic; font-weight: 400; }
 .plcard .pcard-stats tr.streakrow td { text-align: left; }
 .plcard .pcard-vs { margin: 2px 0 0; font-size: 13.5px; font-size: 4.5cqw; }
-.plcard .pcard-vs b { color: #41474f; }
+.plcard .pcard-vs b { color: var(--pp-x-steel-19); }
 /* The empty line centers in the panel space it owns (its auto
  * margins share the free height with the footnotes' anchor), instead
  * of huddling under the head over the same hollow panel. */
-.plcard .pcard-nogames { margin: auto 0; text-align: center; color: #6a6284; font-style: italic; font-size: 14.5px; font-size: 4.8cqw; }
-.plcard .pcard-back-story { margin: auto 0 0; padding-top: 9px; padding-top: 3cqw; font-size: 12.5px; font-size: 4.2cqw; color: #6a6284; border-top: 1px dashed rgba(28,30,34, .3); }
-.plcard .pcard-since { margin: 0; color: #6a6284; font-size: 12px; font-size: 4cqw; }
+.plcard .pcard-nogames { margin: auto 0; text-align: center; color: var(--pp-x-steel-20); font-style: italic; font-size: 14.5px; font-size: 4.8cqw; }
+.plcard .pcard-back-story { margin: auto 0 0; padding-top: 9px; padding-top: 3cqw; font-size: 12.5px; font-size: 4.2cqw; color: var(--pp-x-steel-20); border-top: 1px dashed rgba(var(--pp-x-steel-10-rgb), .3); }
+.plcard .pcard-since { margin: 0; color: var(--pp-x-steel-20); font-size: 12px; font-size: 4cqw; }
 
 /* -------------------------------------------------------- deck size */
 /* Indices, pips, the nameplate and the whole back need no deck
