@@ -289,7 +289,7 @@ async function tonkOffline(b: Browser) {
   await p.evaluate(() => { const w = window as unknown as Record<string, boolean>; new MutationObserver(() => { if (document.querySelector('[data-testid="tk-hand-result"]')) w.__tkResult = true; if (document.querySelector('[data-testid="reshuffle-beat"]')) w.__tkBeat = true; }).observe(document.body, { childList: true, subtree: true }); });
   const flags = () => p.evaluate(() => { const w = window as unknown as Record<string, boolean>; return { result: !!w.__tkResult, beat: !!w.__tkBeat }; });
   // a game can end on an instant win in hand 1 (random deal): play again (same page) until the between-hands flow was seen
-  for (let game = 0; game < 4; game++) {
+  for (let game = 0; game < 6; game++) {
     await playToRecap([p], undefined, async (pg) => {
       if (!shotsTaken.table && await pg.getByTestId('tk-drawStock').isVisible().catch(() => false)) { shotsTaken.table = true; await pg.screenshot({ path: `${shots}/9b-table-390.png` }); await layoutOk(pg, 'tonk 7-card hand'); }
       if (!shotsTaken.spread && await pg.locator('.pp-actions [data-testid^="tk-spread-"]').first().isVisible().catch(() => false)) { shotsTaken.spread = true; await pg.screenshot({ path: `${shots}/9b-spread-390.png` }); await layoutOk(pg, 'tonk spread controls'); }
@@ -300,7 +300,14 @@ async function tonkOffline(b: Browser) {
     const f = await flags();
     if (f.result && f.beat && (shotsTaken.spread || shotsTaken.hit)) break;
     await p.getByTestId('mode-again').click();
-    await p.getByTestId('mode-recap').waitFor({ state: 'hidden' });
+    // Play again deals a NEW game. With 7 cards + jokers wild about 1 in 4 new 4-seat games ends at once on an instant
+    // win (49/50 dealt: +2 from each = +6 >= the 5-point target), so the new game's recap shows straight away. That is
+    // the rules, not a stuck recap: accept either the table or a fresh one-hand "instant win on the deal" recap.
+    await p.waitForFunction(() => {
+      const r = document.querySelector('[data-testid="mode-recap"]'); if (!r) return true;
+      const hands = r.querySelectorAll('[data-testid="tk-recap-hands"] li');
+      return hands.length === 1 && /instant win on the deal/.test(hands[0]!.textContent ?? '');
+    }, null, { timeout: 20000 });
   }
   const seen = await p.evaluate(() => { const w = window as unknown as Record<string, boolean>; return { result: !!w.__tkResult, beat: !!w.__tkBeat }; });
   ok(seen.result || shotsTaken.result, 'tonk: hand result shown between hands (pauseBetweenHands)');
