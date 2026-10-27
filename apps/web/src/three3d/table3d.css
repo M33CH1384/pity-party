@@ -34,3 +34,26 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 .mode-screen[data-renderer="3d"][data-table3d="on"] .tk-spreads { background: transparent; border-color: transparent; box-shadow: none; }
 .mode-screen[data-renderer="3d"][data-table3d="on"] .tk-spread-seat:not(.is-me):not(:has(button)) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .mode-screen[data-renderer="3d"][data-table3d="on"] .tk-spreads:not(:has(.tk-spread-seat.is-me, button)) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+/* V10g: the 3D hand is a big curved fan (table-v2). The DOM input layer becomes one overlapping row of bigger cards:
+   each slot is ~.68 of a card (the visible strip, still a ≥ 60px tap target), the row shrinks before it would scroll. */
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand { --pp-card-w: clamp(56px, min(26vw, 24vh), 116px); --pp-card-h: calc(var(--pp-card-w) * 1.4); flex-wrap: wrap; row-gap: 6px; column-gap: 0; max-width: 100%; padding-right: calc(var(--pp-card-w) * .32); }
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pp-card-slot { flex: 0 1 calc(var(--pp-card-w) * .68); min-width: 44px; }
+/* V10g landscape: the (invisible) DOM seat strip stops taking a row, so the action row + hand fit the short screen */
+@media (min-aspect-ratio: 4/3) and (max-height: 600px) {
+  .mode-screen[data-renderer="3d"][data-table3d="on"] .pp-seats { position: absolute; top: 0; inset-inline: 0; height: 1px; overflow: hidden; }
+  /* the fan sits on the bottom edge, its lower third cropped like the table-v2 landscape board */
+  .mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand { position: fixed; left: 0; right: 0; margin-inline: auto; width: fit-content; bottom: calc(var(--pp-card-h) * -.12); right: 200px; z-index: 2; }
+  /* actions: the bottom-right column (table-v2 landscape), clear of the fan */
+  .mode-screen[data-renderer="3d"][data-table3d="on"] .pp-actions { position: fixed; right: 12px; bottom: 12px; width: 184px; flex-direction: column; align-items: stretch; z-index: 3; }
+}
+/* V10g top-bar score chips (portrait + tall screens; short landscape keeps the scores on the seat plates) */
+.v3-chips { display: none; }
+@media (max-aspect-ratio: 3/4), (min-height: 700px) {
+  .mode-screen[data-renderer="3d"][data-table3d="on"] .v3-chips { display: flex; gap: 4px; justify-content: center; flex-wrap: nowrap; position: fixed; top: 106px; left: 8px; right: 8px; z-index: 2; pointer-events: none; }
+}
+.v3-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 3px; border-radius: 999px; min-width: 0; flex: 0 1 auto; background: var(--pp-plate); color: var(--pp-ink); box-shadow: 0 0 0 1.5px var(--pp-muted); font-size: 13px; line-height: 1; }
+.v3-chip.is-turn { box-shadow: 0 0 0 2px var(--pp-accent); }
+.v3-chip i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-style: normal; font-weight: 800; color: var(--pp-plate); background: linear-gradient(135deg, var(--pp-accent), var(--pp-accent-2)); }
+.v3-chip b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
+.v3-chip em { font-style: normal; font-weight: 800; }
+.v3-chip small { font-size: 12px; opacity: .8; }

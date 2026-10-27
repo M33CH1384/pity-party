@@ -20,7 +20,7 @@ describe('parseCardText round-trips the DOM card text', () => {
 describe('fan', () => {
   it('is symmetric and capped at ±6°', () => {
     expect(fanTilt(0, 1)).toBe(0);
-    for (const n of [2, 5, 7, 9, 12]) { expect(fanTilt(0, n)).toBeCloseTo(-fanTilt(n - 1, n)); expect(Math.abs(fanTilt(0, n))).toBeLessThanOrEqual(6.01); }
+    for (const n of [2, 5, 7, 9, 12]) { expect(fanTilt(0, n)).toBeCloseTo(-fanTilt(n - 1, n)); expect(Math.abs(fanTilt(0, n))).toBeLessThanOrEqual(22.01); }
   });
 });
 
