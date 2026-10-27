@@ -127,7 +127,7 @@ export function TonkTable({ view, legal, mySeat, names, onMove, busy }: ModeTabl
       {v.spreads.length > 0 && (
         <section className="tk-spreads" data-testid="tk-spreads" aria-label="Spreads on the table">
           {Array.from({ length: n }, (_, i) => spreadsOf(i).length > 0 && (
-            <div key={i} className="tk-spread-seat"><span className="pp-label">{who(i, mySeat, names)}</span><div className="tk-spread-list">{spreadsOf(i).map(spreadRow)}</div></div>
+            <div key={i} className={`tk-spread-seat${i === mySeat ? ' is-me' : ''}`}><span className="pp-label">{who(i, mySeat, names)}</span><div className="tk-spread-list">{spreadsOf(i).map(spreadRow)}</div></div>
           ))}
         </section>
       )}
