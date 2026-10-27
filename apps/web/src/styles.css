@@ -31,9 +31,9 @@
   --glass: rgba(var(--glass-rgb), 0.62);
   --glass-strong: rgba(var(--glass-strong-rgb), 0.82);
   --edge: rgba(var(--edge-rgb), 0.55);
-  --display: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', system-ui, sans-serif;
+  --display: var(--pp-font-label);
   --slant: 14px;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--pp-font-ui);
   color: var(--ink);
   background: var(--bg);
   -webkit-tap-highlight-color: transparent;
