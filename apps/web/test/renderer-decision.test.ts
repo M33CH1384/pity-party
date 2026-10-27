@@ -31,10 +31,10 @@ describe('decideRenderer', () => {
 
 describe('cameraFor (spec §3)', () => {
   it('portrait / phone landscape / iPad', () => {
-    expect(cameraFor(393 / 852)).toMatchObject({ pos: [0, 4.4, 0.75], fov: 50 });
-    expect(cameraFor(852 / 393)).toMatchObject({ pos: [0, 2.05, 1.18], fov: 44 });
-    expect(cameraFor(1180 / 820)).toMatchObject({ pos: [0, 2.15, 2.0], fov: 44 });
-    expect(cameraFor(667 / 375)).toMatchObject({ pos: [0, 2.05, 1.18] });
+    expect(cameraFor(393 / 852)).toMatchObject({ pos: [0, 2.33, 2.55], fov: 56 });
+    expect(cameraFor(852 / 393)).toMatchObject({ pos: [0, 1.71, 1.84], fov: 44 });
+    expect(cameraFor(1180 / 820)).toMatchObject({ pos: [0, 1.88, 1.74], fov: 50 });
+    expect(cameraFor(667 / 375)).toMatchObject({ pos: [0, 1.71, 1.84] });
   });
 });
 

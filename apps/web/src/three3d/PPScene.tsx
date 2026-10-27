@@ -1,12 +1,12 @@
 /**
  * V10b scene: the re-tinted table (table.ts), ONE light rig (hemisphere + key spot; key shadow on High only),
- * the warm_bar HDRI on High only, a radial-gradient backdrop and Neutral tone mapping at the theme's exposure.
+ * the warm_bar HDRI on High only, the V10g lounge room (room.ts) and Neutral tone mapping at the theme's exposure.
  * No postprocessing. Camera per V10-3D-SPEC §3. Lazy chunk only (preload.ts).
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import {
-  CanvasTexture, EquirectangularReflectionMapping, HemisphereLight, NeutralToneMapping, PCFSoftShadowMap, PMREMGenerator,
+  EquirectangularReflectionMapping, HemisphereLight, NeutralToneMapping, PCFSoftShadowMap, PMREMGenerator,
   RepeatWrapping, SpotLight, SRGBColorSpace, type Texture, TextureLoader, type WebGLRenderer,
 } from 'three';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
@@ -15,16 +15,18 @@ import { themeUniforms, watchTheme, type ThemeId, type ThemeUniforms } from './t
 import { HandFan } from './HandFan';
 import { type MirrorCard, type TableSnap, useHandMirror, useTableMirror } from './handMirror';
 import { PPTable3D } from './PPTable3D';
+import { buildRoom, type Room } from './room';
 import './table3d.css';
 
 export { FELTY, FW, FD };
 
 export interface CameraPose { pos: [number, number, number]; target: [number, number, number]; fov: number }
-/** Spec §3: portrait (aspect < .75), phone landscape (> 1.6), iPad / desktop in between. */
+/** Portrait (aspect < .75), phone landscape (> 1.6), iPad / desktop in between. */
 export function cameraFor(aspect: number): CameraPose {
-  if (aspect < 0.75) return { pos: [0, 4.4, 0.75], target: [0, 0.88, -0.02], fov: 50 };
-  if (aspect > 1.6) return { pos: [0, 2.05, 1.18], target: [0, 0.9, -0.3], fov: 44 };
-  return { pos: [0, 2.15, 2.0], target: [0, 0.86, 0.05], fov: 44 };
+  // V10g seated cameras (table-v2 NOTES: BWM 'sitting', low and across the felt, aimed at the far half)
+  if (aspect < 0.75) return { pos: [0, 2.33, 2.55], target: [0, 0.88, -0.22], fov: 56 };
+  if (aspect > 1.6) return { pos: [0, 1.71, 1.84], target: [0, 0.93, -0.3], fov: 44 };
+  return { pos: [0, 1.88, 1.74], target: [0, 0.93, -0.2], fov: 50 };
 }
 /** Clover centre z: portrait .02, landscape / iPad −.26 (§3, §4 fix). */
 export const cloverZ = (aspect: number) => (aspect < 0.75 ? 0.02 : -0.26);
@@ -62,14 +64,6 @@ export function preloadTableAssets(q: Quality): void {
   if (q === 'high') void envHdr().catch(() => {});
 }
 
-function backdrop(u: ThemeUniforms): CanvasTexture {
-  const c = document.createElement('canvas'); c.width = c.height = 512;
-  const g = c.getContext('2d')!; const rg = g.createRadialGradient(256, 230, 0, 256, 256, 380);
-  rg.addColorStop(0, `#${u.bgIn.getHexString()}`); rg.addColorStop(1, `#${u.bgOut.getHexString()}`);
-  g.fillStyle = rg; g.fillRect(0, 0, 512, 512);
-  const t = new CanvasTexture(c); t.colorSpace = SRGBColorSpace; return t;
-}
-
 function Rig() {
   const { camera, size, invalidate } = useThree();
   const aspect = size.width / Math.max(1, size.height);
@@ -104,8 +98,11 @@ function World({ quality, onReady, hand, onHand, snap, onTable }: { quality: Qua
   }, [quality, gl]);
 
   // the table: rebuilt only for quality / layout (clover z), re-tinted for theme
-  const table = useMemo<Table | null>(() => (tx ? buildTable(quality, tx, cz) : null), [tx, quality, cz]);
+  const portrait = aspect < 0.75;
+  const table = useMemo<Table | null>(() => (tx ? buildTable(quality, tx, cz, portrait) : null), [tx, quality, cz, portrait]);
   useEffect(() => () => table?.dispose(), [table]);
+  const room = useMemo<Room | null>(() => (tx ? buildRoom(quality, tx.wood, cz) : null), [tx, quality, cz]);
+  useEffect(() => () => room?.dispose(), [room]);
 
   // lights: hemisphere + key spot (§1b shared key values); shadow on High only
   const lights = useMemo(() => {
@@ -117,14 +114,14 @@ function World({ quality, onReady, hand, onHand, snap, onTable }: { quality: Qua
   }, [quality]);
 
   useEffect(() => {
-    table?.applyTheme(u, inlay);
+    table?.applyTheme(u, inlay); room?.applyTheme(u);
     lights.hemi.color.copy(u.hemiSky); lights.hemi.groundColor.copy(u.hemiGround); lights.hemi.intensity = u.hemi;
     lights.key.color.copy(u.key);
     gl.toneMapping = NeutralToneMapping; gl.toneMappingExposure = u.exposure;
-    const bg = backdrop(u); const old = scene.background; scene.background = bg; if (old instanceof CanvasTexture) old.dispose();
+    scene.background = u.bgOut;
     scene.environment = env; scene.environmentIntensity = u.env;
     invalidate();
-  }, [u, inlay, env, table, lights, gl, scene, invalidate]);
+  }, [u, inlay, env, table, room, lights, gl, scene, invalidate]);
 
   const fired = useRef(false);
   useFrame(() => {
@@ -139,6 +136,7 @@ function World({ quality, onReady, hand, onHand, snap, onTable }: { quality: Qua
       <primitive object={lights.key} />
       <primitive object={lights.key.target} />
       <primitive object={table.group} />
+      {room && <primitive object={room.group} />}
       <PPTable3D snap={snap} u={u} cz={cz} aspect={aspect} onDrawn={onTable} />
       <HandFan cards={hand} u={u} onDrawn={onHand} />
     </>
@@ -158,7 +156,7 @@ export function PPScene({ onFirstFrame, onContextLost, quality = 'high', root = 
       dpr={high ? [1, 2] : 1}
       shadows={high ? { type: PCFSoftShadowMap } : false}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
-      camera={{ fov: 50, near: 0.05, far: 50, position: [0, 4.4, 0.75] }}
+      camera={{ fov: 50, near: 0.05, far: 50, position: [0, 2.33, 2.55] }}
       onCreated={({ gl }) => {
         gl.toneMapping = NeutralToneMapping; gl.outputColorSpace = SRGBColorSpace;
         gl.domElement.addEventListener('webglcontextlost', (e) => { e.preventDefault(); onContextLost(); }, { once: true });
