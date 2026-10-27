@@ -24,10 +24,10 @@ export { FELTY, FW, FD };
 export interface CameraPose { pos: [number, number, number]; target: [number, number, number]; fov: number }
 /** Portrait (aspect < .75), phone landscape (> 1.6), iPad / desktop in between. */
 export function cameraFor(aspect: number): CameraPose {
-  // V10g seated cameras (table-v2 NOTES: BWM 'sitting', low and across the felt, aimed at the far half)
-  if (aspect < 0.75) return { pos: [0, 2.33, 2.55], target: [0, 0.88, -0.22], fov: 56 };
-  if (aspect > 1.6) return { pos: [0, 1.71, 1.84], target: [0, 0.93, -0.3], fov: 44 };
-  return { pos: [0, 1.88, 1.74], target: [0, 0.93, -0.2], fov: 50 };
+  // V10g-3 (hand-v2 §E: raised + tilted so opponents' pairs read) / V10g seated cameras (table-v2 NOTES: BWM 'sitting', low and across the felt, aimed at the far half)
+  if (aspect < 0.75) return { pos: [0, 2.78, 2.15], target: [0, 0.88, -0.46], fov: 56 };
+  if (aspect > 1.6) return { pos: [0, 1.93, 1.84], target: [0, 0.93, -0.4], fov: 44 };
+  return { pos: [0, 2.05, 1.74], target: [0, 0.93, -0.3], fov: 50 };
 }
 /** Clover centre z: portrait .02, landscape / iPad −.26 (§3, §4 fix). */
 export const cloverZ = (aspect: number) => (aspect < 0.75 ? 0.16 : -0.26);
@@ -79,7 +79,7 @@ function Rig() {
   return null;
 }
 
-function World({ quality, onReady, hand, onHand, snap, onTable }: { quality: Quality; onReady: () => void; hand: MirrorCard[]; onHand: (on: boolean) => void; snap: TableSnap | null; onTable: (on: boolean) => void }) {
+function World({ quality, onReady, hand, onHand, snap, onTable, root }: { root: HTMLElement | null; quality: Quality; onReady: () => void; hand: MirrorCard[]; onHand: (on: boolean) => void; snap: TableSnap | null; onTable: (on: boolean) => void }) {
   const { scene, gl, size, invalidate } = useThree();
   const aspect = size.width / Math.max(1, size.height);
   const cz = cloverZ(aspect);
@@ -139,7 +139,7 @@ function World({ quality, onReady, hand, onHand, snap, onTable }: { quality: Qua
       <primitive object={table.group} />
       {room && <primitive object={room.group} />}
       <PPTable3D snap={snap} u={u} cz={cz} aspect={aspect} onDrawn={onTable} />
-      <HandFan cards={hand} u={u} onDrawn={onHand} />
+      <HandFan cards={hand} u={u} onDrawn={onHand} root={root} />
     </>
   );
 }
@@ -166,7 +166,7 @@ export function PPScene({ onFirstFrame, onContextLost, quality = 'high', root = 
       }}
     >
       <Rig />
-      <World quality={quality} onReady={onFirstFrame} hand={hand} onHand={onHand} snap={table} onTable={onTable} />
+      <World quality={quality} onReady={onFirstFrame} hand={hand} onHand={onHand} snap={table} onTable={onTable} root={root} />
     </Canvas>
     </>
   );

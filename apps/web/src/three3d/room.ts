@@ -41,7 +41,7 @@ export function buildRoom(q: Quality, wood: Texture, cz: number): Room {
   const strip = mesh(new Mesh(new BoxGeometry(4.1, 0.012, 0.012), new MeshBasicMaterial({ toneMapped: false }))); strip.position.set(0, 1.375, ZF + 0.27);
 
   // pendant lamp over the clover: cord, shade, warm bulb
-  const lampY = FELTY + 1.5;
+  const lampY = FELTY + 1.85;
   const cord = mesh(new Mesh(new CylinderGeometry(0.004, 0.004, RH - lampY, 6), std())); cord.position.set(0, (RH + lampY) / 2, cz - 0.1);
   const shade = mesh(new Mesh(new ConeGeometry(0.2, 0.16, 24, 1, true), new MeshPhysicalMaterial({ metalness: 0.8, roughness: 0.35, side: DoubleSide }))); shade.position.set(0, lampY, cz - 0.1);
   const bulb = mesh(new Mesh(new CylinderGeometry(0.05, 0.05, 0.01, 16), new MeshBasicMaterial({ toneMapped: false }))); bulb.position.set(0, lampY - 0.075, cz - 0.1);
