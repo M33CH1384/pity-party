@@ -29,7 +29,7 @@ export function cameraFor(aspect: number): CameraPose {
   return { pos: [0, 1.88, 1.74], target: [0, 0.93, -0.2], fov: 50 };
 }
 /** Clover centre z: portrait .02, landscape / iPad −.26 (§3, §4 fix). */
-export const cloverZ = (aspect: number) => (aspect < 0.75 ? 0.02 : -0.26);
+export const cloverZ = (aspect: number) => (aspect < 0.75 ? 0.16 : -0.26);
 
 const BASE = '/three3d/';
 const tl = new TextureLoader();

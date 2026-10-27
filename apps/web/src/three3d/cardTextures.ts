@@ -105,11 +105,17 @@ export function plateTexture(p: PlateInfo): CanvasTexture {
     g.globalAlpha = p.out ? 0.6 : 1;
     g.fillStyle = cssv('--pp-plate') || cssv('--pp-surface-2'); g.beginPath(); g.roundRect(ring, ring, PLATE_W - 2 * ring, PLATE_H - 2 * ring, r); g.fill();
     g.lineWidth = ring; g.strokeStyle = p.hi ? cssv('--pp-accent') : p.turn ? cssv('--pp-primary') : cssv('--pp-ink'); g.stroke();
+    // V10g avatar: an accent → accent-2 disc with the initial (table-v2 seat plates)
+    const ar = 34, ax = ring + 14 + ar, ay = PLATE_H / 2; const gr = g.createLinearGradient(ax - ar, ay - ar, ax + ar, ay + ar);
+    gr.addColorStop(0, cssv('--pp-accent')); gr.addColorStop(1, cssv('--pp-accent-2'));
+    g.fillStyle = gr; g.beginPath(); g.arc(ax, ay, ar, 0, Math.PI * 2); g.fill();
+    g.fillStyle = cssv('--pp-plate') || cssv('--pp-ink'); g.font = `800 36px ${FONT_CARD}`; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText((p.name.trim()[0] ?? '?').toUpperCase(), ax, ay + 2);
+    g.textAlign = 'left'; const nx = ax + ar + 12;
     g.fillStyle = cssv('--pp-ink'); g.textBaseline = 'alphabetic';
-    g.font = `700 34px ${FONT_CARD}`; g.fillText(fit(g, p.name, 190), 22, 50);
-    if (p.me) g.fillRect(22, 56, Math.min(190, g.measureText(p.name).width), 3);
-    g.textAlign = 'right'; g.font = `800 40px ${FONT_CARD}`; g.fillText(p.pts, PLATE_W - 22, 52); g.textAlign = 'left';
-    g.font = `600 26px ${FONT_CARD}`; g.fillText(fit(g, p.sub, PLATE_W - 44), 22, 92);
+    g.font = `700 30px ${FONT_CARD}`; g.fillText(fit(g, p.name, PLATE_W - nx - 96), nx, 50);
+    if (p.me) g.fillRect(nx, 56, Math.min(150, g.measureText(p.name).width), 3);
+    g.textAlign = 'right'; g.font = `800 34px ${FONT_CARD}`; g.fillText(p.pts, PLATE_W - 22, 52); g.textAlign = 'left';
+    g.font = `600 24px ${FONT_CARD}`; g.fillText(fit(g, p.sub, PLATE_W - 2 * ring - 110), ring + 96, 92);
   });
 }
 function fit(g: CanvasRenderingContext2D, s: string, w: number): string {

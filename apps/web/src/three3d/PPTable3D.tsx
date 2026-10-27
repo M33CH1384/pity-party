@@ -109,10 +109,15 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
         if (L.me && seat === s.me) billboard(plateTexture(plate), at(L.me.plate, 0.14), L.portrait ? 0.36 : 0.5, L.portrait ? 0.126 : 0.175, `plate-${seat}`);
         continue;
       }
-      billboard(plateTexture(plate), at(slot.plate, 0.17), 0.5, 0.175, `plate-${seat}`);
+      billboard(plateTexture(plate), at(slot.plate, 0.34), 0.5, 0.175, `plate-${seat}`);
       // opponent hand: backs only, a small fan (count capped at 5) under the plate
       const nb = Math.min(5, s.hc[seat] ?? 0);
-      for (let k = 0; k < nb; k++) { const g = card(null, at(slot.backs, 0.001 + k * 0.0008).add(new Vector3((k - (nb - 1) / 2) * 0.035, 0, 0)), 0.55, `backs-${seat}`); g.rotateZ(((k - (nb - 1) / 2) * 6 * Math.PI) / 180); }
+      // V10g: an upright fan of backs standing at the seat (table-v2 / BWM), leaning back a little toward the far rail
+      for (let k = 0; k < nb; k++) {
+        const a = ((k - (nb - 1) / 2) * 12 * Math.PI) / 180, R = CH * 0.6;
+        const g = card(null, at(slot.backs, CH * 0.6 * 0.5 - R + Math.cos(a) * R).add(new Vector3(Math.sin(a) * R, 0, k * 0.004)), 0.6, `backs-${seat}`);
+        g.quaternion.identity(); g.rotation.set(-0.12, 0, -a);
+      }
       // Tonk: spread rows, newest nearest the centre; a row fans at the spec step and compresses past the slot width
       if (rows.length) {
         const sc = 0.72, cw = CW * sc, slotW = L.portrait ? (s.n >= 4 ? 0.46 : 0.6) : 0.62;
