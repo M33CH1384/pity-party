@@ -36,9 +36,8 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 .mode-screen[data-renderer="3d"][data-table3d="on"] .tk-spreads:not(:has(.tk-spread-seat.is-me, button)) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 /* V10g: the 3D hand is a big curved fan (table-v2). The DOM input layer becomes one overlapping row of bigger cards:
    each slot is ~.68 of a card (the visible strip, still a ≥ 60px tap target), the row shrinks before it would scroll. */
-.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand { --pp-card-w: clamp(56px, min(26vw, 24vh), 116px); --pp-card-h: calc(var(--pp-card-w) * 1.4); flex-wrap: nowrap; gap: 0; max-width: 100%; padding-right: calc(var(--pp-card-w) * .32); }
-.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pp-card-slot { flex: 0 1 calc(var(--pp-card-w) * .68); min-width: 0; }
-.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard-btn { min-width: 0; }
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand { --pp-card-w: clamp(56px, min(26vw, 24vh), 116px); --pp-card-h: calc(var(--pp-card-w) * 1.4); flex-wrap: wrap; row-gap: 6px; column-gap: 0; max-width: 100%; padding-right: calc(var(--pp-card-w) * .32); }
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pp-card-slot { flex: 0 1 calc(var(--pp-card-w) * .68); min-width: 44px; }
 /* V10g landscape: the (invisible) DOM seat strip stops taking a row, so the action row + hand fit the short screen */
 @media (min-aspect-ratio: 4/3) and (max-height: 600px) {
   .mode-screen[data-renderer="3d"][data-table3d="on"] .pp-seats { position: absolute; top: 0; inset-inline: 0; height: 1px; overflow: hidden; }
