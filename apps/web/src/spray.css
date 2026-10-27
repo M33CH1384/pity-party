@@ -69,7 +69,7 @@
 .spray-rv {
   position: absolute;
   inset: 0;
-  background: #070708;
+  background: var(--pp-surface);
   will-change: opacity, transform;
 }
 
@@ -77,10 +77,10 @@
    layers carry a deep navy-violet body under their static masks so
    the dissipating field reads as ink thinning in water, never grey. */
 .ink-rv {
-  background: #04050e;
+  background: var(--pp-surface);
 }
 .ink-rv-grain {
-  background: linear-gradient(160deg, #191c1f 0%, #04050e 70%);
+  background: linear-gradient(160deg, var(--pp-surface) 0%, var(--pp-surface) 70%);
 }
 .ink-splats {
   position: absolute;

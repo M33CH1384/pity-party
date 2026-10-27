@@ -30,8 +30,8 @@ describe('League Wire rendering', () => {
   it('the wire block is styled distinctly in both themes (functionally identical)', () => {
     expect(css).toContain('.soc-wire {');
     expect(css).toContain('.soc-wire-byline {');
-    expect(css).toContain('html[data-theme="neon"] .soc-wire {');
-    expect(css).toContain('html[data-theme="neon"] .soc-wire-byline {');
+    expect(css).toContain('html[data-fx="neon"] .soc-wire {');
+    expect(css).toContain('html[data-fx="neon"] .soc-wire-byline {');
   });
   it('a wire arrival never plays the player-message blip', () => {
     expect(store).toContain("if (!m.line.wire) playChatSound('global'");

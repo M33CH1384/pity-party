@@ -9,7 +9,7 @@
  * surface. The fix gives .profile-page the same translucent-wash treatment
  * plus an ink-toned glow behind the header zone (page host only — the Social
  * panel is a solid sheet by design). Classic stays byte-identical: every rule
- * below lives behind html[data-theme="neon"].
+ * below lives behind html[data-fx="neon"].
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
@@ -32,11 +32,11 @@ describe('the ink is not suppressed on the profile route', () => {
 
 describe('Neon: the profile page carries an ink variation', () => {
   it('the page field gets the translucent wash so the ink canvas reads through', () => {
-    expect(css).toContain('html[data-theme="neon"] .profile-page {');
-    expect(css).toContain('background: radial-gradient(90% 60% at 50% 30%, rgba(var(--purple-rgb), .16), rgba(4, 5, 12, .5) 70%);');
+    expect(css).toContain('html[data-fx="neon"] .profile-page {');
+    expect(css).toContain('background: radial-gradient(90% 60% at 50% 30%, rgba(var(--purple-rgb), .16), rgba(var(--pp-glass-strong-rgb), .5) 70%);');
   });
   it('the header zone pools an ink-toned glow (page host only — .profile-page scope)', () => {
-    expect(css).toContain('html[data-theme="neon"] .profile-page .soc-prof-head {');
+    expect(css).toContain('html[data-fx="neon"] .profile-page .soc-prof-head {');
     expect(css).toContain('rgba(var(--purple-rgb), .22)');
     expect(css).toContain('rgba(38, 156, 255, .14)');
   });
