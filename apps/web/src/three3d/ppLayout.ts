@@ -4,8 +4,8 @@
  * left (−1.00, −.12), across (.25, −.72), right (.95, −.50). Table cards at scale 1.5 (spec fix, was 1.3).
  */
 export const CARD_SCALE = 1.5;
-/** card width in world units (the BWM table-card base .1 × the 1.5 felt scale) and h / w */
-export const CW = 0.1 * CARD_SCALE, CASPECT = 896 / 640, CH = CW * CASPECT;
+/** card width in world units (base .17 ≈ the spec's 66 px at 390 portrait × the 1.5 felt scale) and h / w */
+export const CW = 0.17 * CARD_SCALE, CASPECT = 896 / 640, CH = CW * CASPECT;
 /** pair spread: each card sits ±PAIR_DX from its shelf centre (half-width = .075 + card / 2) */
 export const PAIR_DX = 0.075;
 export type XZ = [number, number];
@@ -32,13 +32,13 @@ export function ppLayout(n: number, me: number | null, aspect: number, cz: numbe
   opp.forEach((s, i) => {
     const [x, z] = anchors[i]!;
     // plate just beyond the shelf (toward the far rail); the backs between plate and shelf
-    seats.set(s, { shelf: [x, z], plate: [x, z - (portrait ? 0.27 : 0.25)], backs: [x, z - (portrait ? 0.27 : 0.25)] });
+    seats.set(s, { shelf: [x, z], plate: [x, z - (portrait ? 0.5 : 0.5)], backs: [x, z - (portrait ? 0.27 : 0.27)] });
   });
-  const dx = portrait ? 0.2 : 0.17;
+  const dx = portrait ? 0.2 : 0.2;
   return {
     portrait, seats,
-    stock: [-dx, cz], up: [dx, cz],
-    me: me === null ? null : { plate: portrait ? [0, cz + 0.42] : [-0.62, cz + 0.4] },
+    stock: [-dx, portrait ? cz - 0.08 : cz], up: [dx, portrait ? cz - 0.08 : cz],
+    me: me === null ? null : { plate: portrait ? [-0.42, cz + 0.38] : [-0.86, 0.26] },
   };
 }
 /** where card i of a shelf's top pair lies */

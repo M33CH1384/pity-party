@@ -3058,3 +3058,5 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 .mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard-btn:focus-visible { outline: 3px solid var(--pp-accent); outline-offset: 3px; }
 /* V10d: the 3D felt draws the seat plates, stock, upcard and shelves; the DOM ones stay (a11y, tests) but step aside */
 .mode-screen[data-renderer="3d"][data-table3d="on"] :is(.pp-seats, .pp-pile) { opacity: 0; pointer-events: none; }
+/* portrait: the event / turn lines sit under the 3D stock + upcard instead of over them (spec §4 stock/upcard 384–475) */
+@media (max-aspect-ratio: 3/4) { .mode-screen[data-renderer="3d"][data-table3d="on"] .pp-center { margin-bottom: 56px; } }

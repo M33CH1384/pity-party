@@ -81,7 +81,7 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
     const stockN = Math.max(0, s.st);
     for (let k = 0; k < Math.min(3, Math.ceil(stockN / 8)); k++) card(null, at(L.stock, k * 0.004).add(new Vector3(-k * 0.003, 0, -k * 0.003)), 1, 'stock');
     if (stockN === 0) card(null, at(L.stock), 1, 'stock').visible = false;
-    billboard(badgeTexture(String(stockN)), at(L.stock, 0.03).add(new Vector3(0, 0, CW * CASPECT * 0.62)), 0.15, 0.1, 'stock-count');
+    billboard(badgeTexture(String(stockN)), at(L.stock, 0.04).add(new Vector3(-CW * 0.95, 0, 0)), 0.15, 0.1, 'stock-count');
 
     // upcard
     const upObj = s.up ? card(tableFaceTexture(s.up[0], s.up[1]), at(L.up, 0.003), 1, 'upcard') : null;
@@ -95,7 +95,7 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
       const sub = `${s.hc[seat] ?? 0} card${s.hc[seat] === 1 ? '' : 's'} · ${pairs} pair${pairs === 1 ? '' : 's'}`;
       const plate = { name: s.nm[seat] ?? `Seat ${seat + 1}`, pts: `${s.pt[seat] ?? 0}${s.tg !== null ? `/${s.tg}` : ''}`, sub, turn: s.turn === seat, out: s.on[seat] === false, me: seat === s.me };
       if (!slot) { // my seat: plate only (my own pairs are listed on the DOM side, never on the near felt)
-        if (L.me && seat === s.me) billboard(plateTexture(plate), at(L.me.plate, 0.05), 0.5, 0.175, `plate-${seat}`);
+        if (L.me && seat === s.me) billboard(plateTexture(plate), at(L.me.plate, 0.05), L.portrait ? 0.36 : 0.5, L.portrait ? 0.126 : 0.175, `plate-${seat}`);
         continue;
       }
       billboard(plateTexture(plate), at(slot.plate, 0.07), 0.5, 0.175, `plate-${seat}`);
