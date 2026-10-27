@@ -3,9 +3,10 @@
  * Ported from BWM src/three/preload.ts (eec0a98): the import goes through importChunk so a chunk
  * deleted by a deploy retries cache-busted, and the memo is cleared on failure so a later call
  * can ask again (a memoized rejected promise was BWM's "crashes on every attempt" bug).
- * No textures yet (V10b adds the table assets); safe to call many times.
+ * V10b: also warms the table textures (+ HDRI on High). Safe to call many times.
  */
 import { importChunk } from '../chunkLoad';
+import { loadSettings } from '../settings';
 
 let scene: Promise<typeof import('./PPScene')> | null = null;
 export function loadScene(): Promise<typeof import('./PPScene')> {
@@ -21,7 +22,7 @@ let started = false;
 export function preloadTable(opts?: { immediate?: boolean }): void {
   if (started || typeof window === 'undefined') return;
   started = true;
-  const go = () => { loadScene().catch(() => { started = false; }); };
+  const go = () => { loadScene().then((m) => m.preloadTableAssets(loadSettings().quality)).catch(() => { started = false; }); };
   if (opts?.immediate) { go(); return; }
   const ric = (window as unknown as { requestIdleCallback?: (f: () => void, o?: { timeout: number }) => void }).requestIdleCallback;
   if (ric) ric(go, { timeout: 1200 }); else window.setTimeout(go, 300);

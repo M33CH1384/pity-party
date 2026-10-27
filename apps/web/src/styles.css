@@ -3042,3 +3042,12 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { background: trans
 html:has(.mode-screen[data-renderer="3d"]) :is(.ink-canvas, .ink-fallback) { visibility: hidden; }
 /* body paints over z -1 when it has its own background (theme B); the html background stays under the canvas */
 html:has(.mode-screen[data-renderer="3d"]) body { background: transparent; }
+/* V10b: HUD text over the 3D felt reads on a plate (3D only; the 2D table is unchanged). Plates use --pp-plate
+   (B: light solid plate + 1.5px ink edge, spec §5); B's accent text uses the darker --pp-3d-text-accent (4.85:1). */
+html[data-theme] .mode-screen[data-renderer="3d"] :is(.pp-label, .pp-event, .turn-line, .pp-wait, .pp-last, .tk-count, .pp-pot, .trick-empty) {
+  background: var(--pp-plate); color: var(--pp-ink); border-radius: 8px; padding: 2px 8px; width: fit-content; max-width: 100%; margin-inline: auto; text-shadow: none;
+}
+html[data-theme] .mode-screen[data-renderer="3d"] .tk-count { margin-inline: 0; }
+html[data-theme="B"] .mode-screen[data-renderer="3d"] :is(.pp-label, .pp-event, .turn-line, .pp-wait, .pp-last, .tk-count, .pp-pot, .trick-empty) { box-shadow: 0 0 0 1.5px var(--pp-ink); }
+html[data-theme="B"] .mode-screen[data-renderer="3d"] .turn-line { color: var(--pp-3d-text-accent); }
+html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: transparent; }
