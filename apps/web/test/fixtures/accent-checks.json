@@ -1,0 +1,62 @@
+{
+ "magenta": {
+  "accent": "#FF2EB8",
+  "felt": "#3a0d1a",
+  "secondary": "#33E6FF",
+  "label": "#14020D",
+  "label_contrast": 6.07,
+  "accent_on_plate": 5.54,
+  "secondary_on_plate": 12.16,
+  "card_vs_felt": 16.77
+ },
+ "blue": {
+  "accent": "#2E8BFF",
+  "felt": "#0b1a3d",
+  "secondary": "#FF4FD8",
+  "label": "#14020D",
+  "label_contrast": 5.99,
+  "accent_on_plate": 5.47,
+  "secondary_on_plate": 6.44,
+  "card_vs_felt": 17.08
+ },
+ "violet": {
+  "accent": "#9B5CFF",
+  "felt": "#1d0f3d",
+  "secondary": "#33E6FF",
+  "label": "#14020D",
+  "label_contrast": 5.14,
+  "accent_on_plate": 4.7,
+  "secondary_on_plate": 12.16,
+  "card_vs_felt": 17.68
+ },
+ "ember": {
+  "accent": "#FF6A2E",
+  "felt": "#3a1208",
+  "secondary": "#33E6FF",
+  "label": "#14020D",
+  "label_contrast": 7.04,
+  "accent_on_plate": 6.43,
+  "secondary_on_plate": 12.16,
+  "card_vs_felt": 16.54
+ },
+ "mint": {
+  "accent": "#2EF2C0",
+  "felt": "#0c1a30",
+  "secondary": "#FF4FD8",
+  "label": "#14020D",
+  "label_contrast": 13.96,
+  "accent_on_plate": 12.75,
+  "secondary_on_plate": 6.44,
+  "card_vs_felt": 17.41
+ },
+ "crimson": {
+  "accent": "#FF3355",
+  "felt": "#3a0a12",
+  "secondary": "#33E6FF",
+  "label": "#14020D",
+  "label_contrast": 5.61,
+  "accent_on_plate": 5.12,
+  "secondary_on_plate": 12.16,
+  "card_vs_felt": 17.04
+ }
+}

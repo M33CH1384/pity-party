@@ -10,6 +10,7 @@
  * no flash; `initTheme()` reconciles on boot. Keep THEME_COLORS + migration in step with theme-boot.js.
  */
 import { useSyncExternalStore } from 'react';
+import { adoptBootVars, applyAccent } from './accent';
 
 export type ThemeName = 'A' | 'B' | 'C' | 'K';
 export const THEMES: readonly ThemeName[] = ['C', 'A', 'B', 'K'];
@@ -70,6 +71,7 @@ export function applyTheme(t: ThemeName): void {
   if (t === 'C') ds.fx = 'neon'; else delete ds.fx;
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute('content', THEME_COLORS[t]);
+  applyAccent(t); // V2: Lounge colour on C only
 }
 
 export const themeStore = {
@@ -87,7 +89,7 @@ export const themeStore = {
 };
 
 /** Boot hook (main.tsx): reconcile the attribute/meta with the stored value. */
-export function initTheme(): void { applyTheme(current); }
+export function initTheme(): void { adoptBootVars(); applyTheme(current); }
 
 export function useTheme(): ThemeName {
   return useSyncExternalStore(themeStore.subscribe, themeStore.get, themeStore.get);
