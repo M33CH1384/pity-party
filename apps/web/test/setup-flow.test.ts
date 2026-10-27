@@ -31,7 +31,7 @@ describe('start screens', () => {
   it('home has PLAY and no Spades copy; PLAY goes straight to the opponent step', async () => {
     await act(async () => { root.render(createElement(App)); });
     expect($('play')).not.toBeNull();
-    expect(document.body.textContent).toContain('Pity Party');
+    expect(document.querySelector('h1 img[alt="Pity Party"]')).not.toBeNull(); // neon sign wordmark (alt text)
     expect(document.body.textContent).not.toMatch(/spades/i);
     await click('play');
     expect($('play-bots')).not.toBeNull();
