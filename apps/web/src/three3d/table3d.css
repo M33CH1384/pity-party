@@ -49,9 +49,9 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 /* V10g top-bar score chips (portrait + tall screens; short landscape keeps the scores on the seat plates) */
 .v3-chips { display: none; }
 @media (max-aspect-ratio: 3/4), (min-height: 700px) {
-  .mode-screen[data-renderer="3d"][data-table3d="on"] .v3-chips { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; position: fixed; top: 104px; left: 8px; right: 8px; z-index: 2; pointer-events: none; }
+  .mode-screen[data-renderer="3d"][data-table3d="on"] .v3-chips { display: flex; gap: 4px; justify-content: center; flex-wrap: nowrap; position: fixed; top: 106px; left: 8px; right: 8px; z-index: 2; pointer-events: none; }
 }
-.v3-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 3px; border-radius: 999px; background: var(--pp-plate); color: var(--pp-ink); box-shadow: 0 0 0 1.5px var(--pp-muted); font-size: 13px; line-height: 1; max-width: 32%; }
+.v3-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 8px 3px 3px; border-radius: 999px; min-width: 0; flex: 0 1 auto; background: var(--pp-plate); color: var(--pp-ink); box-shadow: 0 0 0 1.5px var(--pp-muted); font-size: 13px; line-height: 1; }
 .v3-chip.is-turn { box-shadow: 0 0 0 2px var(--pp-accent); }
 .v3-chip i { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; font-style: normal; font-weight: 800; color: var(--pp-plate); background: linear-gradient(135deg, var(--pp-accent), var(--pp-accent-2)); }
 .v3-chip b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
