@@ -47,5 +47,46 @@
   --pp-glass-strong-rgb: 18, 20, 24;
 }
 
+/* ===================== V0: design-spec token vocabulary =====================
+   Desi's stage2/stage2b specs (and the A/B/C/K themes to come in V1) speak in
+   these names. In V0 they are ALIASES of the neutral values above, so nothing
+   paints differently: new code may use them now, and V1 re-points them per
+   theme. Rules: aliases only reference tokens above (or fixed spec constants
+   like spacing/radii/heights and the never-themed card + suit colours).
+   ============================================================================ */
+:root {
+  /* surfaces + text */
+  --pp-plate: var(--pp-surface);
+  --pp-plate-2: var(--pp-surface-2);
+  --pp-well: var(--pp-field);
+  --pp-off: var(--pp-surface-hi);
+  --pp-bg-dim: rgba(var(--pp-bg-rgb), .72);
+  --pp-mut: var(--pp-muted);
+  --pp-line: rgba(var(--pp-edge-rgb), .18);
+  /* accent family */
+  --pp-accent-2: var(--pp-accent-hot);
+  --pp-accent-on: var(--pp-primary-ink);
+  --pp-accent-glow: rgba(var(--pp-accent-rgb), .55);
+  --pp-glow: var(--pp-accent-glow);
+  --pp-btn-fill: var(--pp-primary-grad);
+  /* table */
+  --pp-felt: var(--pp-surface-2);
+  --pp-felt-sheen: var(--pp-surface-hi);
+  /* cards + suits: fixed, never themed (stage2 Tokens) */
+  --pp-card: #ffffff;
+  --pp-suit-s: #111114;
+  --pp-suit-h: #d1123f;
+  --pp-suit-d: #0066cc;
+  --pp-suit-c: #0e6e78;
+  /* type: the current faces until V2 self-hosts the theme fonts */
+  --pp-font-disp: var(--display);
+  --pp-font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --pp-disp-w: 800;
+  /* spacing, radii, control heights (stage2 Tokens) */
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
+  --r-btn: 18px; --r-plate: 20px; --r-pill: 999px;
+  --h-btn: 52px; --h-btn-sm: 44px; --h-ico: 44px;
+}
+
 /* Text wordmark (placeholder until Desi's logo): neutral, display face. */
 .pp-wordmark { font-family: var(--display); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--pp-ink); }
