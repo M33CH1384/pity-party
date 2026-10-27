@@ -31,11 +31,12 @@ export interface FanPose { x: number; y: number; roll: number; cx: number; cy: n
 export function solveFan(n: number, W: number, H: number, vw: number, vh: number, rise: number, jitter: (i: number) => [number, number, number] = () => [0, 0, 0]): FanPose[] {
   const portrait = W / H < 0.75;
   const pxw = vh / H;
-  const cardWpx = portrait ? 0.31 * W : (H < 400 ? 0.34 : 0.38) * H / ASPECT;
+  const cardWpx = portrait ? 0.31 * W : (H < 400 ? 0.3 : 0.38) * H / ASPECT;
   const cw = Math.min(cardWpx, 180) * pxw, ch = cw * ASPECT;
   const R = 1.12 * ch;
   const pivX = portrait ? 0 : -0.09 * vw;
-  const pivY = -vh / 2 - R + ch * 0.4 + rise * pxw + 0.06 * ch;
+  // landscape: sink the fan .28 card-heights more so it stays under the turn line and clear of the action column (#49)
+  const pivY = -vh / 2 - R + ch * 0.4 + rise * pxw + 0.06 * ch - (portrait ? 0 : 0.28 * ch);
   const out: FanPose[] = [];
   for (let i = 0; i < n; i++) {
     const [j1, jx, jy] = jitter(i);
