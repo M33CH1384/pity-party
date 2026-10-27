@@ -351,3 +351,20 @@ html[data-theme="K"] { --pp-card-back: #1A0F2B; --pp-card-back-ink: #F6F1FF; }
 .so-glyphs i:nth-child(2), .so-classic .so-glyphs i:nth-child(3) { color: var(--pp-suit-h); }
 .so-four .so-glyphs i:nth-child(3) { color: var(--pp-suit-d); }
 .so-four .so-glyphs i:nth-child(4) { color: var(--pp-suit-c); }
+
+/* ---- Wordmark: Desi's option C neon sign cabinet (NeonSign.tsx, /public/logo/*.webp). The renders include
+   their own glow margin, so sizes are set on the image box; text styling no longer applies. */
+.neon-sign { display: block; height: auto; max-width: 100%; }
+.pp-sign-h { margin: 0; line-height: 0; font-size: 0; }
+.pp-sign-h .neon-sign { width: min(92vw, 400px); margin: 0 auto; }
+@media (orientation: landscape) and (max-height: 500px) { .pp-sign-h .neon-sign { width: min(46vw, 300px); } }
+.wiz-mid { display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 0; }
+.wiz-brand { width: clamp(96px, 30vw, 170px); }
+.setup-hero .logo.neon-sign { width: min(86vw, 400px); filter: none; margin: 0 auto; }
+.neon-loading { position: relative; display: block; width: min(80vw, 360px); aspect-ratio: 640 / 464; filter: none; }
+.neon-loading img { position: absolute; inset: 0; width: 100%; height: 100%; }
+.neon-loading .on { animation: pp-sign-flick 1.8s steps(1, end) .25s both; }
+.neon-loading.calm .on { animation: pp-sign-fade .6s ease both; }
+@media (prefers-reduced-motion: reduce) { .neon-loading .on { animation: pp-sign-fade .6s ease both; } }
+@keyframes pp-sign-flick { 0% { opacity: 0; } 8% { opacity: 1; } 11% { opacity: .15; } 16% { opacity: 1; } 22% { opacity: .35; } 24% { opacity: 1; } 100% { opacity: 1; } }
+@keyframes pp-sign-fade { from { opacity: 0; } to { opacity: 1; } }

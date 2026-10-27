@@ -1,3 +1,4 @@
+import { NeonSign } from '../NeonSign';
 import { type FormEvent, useEffect, useState } from 'react';
 import { CODE_LENGTH, isRoomCode, normalizeRoomCode, type PresenceStatus } from '@pp/protocol';
 import { NowPlaying } from '../SoundControls';
@@ -93,7 +94,7 @@ function Entry({ code, name, onName, onGo }: { code: string | null; name: string
   return (
     <div className="setup online-entry" data-testid="online-entry">
       <header className="setup-hero">
-        <span className="logo pp-wordmark" aria-hidden>Pity Party</span>
+        <NeonSign kind="header" className="logo" />
         <h1 className="sr-only">Pity Party online</h1>
         <p className="tagline">Play online with friends</p>
         {code && info?.exists && <p>You're invited to table <b>{code}</b>{info.host ? ` (host: ${info.host})` : ''} · {info.mode === 'joker' ? 'Joker Spades' : info.mode === 'aceDown' ? 'Ace Down' : 'Cutthroat'}</p>}
