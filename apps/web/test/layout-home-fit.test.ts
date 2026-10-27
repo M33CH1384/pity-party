@@ -271,7 +271,7 @@ describe('home structure under both themes', () => {
     const home = c.querySelector('.wiz-home');
     expect(home).toBeTruthy();
     const kids = [...home!.children].map((n) => (n as HTMLElement).className);
-    expect(kids).toEqual(['splash', 'wiz-actions']);
+    expect(kids).toEqual(['theme-chip-row', 'splash', 'wiz-actions']);
     // the dock's seat is the header's right cluster, in line with
     // social + gear — the markup never moved; the CSS seats it there
     const slot = c.querySelector('.wiz-bar .wiz-right .dock-slot');
@@ -292,7 +292,7 @@ describe('home backdrop art: the Neon layer covers the stage (owner, 2026-10-26)
   // is now the stage's backdrop. These pins hold the coverage from the
   // shipped CSS, in the same stage accounting as the grid suite.
   const beforeRule = () => {
-    const m = css.match(/html\[data-theme="neon"\] \.wiz-home::before \{([^}]*)\}/);
+    const m = css.match(/html\[data-fx="neon"\] \.wiz-home::before \{([^}]*)\}/);
     expect(m, 'the neon home ::before rule exists').toBeTruthy();
     return m![1];
   };
@@ -335,7 +335,7 @@ describe('home backdrop art: the Neon layer covers the stage (owner, 2026-10-26)
 
   it('the mask grades the art out inside the stage: strong core, gone before the bottom', () => {
     const rule = beforeRule();
-    const maskM = rule.match(/mask-image: radial-gradient\(ellipse (\d+(?:\.\d+)?)% (\d+(?:\.\d+)?)% at 50% (\d+(?:\.\d+)?)%, #000 (\d+(?:\.\d+)?)%, transparent (\d+(?:\.\d+)?)%\)/);
+    const maskM = rule.match(/mask-image: radial-gradient\(ellipse (\d+(?:\.\d+)?)% (\d+(?:\.\d+)?)% at 50% (\d+(?:\.\d+)?)%, rgb\(var\(--pp-shade-rgb\)\) (\d+(?:\.\d+)?)%, transparent (\d+(?:\.\d+)?)%\)/);
     expect(maskM, 'the backdrop keeps its radial grade').toBeTruthy();
     const [, , , centerY, solid, clear] = maskM!.map(Number);
     // anchored on the hero (center in the top third), opaque through
@@ -378,6 +378,6 @@ describe('home backdrop art: the Neon layer covers the stage (owner, 2026-10-26)
       .map((m) => m[1])
       .filter((s) => s.includes('.wiz-home::before') || s.includes('.wiz-home::after'));
     expect(selectors.length).toBeGreaterThan(0);
-    for (const s of selectors) expect(s).toContain('html[data-theme="neon"]');
+    for (const s of selectors) expect(s).toContain('html[data-fx="neon"]');
   });
 });

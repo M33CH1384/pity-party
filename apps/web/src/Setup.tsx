@@ -4,6 +4,7 @@
  * Bid Wit Me's Spades doors (team/cutthroat, Jokers/Ace Down), house rules, deck, venue and
  * summary bar are gone; the gear still opens the app Settings sheet.
  */
+import { ThemeChip } from './ThemeToggle';
 import { type FormEvent, type ReactNode, useEffect, useRef, useState } from 'react';
 import { CODE_LENGTH, isRoomCode, normalizeRoomCode } from '@pp/protocol';
 import { requestSettingsSheet } from './settingsSheet';
@@ -159,6 +160,7 @@ export default function Setup({ onStart }: Props) {
   if (step === 'home') {
     body = (
       <div className="wiz-home">
+        <div className="theme-chip-row"><ThemeChip /></div>
         <div className="splash">
           <h1 className="pp-wordmark">Pity Party</h1>
           <span className="beta-tag" data-testid="beta-tag">BETA</span>
