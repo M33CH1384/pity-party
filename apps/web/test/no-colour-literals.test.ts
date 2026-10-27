@@ -7,7 +7,7 @@ import { describe, expect, it } from 'vitest';
 
 const SRC = join(__dirname, '../src');
 const LIT = /#[0-9a-fA-F]{3,8}\b|rgba?\(\s*\d/g;
-const EXEMPT = new Set(['theme.css', 'theme.ts', 'accent.ts', 'fonts.css']); // accent.ts holds Desi's preset table + colour maths (V2)
+const EXEMPT = new Set(['theme.css', 'theme.ts', 'accent.ts', 'fonts.css', 'cards/cardArt.ts']); // cardArt.ts: fixed card face + suit inks (documented card/suit tokens, V3) // accent.ts holds Desi's preset table + colour maths (V2)
 /** Ratchet ceilings (V1). Lower these as V1b sweeps; never raise. */
 const CEILING: Record<string, number> = {
   'venues.ts': 108, // BWM-era 3D venue scenery palettes; not drawn by Pity Party's 2D tables. Explicit art exception, pending a delete-vs-keep decision

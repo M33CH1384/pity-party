@@ -1333,6 +1333,12 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .vs-tile.win.video { position: relative; }
 .vs-tile.win.video figcaption { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 2; text-align: center; text-shadow: 0 2px 8px rgba(var(--pp-shade-rgb),.85); }
 .now-playing.quiet { position: fixed; left: 50%; top: calc(64px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 45; pointer-events: none; font-size: 12px; color: var(--muted); background: rgba(var(--glass-strong-rgb),.7); padding: 3px 10px; border-radius: 10px; white-space: nowrap; max-width: 70vw; overflow: hidden; text-overflow: ellipsis; animation: np-quiet 2s ease forwards; }
+/* Phones: the quiet chip used to sit centred at 64px, right over the table's "First to n points" goal line.
+   Below 600px it moves to the right edge of that row (≤ 44vw, ellipsis) and the goal row stacks its
+   "Hand n · 2s wild" line under the goal, so the chip and the goal text never share space. */
+@media (max-width: 600px) {
+  .now-playing.quiet { left: auto; right: 10px; transform: none; max-width: 44vw; }
+}
 @keyframes np-quiet { 0% { opacity: 0; } 15%, 80% { opacity: 1; } 100% { opacity: 0; } }
 .np-line { font-size: 12.5px; color: var(--muted); margin: 2px 0 8px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .np-line b { color: var(--gold); }
@@ -2927,11 +2933,10 @@ body:has(.modal-backdrop) .setup-bar { visibility: hidden; }
 .played { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; color: var(--pp-ink); }
 .turn-line { text-align: center; min-height: 22px; margin: 0; font-weight: 600; }
 .my-hand { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-.pcard { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 80px; border-radius: 8px; background: var(--pp-x-gold-1); color: var(--pp-x-steel-11); font-weight: 700; font-size: 20px; box-shadow: 0 1px 3px rgba(var(--pp-shade-rgb),.4); }
-.pcard.red { color: var(--pp-x-red-2); }
+.pcard { display: block; width: var(--pp-card-w); height: var(--pp-card-h); border-radius: 8px; box-shadow: 0 1px 3px rgba(var(--pp-shade-rgb),.4); }
 .pcard-btn { padding: 0; border: 0; background: none; border-radius: 8px; min-width: 44px; }
 .pcard-btn:disabled { opacity: .45; }
-.pcard-btn:not(:disabled) .pcard { outline: 2px solid var(--pp-x-steel-29); outline-offset: 2px; }
+.pcard-btn:not(:disabled) .pcard { outline: 2px solid var(--pp-muted); outline-offset: 2px; }
 .recap-sheet { position: absolute; inset: auto 0 0 0; padding: 18px 16px max(18px, env(safe-area-inset-bottom)); background: var(--pp-surface); border-radius: 18px 18px 0 0; box-shadow: 0 -6px 24px rgba(var(--pp-shade-rgb),.5); }
 .mode-recap h2 { margin: 0 0 10px; font-size: 22px; text-align: center; }
 .placings { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -2953,6 +2958,7 @@ body:has(.modal-backdrop) .setup-bar { visibility: hidden; }
 .pp-table { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .pp-goal { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 14px; }
 .pp-goal span { color: var(--pp-muted); font-size: 13px; }
+@media (max-width: 600px) { .pp-goal { flex-direction: column; align-items: flex-start; gap: 0; } } /* room for the now-playing chip (see .now-playing.quiet) */
 .pp-seats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
 .pp-seat { display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; border-radius: 10px; background: var(--pp-surface-2); border: 2px solid transparent; min-width: 0; }
 .pp-seat.turn { border-color: var(--pp-primary); }
@@ -2962,14 +2968,15 @@ body:has(.modal-backdrop) .setup-bar { visibility: hidden; }
 .pp-points b { font-size: 22px; font-variant-numeric: tabular-nums; }
 .pp-points small, .pp-seat-sub { color: var(--pp-lav); font-size: 12px; }
 .pp-shelf { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 2px; }
-.pp-mini { font-style: normal; font-size: 11px; font-weight: 700; padding: 1px 4px; border-radius: 4px; background: var(--pp-ink); color: var(--pp-primary-ink); }
-.pp-mini.red { color: var(--pp-x-red-2); }
+.pp-mini { font-style: normal; font-size: 11px; font-weight: 700; padding: 1px 4px; border-radius: 4px; background: var(--pp-card); color: var(--pp-card-ink); }
 .pp-center { display: flex; justify-content: center; gap: 28px; padding: 14px 12px; border-radius: 16px; background: var(--pp-surface); border: 1px solid rgba(var(--pp-edge-rgb), .25); }
 .pp-pile { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .pp-label { font-size: 12px; color: var(--pp-muted); text-transform: uppercase; letter-spacing: .06em; }
 .pp-up { position: relative; display: inline-flex; }
-.pp-up.empty { width: 56px; height: 80px; align-items: center; justify-content: center; border: 2px dashed rgba(var(--pp-edge-rgb), .4); border-radius: 8px; color: var(--pp-muted); }
-.pp-stock { display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 80px; border-radius: 8px; background: repeating-linear-gradient(45deg, var(--pp-surface-hi), var(--pp-surface-hi) 6px, var(--pp-surface-2) 6px, var(--pp-surface-2) 12px); border: 1px solid rgba(var(--pp-edge-rgb), .5); font-weight: 800; font-size: 18px; }
+.pp-up.empty { width: var(--pp-card-w); height: var(--pp-card-h); align-items: center; justify-content: center; border: 2px dashed rgba(var(--pp-edge-rgb), .4); border-radius: 8px; color: var(--pp-muted); }
+.pp-stock { position: relative; display: inline-flex; align-items: center; justify-content: center; width: var(--pp-card-w); height: var(--pp-card-h); border-radius: 8px; box-shadow: 0 1px 3px rgba(var(--pp-shade-rgb),.4); }
+.pp-stock .card-back { position: absolute; inset: 0; }
+.pp-stock-n { position: relative; min-width: 30px; padding: 2px 6px; border-radius: 999px; text-align: center; font-size: 15px; font-weight: 800; background: var(--pp-plate); color: var(--pp-ink); }
 .pp-pot { font-size: 13px; font-weight: 700; color: var(--pp-lav); }
 .pp-wild { position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .06em; padding: 1px 5px; border-radius: 6px; background: var(--pp-primary); color: var(--pp-primary-ink); pointer-events: none; }
 .pp-last, .pp-event { margin: 0; text-align: center; font-size: 13px; color: var(--pp-lav); }

@@ -1,4 +1,5 @@
 import { THEMES, THEME_LABELS, themeStore, useTheme, type ThemeName } from './theme';
+import { cardPrefs, useCardPrefs } from './cards/cardPrefs';
 import { PRESETS, accentStore, resolveAccent, useAccent, type AccentPick } from './accent';
 
 /** Each tile previews its theme with a mini felt + accent swatch (fixed per-tile classes in theme.css). */
@@ -15,6 +16,7 @@ export default function ThemeToggle() {
         ))}
       </div>
       <AccentRow theme={v} />
+      <SuitColours />
     </div>
   );
 }
@@ -54,6 +56,21 @@ function AccentRow({ theme }: { theme: ThemeName }) {
       <div className="accent-preview" aria-hidden data-testid="accent-preview">
         <span className="ap-pri">Pair 8♥</span><span className="ap-sec">Flip stock</span><span className="ap-felt" />
       </div>
+    </div>
+  );
+}
+
+/** V3 card option (Desi c): suit colours 4-colour (default) or Classic black/red. */
+function SuitColours() {
+  const { suits } = useCardPrefs();
+  return (
+    <div className="suit-colours" role="radiogroup" aria-label="Suit colours" data-testid="suit-colours">
+      <span>Suit colours</span>
+      {([['four', '4-colour', '♠♥♦♣'], ['classic', 'Classic', '♠♥♦♣']] as const).map(([k, name, g]) => (
+        <button key={k} type="button" role="radio" aria-label={name} aria-checked={suits === k} className={`suit-opt so-${k}${suits === k ? ' on' : ''}`} data-testid={`suits-${k}`} onClick={() => cardPrefs.set({ suits: k })}>
+          <span aria-hidden className="so-glyphs">{[...g].map((x, i) => <i key={i}>{x}</i>)}</span>{name}
+        </button>
+      ))}
     </div>
   );
 }
