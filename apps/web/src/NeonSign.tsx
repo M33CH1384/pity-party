@@ -3,7 +3,8 @@
  * Pre-rendered from Desi's app/header SVGs (no live SVG filters on phones) as small self-hosted WebPs in
  * /public/logo, one per colour pair; only the active theme's file is fetched, and it never touches the JS bundle.
  *   C Neon Lounge → the Lounge colour (6 presets; a custom hue uses the nearest preset's render)
- *   A / K → their own accent pair · B (light, no lit mock yet) → the unlit "off" layer, as Desi suggests.
+ *   A / K → their own accent pair · B (Porch Daytime) → Desi's unlit painted-enamel sign (logo-v3/themeB).
+ * Home is a <picture>: the stacked sign in portrait, the one-line sign (C1) in landscape (Home v2); only one is fetched.
  * The image carries the accessible name "Pity Party".
  */
 import { nearestPreset, resolveAccent, useAccent } from './accent';
@@ -12,6 +13,11 @@ import { useTheme } from './theme';
 
 export type SignKind = 'home' | 'header' | 'loading';
 const SIZE = { home: [640, 464], header: [440, 134], loading: [640, 464] } as const;
+/** B's painted renders are cropped to their own box; the lit ones keep their glow margin. */
+const B_SIZE = { home: [626, 404], header: [434, 115], loading: [626, 404] } as const;
+const LINE: Record<string, readonly [number, number]> = { B: [787, 209] };
+const LINE_LIT = [800, 301] as const;
+export const LANDSCAPE = '(orientation: landscape)';
 
 export function signPair(theme: string, accent: ReturnType<typeof resolveAccent>): string {
   if (theme === 'A' || theme === 'K' || theme === 'B') return theme;
@@ -22,7 +28,7 @@ export function NeonSign({ kind, className = '' }: { kind: SignKind; className?:
   const theme = useTheme();
   const pair = signPair(theme, resolveAccent(useAccent()));
   const reduce = useReduceEffects();
-  const [w, h] = SIZE[kind];
+  const [w, h] = (pair === 'B' ? B_SIZE : SIZE)[kind];
   const file = (k: string) => `/logo/${kind === 'header' ? 'header' : 'home'}-${k}.webp`;
   if (kind === 'loading' && pair !== 'B') {
     // off layer underneath, lit layer flickers on (CSS); a plain fade under reduced motion / Reduce effects
@@ -31,6 +37,15 @@ export function NeonSign({ kind, className = '' }: { kind: SignKind; className?:
         <img src={file('off')} alt="" width={w} height={h} decoding="async" />
         <img className="on" src={file(pair)} alt="" width={w} height={h} decoding="async" />
       </span>
+    );
+  }
+  if (kind === 'home') {
+    const [lw, lh] = LINE[pair] ?? LINE_LIT;
+    return (
+      <picture className={`neon-pic ${className}`}>
+        <source media={LANDSCAPE} srcSet={`/logo/line-${pair}.webp`} width={lw} height={lh} />
+        <img className="neon-sign ns-home" src={file(pair)} alt="Pity Party" width={w} height={h} decoding="async" data-testid="neon-sign" data-sign={pair} />
+      </picture>
     );
   }
   return <img className={`neon-sign ns-${kind} ${className}`} src={file(pair)} alt="Pity Party" width={w} height={h} decoding="async" data-testid="neon-sign" data-sign={pair} />;

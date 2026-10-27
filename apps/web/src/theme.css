@@ -516,3 +516,47 @@ html[data-theme="K"] { --btn-focus: var(--pp-accent); }
   --pp-x-violet-2: #12081f;
   --pp-x-violet-3-rgb: 128, 84, 255;
 }
+
+/* ---- Home v2 (Desi logo-v3/HANDOFF-HOME-V2, approved Oct 27): full-size card fan over the sign.
+   Portrait: fan, then the stacked sign tucked ~30px under it. Landscape: two columns using the full width,
+   with the fan over the one-line sign on the left and the actions on the right. Static (no motion). */
+.home-fan { --fan-w: min(86vw, 360px); position: relative; z-index: 2; width: var(--fan-w); height: calc(var(--fan-w) * .29 * 1.4 * 1.14); margin: 0 auto; pointer-events: none; }
+.hf-card { position: absolute; bottom: 0; width: calc(var(--fan-w) * .29); aspect-ratio: 640 / 896; border-radius: calc(var(--fan-w) * .022); overflow: hidden;
+  transform-origin: 50% 100%; box-shadow: 0 6px 16px rgba(var(--pp-shade-rgb), .45); background: var(--pp-card); }
+.hf-card svg { display: block; width: 100%; height: 100%; }
+.hf-0 { left: 3%; transform: rotate(-13deg); }
+.hf-1 { left: 24%; transform: rotate(-4.5deg) translateY(-6%); }
+.hf-2 { left: 46%; transform: rotate(4.5deg) translateY(-6%); }
+.hf-3 { left: 67%; transform: rotate(13deg); }
+html[data-theme="B"] .hf-card { box-shadow: 0 0 0 1.5px var(--pp-ink), 0 2px 0 rgba(var(--pp-shade-rgb), .35), 0 6px 14px rgba(var(--pp-shade-rgb), .35); }
+.neon-pic { display: block; }
+/* the theme chip floats in the corner on every theme (Neon Lounge's stacking rule had made it a row item) */
+html[data-fx="neon"] .wiz-home > .theme-chip-row { position: absolute; }
+.wiz-home .pp-sign-h { position: relative; z-index: 1; margin-top: -30px; }
+.wiz-home .pp-sign-h .neon-sign { width: min(92vw, 360px); }
+html[data-theme="B"] .wiz-home .pp-sign-h { margin-top: -14px; }
+html[data-theme="B"] .wiz-home .pp-sign-h .neon-sign { width: min(88vw, 340px); }
+@media (orientation: portrait) and (min-width: 700px) {
+  .home-fan { --fan-w: min(70vw, 560px); }
+  .wiz-home .pp-sign-h .neon-sign { width: min(70vw, 520px); }
+}
+@media (orientation: landscape) {
+  .wiz-home .pp-sign-h { margin-top: -10px; }
+  .wiz-home .pp-sign-h .neon-sign, html[data-theme="B"] .wiz-home .pp-sign-h .neon-sign { width: var(--fan-w); margin: 0 auto; }
+  .wiz-home .home-fan, .wiz-home .pp-sign-h { --fan-w: min(40vw, 300px); }
+}
+@media (orientation: landscape) and (max-height: 540px) {
+  .wizard.step-home .wiz-step { max-width: none; padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); }
+  .wizard .wiz-home { gap: 4vw; }
+  .wiz-home .home-fan, .wiz-home .pp-sign-h { --fan-w: min(36vw, 260px); }
+  .wiz-home .splash { padding-top: 34px; }
+  .wiz-home .splash .tagline { margin-top: 6px; font-size: 14px; }
+  .wiz-home .wiz-actions { max-width: none; }
+}
+@media (orientation: landscape) and (min-height: 541px) and (min-width: 900px) {
+  .wizard.step-home .wiz-step { max-width: none; padding-left: 40px; padding-right: 40px; justify-content: center; }
+  .wizard .wiz-home { display: flex; flex-direction: row; align-items: center; gap: 5vw; }
+  .wizard .wiz-home .splash { flex: 1.1; }
+  .wizard .wiz-home .wiz-actions { flex: 1; max-width: 520px; margin: 0; }
+  .wiz-home .home-fan, .wiz-home .pp-sign-h { --fan-w: min(44vw, 560px); }
+}

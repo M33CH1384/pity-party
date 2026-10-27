@@ -5,6 +5,7 @@
  * summary bar are gone; the gear still opens the app Settings sheet.
  */
 import { NeonSign } from './NeonSign';
+import { HomeFan } from './HomeFan';
 import { ThemeChip } from './ThemeToggle';
 import { type FormEvent, type ReactNode, useEffect, useRef, useState } from 'react';
 import { CODE_LENGTH, isRoomCode, normalizeRoomCode } from '@pp/protocol';
@@ -163,6 +164,7 @@ export default function Setup({ onStart }: Props) {
       <div className="wiz-home">
         <div className="theme-chip-row"><ThemeChip /></div>
         <div className="splash">
+          <HomeFan />
           <h1 className="pp-wordmark pp-sign-h"><NeonSign kind="home" /></h1>
           <span className="beta-tag" data-testid="beta-tag">BETA</span>
           <p className="tagline">Pitty Pat &amp; Tonk with the crew</p>
