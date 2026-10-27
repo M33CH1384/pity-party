@@ -22,6 +22,7 @@
  */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { THEME_IDS, rgbaIn, themeVars } from './themeTokens';
 
 const read = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
 const socialCss = read('../src/social/social.css');
@@ -92,18 +93,16 @@ describe('open tables — the Watch button carries its own paint', () => {
     expect(openTables).not.toMatch(/className="primary" data-testid=\{`ot-watch-/);
   });
 
-  it('the label ink meets ≥ 4.5:1 over its effective background in BOTH themes (computed from the shipped css)', () => {
-    const rowBg = rgbaOf(ruleBlock(socialCss, '.ot-row {'), 'background');
-    const fill = rgbaOf(ghostBlock(), 'background');
-    const themes: [string, string][] = [
-      ['classic', ruleBlock(stylesCss, ':root {')],
-      ['neon', ruleBlock(stylesCss, 'html[data-theme="neon"] {')],
-    ];
-    for (const [name, vars] of themes) {
-      const ink = hexRgb(varHex(vars, '--ink'));
-      const page = hexRgb(varHex(vars, '--bg'));
-      const effective = over(fill.rgb, fill.a, over(rowBg.rgb, rowBg.a, page));
-      expect(contrast(ink, effective), `${name}: ink vs watch background`).toBeGreaterThanOrEqual(4.5);
+  it('the label ink meets ≥ 4.5:1 over its effective background in ALL FOUR themes (computed from the shipped css)', () => {
+    const rowBg = ruleBlock(socialCss, '.ot-row {').match(/background:\s*([^;]+);/)![1]!;
+    const fill = ghostBlock().match(/background:\s*([^;]+);/)![1]!;
+    for (const id of THEME_IDS) {
+      const vars = themeVars(id);
+      const ink = hexRgb(vars.get('--pp-ink')!);
+      const page = hexRgb(vars.get('--pp-bg')!);
+      const r = rgbaIn(vars, rowBg), f = rgbaIn(vars, fill);
+      const effective = over(f.rgb, f.a, over(r.rgb, r.a, page));
+      expect(contrast(ink, effective), `${id}: ink vs watch background`).toBeGreaterThanOrEqual(4.5);
     }
   });
 });

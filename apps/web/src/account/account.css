@@ -8,7 +8,7 @@
   background: var(--glass); box-shadow: inset 0 0 0 1px rgba(var(--gold-rgb),.55); clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); max-width: 52vw; }
 .acct-chip.signed-in { box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.5); padding-left: 6px; }
 .acct-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.acct-avatar { width: 56px; height: 56px; border-radius: 50%; display: inline-grid; place-items: center; flex: none; font-family: var(--display); font-weight: 800; font-size: 27px; color: #1d1204; background: linear-gradient(180deg, var(--gold-hi), var(--gold-deep)); }
+.acct-avatar { width: 56px; height: 56px; border-radius: 50%; display: inline-grid; place-items: center; flex: none; font-family: var(--display); font-weight: 800; font-size: 27px; color: var(--pp-primary-ink); background: linear-gradient(180deg, var(--gold-hi), var(--gold-deep)); }
 .acct-avatar.small { width: 28px; height: 28px; font-size: 15px; }
 .acct-backdrop { z-index: 1100; }
 .acct-sheet { width: min(480px, 100%); }
@@ -22,12 +22,12 @@
 .brand-btn:disabled { opacity: .5; }
 .brand-btn:active:not(:disabled) { transform: scale(.985); }
 .brand-btn.small { min-height: 44px; width: auto; flex: 1 1 calc(50% - 8px); font-size: 14px; gap: 8px; padding: 0 12px; }
-.brand-google { background: #fff; color: #1f1f1f; box-shadow: inset 0 0 0 1px #dadce0; }
-.brand-discord { background: #5865F2; color: #fff; }
-.brand-x { background: #000; color: #fff; box-shadow: inset 0 0 0 1px #3a3a3a; }
-.brand-facebook { background: #1877F2; color: #fff; }
-.brand-mock { background: #2c3036; color: var(--ink); box-shadow: inset 0 0 0 1px var(--edge); }
-.brand-passkey { background: linear-gradient(180deg, var(--gold-hi), var(--gold-deep)); color: #1d1204; }
+.brand-google { background: var(--pp-on-fill); color: var(--pp-primary-ink); box-shadow: inset 0 0 0 1px var(--pp-ink); }
+.brand-discord { background: #5865F2; color: var(--pp-on-fill); }
+.brand-x { background: rgb(var(--pp-shade-rgb)); color: var(--pp-on-fill); box-shadow: inset 0 0 0 1px var(--pp-muted); }
+.brand-facebook { background: #1877F2; color: var(--pp-on-fill); }
+.brand-mock { background: var(--pp-surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--edge); }
+.brand-passkey { background: linear-gradient(180deg, var(--gold-hi), var(--gold-deep)); color: var(--pp-primary-ink); }
 .brand-passkey.ghost { background: transparent; color: var(--gold); box-shadow: inset 0 0 0 1px rgba(var(--gold-rgb),.6); }
 .pk-plus { font-size: 20px; line-height: 1; }
 .acct-or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; margin: 2px 0; }
@@ -35,7 +35,7 @@
 .acct-guest { background: none; border: 0; color: var(--gold); font-family: var(--display); font-weight: 700; letter-spacing: .06em; font-size: 17px; padding: 10px; min-height: 44px; }
 .acct-err { margin: 0; text-align: center; color: var(--red); }
 .acct-username { display: flex; flex-direction: column; gap: 10px; }
-.acct-username input, .acct-body > input { font-size: 20px; padding: 12px 14px; min-height: 44px; border-radius: 10px; border: 1px solid var(--edge); background: rgba(0,0,0,.35); color: var(--ink); width: 100%; }
+.acct-username input, .acct-body > input { font-size: 20px; padding: 12px 14px; min-height: 44px; border-radius: 10px; border: 1px solid var(--edge); background: rgba(var(--pp-shade-rgb),.35); color: var(--ink); width: 100%; }
 .acct-check { margin: 0; min-height: 20px; font-size: 14px; color: var(--muted); }
 .acct-check.ok { color: var(--green); }
 .acct-check.bad { color: var(--red); }
@@ -44,13 +44,13 @@
 .acct-small { background: rgba(var(--edge-rgb),.14); border: 1px solid rgba(var(--edge-rgb),.45); color: var(--ink); border-radius: 8px; padding: 8px 12px; font-size: 14px; flex: none; min-height: 44px; }
 .acct-small:disabled { opacity: .4; }
 .acct-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.acct-list li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.04); box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.2); }
+.acct-list li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; background: rgba(var(--pp-hi-rgb),.04); box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.2); }
 .acct-li-icon { width: 34px; height: 34px; border-radius: 8px; display: grid; place-items: center; flex: none; }
 .acct-li-icon svg { width: 20px; height: 20px; }
 .acct-li-text { flex: 1; display: flex; flex-direction: column; min-width: 0; }
 .acct-li-text small { color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .acct-link-row { display: flex; flex-wrap: wrap; gap: 8px; }
-.acct-row-btn { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 12px 14px; min-height: 44px; background: rgba(255,255,255,.04); border: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.25); color: var(--ink); font-family: inherit; text-align: left; cursor: pointer; }
+.acct-row-btn { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 12px 14px; min-height: 44px; background: rgba(var(--pp-hi-rgb),.04); border: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.25); color: var(--ink); font-family: inherit; text-align: left; cursor: pointer; }
 .acct-row-btn:active { transform: scale(.99); }
 .acct-row-text { display: flex; flex-direction: column; gap: 2px; }
 .acct-row-text b { font-size: 15px; font-weight: 700; }
@@ -63,9 +63,9 @@
 .acct-danger.big { padding: 13px; font-size: 17px; background: rgba(255,77,109,.12); min-height: 44px; }
 .acct-danger:disabled { opacity: .4; }
 .acct-toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 1200; max-width: min(92vw, 460px); padding: 10px 16px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 10px;
-  background: var(--glass-strong); box-shadow: inset 0 0 0 1px var(--edge), 0 8px 30px rgba(0,0,0,.5); text-align: center; font-size: 15px; animation: sheet-up .3s both; }
-.acct-toast.ok { box-shadow: inset 0 0 0 1px rgba(92,255,176,.6), 0 8px 30px rgba(0,0,0,.5); }
-.acct-toast.error { box-shadow: inset 0 0 0 1px rgba(255,77,109,.7), 0 8px 30px rgba(0,0,0,.5); }
+  background: var(--glass-strong); box-shadow: inset 0 0 0 1px var(--edge), 0 8px 30px rgba(var(--pp-shade-rgb),.5); text-align: center; font-size: 15px; animation: sheet-up .3s both; }
+.acct-toast.ok { box-shadow: inset 0 0 0 1px rgba(92,255,176,.6), 0 8px 30px rgba(var(--pp-shade-rgb),.5); }
+.acct-toast.error { box-shadow: inset 0 0 0 1px rgba(255,77,109,.7), 0 8px 30px rgba(var(--pp-shade-rgb),.5); }
 @media (max-width: 560px) { .acct-sheet { width: 100%; } }
 /* flex: none is load-bearing (owner report 2026-10-20: expanded Notifications
    showed only the blurb — no Enable button, last line clipped). The sheet
@@ -92,11 +92,11 @@
    unusable. The regression test in test/account-notif-css.test.ts pins every
    class the notifications markup uses to a rule in this file. */
 .acct-notifs { display: flex; flex-direction: column; gap: 6px; }
-.acct-notif-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 10px 12px; min-height: 44px; background: rgba(255,255,255,.04); border: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.25); color: var(--ink); font-family: inherit; text-align: left; cursor: pointer; }
+.acct-notif-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 10px 12px; min-height: 44px; background: rgba(var(--pp-hi-rgb),.04); border: 0; border-radius: 10px; box-shadow: inset 0 0 0 1px rgba(var(--edge-rgb),.25); color: var(--ink); font-family: inherit; text-align: left; cursor: pointer; }
 .acct-notif-row.off { opacity: .55; }
-.acct-switch { flex: none; width: 44px; height: 26px; border-radius: 999px; background: rgba(255,255,255,.14); position: relative; transition: background .15s; }
-.acct-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: left .15s; }
-.acct-switch.on { background: #89929e; }
+.acct-switch { flex: none; width: 44px; height: 26px; border-radius: 999px; background: rgba(var(--pp-hi-rgb),.14); position: relative; transition: background .15s; }
+.acct-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--pp-on-fill); transition: left .15s; }
+.acct-switch.on { background: var(--pp-muted); }
 .acct-switch.on::after { left: 21px; }
 .acct-notif-acts { display: flex; gap: 10px; margin-top: 8px; }
 
@@ -104,25 +104,25 @@
 .acct-appearance .acct-fine { text-align: left; }
 
 /* Neon Royale (P1): the account chip trades Classic's cut corner for a radius. */
-html[data-theme="neon"] .acct-chip { clip-path: none; border-radius: 10px; }
+html[data-fx="neon"] .acct-chip { clip-path: none; border-radius: 10px; }
 
 /* ================= Neon Royale P3 — Account consistency (append-only) =================
    The account sheet itself is .sheet.glass.slant, so it takes the glass v2
    recipe from styles.css; its inner cards join the same family here. */
-html[data-theme="neon"] .acct-dropdown {
+html[data-fx="neon"] .acct-dropdown {
   background: linear-gradient(180deg, rgba(var(--glass-strong-rgb), .66), rgba(var(--glass-rgb), .5));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.12), inset 0 0 0 1px rgba(var(--edge-rgb), .22);
+  box-shadow: inset 0 1px 0 rgba(var(--pp-hi-rgb),.12), inset 0 0 0 1px rgba(var(--edge-rgb), .22);
 }
-html[data-theme="neon"] .acct-dropdown-head { background: rgba(var(--edge-rgb), .1); }
-html[data-theme="neon"] .acct-list li {
+html[data-fx="neon"] .acct-dropdown-head { background: rgba(var(--edge-rgb), .1); }
+html[data-fx="neon"] .acct-list li {
   background: rgba(var(--glass-rgb), .45);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.07), inset 0 0 0 1px rgba(var(--edge-rgb), .16);
+  box-shadow: inset 0 1px 0 rgba(var(--pp-hi-rgb),.07), inset 0 0 0 1px rgba(var(--edge-rgb), .16);
 }
 
 /* S2 button system, slice 2: Sign in with a passkey is the gold Primary
    chevron; Create an account and Play as guest / Keep playing as guest
    are Secondary (gold outline chevron; the guest links at the xs size). */
-.brand-btn.brand-passkey:not(.ghost) { border-radius: 0; clip-path: var(--btn-chevron); background: var(--btn-gold-grad); color: var(--btn-ink); box-shadow: inset 0 1px 0 rgba(255,255,255,.7); font-family: var(--display); font-weight: 800; letter-spacing: .07em; text-transform: uppercase; min-height: 52px; }
+.brand-btn.brand-passkey:not(.ghost) { border-radius: 0; clip-path: var(--btn-chevron); background: var(--btn-gold-grad); color: var(--btn-ink); box-shadow: inset 0 1px 0 rgba(var(--pp-hi-rgb),.7); font-family: var(--display); font-weight: 800; letter-spacing: .07em; text-transform: uppercase; min-height: 52px; }
 .brand-btn.brand-passkey.ghost, .acct-guest { position: relative; isolation: isolate; border: 0; border-radius: 0; clip-path: var(--btn-chevron); background: var(--gold); color: var(--gold); box-shadow: none; font-family: var(--display); font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
 /* social.css's `button.ghost { background: transparent !important }` would
    erase the gold outline layer; out-rank it by specificity. */

@@ -207,7 +207,7 @@ function AccountScreen({ user, onClose, onChangeName, onDelete, onSecurity }: { 
       <h3 className="sheet-h">Appearance</h3>
       <div className="acct-appearance" data-testid="appearance-section">
         <ThemeToggle />
-        <p className="acct-fine">Classic is the original purple + gold. Neon Royale is the midnight-navy look. Saved on this device.</p>
+        <p className="acct-fine">Neon Lounge is the default. Saved on this device.</p>
       </div>
 
       <h3 className="sheet-h">Progress</h3>

@@ -217,16 +217,16 @@ async function pittyOffline(b: Browser) {
   await p.waitForTimeout(300);
   await p.screenshot({ path: `${shots}/7b-recap-390.png` });
   await layoutOk(p, 'recap');
-  // Neon theme: the table keeps its neutral tokens, so it reads the same
-  await p.evaluate(() => localStorage.setItem('bwm.theme.v1', JSON.stringify({ theme: 'neon' })));
+  // Theme B (Porch Daytime, light UI): the table renders and still fits
+  await p.evaluate(() => localStorage.setItem('pp.theme.v1', JSON.stringify({ theme: 'B' })));
   await p.getByTestId('mode-again').click();
   await toBots(p);
   await p.getByTestId('start-bots').click();
   await p.getByTestId('mode-screen').waitFor();
   await p.waitForTimeout(500);
-  await p.screenshot({ path: `${shots}/7b-table-neon-390.png` });
-  ok(await p.evaluate(() => document.documentElement.dataset.theme) === 'neon', 'neon theme: table renders (screenshot)');
-  await p.evaluate(() => localStorage.removeItem('bwm.theme.v1'));
+  ok(await p.evaluate(() => document.documentElement.dataset.theme) === 'B', 'theme B: table renders');
+  await layoutOk(p, 'theme B table');
+  await p.evaluate(() => localStorage.removeItem('pp.theme.v1'));
   await p.context().close();
 }
 

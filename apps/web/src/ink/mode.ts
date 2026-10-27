@@ -38,7 +38,7 @@ export interface InkGateState {
 }
 
 export function inkMode(s: InkGateState): InkMode {
-  if (s.theme !== 'neon' || s.inGame) return 'none';
+  if (s.theme !== 'C' || s.inGame) return 'none';
   if (s.reducedMotion || s.reduceEffects || s.lowQuality || !s.webgl) return 'gradient';
   return 'webgl';
 }

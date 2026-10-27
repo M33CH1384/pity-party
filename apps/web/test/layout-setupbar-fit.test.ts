@@ -68,7 +68,7 @@ describe('D3 (b): the wizard page reserve clears the shrunken bar by >= 16px', (
 
   it('the bar is opaque from its top edge — no text prints over tiles', () => {
     const bar = rule('.setup-bar');
-    expect(bar).toContain('linear-gradient(180deg, rgba(12,7,18,.94), rgba(12,7,18,.98) 42%)');
+    expect(bar).toContain('linear-gradient(180deg, rgba(var(--pp-glass-strong-rgb),.94), rgba(var(--pp-glass-strong-rgb),.98) 42%)');
     expect(bar).not.toContain('transparent');
     // still the fixed commit bar the scroll-safety pins rely on
     expect(css).toContain('.setup-bar { position: fixed;');

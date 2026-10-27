@@ -202,9 +202,9 @@ describe('the BottomLine renders: bug + lines from the rating board fetch', () =
     expect(css).toContain('.ticker-beta {');
     // the block is fully opaque in BOTH themes — a solid hex fill, and the
     // old translucent gold / neon-tinted bug backgrounds are gone
-    expect(css).toContain('background: #1e2125');
+    expect(css).toContain('background: var(--pp-surface)');
     expect(css).not.toContain('.ticker-bug { flex: none; display: grid; place-items: center; width: 44px; background: rgba');
-    expect(css).not.toContain('html[data-theme="neon"] .ticker-bug { background: rgba');
+    expect(css).not.toContain('html[data-fx="neon"] .ticker-bug { background: rgba');
     // the marquee track lives inside its own clipped viewport beside the bug
     expect(ticker).toContain('<div className="ticker-viewport">');
     expect(css).toContain('.ticker-viewport { flex: 1; min-width: 0; overflow: hidden;');

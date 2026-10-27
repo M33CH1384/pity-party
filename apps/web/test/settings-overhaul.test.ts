@@ -145,11 +145,11 @@ describe('settings follow-ups CSS (owner, 2026-10-20)', () => {
   const tail = css.slice(css.indexOf('Settings follow-ups'));
 
   it('Neon volume sliders take the violet family — no electric-blue track in the sheets', () => {
-    const webkit = tail.slice(tail.indexOf('html[data-theme="neon"] .sheet .vol-slider::-webkit-slider-runnable-track'));
+    const webkit = tail.slice(tail.indexOf('html[data-fx="neon"] .sheet .vol-slider::-webkit-slider-runnable-track'));
     expect(webkit).toContain('var(--purple)');
     expect(webkit).not.toContain('#269cff');
     expect(webkit).not.toContain('--purple-hot'); // --purple-hot IS #269cff under Neon: the clash
-    expect(tail).toContain('html[data-theme="neon"] .sheet .vol-slider::-moz-range-progress');
+    expect(tail).toContain('html[data-fx="neon"] .sheet .vol-slider::-moz-range-progress');
     // the retired sound popover's copies of these rules are gone with it
     expect(tail).not.toContain('.sound-pop');
     // scoped to the sheets: no global .vol-slider recolor (Classic untouched)
@@ -196,9 +196,9 @@ describe('settings overhaul CSS', () => {
   });
 
   it('the Neon settings sheet is solid — the home cannot bleed through it', () => {
-    const rule = tail.slice(tail.indexOf('html[data-theme="neon"] [data-testid="more-options"].sheet'));
-    expect(rule).toContain('#171c42');
-    expect(rule).toContain('#0a0d24');
+    const rule = tail.slice(tail.indexOf('html[data-fx="neon"] [data-testid="more-options"].sheet'));
+    expect(rule).toContain('var(--pp-surface)');
+    expect(rule).toContain('var(--pp-surface)');
     expect(rule).toContain('backdrop-filter: none');
   });
 });

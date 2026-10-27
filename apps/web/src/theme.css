@@ -1,92 +1,280 @@
-/* ===================== Pity Party theme tokens =====================
-   ONE neutral placeholder theme (milestone 3d). Every color the app
-   paints comes from these tokens (directly, or through the legacy aliases
-   in styles.css :root), so Desi's palette drops in by editing THIS file:
-   swap the values below, nothing else. Keep each *-rgb triplet in step
-   with its hex (rgba(var(--x-rgb), a) uses the triplet).
-
-   Roles
-     bg / surface*   page and panel backgrounds (dark → lighter)
-     ink / muted     text: primary, secondary
-     accent*         the brand hue: selection, outlines, toggles, glows
-     primary*        main call-to-action fill (Start, Deal me in) + its ink
-     danger/success  functional colors (leave table, ready ✓) — not brand
-   ==================================================================== */
-:root {
-  --pp-bg: #111317;
-  --pp-bg-rgb: 17, 19, 23;
-  --pp-surface: #171a1f;
-  --pp-surface-2: #1d2027;
-  --pp-surface-hi: #252932;
-  --pp-field: #1a1d23;
-  --pp-ink: #f1f3f6;
-  --pp-ink-deep: #0c0d10;
-  --pp-muted: #a4abb7;
-  --pp-soft: #c9ced8;
-
-  --pp-accent: #7d8899;
-  --pp-accent-rgb: 125, 136, 153;
-  --pp-accent-hot: #a3adbd;
-  --pp-accent-deep-rgb: 72, 80, 94;
-  --pp-edge-rgb: 150, 160, 176;
-
-  --pp-primary: #dfe3e9;
-  --pp-primary-rgb: 223, 227, 233;
-  --pp-primary-deep: #a9b0bc;
-  --pp-primary-hi: #f2f4f7;
-  --pp-primary-hi-rgb: 242, 244, 247;
-  --pp-primary-ink: #14161a;
-  --pp-primary-grad: linear-gradient(180deg, #f2f4f7, #dfe3e9 45%, #a9b0bc);
-
-  --pp-info-rgb: 125, 165, 205;
-  --pp-cyan-rgb: 130, 190, 210;
-  --pp-danger: #e5484d;
-  --pp-success: #4cc38a;
-
-  --pp-glass-rgb: 22, 24, 29;
-  --pp-glass-strong-rgb: 18, 20, 24;
+/* ===================== Pity Party theme tokens (visual pass V1) =====================
+   FOUR themes from Desi's specs (stage1b themes.md + theme.js, stage2 HANDOFF, stage2b delta):
+     A House Party Night · B Porch Daytime (light UI) · C Neon Lounge (DEFAULT, Magenta) · K Classic BWM
+   Every colour the app paints comes from these tokens (directly, through the legacy aliases in
+   styles.css :root, or through the --pp-hi-rgb / --pp-shade-rgb overlay channels). theme.ts /
+   public/theme-boot.js set html[data-theme]; with no attribute (no JS yet) the :root block is C.
+   Keep each *-rgb triplet in step with its hex (rgba(var(--x-rgb), a) uses the triplet).
+   This is the ONLY file allowed to hold colour literals (test/no-colour-literals.test.ts), apart
+   from the documented fixed card/suit tokens and an allowlist that shrinks as the sweep finishes.
+   ===================================================================================== */
+:root,
+html[data-theme="C"] {
+  /* C · Neon Lounge (default) */
+  --pp-bg: #0C0C10;
+  --pp-bg-rgb: 12, 12, 16;
+  --pp-surface: #15151B;
+  --pp-surface-2: #1B1B23;
+  --pp-surface-hi: #262631;
+  --pp-field: #121218;
+  --pp-ink: #F4F4F8;
+  --pp-ink-deep: #08080B;
+  --pp-muted: #A5A5B4;
+  --pp-muted-rgb: 165, 165, 180;
+  --pp-lav: #CFCFDC;
+  --pp-accent: #FF2EB8;
+  --pp-accent-rgb: 255, 46, 184;
+  --pp-accent-hot: #FF6FD0;
+  --pp-accent-deep-rgb: 120, 10, 85;
+  --pp-edge-rgb: 255, 46, 184;
+  --pp-primary: #FF2EB8;
+  --pp-primary-rgb: 255, 46, 184;
+  --pp-primary-deep: #B8127F;
+  --pp-primary-hi: #FF6FD0;
+  --pp-primary-hi-rgb: 255, 111, 208;
+  --pp-primary-ink: #14020D;
+  --pp-primary-grad: linear-gradient(180deg, #FF6FD0, #FF2EB8 45%, #B8127F);
+  --pp-info-rgb: 51, 230, 255;
+  --pp-cyan-rgb: 51, 230, 255;
+  --pp-danger: #FF5C5C;
+  --pp-success: #4CC38A;
+  --pp-glass-rgb: 20, 20, 26;
+  --pp-glass-strong-rgb: 14, 14, 19;
+  /* spec (stage1b/html/theme.js) */
+  --pp-accent-2: #33E6FF;
+  --pp-accent-2-rgb: 51, 230, 255;
+  --pp-felt: #3A0D1A;
+  --pp-plate: rgba(20, 20, 26, .86);
+  --pp-line: rgba(255, 255, 255, .10);
+  --pp-btn-fill: rgba(12, 12, 16, .88);
+  --pp-soft: rgba(255, 255, 255, .07);
+  --pp-well: rgba(0, 0, 0, .35);
+  --pp-off: #3A3A46;
+  --pp-bg-dim: rgba(12, 12, 16, .55);
+  --pp-disp-w: 800;
+  /* light/shade channels: what used to be hard-coded white/black overlays */
+  --pp-hi: #FFFFFF;
+  --pp-hi-rgb: 255, 255, 255;
+  --pp-shade-rgb: 0, 0, 0;
+  color-scheme: dark;
+}
+html[data-theme="A"] {
+  /* A · House Party Night */
+  --pp-bg: #141233;
+  --pp-bg-rgb: 20, 18, 51;
+  --pp-surface: #1C1A45;
+  --pp-surface-2: #231F52;
+  --pp-surface-hi: #2F2A66;
+  --pp-field: #1A1740;
+  --pp-ink: #FFF4E2;
+  --pp-ink-deep: #0A0920;
+  --pp-muted: #B9B2DA;
+  --pp-muted-rgb: 185, 178, 218;
+  --pp-lav: #DDD6F2;
+  --pp-accent: #FF5A5F;
+  --pp-accent-rgb: 255, 90, 95;
+  --pp-accent-hot: #FF8A8E;
+  --pp-accent-deep-rgb: 140, 30, 40;
+  --pp-edge-rgb: 255, 200, 92;
+  --pp-primary: #FF5A5F;
+  --pp-primary-rgb: 255, 90, 95;
+  --pp-primary-deep: #C23A40;
+  --pp-primary-hi: #FF8A8E;
+  --pp-primary-hi-rgb: 255, 138, 142;
+  --pp-primary-ink: #14020D;
+  --pp-primary-grad: linear-gradient(180deg, #FF8A8E, #FF5A5F 45%, #C23A40);
+  --pp-info-rgb: 255, 200, 92;
+  --pp-cyan-rgb: 255, 200, 92;
+  --pp-danger: #FF8A7A;
+  --pp-success: #5CD6A0;
+  --pp-glass-rgb: 26, 22, 64;
+  --pp-glass-strong-rgb: 18, 15, 46;
+  /* spec (stage1b/html/theme.js) */
+  --pp-accent-2: #FFC85C;
+  --pp-accent-2-rgb: 255, 200, 92;
+  --pp-felt: #0D3D66;
+  --pp-plate: rgba(26, 22, 64, .78);
+  --pp-line: rgba(255, 255, 255, .12);
+  --pp-btn-fill: rgba(20, 16, 48, .88);
+  --pp-soft: rgba(255, 255, 255, .07);
+  --pp-well: rgba(0, 0, 0, .30);
+  --pp-off: #3A3560;
+  --pp-bg-dim: rgba(20, 18, 51, .55);
+  --pp-disp-w: 400;
+  /* light/shade channels: what used to be hard-coded white/black overlays */
+  --pp-hi: #FFFFFF;
+  --pp-hi-rgb: 255, 255, 255;
+  --pp-shade-rgb: 0, 0, 0;
+  color-scheme: dark;
+}
+html[data-theme="B"] {
+  /* B · Porch Daytime (light UI) */
+  --pp-bg: #F3E9DA;
+  --pp-bg-rgb: 243, 233, 218;
+  --pp-surface: #FFFAF2;
+  --pp-surface-2: #F8F0E3;
+  --pp-surface-hi: #ECE2D2;
+  --pp-field: #FFFDF8;
+  --pp-ink: #1F2A44;
+  --pp-ink-deep: #1F2A44;
+  --pp-muted: #5E6577;
+  --pp-muted-rgb: 94, 101, 119;
+  --pp-lav: #3D4A6B;
+  --pp-accent: #B4532A;
+  --pp-accent-rgb: 180, 83, 42;
+  --pp-accent-hot: #C9622F;
+  --pp-accent-deep-rgb: 120, 50, 20;
+  --pp-edge-rgb: 31, 42, 68;
+  --pp-primary: #B4532A;
+  --pp-primary-rgb: 180, 83, 42;
+  --pp-primary-deep: #8C3D1C;
+  --pp-primary-hi: #C96A3F;
+  --pp-primary-hi-rgb: 201, 106, 63;
+  --pp-primary-ink: #FFFFFF;
+  --pp-primary-grad: linear-gradient(180deg, #C96A3F, #B4532A 45%, #8C3D1C);
+  --pp-info-rgb: 31, 95, 168;
+  --pp-cyan-rgb: 31, 95, 168;
+  --pp-danger: #A3262A;
+  --pp-success: #2F7D52;
+  --pp-glass-rgb: 255, 250, 242;
+  --pp-glass-strong-rgb: 255, 252, 247;
+  /* spec (stage1b/html/theme.js) */
+  --pp-accent-2: #1F5FA8;
+  --pp-accent-2-rgb: 31, 95, 168;
+  --pp-felt: #3A5F9A;
+  --pp-plate: rgba(255, 250, 242, .88);
+  --pp-line: rgba(31, 42, 68, .14);
+  --pp-btn-fill: rgba(255, 255, 255, .85);
+  --pp-soft: rgba(31, 42, 68, .06);
+  --pp-well: rgba(31, 42, 68, .08);
+  --pp-off: #C9C2B4;
+  --pp-bg-dim: rgba(243, 233, 218, .95);
+  --pp-disp-w: 800;
+  /* light/shade channels: what used to be hard-coded white/black overlays */
+  --pp-hi: #1F2A44;
+  --pp-hi-rgb: 31, 42, 68;
+  --pp-shade-rgb: 43, 33, 24;
+  color-scheme: light;
+}
+html[data-theme="K"] {
+  /* K · Classic BWM */
+  --pp-bg: #0C0712;
+  --pp-bg-rgb: 12, 7, 18;
+  --pp-surface: #150D22;
+  --pp-surface-2: #1C122D;
+  --pp-surface-hi: #281A40;
+  --pp-field: #120B1D;
+  --pp-ink: #F6F1FF;
+  --pp-ink-deep: #0C0712;
+  --pp-muted: #B7A9D6;
+  --pp-muted-rgb: 183, 169, 214;
+  --pp-lav: #D6C8F2;
+  --pp-accent: #F5C542;
+  --pp-accent-rgb: 245, 197, 66;
+  --pp-accent-hot: #FFD978;
+  --pp-accent-deep-rgb: 138, 106, 18;
+  --pp-edge-rgb: 185, 128, 255;
+  --pp-primary: #F5C542;
+  --pp-primary-rgb: 245, 197, 66;
+  --pp-primary-deep: #C99A1E;
+  --pp-primary-hi: #FFE08A;
+  --pp-primary-hi-rgb: 255, 224, 138;
+  --pp-primary-ink: #14020D;
+  --pp-primary-grad: linear-gradient(180deg, #FFE08A, #F5C542 45%, #C99A1E);
+  --pp-info-rgb: 185, 128, 255;
+  --pp-cyan-rgb: 185, 128, 255;
+  --pp-danger: #FF6B6B;
+  --pp-success: #4CC38A;
+  --pp-glass-rgb: 18, 10, 30;
+  --pp-glass-strong-rgb: 13, 7, 22;
+  /* spec (stage1b/html/theme.js) */
+  --pp-accent-2: #B980FF;
+  --pp-accent-2-rgb: 185, 128, 255;
+  --pp-felt: #1D5A3C;
+  --pp-plate: rgba(18, 10, 30, .84);
+  --pp-line: rgba(185, 128, 255, .22);
+  --pp-btn-fill: rgba(16, 8, 28, .88);
+  --pp-soft: rgba(255, 255, 255, .06);
+  --pp-well: rgba(0, 0, 0, .35);
+  --pp-off: #3A2D55;
+  --pp-bg-dim: rgba(12, 7, 18, .55);
+  --pp-disp-w: 800;
+  /* light/shade channels: what used to be hard-coded white/black overlays */
+  --pp-hi: #FFFFFF;
+  --pp-hi-rgb: 255, 255, 255;
+  --pp-shade-rgb: 0, 0, 0;
+  color-scheme: dark;
 }
 
-/* ===================== V0: design-spec token vocabulary =====================
-   Desi's stage2/stage2b specs (and the A/B/C/K themes to come in V1) speak in
-   these names. In V0 they are ALIASES of the neutral values above, so nothing
-   paints differently: new code may use them now, and V1 re-points them per
-   theme. Rules: aliases only reference tokens above (or fixed spec constants
-   like spacing/radii/heights and the never-themed card + suit colours).
-   ============================================================================ */
+/* Shared, never themed (stage2 Tokens): card faces, suits, type, spacing, radii, control heights. */
 :root {
-  /* surfaces + text */
-  --pp-plate: var(--pp-surface);
-  --pp-plate-2: var(--pp-surface-2);
-  --pp-well: var(--pp-field);
-  --pp-off: var(--pp-surface-hi);
-  --pp-bg-dim: rgba(var(--pp-bg-rgb), .72);
-  --pp-mut: var(--pp-muted);
-  --pp-line: rgba(var(--pp-edge-rgb), .18);
-  /* accent family */
-  --pp-accent-2: var(--pp-accent-hot);
   --pp-accent-on: var(--pp-primary-ink);
   --pp-accent-glow: rgba(var(--pp-accent-rgb), .55);
   --pp-glow: var(--pp-accent-glow);
-  --pp-btn-fill: var(--pp-primary-grad);
-  /* table */
-  --pp-felt: var(--pp-surface-2);
-  --pp-felt-sheen: var(--pp-surface-hi);
-  /* cards + suits: fixed, never themed (stage2 Tokens) */
+  --pp-mut: var(--pp-muted);
+  --pp-plate-2: var(--pp-surface-2);
+  --pp-felt-sheen: rgba(var(--pp-hi-rgb), .06);
   --pp-card: #ffffff;
+  --pp-card-ink: #111114;
   --pp-suit-s: #111114;
   --pp-suit-h: #d1123f;
   --pp-suit-d: #0066cc;
   --pp-suit-c: #0e6e78;
-  /* type: the current faces until V2 self-hosts the theme fonts */
+  /* fonts are V2: today's faces */
   --pp-font-disp: var(--display);
   --pp-font-ui: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --pp-disp-w: 800;
-  /* spacing, radii, control heights (stage2 Tokens) */
   --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 24px;
   --r-btn: 18px; --r-plate: 20px; --r-pill: 999px;
   --h-btn: 52px; --h-btn-sm: 44px; --h-ico: 44px;
+  /* B's tablecloth (Desi): gingham bands, 22px (16px on phones) */
+  --pp-gingham-band: 22px;
 }
+@media (max-width: 600px) { :root { --pp-gingham-band: 16px; } }
 
-/* Text wordmark (placeholder until Desi's logo): neutral, display face. */
-.pp-wordmark { font-family: var(--display); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--pp-ink); }
+/* 2D table surface: felt colour; Porch Daytime gets Desi's CSS gingham (no texture). */
+.pp-center { background: var(--pp-felt); border-radius: var(--r-plate); }
+html[data-theme="B"] .pp-center {
+  background-color: var(--pp-felt);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .14) 0 var(--pp-gingham-band), transparent var(--pp-gingham-band) calc(var(--pp-gingham-band) * 2)),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .14) 0 var(--pp-gingham-band), transparent var(--pp-gingham-band) calc(var(--pp-gingham-band) * 2));
+  box-shadow: inset 0 0 0 10px var(--pp-bg), inset 0 0 24px rgba(var(--pp-shade-rgb), .25);
+  padding: 18px;
+}
+.pp-center .pp-label { color: var(--pp-ink); }
+html[data-theme="B"] .pp-center .pp-label, html[data-theme="B"] .pp-center .pp-stock, html[data-theme="B"] .pp-center .pp-pot { color: #ffffff; }
+html[data-theme="B"] .pp-center .pp-stock { background: repeating-linear-gradient(45deg, var(--pp-accent-2), var(--pp-accent-2) 6px, var(--pp-ink) 6px, var(--pp-ink) 12px); border: 1.5px solid var(--pp-card-ink); text-shadow: 0 1px 2px rgba(var(--pp-shade-rgb), .8) !important; }
+/* Cards on B: 1.5px ink edge + Desi's two-layer shadow. */
+html[data-theme="B"] .pcard { box-shadow: 0 0 0 1.5px #2b2118, 0 2px 0 rgba(43, 33, 24, .35), 0 6px 14px rgba(20, 30, 60, .35); }
+
+/* Settings > Theme tiles (4 × 64px, mini felt/accent preview) + Home chip. */
+.theme-picker { display: flex; flex-direction: column; gap: 8px; }
+.theme-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.theme-tile { display: flex; flex-direction: column; align-items: center; gap: 4px; min-height: 64px; padding: 6px 4px; border-radius: 14px; border: 2px solid var(--pp-line); background: var(--pp-soft); color: var(--pp-ink); }
+.theme-tile.on { border-color: var(--pp-accent); box-shadow: 0 0 0 2px rgba(var(--pp-accent-rgb), .35); }
+.theme-tile-swatch { position: relative; width: 44px; height: 30px; border-radius: 8px; overflow: hidden; }
+.theme-tile-swatch i { position: absolute; right: 4px; bottom: 4px; width: 12px; height: 12px; border-radius: 50%; }
+.theme-tile-name { font-size: 11px; line-height: 1.1; text-align: center; }
+.tt-A .theme-tile-swatch { background: #0d3d66; } .tt-A .theme-tile-swatch i { background: #ff5a5f; }
+.tt-B .theme-tile-swatch { background: #3a5f9a repeating-linear-gradient(90deg, rgba(255, 255, 255, .2) 0 6px, transparent 6px 12px); } .tt-B .theme-tile-swatch i { background: #b4532a; }
+.tt-C .theme-tile-swatch { background: #3a0d1a; } .tt-C .theme-tile-swatch i { background: #ff2eb8; }
+.tt-K .theme-tile-swatch { background: #1d5a3c; } .tt-K .theme-tile-swatch i { background: #f5c542; }
+.theme-accent-row { display: flex; align-items: center; gap: 8px; min-height: 44px; margin: 0; font-size: 13px; color: var(--pp-ink); }
+.theme-accent-row.off { color: var(--pp-muted); opacity: .8; }
+.theme-accent-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--pp-accent); box-shadow: 0 0 10px var(--pp-accent-glow); }
+.wiz-home { position: relative; }
+.theme-chip-row { position: absolute; top: 0; left: 0; z-index: 2; display: flex; }
+.theme-chip { position: relative; display: inline-flex; height: 44px; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px; border-radius: var(--r-pill); background: var(--pp-plate); border: 1px solid var(--pp-line); color: var(--pp-ink); font-size: 14px; }
+.theme-chip select { appearance: none; -webkit-appearance: none; background: transparent; border: 0; color: inherit; font: inherit; min-height: 44px; padding-right: 4px; }
+.theme-chip select option { color: #111114; background: #ffffff; }
+.theme-chip-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--pp-accent); }
+.theme-chip-caret { pointer-events: none; font-size: 12px; opacity: .8; }
+
+/* Text wordmark (placeholder until Desi's logo): plain text, display face. */
+.pp-wordmark { font-family: var(--pp-font-disp); font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--pp-ink); }
+
+/* Text/glyphs painted ON a coloured fill (badges, accent buttons, brand chips, switch knobs): white in every theme. */
+:root { --pp-on-fill: #ffffff; }
+/* B is a light UI: no white glows or text-shadows (Desi, stage2b §9). */
+html[data-theme="B"] body * { text-shadow: none !important; }
+html[data-theme="B"] :focus-visible { outline-color: var(--pp-ink); }

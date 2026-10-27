@@ -18,7 +18,7 @@ describe('neutral placeholder theme (3d): one token file', () => {
     expect(rootBlock).toContain('--gold: var(--pp-primary)');
   });
 
-  it('no BWM purple or gold left in the base tokens', () => {
-    for (const hex of ['#9b5cff', '#b980ff', '#f5c542', '#0c0712']) expect(theme + rootBlock).not.toContain(hex);
+  it('no BWM purple or gold in the legacy :root aliases (K Classic BWM carries them as theme tokens in theme.css)', () => {
+    for (const hex of ['#9b5cff', '#b980ff', '#f5c542', '#0c0712']) expect(rootBlock.toLowerCase()).not.toContain(hex);
   });
 });

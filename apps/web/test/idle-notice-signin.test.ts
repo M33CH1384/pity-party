@@ -112,7 +112,7 @@ describe('popup rendering pins', () => {
     expect(guard).not.toContain('className="btn"');
     // …and .primary is the gold block with dark text in BOTH themes (the neon
     // block deliberately never overrides the gold tokens).
-    expect(styles).toMatch(/\.primary \{ background: linear-gradient\(180deg, var\(--gold-hi\), var\(--gold-deep\)\); color: #1d1204;/);
+    expect(styles).toMatch(/\.primary \{ background: linear-gradient\(180deg, var\(--gold-hi\), var\(--gold-deep\)\); color: var\(--pp-primary-ink\);/);
   });
 
   it('visibility derives from (owed && !signedIn), driven by the live account store', () => {

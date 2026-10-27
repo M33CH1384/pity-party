@@ -14,35 +14,35 @@
 .tfan-shade {
   position: absolute;
   inset: 0;
-  background: #070708;
+  background: var(--pp-surface);
   will-change: opacity;
 }
 .tfan-neon .tfan-shade {
-  background: #04050e;
+  background: var(--pp-surface);
 }
 .tfan-card {
   position: absolute;
   border-radius: 12px;
   background:
-    radial-gradient(120% 90% at 50% 0%, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 55%),
-    linear-gradient(155deg, #23304d 0%, #141d33 55%, #0d1424 100%);
-  border: 1px solid rgba(152,159,170, 0.55);
+    radial-gradient(120% 90% at 50% 0%, rgba(var(--pp-hi-rgb), 0.10), rgba(var(--pp-hi-rgb), 0) 55%),
+    linear-gradient(155deg, #23304d 0%, var(--pp-surface) 55%, var(--pp-surface) 100%);
+  border: 1px solid rgba(var(--pp-muted-rgb), 0.55);
   box-shadow:
-    inset 0 0 0 5px rgba(10, 14, 26, 0.85),
-    inset 0 0 0 6px rgba(152,159,170, 0.28),
-    0 18px 44px rgba(0, 0, 0, 0.5);
-  color: rgba(152,159,170, 0.30);
+    inset 0 0 0 5px rgba(var(--pp-glass-strong-rgb), 0.85),
+    inset 0 0 0 6px rgba(var(--pp-muted-rgb), 0.28),
+    0 18px 44px rgba(var(--pp-shade-rgb), 0.5);
+  color: rgba(var(--pp-muted-rgb), 0.30);
   will-change: transform, opacity;
 }
 .tfan-neon .tfan-card {
   background:
     radial-gradient(120% 90% at 50% 0%, rgba(91, 223, 255, 0.14), rgba(91, 223, 255, 0) 55%),
-    linear-gradient(155deg, #31353b 0%, #1e2125 55%, #0a0618 100%);
-  border-color: rgba(161,168,178, 0.65);
+    linear-gradient(155deg, var(--pp-muted) 0%, var(--pp-surface) 55%, var(--pp-surface) 100%);
+  border-color: rgba(var(--pp-muted-rgb), 0.65);
   box-shadow:
-    inset 0 0 0 5px rgba(7, 9, 20, 0.85),
+    inset 0 0 0 5px rgba(var(--pp-glass-strong-rgb), 0.85),
     inset 0 0 0 6px rgba(91, 223, 255, 0.30),
-    0 18px 44px rgba(0, 0, 0, 0.55);
+    0 18px 44px rgba(var(--pp-shade-rgb), 0.55);
   color: rgba(91, 223, 255, 0.34);
 }
 .tfan-mark {
@@ -66,8 +66,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(90% 70% at 50% 42%, rgba(38, 84, 62, 0.5), rgba(0, 0, 0, 0) 70%),
-    linear-gradient(160deg, #0c1712 0%, #060a08 70%);
+    radial-gradient(90% 70% at 50% 42%, rgba(38, 84, 62, 0.5), rgba(var(--pp-shade-rgb), 0) 70%),
+    linear-gradient(160deg, var(--pp-surface) 0%, var(--pp-surface) 70%);
   will-change: opacity;
 }
 .tt-card {
@@ -79,8 +79,8 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(90% 70% at 50% 42%, rgba(38, 84, 62, 0.35), rgba(0, 0, 0, 0) 70%),
-    linear-gradient(160deg, #0d130f 0%, #070908 70%);
+    radial-gradient(90% 70% at 50% 42%, rgba(38, 84, 62, 0.35), rgba(var(--pp-shade-rgb), 0) 70%),
+    linear-gradient(160deg, var(--pp-surface) 0%, var(--pp-surface) 70%);
   will-change: transform, opacity;
 }
 .tt-scoop-edge {
@@ -89,7 +89,7 @@
   top: 0;
   bottom: 0;
   width: 5px;
-  background: linear-gradient(180deg, rgba(152,159,170, 0), rgba(152,159,170, 0.85) 30%, rgba(152,159,170, 0.85) 70%, rgba(152,159,170, 0));
+  background: linear-gradient(180deg, rgba(var(--pp-muted-rgb), 0), rgba(var(--pp-muted-rgb), 0.85) 30%, rgba(var(--pp-muted-rgb), 0.85) 70%, rgba(var(--pp-muted-rgb), 0));
 }
 .tt-stack {
   position: absolute;
@@ -114,7 +114,7 @@
 .tdoor-shade {
   position: absolute;
   inset: 0;
-  background: radial-gradient(120% 100% at 58% 42%, #2a1608 0%, #140b06 62%);
+  background: radial-gradient(120% 100% at 58% 42%, var(--pp-surface) 0%, var(--pp-surface) 62%);
   will-change: opacity;
 }
 .tdoor-glow {
@@ -134,7 +134,7 @@
   right: 42%;
   width: 66%;
   transform-origin: 100% 50%;
-  background: linear-gradient(270deg, #cbcfd4 0%, rgba(255, 179, 92, 0.78) 30%, rgba(255, 138, 60, 0.3) 66%, rgba(255, 138, 60, 0) 100%);
+  background: linear-gradient(270deg, var(--pp-ink) 0%, rgba(255, 179, 92, 0.78) 30%, rgba(255, 138, 60, 0.3) 66%, rgba(255, 138, 60, 0) 100%);
   clip-path: polygon(0 5%, 100% 0, 100% 100%, 0 95%);
   will-change: transform, opacity;
   pointer-events: none;
@@ -146,8 +146,8 @@
   left: 58%;
   width: 44%;
   transform-origin: 100% 50%;
-  background: linear-gradient(100deg, #2b1a0a 0%, #1a0f05 55%, #120a03 100%);
-  border-left: 2px solid rgba(203,207,212, 0.85);
+  background: linear-gradient(100deg, var(--pp-surface) 0%, var(--pp-surface) 55%, var(--pp-surface) 100%);
+  border-left: 2px solid rgba(var(--pp-hi-rgb), 0.85);
   box-shadow: -18px 0 44px rgba(255, 160, 70, 0.25);
   will-change: transform, opacity;
 }
