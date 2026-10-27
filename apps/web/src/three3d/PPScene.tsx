@@ -13,8 +13,9 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { buildTable, FD, FELTY, FW, type Quality, type Table, type TableTextures } from './table';
 import { themeUniforms, watchTheme, type ThemeId, type ThemeUniforms } from './themeUniforms';
 import { HandFan } from './HandFan';
-import type { MirrorCard, TableSnap } from './handMirror';
+import { type MirrorCard, type TableSnap, useHandMirror, useTableMirror } from './handMirror';
 import { PPTable3D } from './PPTable3D';
+import './table3d.css';
 
 export { FELTY, FW, FD };
 
@@ -145,7 +146,10 @@ function World({ quality, onReady, hand, onHand, snap, onTable }: { quality: Qua
 }
 
 const noop = () => {};
-export function PPScene({ onFirstFrame, onContextLost, quality = 'high', hand = [], onHand = noop, table = null, onTable = noop }: { onFirstFrame: () => void; onContextLost: () => void; quality?: Quality; hand?: MirrorCard[]; onHand?: (on: boolean) => void; table?: TableSnap | null; onTable?: (on: boolean) => void }) {
+export function PPScene({ onFirstFrame, onContextLost, quality = 'high', root = null, onHand = noop, onTable = noop }: { onFirstFrame: () => void; onContextLost: () => void; quality?: Quality; root?: HTMLElement | null; onHand?: (on: boolean) => void; onTable?: (on: boolean) => void }) {
+  // V10c/d mirrors (lazy side, so they cost the first load nothing): own DOM hand + the public table snapshot
+  const hand = useHandMirror(root);
+  const table = useTableMirror(root);
   const high = quality === 'high';
   return (
     <Canvas
