@@ -33,11 +33,12 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
   const prev = useRef<TableSnap | null>(null);
   const [gather, setGather] = useState<TableSnap | null>(null);
 
-  // the gather/reshuffle beat: a fresh deal after the hand-over shows the OLD table collecting into the stock for ~700ms
+  // the gather/reshuffle beat: a fresh deal (engine 'deal' event) shows the OLD table collecting into the stock for ~700ms
   useEffect(() => {
     const was = prev.current;
-    if (snap && was && was.ph === 'handOver' && snap.ph !== 'handOver' && snap.ph !== 'over' && !reduced()) {
+    if (snap && was && snap.ev?.[0] === 'deal' && evKey(was) !== evKey(snap) && (was.up || was.sh.some((x) => x.length)) && !reduced()) {
       setGather(was);
+      const w = window as unknown as { __pp3dGather?: number }; w.__pp3dGather = (w.__pp3dGather ?? 0) + 1;
       const t = window.setTimeout(() => setGather(null), GATHER_MS);
       return () => window.clearTimeout(t);
     }
@@ -72,6 +73,7 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
     };
     const fly = (obj: Group, from: Vector3, faceDown = false, ms = FLIGHT_MS, hideAtEnd = false) => {
       if (reduced()) { if (hideAtEnd) obj.visible = false; return; }
+      if (faceDown) { const bk = new Mesh(faceGeometry(CASPECT), backM); bk.scale.set(CW, CW, 1); bk.rotation.y = Math.PI; bk.position.z = -0.0004; obj.add(bk); }
       const q1 = obj.quaternion.clone(); const q0 = faceDown ? q1.clone().multiply(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), Math.PI)) : q1.clone();
       flights.current.push({ obj, from, to: obj.position.clone(), q0, q1, t0: performance.now(), ms, hideAtEnd });
       obj.position.copy(from);
