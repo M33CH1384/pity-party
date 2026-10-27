@@ -1,12 +1,12 @@
 /**
- * V10c 3D hand fan. Each card is a camera-attached quad at its DOM card's rect (the DOM hand stays the input
- * layer), with a slight fan tilt per row, a primary ring on playable cards, an accent plate behind the lifted
+ * V10c/V10g 3D hand fan. Each card is a camera-attached quad at its DOM card's rect (the DOM hand stays the input
+ * layer), on a curved fan (tilt + arc drop per row, a little card thickness and a soft contact shadow), a primary ring on playable cards, an accent plate behind the lifted
  * (Tonk-picked) card, and in theme B the 1.5px ink edge on every face. Faces are unlit MeshBasic with tone
  * mapping off, so B's pure-white faces stay untinted. Ported from BWM Card3D's hand path (handLift fan pose).
  */
 import { useEffect, useMemo, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
-import { Color, Group, Mesh, MeshBasicMaterial, type PerspectiveCamera } from 'three';
+import { CanvasTexture, Color, Group, Mesh, MeshBasicMaterial, type PerspectiveCamera, PlaneGeometry } from 'three';
 import type { MirrorCard } from './handMirror';
 import { parseCardText } from './handMirror';
 import { cardFontsReady, faceTexture } from './cardTextures';
@@ -14,8 +14,21 @@ import { faceGeometry } from './cardGeometry';
 import type { ThemeUniforms } from './themeUniforms';
 
 const D = 1; // camera-local depth of the hand plane
-/** fan tilt per card from the row centre (deg), capped; small so the quad never leaves its DOM tap rect */
-export function fanTilt(i: number, n: number): number { const step = Math.min(3, 12 / Math.max(1, n - 1)); return (i - (n - 1) / 2) * step; }
+/** V10g curved fan (table-v2 / BWM handFan): tilt per card from the row centre (deg), ~10° a card, the whole fan capped at 44°. */
+export function fanTilt(i: number, n: number): number { const step = Math.min(10, 44 / Math.max(1, n - 1)); return (i - (n - 1) / 2) * step; }
+/** the arc drop (px) for a card tilted `deg` on a radius of 2.6 card widths */
+export const fanDrop = (deg: number, w: number) => 2.6 * w * (1 - Math.cos((deg * Math.PI) / 180));
+
+/** one shared 128px soft contact shadow (alpha mask drawn with named colours) */
+let shadowTex: CanvasTexture | null = null;
+function contactShadow(): CanvasTexture {
+  if (shadowTex) return shadowTex;
+  const c = document.createElement('canvas'); c.width = c.height = 128;
+  const g = c.getContext('2d')!; const r = g.createRadialGradient(64, 64, 10, 64, 64, 64);
+  r.addColorStop(0, 'black'); r.addColorStop(1, 'transparent'); g.fillStyle = r; g.fillRect(0, 0, 128, 128);
+  return (shadowTex = new CanvasTexture(c));
+}
+const shadowGeo = new PlaneGeometry(1, 1);
 
 export function HandFan({ cards, u, onDrawn }: { cards: MirrorCard[]; u: ThemeUniforms; onDrawn: (on: boolean) => void }) {
   const { camera, size, invalidate } = useThree();
@@ -38,8 +51,14 @@ export function HandFan({ cards, u, onDrawn }: { cards: MirrorCard[]; u: ThemeUn
       const parsed = parseCardText(c.text); if (!parsed) return;
       const w = c.rect.w * px, h = c.rect.h * px;
       const card = new Group();
-      card.position.set((c.rect.x + c.rect.w / 2 - size.width / 2) * px, (size.height / 2 - (c.rect.y + c.rect.h / 2)) * px, -D);
-      card.rotation.z = (-fanTilt(i, row.length) * Math.PI) / 180;
+      const tilt = fanTilt(i, row.length);
+      card.position.set((c.rect.x + c.rect.w / 2 - size.width / 2) * px, (size.height / 2 - (c.rect.y + c.rect.h / 2) - fanDrop(tilt, c.rect.w)) * px, -D);
+      card.rotation.set(-0.12, (-tilt * 0.35 * Math.PI) / 180, (-tilt * Math.PI) / 180);
+      // contact shadow (down-right) + a dark 3.5 mm-ish edge under the face for card thickness
+      const sh = new Mesh(shadowGeo, new MeshBasicMaterial({ map: contactShadow(), transparent: true, opacity: 0.55, depthTest: false, depthWrite: false }));
+      sh.scale.set(w * 1.25, h * 1.18, 1); sh.position.set(0.1 * w, -0.08 * w, -0.0006); sh.renderOrder = 1000 + order * 4; card.add(sh);
+      const edge = new Mesh(faceGeometry(h / w), new MeshBasicMaterial({ color: new Color().copy(u.bgOut).multiplyScalar(0.6), toneMapped: false, depthTest: false, transparent: true }));
+      edge.scale.set(w, w, 1); edge.position.set(0.012 * w, -0.03 * w, -0.0004); edge.renderOrder = 1000 + order * 4; card.add(edge);
       const ring = (grow: number, col: Color, z: number) => {
         const m = new Mesh(faceGeometry(h / w), new MeshBasicMaterial({ color: col, toneMapped: false, depthTest: false, transparent: true }));
         m.scale.set(w + grow * 2 * px, w + grow * 2 * px, 1); m.position.z = z; m.renderOrder = 1000 + order * 4; card.add(m);
