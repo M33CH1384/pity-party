@@ -189,11 +189,11 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .seat-anchor { pointer-events: none; }
 .plate { --ring-d: 40px; --ring-x: 0px; --ring-pad: 10px; position: relative; display: flex; align-items: center; gap: 0; white-space: nowrap; filter: drop-shadow(0 4px 10px rgba(var(--pp-shade-rgb),.5)); }
 .plate-name { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .05em; text-transform: uppercase; display: flex; align-items: center; gap: 5px; }
-.view-chip { display: inline-block; margin-top: 3px; font: 700 10px/1 var(--display); letter-spacing: .04em; padding: 4px 8px; border-radius: 999px; border: 1px solid rgba(var(--pp-hi-rgb),.35); background: rgba(var(--pp-glass-strong-rgb),.72); color: var(--pp-ink); cursor: pointer; pointer-events: auto; }
+.view-chip { display: inline-block; margin-top: 3px; font: 700 11px/1 var(--display); letter-spacing: .04em; padding: 4px 8px; border-radius: 999px; border: 1px solid rgba(var(--pp-hi-rgb),.35); background: rgba(var(--pp-glass-strong-rgb),.72); color: var(--pp-ink); cursor: pointer; pointer-events: auto; }
 .chip { font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: .08em; padding: 1px 6px; background: rgba(var(--purple-rgb),.25); color: var(--pp-ink); }
 .chip.ally { background: rgba(var(--gold-rgb),.2); color: var(--gold); }
 .chip.notice { background: var(--pp-x-red-6); color: var(--pp-on-fill); font-weight: 800; letter-spacing: .04em; animation: notice-pulse 1.6s ease-in-out infinite; }
-.plate .plate-name:has(.chip + .chip) .chip { font-size: 10px; padding: 1px 4px; letter-spacing: .03em; }
+.plate .plate-name:has(.chip + .chip) .chip { font-size: 11px; padding: 1px 4px; letter-spacing: .03em; }
 /* a side plate next to the trick cards on a narrow phone goes narrow: its chips wrap under the name (Scene.tsx Badges) */
 .plate.narrow .plate-name { flex-wrap: wrap; row-gap: 2px; max-width: 128px; white-space: normal; }
 .plate.narrow .plate-name .chip { white-space: nowrap; }
@@ -210,12 +210,12 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 
 /* toasts */
 .toasts { position: absolute; top: 128px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; z-index: 40; pointer-events: none; }
-.toast { display: flex; flex-direction: column; align-items: center; padding: 6px 26px 8px; background: var(--glass-strong); clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%); animation: toast-in .5s cubic-bezier(.2,1.6,.4,1) both, toast-out .4s ease-in 2.7s forwards; }
+.toast { display: flex; flex-direction: column; align-items: center; padding: 6px 26px 8px; background: var(--glass-strong); clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%); animation: toast-in .5s cubic-bezier(.2,1.3,.4,1) both, toast-out .4s ease-in 2.7s forwards; }
 @keyframes toast-in { from { transform: scale(.3) skewX(-12deg); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes toast-out { to { transform: translateY(-14px); opacity: 0; } }
 
 /* chat */
-.unread { position: absolute; top: 2px; right: 4px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--red); font-size: 10px; font-weight: 800; display: grid; place-items: center; padding: 0 3px; }
+.unread { position: absolute; top: 2px; right: 4px; min-width: 16px; height: 16px; border-radius: 8px; background: var(--red); font-size: 11px; font-weight: 800; display: grid; place-items: center; padding: 0 3px; }
 @keyframes ticker { 0% { opacity: 0; transform: translateX(20px); } 8%, 80% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 .chat { position: absolute; right: calc(8px + env(safe-area-inset-right)); bottom: calc(23vh + 112px + env(safe-area-inset-bottom)); width: min(300px, 82vw); height: min(40vh, 380px); z-index: 11; display: none; flex-direction: column; --slant: 14px; }
 .chat.open { display: flex; }
@@ -308,7 +308,7 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 
 /* now playing ticker */
 .now-playing, .now-playing.glass.slant { position: fixed; left: 50%; top: calc(124px + env(safe-area-inset-top)); transform: translateX(-50%); z-index: 60; display: flex; align-items: baseline; gap: 8px; padding: 7px 16px 7px 12px; --slant: 10px; white-space: nowrap; max-width: 94vw; overflow: hidden; pointer-events: none; animation: np-in 6.5s ease forwards; z-index: 45; }
-.np-label { font-family: var(--display); font-weight: 700; font-size: 10px; letter-spacing: .16em; color: var(--gold); }
+.np-label { font-family: var(--display); font-weight: 700; font-size: 11px; letter-spacing: .16em; color: var(--gold); }
 .np-title { font-family: var(--display); font-weight: 800; font-size: 17px; letter-spacing: .03em; color: var(--pp-ink); text-shadow: 0 0 10px rgba(var(--edge-rgb),.8); overflow: hidden; text-overflow: ellipsis; }
 .np-by { font-size: 13px; color: var(--muted); }
 .np-eq { display: inline-flex; gap: 2px; align-items: flex-end; height: 12px; align-self: center; }
@@ -335,8 +335,8 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .table-screen.short .bug { display: flex; align-items: center; gap: 10px; padding: 2px 12px; max-width: 860px; margin: 0 auto; --slant: 9px; }
 .table-screen.short .plate { --ring-d: 30px; }
 .table-screen.short .plate-name { font-size: 14px; gap: 4px; }
-.table-screen.short .plate .chip { font-size: 10px; padding: 0 5px; }
-.table-screen.short .plate .chip.notice { font-size: 9px; padding: 1px 4px; }
+.table-screen.short .plate .chip { font-size: 11px; padding: 0 5px; }
+.table-screen.short .plate .chip.notice { font-size: 11px; padding: 1px 4px; }
 .table-screen.short .vbubble { width: 52px; height: 52px; left: -8px; }
 .table-screen.short .vbubble.self { width: 48px; height: 48px; left: -6px; }
 .table-screen.short .vb-icon { font-size: 20px; } /* centered above partner cards — Demetrius 2026-10-19 */
@@ -580,8 +580,9 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .nuke-banner { position: absolute; left: 50%; top: 18%; transform: translateX(-50%); text-align: center; pointer-events: auto; cursor: pointer; animation: nb-in 3.3s cubic-bezier(.2,.8,.2,1) .45s both; }
 .nuke-banner.calm { animation-delay: .05s; }
 .nuke-banner .nb-title { position: relative; font: 900 clamp(40px, 9vw, 104px)/1 var(--display, 'Bebas Neue', Impact, sans-serif); letter-spacing: .14em; white-space: nowrap;
-  background: linear-gradient(180deg, var(--pp-x-gold-2) 0%, var(--pp-ink) 30%, var(--pp-x-amber-12) 52%, var(--pp-x-red-1) 70%, var(--pp-ink) 86%, var(--pp-ink) 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  background: linear-gradient(180deg, var(--pp-x-gold-2) 0%, var(--pp-ink) 30%, var(--pp-x-amber-12) 52%, var(--pp-x-red-1) 70%, var(--pp-ink) 86%, var(--pp-ink) 100%); -webkit-background-clip: text; background-clip: text; color: var(--pp-x-amber-12); /* solid fallback if text clipping is unsupported */
   -webkit-text-stroke: 1px rgba(var(--pp-hi-rgb), .55); filter: drop-shadow(0 0 18px rgba(var(--pp-x-amber-11-rgb), .85)) drop-shadow(0 0 48px rgba(var(--pp-x-amber-9-rgb), .55)) drop-shadow(0 4px 2px rgba(var(--pp-glass-strong-rgb), .9)); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) { .nuke-banner .nb-title { color: transparent; } }
 .nuke-banner .nb-title::after { content: attr(data-text); position: absolute; inset: 0; background: linear-gradient(100deg, transparent 35%, rgba(var(--pp-hi-rgb),.95) 50%, transparent 65%); background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-stroke: 0; animation: nb-shine 1.6s ease-in-out .7s 2; }
 .nuke-banner .nb-sub { margin-top: 6px; font: 700 clamp(11px, 1.6vw, 15px)/1.2 system-ui, sans-serif; letter-spacing: .32em; text-transform: uppercase; color: var(--pp-ink); text-shadow: 0 0 10px rgba(var(--pp-x-amber-10-rgb), .9), 0 1px 2px rgb(var(--pp-shade-rgb)); }
 @keyframes nb-in { 0% { opacity: 0; transform: translateX(-50%) scale(1.5); filter: blur(8px) brightness(3); } 10% { opacity: 1; transform: translateX(-50%) scale(1); filter: none; } 85% { opacity: 1; transform: translateX(-50%) scale(1.06); } 100% { opacity: 0; transform: translateX(-50%) scale(1.1); } }
@@ -622,7 +623,7 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 @media (prefers-reduced-motion: reduce) { .tod { animation: none; opacity: 1; } }
 .notice-pill { font-family: var(--display); font-style: normal; font-weight: 800; font-size: 11px; letter-spacing: .08em; color: var(--pp-x-red-23); background: rgba(var(--pp-x-red-8-rgb), .18); border: 1px solid rgba(var(--pp-x-red-8-rgb), .75); border-radius: 999px; padding: 2px 8px; }
 /* "Bid 8 · Took 6 · SET · −80": the score pad's words, one readable line */
-.nil-tag { font-style: normal; font-weight: 800; font-size: 10px; padding: 0 3px; border-radius: 2px; background: var(--purple); color: var(--pp-on-fill); }
+.nil-tag { font-style: normal; font-weight: 800; font-size: 11px; padding: 0 3px; border-radius: 2px; background: var(--purple); color: var(--pp-on-fill); }
 /* Compact elimination cards have no tape lane. The extra bottom padding is the lower-left hole's seat, clear of the player line. */
 @keyframes tt-shuffle { 0%, 100% { transform: translateX(0); } 40% { transform: translateX(-16px) rotate(-8deg); } 60% { transform: translateX(-2px); } }
 .tt-avatar { width: 46%; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(135deg, var(--purple), var(--pp-surface)); box-shadow: 0 0 0 2px rgba(var(--pp-hi-rgb),.3); font-family: var(--display); font-weight: 800; font-size: clamp(20px, 5vw, 38px); }
@@ -655,13 +656,13 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .sound-dock { z-index: 1050; }
 .av-bar.offline .av-btn { opacity: .45; cursor: not-allowed; filter: grayscale(.6); }
 .av-bar.offline { cursor: help; }
-.mic-limited { align-self: center; font-family: var(--display); font-weight: 800; font-size: 10px; letter-spacing: .1em; padding: 2px 6px; border-radius: 3px; color: var(--pp-primary-ink); background: var(--gold); white-space: nowrap; }
+.mic-limited { align-self: center; font-family: var(--display); font-weight: 800; font-size: 11px; letter-spacing: .1em; padding: 2px 6px; border-radius: 3px; color: var(--pp-primary-ink); background: var(--gold); white-space: nowrap; }
 .vb-badge.limited { background: var(--gold); }
-.tt-tag { position: absolute; right: 5px; top: 5px; font-size: 10px; font-weight: 800; padding: 1px 5px; border-radius: 3px; background: rgba(var(--pp-shade-rgb),.55); }
+.tt-tag { position: absolute; right: 5px; top: 5px; font-size: 11px; font-weight: 800; padding: 1px 5px; border-radius: 3px; background: rgba(var(--pp-shade-rgb),.55); }
 .music-card { display: flex; align-items: center; gap: 8px; padding: 6px 10px; text-decoration: none; color: inherit; box-shadow: inset 0 0 0 1px rgba(var(--pp-brand-spotify-rgb), .6); border-radius: 8px; }
 .music-card .mc-icon { font-size: 20px; color: var(--pp-brand-spotify); }
 .music-card .mc-text { display: flex; flex-direction: column; min-width: 0; }
-.music-card .mc-text small { font-size: 9px; letter-spacing: .12em; color: var(--muted); font-weight: 800; }
+.music-card .mc-text small { font-size: 11px; letter-spacing: .12em; color: var(--muted); font-weight: 800; }
 .music-card .mc-text b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px; }
 .music-card .mc-open { margin-left: auto; font-size: 11px; font-weight: 800; color: var(--pp-brand-spotify); white-space: nowrap; }
 .music-card.compact { padding: 4px 8px; }
@@ -684,10 +685,10 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 /* "?" help lives in the scorebug (keeps the bottom-right control cluster clear of the hand) */
 /* MIC LIMITED rides on the mic button instead of widening the cluster */
 .av-bar { position: relative; }
-.av-bar .mic-limited { position: absolute; right: 0; top: -13px; font-size: 8px; padding: 1px 4px; pointer-events: none; z-index: 1; }
+.av-bar .mic-limited { position: absolute; right: 0; top: -13px; font-size: 11px; padding: 1px 4px; pointer-events: none; z-index: 1; }
 /* very narrow phones (≤ 340 px, e.g. iPhone SE 1st gen / small Androids): compact plates + video bubbles */
 @media (max-width: 340px) {
-  .plate .chip { font-size: 9px; padding: 0 4px; letter-spacing: .04em; }
+  .plate .chip { font-size: 11px; padding: 0 4px; letter-spacing: .04em; }
   .plate-name { font-size: 12.5px !important; }
   .plate { --ring-d: 26px; --ring-pad: 8px; }
   .plate .vbubble { width: 44px !important; height: 44px !important; left: -6px; }
@@ -919,7 +920,7 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 /* Same wash, same theft, milder symptom: Blind Nil's .danger red (class only) was
    stripped inside the panel the same way — its white label survived on plum, its
    danger paint did not. Restored, scoped to the panel it lives in. */
-.badge-unlock { position: fixed; top: 18%; left: 50%; transform: translateX(-50%); z-index: 1150; display: flex; gap: 12px; align-items: center; padding: 12px 18px; border: 1px solid rgba(var(--gold-rgb),.8); box-shadow: 0 0 30px rgba(var(--gold-rgb),.45); cursor: pointer; animation: bu-in .5s cubic-bezier(.2,1.4,.4,1) both; }
+.badge-unlock { position: fixed; top: 18%; left: 50%; transform: translateX(-50%); z-index: 1150; display: flex; gap: 12px; align-items: center; padding: 12px 18px; border: 1px solid rgba(var(--gold-rgb),.8); box-shadow: 0 0 30px rgba(var(--gold-rgb),.45); cursor: pointer; animation: bu-in .5s cubic-bezier(.2,1.3,.4,1) both; }
 .badge-unlock small { color: var(--gold); font-weight: 800; letter-spacing: .14em; font-size: 11px; }
 .badge-unlock b { font-family: var(--display); font-size: 24px; font-style: italic; }
 .badge-unlock i { font-style: normal; color: var(--muted); font-size: 13px; }
@@ -1028,7 +1029,7 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .bwm-seat-plate { width: 100%; max-width: 96px; height: 64px; border-radius: 14px; display: grid; place-items: center; padding: 6px 5px; background: linear-gradient(160deg, color-mix(in srgb, var(--uc) 34%, var(--pp-surface)), var(--pp-surface) 78%); border: 1px solid color-mix(in srgb, var(--uc) 55%, transparent); box-shadow: inset 0 1px 0 rgba(var(--pp-hi-rgb), .1), 0 10px 22px rgba(var(--pp-shade-rgb), .45); }
 .bwm-seat-plate-name { font-family: var(--display); font-weight: 800; font-size: 12.5px; line-height: 1.18; letter-spacing: .03em; color: var(--pp-ink); text-align: center; overflow-wrap: anywhere; }
 .bwm-seat-name { font-family: var(--display); font-weight: 700; font-size: 12.5px; line-height: 1.1; letter-spacing: .04em; color: var(--ink); text-align: center; overflow-wrap: anywhere; }
-.bwm-seat-tag { font-size: 10.5px; line-height: 1.2; color: var(--ink); opacity: .72; text-align: center; overflow-wrap: anywhere; }
+.bwm-seat-tag { font-size: 12px; line-height: 1.35; color: var(--ink); opacity: .72; text-align: center; overflow-wrap: anywhere; }
 
 /* Versus intro (boxing match card): the two sides' pics smash together at center,
    then the Tale of the Tape reveals. Transforms/opacity only. Beat sheet (synced
@@ -1061,7 +1062,7 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .versus-face > span { border-radius: 50%; }
 .versus-side-names { font-size: 13px; font-weight: 600; color: var(--ink); opacity: .92; text-align: center; }
 .versus-vs { position: absolute; left: 50%; top: 52%; z-index: 3; transform: translate(-50%, -50%); font: 900 44px/1 var(--display); font-style: italic; letter-spacing: .02em; color: var(--pp-ink);
-  text-shadow: 0 0 18px rgba(var(--gold-rgb), .85), 0 2px 0 var(--gold), 0 6px 18px rgba(var(--pp-shade-rgb),.6); animation: versus-vs-in .45s cubic-bezier(.2,1.6,.4,1) 1.44s both; }
+  text-shadow: 0 0 18px rgba(var(--gold-rgb), .85), 0 2px 0 var(--gold), 0 6px 18px rgba(var(--pp-shade-rgb),.6); animation: versus-vs-in .45s cubic-bezier(.2,1.3,.4,1) 1.44s both; }
 @keyframes versus-vs-in { from { transform: translate(-50%, -50%) scale(2.6); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
 .versus-flash { position: absolute; left: 50%; top: 52%; z-index: 1; width: 240px; height: 240px; transform: translate(-50%, -50%); border-radius: 50%; pointer-events: none; opacity: 0;
   background: radial-gradient(circle, rgba(var(--pp-hi-rgb),.95) 0%, rgba(var(--gold-rgb), .5) 34%, transparent 68%); animation: versus-flash-pop .4s ease-out 1.48s both; }
@@ -1078,7 +1079,7 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .versus-pot.only { animation: versus-tape-in .45s cubic-bezier(.2,1.3,.4,1) 2.2s both; font-size: 15px; }
 .versus-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; padding: 5px 2px; border-top: 1px solid rgba(var(--edge-rgb), .16); animation: versus-row-in .35s ease-out both; }
 @keyframes versus-row-in { from { transform: translateY(7px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.versus-row-label { font: 700 10.5px/1 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-align: center; }
+.versus-row-label { font: 700 11px/1 var(--display); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-align: center; }
 .versus-cell { font: 800 17px/1 var(--display); color: var(--ink); }
 .versus-cell.a { text-align: right; }
 .versus-cell.b { text-align: left; }
@@ -1247,7 +1248,7 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
   transform: translateY(14px) scale(.98); animation: rw-card-in .4s cubic-bezier(.2,.9,.3,1.2) forwards; }
 @keyframes rw-card-in { to { transform: none; } }
 .rw-head { display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
-.rw-trophy { font-size: 44px; line-height: 1; animation: rw-pop .5s cubic-bezier(.2,.9,.3,1.4) both; }
+.rw-trophy { font-size: 44px; line-height: 1; animation: rw-pop .5s cubic-bezier(.2,.9,.3,1.3) both; }
 @keyframes rw-pop { from { transform: scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
 .rw-head h2 { margin: 0; font-family: var(--display); font-weight: 900; letter-spacing: .06em; text-transform: uppercase;
   font-size: clamp(34px, 9vw, 52px); line-height: 1; }
@@ -1269,7 +1270,7 @@ select { background: var(--field); color: var(--ink); border: 1px solid rgba(var
 .rw-num.down { color: var(--pp-x-red-15); }
 .rw-num.small { font-size: 15px; color: var(--muted); }
 .rw-sub { font-family: var(--display); font-size: 12.5px; letter-spacing: .06em; color: var(--muted); }
-.rw-levelup { color: var(--gold); font-weight: 800; animation: rw-pop .5s .3s cubic-bezier(.2,.9,.3,1.4) both; }
+.rw-levelup { color: var(--gold); font-weight: 800; animation: rw-pop .5s .3s cubic-bezier(.2,.9,.3,1.3) both; }
 .rw-levelbar { height: 8px; border-radius: 4px; background: rgba(var(--pp-hi-rgb),.1); overflow: hidden; }
 .rw-levelbar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--purple-hot), var(--gold));
   transition: width 1.1s cubic-bezier(.2,.8,.3,1); }
@@ -1504,7 +1505,7 @@ button.mode-pick::after, button.quiet-row::after { content: ''; position: absolu
 .soc-coin-chip { font-size: 13px; padding: 4px 9px; border-radius: 999px; background: rgba(var(--gold-rgb),.12); border: 1px solid rgba(var(--gold-rgb),.45); color: var(--gold); font-weight: 600; }
 .xp-bar { position: relative; height: 10px; border-radius: 6px; background: rgba(var(--pp-hi-rgb),.1); margin-top: 6px; overflow: hidden; }
 .xp-bar i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--purple), var(--gold)); border-radius: 6px; }
-.xp-bar small { position: absolute; right: 6px; top: -1px; font-size: 9px; color: var(--pp-ink); }
+.xp-bar small { position: absolute; right: 6px; top: -1px; font-size: 9px; /* exception: drawn inside the 10px-tall XP bar */ color: var(--pp-ink); }
 /* Rep block legibility pass (owner, 2026-10-24, annotated profile screenshot:
    "This bar needs to be thicker so the numbers can be larger for legibility").
    On the full profile (ProfileView — /profile and the Social profile share the
@@ -2328,8 +2329,8 @@ html[data-fx="neon"] .sheet .vol-slider::-moz-range-progress { background: var(-
 @media (min-width: 341px) and (max-width: 480px) {
   .table-screen:not(.short) .badge-layer .plate:not(:has(> .vbubble)) { --ring-d: 30px; }
   .table-screen:not(.short) .badge-layer .plate-name { font-size: 13.5px; letter-spacing: .03em; gap: 4px; }
-  .table-screen:not(.short) .badge-layer .plate .chip { font-size: 10px; padding: 1px 5px; letter-spacing: .05em; }
-  .table-screen:not(.short) .badge-layer .plate-name .chip { font-size: 9px; padding: 1px 4px; letter-spacing: .03em; }
+  .table-screen:not(.short) .badge-layer .plate .chip { font-size: 11px; padding: 1px 5px; letter-spacing: .05em; }
+  .table-screen:not(.short) .badge-layer .plate-name .chip { font-size: 11px; padding: 1px 4px; letter-spacing: .03em; }
   /* Video-bubble plates (owner 2026-10-24): the compact body rule above is UNGUARDED,
      so in this one context it silently out-specified the bubble's own clearance
      (.plate:has(> .vbubble) .plate-body { margin-left: 26px } in online.css) and the
@@ -2978,7 +2979,7 @@ body:has(.modal-backdrop) .setup-bar { visibility: hidden; }
 .pp-stock .card-back { position: absolute; inset: 0; }
 .pp-stock-n { position: relative; min-width: 30px; padding: 2px 6px; border-radius: 999px; text-align: center; font-size: 15px; font-weight: 800; background: var(--pp-plate); color: var(--pp-ink); }
 .pp-pot { font-size: 13px; font-weight: 700; color: var(--pp-lav); }
-.pp-wild { position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); font-style: normal; font-size: 10px; font-weight: 800; letter-spacing: .06em; padding: 1px 5px; border-radius: 6px; background: var(--pp-primary); color: var(--pp-primary-ink); pointer-events: none; }
+.pp-wild { position: absolute; left: 50%; bottom: -8px; transform: translateX(-50%); font-style: normal; font-size: 11px; font-weight: 800; letter-spacing: .06em; padding: 1px 5px; border-radius: 6px; background: var(--pp-primary); color: var(--pp-primary-ink); pointer-events: none; }
 .pp-last, .pp-event { margin: 0; text-align: center; font-size: 13px; color: var(--pp-lav); }
 .pp-result { padding: 14px; border-radius: 14px; background: var(--pp-surface-2); border: 1px solid rgba(var(--pp-edge-rgb), .45); display: flex; flex-direction: column; gap: 10px; }
 .pp-result h2 { margin: 0; font-size: 18px; text-align: center; }
@@ -3014,3 +3015,17 @@ button.tk-spread { cursor: pointer; }
 .pp-reshuffle { margin: 0; text-align: center; font-weight: 600; opacity: .85; animation: pp-fade 700ms ease-out both; }
 @keyframes pp-fade { 0% { opacity: 0; } 25%, 75% { opacity: .85; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .pp-reshuffle { display: none; } }
+
+/* ================= Small-text / polish pass (Impeccable REPORT.md, approved Oct 27) =================
+   1. Settings: the section groups were cards inside the sheet's card. They are now plain sections
+      separated by a hairline divider (no card-in-card). Rows keep their 44px floor.
+   2. Reduced motion: every animation and transition in the app collapses to an instant change when the
+      OS asks for reduced motion (the per-component rules above stay; this is the global backstop). */
+.set-group, html[data-fx="neon"] .set-group {
+  margin-top: 6px; padding: 10px 2px 8px; border: 0; border-radius: 0; background: none; box-shadow: none;
+  border-top: 1px solid var(--pp-line);
+}
+.sheet-body > .set-group:first-child { border-top: 0; margin-top: 0; padding-top: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+}
