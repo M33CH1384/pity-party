@@ -19,7 +19,8 @@ async function toTable(p: Page, q = '') {
 
 const b = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
 const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
-await ctx.addInitScript(() => { localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} })); });
+await ctx.addInitScript(() => { localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} }));
+  const w = window as unknown as { __seen: Set<string> }; w.__seen = new Set(); new MutationObserver(() => document.querySelectorAll<HTMLElement>('[data-testid="my-hand"] .pcard[data-card]').forEach((e) => w.__seen.add(e.dataset.card!))).observe(document, { subtree: true, childList: true, attributes: true }); });
 const p = await ctx.newPage();
 const scene: string[] = []; p.on('request', (r) => { if (/PPScene-/.test(r.url())) scene.push(r.url()); });
 
@@ -36,6 +37,13 @@ ok(await renderer(p) === '3d', 'default (WebGL2): 3D layer drew its first frame'
 ok(await p.locator('.table3d-layer canvas').count() === 1, 'default: one canvas under the HUD');
 ok(await p.getByTestId('trick-area').isVisible(), 'default: 2D HUD still mounted on top');
 ok(scene.length > 0, 'default: PPScene chunk loaded lazily');
+// V10c: the 3D fan only ever paints faces the DOM hand showed this seat (its own hand)
+await p.waitForFunction(() => document.querySelector('[data-testid="mode-screen"]')?.getAttribute('data-hand3d') === 'on', null, { timeout: 8000 }).catch(() => {});
+await p.waitForTimeout(6000); // bots play a few turns
+const leak = await p.evaluate(() => { const w = window as unknown as { __pp3dFaces?: string[]; __seen?: Set<string> }; return { faces: w.__pp3dFaces ?? [], seen: [...(w.__seen ?? [])] }; });
+ok(leak.faces.length > 0, `3D hand drew ${leak.faces.length} own faces`);
+ok(leak.faces.every((f) => leak.seen.includes(f)), `no 3D face outside this seat's own DOM hand (${leak.faces.filter((f) => !leak.seen.includes(f)).join(',') || 'none'})`);
+ok(await p.locator('[data-testid="my-hand"] [data-testid^="pp-card-"]').count() > 0 && await p.locator('[data-testid="my-hand"] .card-face[aria-label], [data-testid="my-hand"] .pcard-btn[aria-label]').count() > 0, 'DOM hand stays in the tree as the labelled, test-id input layer');
 
 const pc = await b.newContext({ viewport: { width: 390, height: 844 } });
 await pc.addInitScript(() => { localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} })); localStorage.setItem('pp.table3d.v1', '2d'); });

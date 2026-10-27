@@ -12,6 +12,8 @@ import {
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { buildTable, FD, FELTY, FW, type Quality, type Table, type TableTextures } from './table';
 import { themeUniforms, watchTheme, type ThemeId, type ThemeUniforms } from './themeUniforms';
+import { HandFan } from './HandFan';
+import type { MirrorCard } from './handMirror';
 
 export { FELTY, FW, FD };
 
@@ -80,7 +82,7 @@ function Rig() {
   return null;
 }
 
-function World({ quality, onReady }: { quality: Quality; onReady: () => void }) {
+function World({ quality, onReady, hand, onHand }: { quality: Quality; onReady: () => void; hand: MirrorCard[]; onHand: (on: boolean) => void }) {
   const { scene, gl, size, invalidate } = useThree();
   const aspect = size.width / Math.max(1, size.height);
   const cz = cloverZ(aspect);
@@ -135,11 +137,12 @@ function World({ quality, onReady }: { quality: Quality; onReady: () => void }) 
       <primitive object={lights.key} />
       <primitive object={lights.key.target} />
       <primitive object={table.group} />
+      <HandFan cards={hand} u={u} onDrawn={onHand} />
     </>
   );
 }
 
-export function PPScene({ onFirstFrame, onContextLost, quality = 'high' }: { onFirstFrame: () => void; onContextLost: () => void; quality?: Quality }) {
+export function PPScene({ onFirstFrame, onContextLost, quality = 'high', hand = [], onHand = () => {} }: { onFirstFrame: () => void; onContextLost: () => void; quality?: Quality; hand?: MirrorCard[]; onHand?: (on: boolean) => void }) {
   const high = quality === 'high';
   return (
     <Canvas
@@ -155,7 +158,7 @@ export function PPScene({ onFirstFrame, onContextLost, quality = 'high' }: { onF
       }}
     >
       <Rig />
-      <World quality={quality} onReady={onFirstFrame} />
+      <World quality={quality} onReady={onFirstFrame} hand={hand} onHand={onHand} />
     </Canvas>
   );
 }
