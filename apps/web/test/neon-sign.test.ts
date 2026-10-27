@@ -17,7 +17,7 @@ describe('neon sign assets', () => {
     }
     expect(existsSync(join(pub, 'home-off.webp'))).toBe(true);
   });
-  it('theme + Lounge colour pick the file; B uses the unlit layer render; custom hues use the nearest preset', () => {
+  it('theme + Lounge colour pick the file; B uses its painted enamel render; custom hues use the nearest preset', () => {
     expect(signPair('A', resolveAccent({ id: 'magenta', follow: true }))).toBe('A');
     expect(signPair('B', resolveAccent({ id: 'blue', follow: true }))).toBe('B');
     expect(signPair('K', resolveAccent({ id: 'ember', follow: true }))).toBe('K');
