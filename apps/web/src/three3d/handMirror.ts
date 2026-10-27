@@ -4,7 +4,7 @@
  * exactly the DOM cards' rects. Only cards the DOM already shows this seat are read (its OWN hand: the views never
  * render another seat's faces), so the 3D layer can't know a hidden card. First-load side: no three import.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 export interface Rect { x: number; y: number; w: number; h: number }
 export interface MirrorCard {
@@ -72,4 +72,19 @@ export function useHandMirror(root: HTMLElement | null): MirrorCard[] {
     return () => { mo.disconnect(); ro.disconnect(); window.removeEventListener('scroll', kick, true); window.removeEventListener('resize', kick); root.removeEventListener('transitionend', kick, true); if (raf) cancelAnimationFrame(raf); };
   }, [root]);
   return cards;
+}
+
+/** V10d: the public Pitty Pat table snapshot (`data-t3d` on the mode table), parsed; null when absent. */
+export interface TableSnap { n: number; me: number | null; turn: number | null; ph: string; up: [string, boolean] | null; st: number; hc: number[]; sh: string[][]; pt: number[]; tg: number | null; on: boolean[]; nm: string[]; ev: [string, number | null, number] | null }
+export function useTableMirror(root: HTMLElement | null): TableSnap | null {
+  const [raw, setRaw] = useState<string | null>(null);
+  useEffect(() => {
+    if (!root) return;
+    const read = () => setRaw(root.querySelector<HTMLElement>('[data-t3d]')?.dataset.t3d ?? null);
+    const mo = new MutationObserver(read);
+    mo.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ['data-t3d'] });
+    read();
+    return () => mo.disconnect();
+  }, [root]);
+  return useMemo(() => { try { return raw ? (JSON.parse(raw) as TableSnap) : null; } catch { return null; } }, [raw]);
 }

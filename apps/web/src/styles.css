@@ -3029,30 +3029,3 @@ button.tk-spread { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
-
-/* V10a 3D shell: the canvas sits under the always-mounted 2D table (HUD + fallback) at z -1 in the root
-   stacking context (no isolation: fixed HUD bits like the chat tab keep their global z-index). The screen
-   background and the 2D felt go see-through only after the first 3D frame (data-renderer="3d"). */
-.mode-screen[data-renderer="3d"] { background: transparent; }
-.table3d-layer { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-.table3d-layer canvas { display: block; }
-.mode-screen[data-renderer="3d"] .pp-center,
-html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { background: transparent; box-shadow: none; }
-/* the background ink shares z -1 and comes later in the DOM: hide it while the 3D table is up (it would cover the felt) */
-html:has(.mode-screen[data-renderer="3d"]) :is(.ink-canvas, .ink-fallback) { visibility: hidden; }
-/* body paints over z -1 when it has its own background (theme B); the html background stays under the canvas */
-html:has(.mode-screen[data-renderer="3d"]) body { background: transparent; }
-/* V10b: HUD text over the 3D felt reads on a plate (3D only; the 2D table is unchanged). Plates use --pp-plate
-   (B: light solid plate + 1.5px ink edge, spec §5); B's accent text uses the darker --pp-3d-text-accent (4.85:1). */
-html[data-theme] .mode-screen[data-renderer="3d"] :is(.pp-label, .pp-event, .turn-line, .pp-wait, .pp-last, .pp-pot, .trick-empty) {
-  background: var(--pp-plate); color: var(--pp-ink); border-radius: 8px; padding: 2px 8px; width: fit-content; max-width: 100%; margin-inline: auto; text-shadow: none;
-}
-html[data-theme="B"] .mode-screen[data-renderer="3d"] :is(.pp-label, .pp-event, .turn-line, .pp-wait, .pp-last, .pp-pot, .trick-empty) { box-shadow: 0 0 0 1.5px var(--pp-ink); }
-html[data-theme="B"] .mode-screen[data-renderer="3d"] .turn-line { color: var(--pp-3d-text-accent); }
-html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: transparent; }
-/* V10c: the 3D fan draws the hand at the DOM cards' rects. The DOM hand stays the input + a11y layer: its faces
-   go see-through (buttons keep their labels, focus ring and test ids) and each tap target grows to ≥ 60px. */
-.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard { opacity: 0; outline-color: transparent; }
-.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard-btn { position: relative; opacity: 1; }
-.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard-btn::after { content: ""; position: absolute; inset: -4px; min-height: 60px; }
-.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand .pcard-btn:focus-visible { outline: 3px solid var(--pp-accent); outline-offset: 3px; }
