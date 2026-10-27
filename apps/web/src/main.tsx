@@ -24,6 +24,7 @@ import EntryFlow from './EntryFlow';
 import './fonts.css';
 import './theme.css';
 import './styles.css';
+import './buttons.css';
 
 // Route chunks load through importChunk: a deploy deletes the previous build's hashed
 // chunks, so a page opened before the deploy (an invite landing in a long-lived tab is
