@@ -106,10 +106,10 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
       const plate = { name: s.nm[seat] ?? `Seat ${seat + 1}`, pts: `${s.pt[seat] ?? 0}${s.tg !== null ? `/${s.tg}` : ''}`, sub, turn: !end && s.turn === seat, out: s.on[seat] === false, me: seat === s.me,
         hi: !!end && (seat === end[1] || (end[0] === 'caught' && seat === end[2])) };
       if (!slot) { // my seat: plate only (my own pairs are listed on the DOM side, never on the near felt)
-        if (L.me && seat === s.me) billboard(plateTexture(plate), at(L.me.plate, 0.05), L.portrait ? 0.36 : 0.5, L.portrait ? 0.126 : 0.175, `plate-${seat}`);
+        if (L.me && seat === s.me) billboard(plateTexture(plate), at(L.me.plate, 0.14), L.portrait ? 0.36 : 0.5, L.portrait ? 0.126 : 0.175, `plate-${seat}`);
         continue;
       }
-      billboard(plateTexture(plate), at(slot.plate, 0.07), 0.5, 0.175, `plate-${seat}`);
+      billboard(plateTexture(plate), at(slot.plate, 0.17), 0.5, 0.175, `plate-${seat}`);
       // opponent hand: backs only, a small fan (count capped at 5) under the plate
       const nb = Math.min(5, s.hc[seat] ?? 0);
       for (let k = 0; k < nb; k++) { const g = card(null, at(slot.backs, 0.001 + k * 0.0008).add(new Vector3((k - (nb - 1) / 2) * 0.035, 0, 0)), 0.55, `backs-${seat}`); g.rotateZ(((k - (nb - 1) / 2) * 6 * Math.PI) / 180); }

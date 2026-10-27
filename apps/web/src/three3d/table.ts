@@ -66,23 +66,27 @@ export interface Table {
 }
 
 /** Build the table. `cz` = clover centre z (portrait .02, landscape −.26 per §3/§4). */
-export function buildTable(q: Quality, tx: TableTextures, cz: number): Table {
+/** V10g felt size: landscape / iPad the full 2.97 × 1.78; portrait narrowed to 1.95 × 2.1 so the seats fit (table-v2 NOTES). */
+export const feltSize = (portrait: boolean): [number, number] => (portrait ? [1.95, 2.1] : [FW, FD]);
+
+export function buildTable(q: Quality, tx: TableTextures, cz: number, portrait = false): Table {
+  const [W, D] = feltSize(portrait);
   const group = new Group(); group.name = 'pp-table';
   const disposables: { dispose(): void }[] = [];
   const add = (m: Mesh) => { group.add(m); disposables.push(m.geometry); return m; };
   const shadows = q === 'high';
 
-  // wood top (BWM dining-table top stand-in), rail ring, felt, trim
-  const woodM = new MeshStandardMaterial({ map: tx.wood, roughness: 0.6 }); disposables.push(woodM);
-  add(new Mesh(slab(FW + 0.3, FD + 0.24, 0.2, 0.06, TOPY, 0.01), woodM)).receiveShadow = shadows;
-  const railM = new MeshPhysicalMaterial({ roughness: 0.45, clearcoat: 1, clearcoatRoughness: 0.15 }); disposables.push(railM);
-  const rail = add(new Mesh(slab(FW + 0.16, FD + 0.16, 0.16, 0.04, TOPY + 0.044, 0.018, [FW - 0.03, FD - 0.03, 0.09]), railM));
+  // V10g (table-v2): thick lacquered rail (.16 wide, .11 tall, clearcoat) on a black apron, over a dark pedestal
+  const RW = 0.16, RT = FELTY + 0.07;
+  const woodM = new MeshPhysicalMaterial({ roughness: 0.4, clearcoat: 0.6 }); disposables.push(woodM);
+  add(new Mesh(slab(W + RW * 2 + 0.02, D + RW * 2 + 0.02, 0.25, 0.07, RT - 0.12, 0.01), woodM)).receiveShadow = shadows;
+  const ped = add(new Mesh(slab(W * 0.55, D * 0.5, 0.2, FELTY - 0.1, FELTY - 0.1), woodM)); ped.castShadow = shadows;
+  const railM = new MeshPhysicalMaterial({ roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.12, envMapIntensity: 0.5 }); disposables.push(railM);
+  const rail = add(new Mesh(slab(W + RW * 2, D + RW * 2, 0.24, 0.11, RT, 0.035, [W - 0.01, D - 0.01, 0.11]), railM));
   rail.castShadow = shadows; rail.receiveShadow = shadows;
   const feltM = new MeshPhysicalMaterial({ roughness: 0.95, sheen: 1, sheenRoughness: 0.45, normalMap: tx.suedeNor, roughnessMap: tx.suedeRough, normalScale: new Vector2(0.8, 0.8) });
   disposables.push(feltM);
-  add(new Mesh(slab(FW, FD, 0.1, 0.03, FELTY), feltM)).receiveShadow = shadows;
-  const trimM = new MeshStandardMaterial({ metalness: 0.9, roughness: 0.3 }); disposables.push(trimM);
-  add(new Mesh(slab(FW + 0.03, FD + 0.03, 0.11, 0.004, TOPY + 0.0515), trimM));
+  add(new Mesh(slab(W, D, 0.1, 0.03, FELTY), feltM)).receiveShadow = shadows;
 
   // clover: inner disc + lip ring + baked inlay decal (§2; 1 world = 880px of the 1024 PNG, z squashed .92)
   const discM = new MeshPhysicalMaterial({ roughness: 0.95, sheen: 1 }); disposables.push(discM);
@@ -123,12 +127,12 @@ export function buildTable(q: Quality, tx: TableTextures, cz: number): Table {
   }
   { const ring: Vector3[] = []; for (let i = 0; i < 160; i++) { const a = (i / 160) * Math.PI * 2; ring.push(new Vector3(Math.cos(a) * (CLOVER_R + 0.03), FELTY + 0.004, cz + Math.sin(a) * (CLOVER_R + 0.03) * 0.92)); } tube(ring, 'accent2', 0.0025, 1.4, true, 240); }
   { const sw: Vector3[] = []; for (let i = 0; i <= 40; i++) { const a = Math.PI / 2 + (i / 40 - 0.5) * 1.1; sw.push(new Vector3(Math.cos(a) * (CLOVER_R + 0.03), FELTY + 0.006, cz + Math.sin(a) * (CLOVER_R + 0.03) * 0.92)); } tube(sw, 'accent', 0.0065, 7, false, 80); }
-  // C: neon rail tube along the trim line (rounded rect)
-  const railTube = (() => {
-    const pts = rr(FW + 0.05, FD + 0.05, 0.12).getPoints(24).map((v) => new Vector3(v.x, TOPY + 0.056, v.y));
-    pts.pop();
-    const before = tubes.length; tube(pts, 'accent', 0.005, 2.2 / 0.32, true, 400); return tubes[before]!;
-  })();
+  // V10g rail tubes: accent on the outer rail lip, accent-2 at the felt edge (every theme; B / K read as metal)
+  const ringPts = (w: number, d: number, r: number, y: number) => { const p = rr(w, d, r).getPoints(30).map((v) => new Vector3(v.x, y, v.y)); p.pop(); return p; };
+  const railTubes = tubes.length;
+  tube(ringPts(W + RW * 2 + 0.08, D + RW * 2 + 0.08, 0.28, RT - 0.01), 'accent', 0.009, 4.5, true, 360);
+  tube(ringPts(W - 0.09, D - 0.09, 0.1, RT + 0.03), 'accent2', 0.0055, 3.2, true, 360);
+  const isRailTube = (i: number) => i >= railTubes;
 
   // underglow + centre spot (High only, §1c)
   const glowPlanes: { mesh: Mesh; base: number; color: 'accent' | 'accent2' }[] = [];
@@ -149,8 +153,9 @@ export function buildTable(q: Quality, tx: TableTextures, cz: number): Table {
 
   let gingham: CanvasTexture | null = null;
   const applyTheme = (u: ThemeUniforms, inlayTex: Texture | null) => {
-    woodM.color.copy(u.wood);
-    railM.color.copy(u.rail); railM.roughness = u.railRough; railM.sheen = u.railSheen; railM.sheenColor.copy(u.railSheenColor);
+    woodM.color.copy(u.wood).multiplyScalar(0.25);
+    // oxblood lacquer: the rail token pulled toward the felt (B keeps its cream rail)
+    railM.color.copy(u.rail); if (u.theme !== 'B') railM.color.lerp(u.felt, 0.4).multiplyScalar(0.6); railM.roughness = Math.min(0.3, u.railRough); railM.sheen = 0;
     if (u.gingham) {
       gingham?.dispose(); gingham = ginghamTexture(u.felt, u.ginghamBand);
       feltM.map = gingham; feltM.color.set(1, 1, 1); feltM.roughness = 0.9; feltM.sheen = 0.4; feltM.sheenRoughness = 0.6; feltM.roughnessMap = null; feltM.normalScale.set(0.35, 0.35);
@@ -158,24 +163,23 @@ export function buildTable(q: Quality, tx: TableTextures, cz: number): Table {
       feltM.map = null; feltM.color.copy(u.felt); feltM.roughness = 0.95; feltM.sheen = 1; feltM.sheenRoughness = 0.45; feltM.roughnessMap = tx.suedeRough; feltM.normalScale.set(0.8, 0.8);
     }
     feltM.sheenColor.copy(u.feltSheen); feltM.needsUpdate = true;
-    trimM.color.copy(u.trim); trimM.emissive.copy(u.trimEmissive > 0 ? u.trim : new Color(0, 0, 0)); trimM.emissiveIntensity = u.trimEmissive;
-    lipM.color.copy(u.lip);
+        lipM.color.copy(u.lip);
     discM.color.copy(u.disc); discM.sheenColor.copy(u.accent).multiplyScalar(0.25);
     inlayM.map = inlayTex; inlayM.visible = !!inlayTex; inlayM.needsUpdate = true;
     const colorOf = (c: 'accent' | 'accent2' | 'spade') => (c === 'accent' ? u.accent : c === 'accent2' ? u.accent2 : u.spade);
-    for (const t of tubes) {
-      const m = t.mesh.material as MeshStandardMaterial; const c = colorOf(t.color);
-      const isRail = t === railTube;
-      t.mesh.visible = isRail ? u.theme === 'C' : true;
-      const ei = isRail ? u.trimEmissive : t.k * 0.32 * u.neon;
-      m.color.copy(c); m.emissive.copy(c); m.emissiveIntensity = ei; m.metalness = u.gingham ? 0.3 : 0;
+    tubes.forEach((t, i) => {
+      const m = t.mesh.material as MeshStandardMaterial; const rail = isRailTube(i);
+      // K: the rail tubes turn gold (the trim token); B never glows, its tubes are brass-like metal
+      const c = rail && u.theme === 'K' ? u.trim : colorOf(t.color);
+      const ei = u.glow ? t.k * (rail ? 0.22 : 0.32) * u.neon * (rail && u.theme === 'K' ? 0.4 : 1) : 0;
+      m.color.copy(c); m.emissive.copy(c); m.emissiveIntensity = ei; m.metalness = ei ? 0 : 0.8;
       for (const s of t.shells) {
         const sm = s.material as MeshBasicMaterial; sm.color.copy(c);
         sm.opacity = (s.userData.op as number) * Math.min(1, ei / 1.6);
         // §1c: shells only for emissive ≥ .5; B never glows
-        s.visible = t.mesh.visible && u.glow && ei >= 0.5;
+        s.visible = u.glow && ei >= 0.5;
       }
-    }
+    });
     for (const g of glowPlanes) { const m = g.mesh.material as MeshBasicMaterial; m.color.copy(colorOf(g.color)); m.opacity = g.base * u.neon; g.mesh.visible = u.glow; }
   };
   return { group, applyTheme, dispose: () => { gingham?.dispose(); disposables.forEach((d) => d.dispose()); } };

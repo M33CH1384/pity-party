@@ -68,7 +68,7 @@ describe('first script on a reload', () => {
     const reached = files.filter((f) => seen.has(f));
     const imports3 = (f: string) => valueImports(f).some((p) => p === 'three' || p.startsWith('three/') || p.startsWith('@react-three'));
     // the three-importing files exist (PPScene + its table / theme helpers) but none is on the first-load graph
-    expect(files.filter(imports3).map((f) => f.slice(dir.length + 1)).sort()).toEqual(['HandFan.tsx', 'PPScene.tsx', 'PPTable3D.tsx', 'cardGeometry.ts', 'cardTextures.ts', 'table.ts', 'themeUniforms.ts']);
+    expect(files.filter(imports3).map((f) => f.slice(dir.length + 1)).sort()).toEqual(['HandFan.tsx', 'PPScene.tsx', 'PPTable3D.tsx', 'cardGeometry.ts', 'cardTextures.ts', 'room.ts', 'table.ts', 'themeUniforms.ts']);
     expect(reached.filter(imports3)).toEqual([]);
     expect(reached.map((f) => f.slice(dir.length + 1)).sort()).toEqual(['Table3DLayer.tsx', 'preload.ts', 'renderer.ts']);
     // preload reaches PPScene only through a dynamic import()
