@@ -162,7 +162,7 @@ export function resolveProgram(moveClass: MoveClass): TransitionProgramId {
     case 'menu-nav':
     case 'screen':
     default:
-      return themeStore.get() === 'neon' ? 'ink' : 'spray';
+      return themeStore.get() === 'C' ? 'ink' : 'spray';
   }
 }
 

@@ -1,5 +1,5 @@
-/** The CSP is script-src 'self' (no 'unsafe-inline'): index.html must carry no inline script, and the pre-paint
- *  theme lives in /theme-boot.js, loaded blocking in <head> before any stylesheet/module, and still applies neon. */
+/** The CSP is script-src 'self' (no 'unsafe-inline'): index.html carries no inline script, and the pre-paint
+ *  theme lives in /theme-boot.js, loaded blocking in <head>. V1: four themes, default C, BWM-key migration. */
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { runInNewContext } from 'node:vm';
@@ -10,11 +10,12 @@ const root = join(__dirname, '..');
 const html = readFileSync(join(root, 'index.html'), 'utf8');
 const boot = readFileSync(join(root, 'public', 'theme-boot.js'), 'utf8');
 
-function run(stored: string | null) {
-  const meta = { content: '#111317', setAttribute(_: string, v: string) { this.content = v; } };
+function run(seed: Record<string, string>) {
+  const ls = new Map(Object.entries(seed));
+  const meta = { content: '#0C0C10', setAttribute(_: string, v: string) { this.content = v; } };
   const documentElement = { dataset: {} as Record<string, string> };
-  runInNewContext(boot, { localStorage: { getItem: () => stored }, document: { documentElement, querySelector: () => meta }, JSON });
-  return { theme: documentElement.dataset.theme, color: meta.content };
+  runInNewContext(boot, { localStorage: { getItem: (k: string) => ls.get(k) ?? null, setItem: (k: string, v: string) => { ls.set(k, v); } }, document: { documentElement, querySelector: () => meta }, JSON });
+  return { ds: { ...documentElement.dataset }, color: meta.content, stored: ls.get('pp.theme.v1') ?? null };
 }
 
 describe('pre-paint theme under a strict CSP', () => {
@@ -31,10 +32,17 @@ describe('pre-paint theme under a strict CSP', () => {
     expect(script).toContain("'self'");
     expect(script).not.toContain('unsafe-inline');
   });
-  it('applies neon + theme colour from storage, ignores classic/corrupt/absent', () => {
-    expect(run(JSON.stringify({ theme: 'neon' }))).toEqual({ theme: 'neon', color: '#070914' });
-    expect(run(JSON.stringify({ theme: 'classic' }))).toEqual({ theme: undefined, color: '#111317' });
-    expect(run('{nope')).toEqual({ theme: undefined, color: '#111317' });
-    expect(run(null)).toEqual({ theme: undefined, color: '#111317' });
+  it('fresh visitor → C (Neon Lounge + neon fx), nothing written', () => {
+    expect(run({})).toEqual({ ds: { theme: 'C', fx: 'neon' }, color: '#0C0C10', stored: null });
+  });
+  it('new key applies A / B / K with their chrome colours', () => {
+    expect(run({ 'pp.theme.v1': '{"theme":"A"}' })).toMatchObject({ ds: { theme: 'A' }, color: '#141233' });
+    expect(run({ 'pp.theme.v1': '{"theme":"B"}' })).toMatchObject({ ds: { theme: 'B' }, color: '#F3E9DA' });
+    expect(run({ 'pp.theme.v1': '{"theme":"K"}' })).toMatchObject({ ds: { theme: 'K' }, color: '#0C0712' });
+  });
+  it('migrates BWM\'s old key before first paint: neon → C, classic → K, corrupt → C (and writes the new key)', () => {
+    expect(run({ 'bwm.theme.v1': '{"theme":"neon"}' })).toEqual({ ds: { theme: 'C', fx: 'neon' }, color: '#0C0C10', stored: '{"theme":"C"}' });
+    expect(run({ 'bwm.theme.v1': '{"theme":"classic"}' })).toEqual({ ds: { theme: 'K' }, color: '#0C0712', stored: '{"theme":"K"}' });
+    expect(run({ 'bwm.theme.v1': '{nope' })).toMatchObject({ ds: { theme: 'C' }, stored: '{"theme":"C"}' });
   });
 });

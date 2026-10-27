@@ -25,7 +25,7 @@ export interface GlowGateState {
 
 /** The effect runs only for Neon with every motion gate green. */
 export function glowEnabled(s: GlowGateState): boolean {
-  return s.theme === 'neon' && !s.reducedMotion && !s.reduceEffects;
+  return s.theme === 'C' && !s.reducedMotion && !s.reduceEffects;
 }
 
 /** Pointer position in element-local CSS pixels — what --mx/--my hold, so the

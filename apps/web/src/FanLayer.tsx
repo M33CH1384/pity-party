@@ -201,7 +201,7 @@ export default function FanLayer() {
 
   if (!active) return null;
   const layout = fanLayout(window.innerWidth, window.innerHeight);
-  const neon = theme === 'neon';
+  const neon = theme === 'C';
 
   return (
     <div
