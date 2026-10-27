@@ -1,3 +1,4 @@
+import { NeonSign } from './NeonSign';
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { AvatarCircle, useAvatar } from './avatar';
@@ -169,7 +170,7 @@ export function TableLoading({ progress, leaving, onBack, onRetry, fault, room, 
   const node = (
     <div className={`bwm-loading${leaving ? ' leaving' : ''}`} role={fault ? 'alert' : 'status'} data-testid="table-loading">
       <div className="bwm-loading-card">
-        <span className="bwm-loading-mark pp-wordmark">Pity Party</span>
+        <NeonSign kind="loading" className="bwm-loading-mark" />
         <span className="beta-tag">BETA</span>
         {room && <div className="bwm-loading-room" data-testid="loading-room">{room}</div>}
         {fault ? (

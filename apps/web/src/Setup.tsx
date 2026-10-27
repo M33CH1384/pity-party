@@ -4,6 +4,7 @@
  * Bid Wit Me's Spades doors (team/cutthroat, Jokers/Ace Down), house rules, deck, venue and
  * summary bar are gone; the gear still opens the app Settings sheet.
  */
+import { NeonSign } from './NeonSign';
 import { ThemeChip } from './ThemeToggle';
 import { type FormEvent, type ReactNode, useEffect, useRef, useState } from 'react';
 import { CODE_LENGTH, isRoomCode, normalizeRoomCode } from '@pp/protocol';
@@ -162,7 +163,7 @@ export default function Setup({ onStart }: Props) {
       <div className="wiz-home">
         <div className="theme-chip-row"><ThemeChip /></div>
         <div className="splash">
-          <h1 className="pp-wordmark">Pity Party</h1>
+          <h1 className="pp-wordmark pp-sign-h"><NeonSign kind="home" /></h1>
           <span className="beta-tag" data-testid="beta-tag">BETA</span>
           <p className="tagline">Pitty Pat &amp; Tonk with the crew</p>
         </div>
@@ -210,7 +211,7 @@ export default function Setup({ onStart }: Props) {
             <button type="button" className="icon-btn home" aria-label="Home" title="Home" data-testid="wiz-home" onClick={home}>PP</button>
           </span>
         ) : <AccountEntry showChip />}
-        <div className="wiz-dots" aria-hidden>{ORDER.map((x) => <i key={x} className={x === step ? 'on' : ''} />)}</div>
+        <div className="wiz-mid">{step !== 'home' && <NeonSign kind="header" className="wiz-brand" />}<div className="wiz-dots" aria-hidden>{ORDER.map((x) => <i key={x} className={x === step ? 'on' : ''} />)}</div></div>
         <span className="wiz-right">
           <SocialButton className="wiz-social" />
           <button type="button" className="icon-btn gear" aria-label="More options" data-testid="more" onClick={() => requestSettingsSheet()}><GearIcon /></button>
