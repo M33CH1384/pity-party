@@ -15,12 +15,34 @@ const shots = process.env.BWM_SHOTS ?? 'docs/screenshots';
 const IPHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
 const ok = (c: unknown, msg: string) => { if (!c) throw new Error(msg); console.log('  ✓', msg); };
 
+/** Frame-level hidden-info check on every received WebSocket frame: no other seat's cards ever cross the wire.
+ *  A per-seat view carries only its own `hand` (length = its handCounts entry); no `hands`/`stock`/`deck` card arrays. */
+const wsStats = { frames: 0, views: 0, leaks: [] as string[] };
+function wsCheck(raw: string) {
+  wsStats.frames++;
+  let msg: unknown; try { msg = JSON.parse(raw); } catch { return; }
+  const isCards = (v: unknown) => Array.isArray(v) && v.some((c) => c && typeof c === 'object' && 'id' in (c as object) && ('rank' in (c as object) || 'suit' in (c as object)));
+  const walk = (o: unknown, path: string) => {
+    if (!o || typeof o !== 'object') return;
+    const r = o as Record<string, unknown>;
+    for (const k of ['hands', 'stock', 'deck']) if (k in r && (isCards(r[k]) || (Array.isArray(r[k]) && (r[k] as unknown[]).some(isCards)))) wsStats.leaks.push(`${path}.${k}`);
+    if (Array.isArray(r.hand) && Array.isArray(r.handCounts) && 'seat' in r) {
+      wsStats.views++;
+      if (typeof r.seat === 'number' && r.hand.length !== (r.handCounts as number[])[r.seat]) wsStats.leaks.push(`${path}.hand len ${r.hand.length} != count ${(r.handCounts as number[])[r.seat]}`);
+      if (r.seat === 'spectator' && r.hand.length) wsStats.leaks.push(`${path}: spectator got ${r.hand.length} cards`);
+    }
+    for (const [k, v] of Object.entries(r)) if (v && typeof v === 'object') walk(v, `${path}.${k}`);
+  };
+  walk(msg, '$');
+}
+
 async function newPage(b: Browser): Promise<Page> {
   const ctx = await b.newContext(IPHONE);
   await ctx.addInitScript(() => { if (!localStorage.getItem('bwm.online.name')) localStorage.setItem('bwm.online.name', 'Guest'); localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} })); }); // V10: BWM_TABLE=2d forces the 2D table (Settings Table: 2D)
   if (process.env.BWM_TABLE === '2d') await ctx.addInitScript(() => localStorage.setItem('pp.table3d.v1', '2d'));
   const p = await ctx.newPage();
   p.setDefaultTimeout(20000);
+  p.on('websocket', (ws) => ws.on('framereceived', (f) => wsCheck(typeof f.payload === 'string' ? f.payload : f.payload.toString())));
   return p;
 }
 
@@ -374,4 +396,8 @@ try {
   if (process.env.BWM_SKIP_ONLINE !== '1') await tonkOnline(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/failtko${i++}.png` }); throw e; });
   if (process.env.BWM_SKIP_ONLINE !== '1') await pittyOnline(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/failppo${i++}.png` }); throw e; });
   if (process.env.BWM_SKIP_ONLINE !== '1') await online(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/fail${i++}.png` }); throw e; });
+  if (process.env.BWM_SKIP_ONLINE !== '1') {
+    ok(wsStats.views > 0, `ws: ${wsStats.frames} frames, ${wsStats.views} per-seat views inspected`);
+    ok(wsStats.leaks.length === 0, `ws: no hidden cards on the wire${wsStats.leaks.length ? ` (${wsStats.leaks.slice(0, 5).join('; ')})` : ''}`);
+  }
 } finally { await b.close(); }
