@@ -51,7 +51,7 @@ export function buildRoom(q: Quality, wood: Texture, cz: number): Room {
   if (barLight) { barLight.position.set(0, 1.6, ZF + 0.6); group.add(barLight); }
   // V10g-4: the pendant's warm pool on the felt on every quality (bright centre, soft falloff to darker edges);
   // only High keeps its 1024 shadow map, Low/Medium get no shadow map at all (contact blobs do the grounding)
-  const pool = new SpotLight(0xffffff, high ? 6 : 5, 0, 0.5, 0.9, 1.7);
+  const pool = new SpotLight(0xffffff, high ? 14 : 12, 0, 0.56, 0.95, 1.7);
   pool.position.set(0, lampY - 0.05, cz); pool.target.position.set(0, FELTY, cz);
   if (high) { pool.castShadow = true; pool.shadow.mapSize.set(1024, 1024); pool.shadow.bias = -0.0001; pool.shadow.radius = 6; }
   group.add(pool, pool.target);
@@ -74,7 +74,8 @@ export function buildRoom(q: Quality, wood: Texture, cz: number): Room {
     (shade.material as MeshPhysicalMaterial).color.copy(u.theme === 'K' ? u.trim : dark(u.rail, 0.8));
     (bulb.material as MeshBasicMaterial).color.copy(u.pendant).multiplyScalar(1.5);
     if (barLight) { barLight.color.copy(u.accent2); barLight.intensity = 2.5 * glow; }
-    pool.color.copy(u.pendant);
+    // V10g-5: turned up so the warm pool reads at phone size; B (exposure .72, daylight porch) gets a gentler pool
+    pool.color.copy(u.pendant); pool.intensity = (high ? 14 : 12) * (u.theme === 'B' ? 0.5 : 1);
   };
   return { group, applyTheme, dispose: () => ds.forEach((d) => d.dispose()) };
 }
