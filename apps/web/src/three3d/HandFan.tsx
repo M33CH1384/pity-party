@@ -87,6 +87,16 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
   const [fonts, setFonts] = useState(false);
   useEffect(() => { let live = true; void cardFontsReady().then(() => { if (live) setFonts(true); }); return () => { live = false; }; }, []);
   const group = useMemo(() => new Group(), []);
+  // re-solve the fan when the portrait action row appears / grows / goes (it changes without the hand changing)
+  const [actsH, setActsH] = useState(0);
+  useEffect(() => {
+    if (!root) return undefined;
+    const measure = () => { const a = root.querySelector<HTMLElement>('.pp-actions'); setActsH(a ? Math.round(a.getBoundingClientRect().height) : 0); };
+    const ro = new ResizeObserver(measure); let seen: Element | null = null;
+    const mo = new MutationObserver(() => { const a = root.querySelector('.pp-actions'); if (a !== seen) { if (seen) ro.unobserve(seen); if (a) ro.observe(a); seen = a; } measure(); });
+    mo.observe(root, { childList: true, subtree: true }); measure();
+    return () => { mo.disconnect(); ro.disconnect(); };
+  }, [root]);
 
   useEffect(() => {
     group.clear();
@@ -144,7 +154,7 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
     hand.classList.add('is-posed');
     onDrawn(true); invalidate();
     return () => { mats.forEach((x) => x.dispose()); };
-  }, [cards, fonts, u, size, camera, group, invalidate, onDrawn, root]);
+  }, [cards, fonts, u, size, camera, group, invalidate, onDrawn, root, actsH]);
   useEffect(() => () => { root?.querySelector('[data-testid="my-hand"]')?.classList.remove('is-posed'); }, [root]);
 
   // follow the camera (static between layout changes; frameloop is on demand)
