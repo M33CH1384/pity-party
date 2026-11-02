@@ -1,3 +1,4 @@
+import type { OptionValues } from '../src/options';
 /**
  * Fixed-seed reference games for Pitty Pat, one per main option preset: seed → full move log → results.
  * The placeholder bot plays every seat with an RNG keyed like the server's (seed:bot:moveNo:seat), so these
@@ -9,7 +10,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { type PpMove, getBot, pittyPatRules as R, seededRng } from '../src';
 
-export const PRESETS: Record<string, { seats: number; seed: string; options: Record<string, unknown> }> = {
+export const PRESETS: Record<string, { seats: number; seed: string; options: OptionValues }> = {
   defaults: { seats: 4, seed: 'golden-defaults', options: {} },
   'may-untilMatch': { seats: 3, seed: 'golden-may', options: { mustPair: 'may', flipsPerTurn: 'untilMatch' } },
   'trips-steal': { seats: 4, seed: 'golden-trips', options: { tripsAsOne: true, deadCardSteal: true, stealResume: 'firstPlayer' } },
