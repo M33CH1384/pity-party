@@ -3,7 +3,7 @@
 import { chromium } from 'playwright-core';
 import { mkdirSync } from 'node:fs';
 const base = process.argv[2] ?? 'http://127.0.0.1:4174';
-const out = 'docs/screenshots/v10g-3'; mkdirSync(out, { recursive: true });
+const out = process.env.OUT ?? 'docs/screenshots/v10g-3'; mkdirSync(out, { recursive: true });
 const sizes = [[393, 852], [852, 393], [1180, 820], [667, 375]];
 const modes = { pp: { modeId: 'pitty-pat', options: {} }, tk: { modeId: 'tonk', options: { gameTarget: 5, handSize: '5' } } };
 const b = await chromium.launch({ args: ['--no-sandbox', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
