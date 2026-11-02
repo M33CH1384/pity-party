@@ -56,3 +56,16 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 .v3-chip i { flex: none; display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-style: normal; font-weight: 800; color: var(--pp-plate); background: linear-gradient(135deg, var(--pp-accent), var(--pp-accent-2)); }
 .v3-chip b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 700; }
 .v3-chip em { font-style: normal; font-weight: 800; }
+/* V10g-3: the 3D fan is solved in HandFan and the DOM hand is POSED onto it: each slot sits exactly on its drawn card
+   (centre, size, roll set by HandFan as --hx/--hy/--hw/--hh/--hr), so the tap area follows the visual card. Later slots
+   stack on top, like the right-in-front 3D fan. */
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand.is-posed { position: fixed; inset: 0; width: auto; padding: 0; margin: 0; z-index: 2; pointer-events: none; display: block; }
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand.is-posed .pp-card-slot { position: absolute; left: var(--hx); top: var(--hy); width: var(--hw); height: var(--hh); min-width: 0; margin: 0; transform: translate(-50%, -50%) rotate(var(--hr)); pointer-events: auto; }
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand.is-posed :is(.pcard-btn, .pcard) { display: block; width: 100%; height: 100%; transform: none; }
+/* portrait: the action row sits on the bottom edge under the fan (hand-v2 board) */
+@media (max-aspect-ratio: 3/4) {
+  .mode-screen[data-renderer="3d"][data-hand3d="on"]:has(.my-hand.is-posed) .pp-actions { position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 3; }
+}
+.v3-chip.is-me { flex: none; }
+/* the hand's own notes (Tonk count, "No cards") leave the posed layer as a small plate at the upper left */
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand.is-posed > :not(.pp-card-slot) { position: absolute; left: 12px; right: auto; width: fit-content; top: 148px; margin: 0; padding: 2px 8px; border-radius: 8px; background: var(--pp-plate); color: var(--pp-ink); pointer-events: none; }

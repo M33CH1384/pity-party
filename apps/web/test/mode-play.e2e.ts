@@ -7,7 +7,7 @@
  *    2 humans + 2 bots to the points target; 390px checks (no horizontal scroll, 44px touch targets).
  * Run: BWM_URL=http://127.0.0.1:4173 npx tsx apps/web/test/mode-play.e2e.ts
  */
-import { chromium, type Browser, type Page } from 'playwright-core';
+import { chromium, type Browser, type Locator, type Page } from 'playwright-core';
 
 const base = process.env.BWM_URL ?? 'http://127.0.0.1:4173';
 const server = process.env.BWM_SERVER ?? 'http://127.0.0.1:8787';
@@ -15,18 +15,55 @@ const shots = process.env.BWM_SHOTS ?? 'docs/screenshots';
 const IPHONE = { viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true };
 const ok = (c: unknown, msg: string) => { if (!c) throw new Error(msg); console.log('  ✓', msg); };
 
+/** Frame-level hidden-info check on every received WebSocket frame: no other seat's cards ever cross the wire.
+ *  A per-seat view carries only its own `hand` (length = its handCounts entry); no `hands`/`stock`/`deck` card arrays. */
+const wsStats = { frames: 0, views: 0, leaks: [] as string[] };
+function wsCheck(raw: string) {
+  wsStats.frames++;
+  let msg: unknown; try { msg = JSON.parse(raw); } catch { return; }
+  const isCards = (v: unknown) => Array.isArray(v) && v.some((c) => c && typeof c === 'object' && 'id' in (c as object) && ('rank' in (c as object) || 'suit' in (c as object)));
+  const walk = (o: unknown, path: string) => {
+    if (!o || typeof o !== 'object') return;
+    const r = o as Record<string, unknown>;
+    for (const k of ['hands', 'stock', 'deck']) if (k in r && (isCards(r[k]) || (Array.isArray(r[k]) && (r[k] as unknown[]).some(isCards)))) wsStats.leaks.push(`${path}.${k}`);
+    if (Array.isArray(r.hand) && Array.isArray(r.handCounts) && 'seat' in r) {
+      wsStats.views++;
+      if (typeof r.seat === 'number' && r.hand.length !== (r.handCounts as number[])[r.seat]) wsStats.leaks.push(`${path}.hand len ${r.hand.length} != count ${(r.handCounts as number[])[r.seat]}`);
+      if (r.seat === 'spectator' && r.hand.length) wsStats.leaks.push(`${path}: spectator got ${r.hand.length} cards`);
+    }
+    for (const [k, v] of Object.entries(r)) if (v && typeof v === 'object') walk(v, `${path}.${k}`);
+  };
+  walk(msg, '$');
+}
+
 async function newPage(b: Browser): Promise<Page> {
   const ctx = await b.newContext(IPHONE);
   await ctx.addInitScript(() => { if (!localStorage.getItem('bwm.online.name')) localStorage.setItem('bwm.online.name', 'Guest'); localStorage.setItem('bwm.entryGuest', '1'); localStorage.setItem('bwm.tips', JSON.stringify({ on: false, asked: true, counts: {} })); }); // V10: BWM_TABLE=2d forces the 2D table (Settings Table: 2D)
   if (process.env.BWM_TABLE === '2d') await ctx.addInitScript(() => localStorage.setItem('pp.table3d.v1', '2d'));
   const p = await ctx.newPage();
   p.setDefaultTimeout(20000);
+  p.on('websocket', (ws) => ws.on('framereceived', (f) => wsCheck(typeof f.payload === 'string' ? f.payload : f.payload.toString())));
   return p;
+}
+
+/** V10g-3: in the 3D held fan a card's centre is under its right-hand neighbour, so tap the card where it is actually
+ *  visible (the first point inside its box whose hit-test lands on it), like a finger on the exposed strip. */
+async function tapVisible(p: Page, card: Locator): Promise<boolean> {
+  const pt = await card.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    for (let fy = 0.1; fy <= 0.9; fy += 0.1) for (let fx = 0.04; fx <= 0.96; fx += 0.04) {
+      const x = r.left + r.width * fx, y = r.top + r.height * fy, hit = document.elementFromPoint(x, y);
+      if (hit && (hit === el || el.contains(hit))) return { x, y };
+    }
+    return null;
+  }, undefined, { timeout: 2000 }).catch(() => null);
+  if (pt) { await p.mouse.click(pt.x, pt.y); return true; }
+  return false;
 }
 
 /** Tap a legal card whenever it is this page's turn, until the recap shows. */
 async function playToRecap(pages: Page[], shotMid?: string, onTick?: (p: Page) => Promise<void>): Promise<void> {
-  let shot = false;
+  let shot = false, misses = 0;
   for (let i = 0; i < 9000; i++) {
     for (const p of pages) {
       if (await p.getByTestId('mode-recap').isVisible().catch(() => false)) continue;
@@ -34,7 +71,17 @@ async function playToRecap(pages: Page[], shotMid?: string, onTick?: (p: Page) =
       if (onTick) await onTick(p);
       if (await card.isVisible().catch(() => false)) {
         if (shotMid && !shot) { shot = true; await p.screenshot({ path: `${shots}/${shotMid}` }); }
-        await card.click();
+        // the first legal card may be fully covered (e.g. by a lifted neighbour): tap any legal card that shows
+        const all = p.locator('.pcard-btn:not([disabled]), .pp-move:not([disabled])');
+        let tapped = false;
+        for (let k = 0, n = await all.count(); k < n && !tapped; k++) tapped = await tapVisible(p, all.nth(k));
+        // a deal / hand-result beat can briefly cover the table: retry, but a legal card that stays covered is a real bug
+        misses = tapped ? 0 : misses + 1;
+        if (misses > 40) {
+          const why = await p.evaluate(() => [...document.querySelectorAll('.pcard-btn:not([disabled]), .pp-move:not([disabled])')].map((el) => { const r = el.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return `${el.getAttribute('data-testid') ?? el.textContent} @${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}x${Math.round(r.height)} under ${h?.className ?? h?.tagName}`; }).join(' | '));
+          await p.screenshot({ path: '/tmp/v10g-untappable.png' });
+          throw new Error(`no legal card or move is visible to tap for 6 s: ${why}`);
+        }
       }
     }
     const done = await Promise.all(pages.map((p) => p.getByTestId('mode-recap').isVisible().catch(() => false)));
@@ -360,4 +407,8 @@ try {
   if (process.env.BWM_SKIP_ONLINE !== '1') await tonkOnline(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/failtko${i++}.png` }); throw e; });
   if (process.env.BWM_SKIP_ONLINE !== '1') await pittyOnline(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/failppo${i++}.png` }); throw e; });
   if (process.env.BWM_SKIP_ONLINE !== '1') await online(b).catch(async (e) => { let i = 0; for (const c of b.contexts()) for (const pg of c.pages()) await pg.screenshot({ path: `/tmp/fail${i++}.png` }); throw e; });
+  if (process.env.BWM_SKIP_ONLINE !== '1') {
+    ok(wsStats.views > 0, `ws: ${wsStats.frames} frames, ${wsStats.views} per-seat views inspected`);
+    ok(wsStats.leaks.length === 0, `ws: no hidden cards on the wire${wsStats.leaks.length ? ` (${wsStats.leaks.slice(0, 5).join('; ')})` : ''}`);
+  }
 } finally { await b.close(); }
