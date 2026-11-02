@@ -28,6 +28,8 @@ for (const [g, choice] of Object.entries(modes)) for (const t of ['A', 'B', 'C',
     const m = await p.evaluate(() => {
       const slots = [...document.querySelectorAll('[data-testid="my-hand"] .pp-card-slot')].map((e) => e.getBoundingClientRect());
       return { n: slots.length, maxBottom: Math.max(...slots.map((r) => r.bottom)), minW: Math.min(...slots.map((r) => r.width)), hscroll: document.documentElement.scrollWidth > innerWidth,
+        actsTop: Math.min(...[...document.querySelectorAll('.pp-actions button')].map((e) => e.getBoundingClientRect()).filter((r) => r.width && innerWidth / innerHeight < 0.75).map((r) => r.top), 1e9),
+        untappable: [...document.querySelectorAll('[data-testid="my-hand"] .pp-card-slot')].filter((el) => { const r = el.getBoundingClientRect(); for (let fy = 0.1; fy < 1; fy += 0.1) for (let fx = 0.04; fx < 1; fx += 0.04) { const h = document.elementFromPoint(r.left + r.width * fx, r.top + r.height * fy); if (h && el.contains(h)) return false; } return true; }).length,
         small: [...document.querySelectorAll('.mode-screen button')].filter((el) => { const r = el.getBoundingClientRect(); return r.width > 0 && (r.height < 44 || r.width < 44); }).length,
         calls: window.__ppRenderInfo?.calls ?? null };
     });

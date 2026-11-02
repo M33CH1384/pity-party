@@ -48,21 +48,22 @@ async function newPage(b: Browser): Promise<Page> {
 
 /** V10g-3: in the 3D held fan a card's centre is under its right-hand neighbour, so tap the card where it is actually
  *  visible (the first point inside its box whose hit-test lands on it), like a finger on the exposed strip. */
-async function tapVisible(p: Page, card: Locator): Promise<void> {
+async function tapVisible(p: Page, card: Locator): Promise<boolean> {
   const pt = await card.evaluate((el) => {
     const r = el.getBoundingClientRect();
-    for (let fy = 0.25; fy <= 0.85; fy += 0.15) for (let fx = 0.1; fx <= 0.9; fx += 0.1) {
+    for (let fy = 0.1; fy <= 0.9; fy += 0.1) for (let fx = 0.04; fx <= 0.96; fx += 0.04) {
       const x = r.left + r.width * fx, y = r.top + r.height * fy, hit = document.elementFromPoint(x, y);
       if (hit && (hit === el || el.contains(hit))) return { x, y };
     }
     return null;
-  });
-  if (pt) await p.mouse.click(pt.x, pt.y); else await card.click();
+  }, undefined, { timeout: 2000 }).catch(() => null);
+  if (pt) { await p.mouse.click(pt.x, pt.y); return true; }
+  return false;
 }
 
 /** Tap a legal card whenever it is this page's turn, until the recap shows. */
 async function playToRecap(pages: Page[], shotMid?: string, onTick?: (p: Page) => Promise<void>): Promise<void> {
-  let shot = false;
+  let shot = false, misses = 0;
   for (let i = 0; i < 9000; i++) {
     for (const p of pages) {
       if (await p.getByTestId('mode-recap').isVisible().catch(() => false)) continue;
@@ -70,7 +71,17 @@ async function playToRecap(pages: Page[], shotMid?: string, onTick?: (p: Page) =
       if (onTick) await onTick(p);
       if (await card.isVisible().catch(() => false)) {
         if (shotMid && !shot) { shot = true; await p.screenshot({ path: `${shots}/${shotMid}` }); }
-        await tapVisible(p, card);
+        // the first legal card may be fully covered (e.g. by a lifted neighbour): tap any legal card that shows
+        const all = p.locator('.pcard-btn:not([disabled]), .pp-move:not([disabled])');
+        let tapped = false;
+        for (let k = 0, n = await all.count(); k < n && !tapped; k++) tapped = await tapVisible(p, all.nth(k));
+        // a deal / hand-result beat can briefly cover the table: retry, but a legal card that stays covered is a real bug
+        misses = tapped ? 0 : misses + 1;
+        if (misses > 40) {
+          const why = await p.evaluate(() => [...document.querySelectorAll('.pcard-btn:not([disabled]), .pp-move:not([disabled])')].map((el) => { const r = el.getBoundingClientRect(); const h = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return `${el.getAttribute('data-testid') ?? el.textContent} @${Math.round(r.left)},${Math.round(r.top)} ${Math.round(r.width)}x${Math.round(r.height)} under ${h?.className ?? h?.tagName}`; }).join(' | '));
+          await p.screenshot({ path: '/tmp/v10g-untappable.png' });
+          throw new Error(`no legal card or move is visible to tap for 6 s: ${why}`);
+        }
       }
     }
     const done = await Promise.all(pages.map((p) => p.getByTestId('mode-recap').isVisible().catch(() => false)));

@@ -45,8 +45,9 @@ export function solveFan(n: number, W: number, H: number, vw: number, vh: number
     const roll = -0.66 * a;
     out.push({ x, y, roll, cx: (x / vw + 0.5) * W, cy: (0.5 - y / vh) * H, w: cw / pxw, h: ch / pxw, deg: (-roll * 180) / Math.PI });
   }
-  // keep every rolled card's lowest corner on screen (Tonk portrait: the outer cards of a 5+ fan hung past the bottom edge)
-  const margin = 10;
+  // keep every rolled card's lowest corner on screen AND above the portrait action row (`rise` px), so no tap area sits
+  // under a button (Tonk portrait: the outer cards of a 5+ fan hung past the bottom edge / under Draw-Take-Drop)
+  const margin = Math.max(10, rise);
   const low = Math.max(...out.map((p) => p.cy + (p.h / 2) * Math.cos(p.roll) + (p.w / 2) * Math.abs(Math.sin(p.roll))));
   const up = low - (H - margin);
   if (up > 0) for (const p of out) { p.cy -= up; p.y += up * pxw; }
@@ -98,8 +99,7 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
     const vh = 2 * D * Math.tan((cam.fov * Math.PI) / 360), vw = vh * (size.width / size.height);
     // portrait: lift the fan clear of the (fixed, bottom) action row
     const acts = root?.querySelector<HTMLElement>('.pp-actions');
-    // capped: a tall offer column (Pitty Pat wild pairs) must not hoist the fan over the table and seat plate
-    const rise = portrait ? Math.min(0.22 * size.height, Math.max(0.075 * size.height, (acts?.getBoundingClientRect().height ?? 0) + 20)) : 0;
+    const rise = portrait ? Math.max(0.075 * size.height, (acts?.getBoundingClientRect().height ?? 0) + 20) : 0;
     const poses = solveFan(cards.length, size.width, size.height, vw, vh, rise, (i) => { const s = hash(cards[i]!.key); return [rnd(s, 1), rnd(s, 2) * 0.032, rnd(s, 3) * 0.032]; });
 
     const m = maskTex();
