@@ -130,7 +130,7 @@ export function PittyPatTable({ view, legal, mySeat, names, onMove, busy }: Mode
       {mySeat !== null && (
         <div className="my-hand pp-hand" data-testid="my-hand">
           {v.hand.map((c) => (
-            <span key={c.id} className="pp-card-slot">
+            <span key={c.id} className="pp-card-slot" data-discard={shed.has(c.id) ? 'self' : undefined}>
               <PlainCard card={c} testid={`pp-card-${c.id}`} wild={isWild(c, v)} disabled={busy || !shed.has(c.id)} onClick={shed.has(c.id) ? () => onMove({ t: 'discard', cardId: c.id } satisfies PpMove) : undefined} />
             </span>
           ))}

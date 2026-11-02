@@ -13,6 +13,8 @@ import type { TableSnap } from './handMirror';
 import { backTexture, badgeTexture, cardFontsReady, plateTexture, tableFaceTexture } from './cardTextures';
 import { faceGeometry } from './cardGeometry';
 import { contactTexture } from './contactShadow';
+import { planFlick, planScripted, sampleFlight, type FlightPlan, type V3 } from './physics/flight';
+import { setStockScreen, takeFlick } from './handGestures';
 import { CASPECT, CH, CW, pairX, ppLayout, type XZ } from './ppLayout';
 import { FELTY } from './table';
 import type { ThemeUniforms } from './themeUniforms';
@@ -22,11 +24,14 @@ const reduced = () => typeof matchMedia === 'function' && matchMedia('(prefers-r
 const plateGeo = new PlaneGeometry(1, 1);
 const FLAT = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -Math.PI / 2);
 
-interface Flight { obj: Group; from: Vector3; to: Vector3; q0: Quaternion; q1: Quaternion; t0: number; ms: number; hideAtEnd?: boolean }
+interface Flight { obj: Group; from: Vector3; to: Vector3; q0: Quaternion; q1: Quaternion; t0: number; ms: number; hideAtEnd?: boolean; plan?: FlightPlan; shadow?: Mesh }
+const v3 = (v: Vector3): V3 => [v.x, v.y, v.z];
+const AX = new Vector3(1, 0, 0), AY = new Vector3(0, 1, 0), AZ = new Vector3(0, 0, 1);
+const qa = new Quaternion();
 const evKey = (s: TableSnap | null) => (s?.ev ? s.ev.join(':') : '');
 
 export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | null; u: ThemeUniforms; cz: number; aspect: number; onDrawn: (on: boolean) => void }) {
-  const { camera, invalidate } = useThree();
+  const { camera, invalidate, size } = useThree();
   const [fonts, setFonts] = useState(false);
   useEffect(() => { let live = true; void cardFontsReady().then(() => { if (live) setFonts(true); }); return () => { live = false; }; }, []);
   const group = useMemo(() => new Group(), []);
@@ -77,6 +82,17 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
     const billboard = (tex: CanvasTexture, pos: Vector3, w: number, h: number, name: string) => {
       texs.push(tex); const m = new Mesh(plateGeo, mat({ map: tex, transparent: true, depthWrite: false })); m.name = name;
       m.position.copy(pos); m.quaternion.copy(camQ); m.scale.set(w, h, 1); m.renderOrder = 10; group.add(m); return m;
+    };
+    /** V10h: a lifelike flight (HAND-SPEC §F) on the pure integrator; the shadow blob rides the felt under it */
+    const physFly = (obj: Group, from: Vector3, plan: (p0: V3, p1: V3) => FlightPlan) => {
+      if (reduced()) return;
+      const pl = plan(v3(from), v3(obj.position));
+      if (pl.flip) { const bk = new Mesh(faceGeometry(CASPECT), backM); bk.scale.set(CW, CW, 1); bk.rotation.y = Math.PI; bk.position.z = -0.0004; obj.add(bk); }
+      const shM = blobM.clone(); mats.push(shM);
+      const sh = new Mesh(plateGeo, shM); sh.name = 'flight-shadow'; sh.quaternion.copy(FLAT); sh.scale.set(CW * 1.15, CH * 1.15, 1); sh.position.set(from.x, FELTY + 0.0007, from.z); group.add(sh);
+      const q1 = obj.quaternion.clone();
+      flights.current.push({ obj, from, to: obj.position.clone(), q0: q1.clone(), q1, t0: performance.now(), ms: pl.delay + pl.T + pl.settleMs, plan: pl, shadow: sh });
+      obj.position.copy(from);
     };
     const fly = (obj: Group, from: Vector3, faceDown = false, ms = FLIGHT_MS, hideAtEnd = false) => {
       if (reduced()) { if (hideAtEnd) obj.visible = false; return; }
@@ -149,10 +165,16 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
     if (!gather && was && snap && evKey(was) !== evKey(snap) && snap.ev) {
       const [e, seat] = snap.ev;
       const seatFrom = (st: number | null): Vector3 => { const sl = st !== null ? L.seats.get(st) : undefined; return sl ? at(sl.backs, 0.08) : at([0, cz + 0.7], 0.12); };
-      if (e === 'flip' && upObj) fly(upObj, at(L.stock, 0.06), true);
-      else if (e === 'discard' && upObj) fly(upObj, seatFrom(seat));
-      else if (e === 'pair' && seat !== null) for (const g of shelfTop.get(seat) ?? []) fly(g, at(L.up, 0.08));
-      else if (e === 'deal' && upObj) fly(upObj, at(L.stock, 0.06), true);
+      // V10h: flips, discards and pair moves fly on the §F integrator (bots after a seeded 150–250 ms human delay;
+      // my own flick keeps its release velocity and launches from the hand at FELTY + 0.30)
+      const id = `${snap.ev.join(':')}`;
+      const mine = seat !== null && seat === s.me;
+      if ((e === 'flip' || e === 'deal') && upObj) physFly(upObj, at(L.stock, 0.004), (a, b) => planScripted('flip', a, b, id, { delay: !mine && e === 'flip' }));
+      else if (e === 'discard' && upObj) {
+        const fv = mine ? takeFlick() : null;
+        const from = mine ? at([0, cz + 0.75], 0.3) : seatFrom(seat).add(new Vector3(0, 0.14, 0));
+        physFly(upObj, from, (a, b) => (fv ? planFlick(a, b, fv) : planScripted('play', a, b, id, { delay: !mine })));
+      } else if (e === 'pair' && seat !== null) (shelfTop.get(seat) ?? []).forEach((g, i) => physFly(g, at(L.up, 0.08), (a, b) => planScripted('pair', a, b, `${id}:${i}`, { delay: !mine })));
       // Tonk: a new spread / a hit flies in from the seat (a slap from the discard); cards already down re-fan from where they were
       if (s.k === 'tk' && (e === 'spread' || e === 'hit' || e === 'slap')) {
         const from = e === 'slap' ? at(L.up, 0.08) : seatFrom(seat);
@@ -165,22 +187,33 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
       // collect every table card into the stock
       group.children.forEach((o) => { if (o instanceof Group && /^(upcard|shelf|backs|spread)/.test(o.name)) { const to = at(L.stock, 0.01); const from = o.position.clone(); o.position.copy(to); fly(o, from, false, GATHER_MS - 80, true); } });
     }
+    { const sp = at(L.stock).project(camera); setStockScreen(s.st > 0 ? { x: ((sp.x + 1) / 2) * size.width, y: ((1 - sp.y) / 2) * size.height } : null); }
     prev.current = snap;
     (window as unknown as { __pp3dFlights?: number }).__pp3dFlights = flights.current.length;
     onDrawn(true); invalidate();
     return () => { mats.forEach((m) => m.dispose()); texs.forEach((t) => t.dispose()); };
-  }, [snap, gather, fonts, u, aspect, cz, camera, group, invalidate, onDrawn]);
-  useEffect(() => () => onDrawn(false), [onDrawn]);
+  }, [snap, gather, fonts, u, aspect, cz, camera, group, invalidate, onDrawn, size]);
+  useEffect(() => () => { onDrawn(false); setStockScreen(null); }, [onDrawn]);
 
   useFrame(() => {
     const fl = flights.current; if (!fl.length) return;
     const now = performance.now();
     for (const f of fl) {
+      if (f.plan) {
+        const sm = sampleFlight(f.plan, now - f.t0);
+        f.obj.position.set(sm.p[0], sm.p[1], sm.p[2]);
+        f.obj.quaternion.copy(f.q1);
+        f.obj.quaternion.premultiply(qa.setFromAxisAngle(AY, sm.spin));
+        f.obj.quaternion.multiply(qa.setFromAxisAngle(AX, sm.pitch)).multiply(qa.setFromAxisAngle(AY, sm.turn)).multiply(qa.setFromAxisAngle(AZ, sm.roll));
+        if (f.shadow) { f.shadow.position.set(sm.p[0] + 0.15 * sm.height * 0.3, FELTY + 0.0007, sm.p[2] + 0.15 * sm.height); f.shadow.scale.set(CW * sm.shadowScale, CH * sm.shadowScale, 1); (f.shadow.material as MeshBasicMaterial).opacity = sm.shadowOpacity * (sm.done ? 0 : 1); }
+        continue;
+      }
       const t = Math.min(1, (now - f.t0) / f.ms); const e = t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
       f.obj.position.lerpVectors(f.from, f.to, e); f.obj.position.y += Math.sin(Math.PI * e) * 0.12;
       f.obj.quaternion.slerpQuaternions(f.q0, f.q1, e);
       if (t === 1 && f.hideAtEnd) f.obj.visible = false;
     }
+    for (const f of fl) if (f.shadow && now - f.t0 >= f.ms) f.shadow.visible = false;
     flights.current = fl.filter((f) => now - f.t0 < f.ms);
     (window as unknown as { __pp3dFlights?: number }).__pp3dFlights = flights.current.length;
     invalidate();

@@ -158,7 +158,7 @@ export function TonkTable({ view, legal, mySeat, names, onMove, busy }: ModeTabl
       {mySeat !== null && (
         <div className="my-hand pp-hand tk-hand" data-testid="my-hand">
           {hand.map((c) => (
-            <span key={c.id} className={`pp-card-slot${picked === c.id ? ' tk-picked' : ''}`}>
+            <span key={c.id} className={`pp-card-slot${picked === c.id ? ' tk-picked' : ''}`} data-discard={discards.has(c.id) ? 'pick' : undefined}>
               <PlainCard card={c} testid={`tk-card-${c.id}`} wild={isWildCard(c, v.options)} disabled={busy || !selectable.has(c.id) || picked === c.id} onClick={selectable.has(c.id) ? () => setSel(c.id) : undefined} />
             </span>
           ))}
