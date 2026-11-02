@@ -96,7 +96,8 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
     const vh = 2 * D * Math.tan((cam.fov * Math.PI) / 360), vw = vh * (size.width / size.height);
     // portrait: lift the fan clear of the (fixed, bottom) action row
     const acts = root?.querySelector<HTMLElement>('.pp-actions');
-    const rise = portrait ? Math.max(0.075 * size.height, (acts?.getBoundingClientRect().height ?? 0) + 20) : 0;
+    // capped: a tall offer column (Pitty Pat wild pairs) must not hoist the fan over the table and seat plate
+    const rise = portrait ? Math.min(0.22 * size.height, Math.max(0.075 * size.height, (acts?.getBoundingClientRect().height ?? 0) + 20)) : 0;
     const poses = solveFan(cards.length, size.width, size.height, vw, vh, rise, (i) => { const s = hash(cards[i]!.key); return [rnd(s, 1), rnd(s, 2) * 0.032, rnd(s, 3) * 0.032]; });
 
     const m = maskTex();
