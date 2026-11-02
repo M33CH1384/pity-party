@@ -7,7 +7,7 @@
  *    2 humans + 2 bots to the points target; 390px checks (no horizontal scroll, 44px touch targets).
  * Run: BWM_URL=http://127.0.0.1:4173 npx tsx apps/web/test/mode-play.e2e.ts
  */
-import { chromium, type Browser, type Page } from 'playwright-core';
+import { chromium, type Browser, type Locator, type Page } from 'playwright-core';
 
 const base = process.env.BWM_URL ?? 'http://127.0.0.1:4173';
 const server = process.env.BWM_SERVER ?? 'http://127.0.0.1:8787';
@@ -24,6 +24,20 @@ async function newPage(b: Browser): Promise<Page> {
   return p;
 }
 
+/** V10g-3: in the 3D held fan a card's centre is under its right-hand neighbour, so tap the card where it is actually
+ *  visible (the first point inside its box whose hit-test lands on it), like a finger on the exposed strip. */
+async function tapVisible(p: Page, card: Locator): Promise<void> {
+  const pt = await card.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    for (let fy = 0.25; fy <= 0.85; fy += 0.15) for (let fx = 0.1; fx <= 0.9; fx += 0.1) {
+      const x = r.left + r.width * fx, y = r.top + r.height * fy, hit = document.elementFromPoint(x, y);
+      if (hit && (hit === el || el.contains(hit))) return { x, y };
+    }
+    return null;
+  });
+  if (pt) await p.mouse.click(pt.x, pt.y); else await card.click();
+}
+
 /** Tap a legal card whenever it is this page's turn, until the recap shows. */
 async function playToRecap(pages: Page[], shotMid?: string, onTick?: (p: Page) => Promise<void>): Promise<void> {
   let shot = false;
@@ -34,7 +48,7 @@ async function playToRecap(pages: Page[], shotMid?: string, onTick?: (p: Page) =
       if (onTick) await onTick(p);
       if (await card.isVisible().catch(() => false)) {
         if (shotMid && !shot) { shot = true; await p.screenshot({ path: `${shots}/${shotMid}` }); }
-        await card.click();
+        await tapVisible(p, card);
       }
     }
     const done = await Promise.all(pages.map((p) => p.getByTestId('mode-recap').isVisible().catch(() => false)));

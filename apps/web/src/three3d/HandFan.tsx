@@ -89,7 +89,9 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
   useEffect(() => {
     group.clear();
     const hand = root?.querySelector<HTMLElement>('[data-testid="my-hand"]') ?? null;
-    if (!fonts || !cards.length || !hand) { hand?.classList.remove('is-posed'); onDrawn(false); invalidate(); return; }
+    // only views that render a slot per card (Pitty Pat, Tonk) can be posed; others (High Card) keep their DOM hand
+    const slotCount = hand?.querySelectorAll('.pp-card-slot').length ?? 0;
+    if (!fonts || !cards.length || !hand || slotCount !== cards.length) { hand?.classList.remove('is-posed'); onDrawn(false); invalidate(); return; }
     const cam = camera as PerspectiveCamera;
     const portrait = size.width / size.height < 0.75;
     const D = portrait ? 0.62 : 0.6;
