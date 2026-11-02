@@ -75,3 +75,10 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 /* V10g-4: darker edges: a soft vignette over the canvas only (CSS, no draw call, no texture); B's daylight porch gets a light one */
 .table3d-layer::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 70% at 50% 58%, transparent 52%, color-mix(in srgb, var(--pp-3d-bg-out) 78%, transparent) 100%); }
 html[data-theme="B"] .table3d-layer::after { background: radial-gradient(ellipse 80% 75% at 50% 58%, transparent 60%, color-mix(in srgb, var(--pp-3d-bg-out) 35%, transparent) 100%); }
+/* V10h gestures: posed hand cards are dragged / flicked (no page pan under them); the deck tap box (≥ 44 px) over the 3D
+   stock pulses when it's your draw; the coach hint sits above the turn line, never over the cards */
+.mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand.is-posed .pp-card-slot { touch-action: none; }
+.t3d-stock-hit { position: fixed; width: 64px; height: 64px; transform: translate(-50%, -50%); border-radius: 12px; border: 0; padding: 0; background: transparent; z-index: 1; box-shadow: 0 0 0 2px color-mix(in srgb, var(--pp-accent) 70%, transparent); animation: t3d-pulse 1.5s ease-in-out infinite; }
+@keyframes t3d-pulse { 50% { box-shadow: 0 0 0 2px var(--pp-accent), 0 0 18px color-mix(in srgb, var(--pp-accent) 40%, transparent); } }
+.t3d-coach { position: fixed; left: 50%; top: 22%; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 8px 12px; border-radius: 10px; background: var(--pp-plate); color: var(--pp-ink); font-size: 13px; text-align: center; pointer-events: none; z-index: 4; }
+@media (prefers-reduced-motion: reduce) { .t3d-stock-hit { animation: none; } }

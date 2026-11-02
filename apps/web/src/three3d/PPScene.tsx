@@ -13,6 +13,7 @@ import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { buildTable, FD, FELTY, FW, type Quality, type Table, type TableTextures } from './table';
 import { themeUniforms, watchTheme, type ThemeId, type ThemeUniforms } from './themeUniforms';
 import { HandFan } from './HandFan';
+import { HandGestures } from './handGestures';
 import { type MirrorCard, type TableSnap, useHandMirror, useTableMirror } from './handMirror';
 import { PPTable3D } from './PPTable3D';
 import { ScoreChips } from './ScoreChips';
@@ -153,6 +154,7 @@ export function PPScene({ onFirstFrame, onContextLost, quality = 'high', root = 
   return (
     <>
     <ScoreChips snap={table} root={root} />
+    <HandGestures root={root} />
     <Canvas
       data-testid="pp-canvas"
       frameloop="demand"

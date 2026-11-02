@@ -16,6 +16,7 @@ import { parseCardText } from './handMirror';
 import { cardFontsReady, faceTexture } from './cardTextures';
 import { CORNER, faceGeometry } from './cardGeometry';
 import type { ThemeUniforms } from './themeUniforms';
+import { dragOffsets, onDragFrame } from './handGestures';
 
 const ASPECT = 1.4;
 /** spec §B: degrees between cards (14 for ≤ 5, 9.5 for 7, shrinking so the outer cards stay within ~±30°) */
@@ -86,6 +87,16 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
   const [fonts, setFonts] = useState(false);
   useEffect(() => { let live = true; void cardFontsReady().then(() => { if (live) setFonts(true); }); return () => { live = false; }; }, []);
   const group = useMemo(() => new Group(), []);
+  // re-solve the fan when the portrait action row appears / grows / goes (it changes without the hand changing)
+  const [actsH, setActsH] = useState(0);
+  useEffect(() => {
+    if (!root) return undefined;
+    const measure = () => { const a = root.querySelector<HTMLElement>('.pp-actions'); setActsH(a ? Math.round(a.getBoundingClientRect().height) : 0); };
+    const ro = new ResizeObserver(measure); let seen: Element | null = null;
+    const mo = new MutationObserver(() => { const a = root.querySelector('.pp-actions'); if (a !== seen) { if (seen) ro.unobserve(seen); if (a) ro.observe(a); seen = a; } measure(); });
+    mo.observe(root, { childList: true, subtree: true }); measure();
+    return () => { mo.disconnect(); ro.disconnect(); };
+  }, [root]);
 
   useEffect(() => {
     group.clear();
@@ -130,6 +141,7 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
       const face = add(new Mesh(faceGeometry(ASPECT), mat({ map: faceTexture(parsed, c.text, c.wild, false), color: new Color().setScalar(c.dim ? 0.62 : 1) })), 4);
       face.scale.set(cw, cw, 1);
       const gl = add(new Mesh(faceGeometry(ASPECT), glossM), 5); gl.scale.set(cw, cw, 1); gl.position.z = 0.0002;
+      g.userData.base = g.position.clone(); g.userData.idx = i; g.userData.pxw = vh / size.height;
       group.add(g);
       // pose the DOM tap target onto the drawn card (same centre, size and roll; lifted cards move with the lift)
       const el = slots[i];
@@ -142,10 +154,19 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
     hand.classList.add('is-posed');
     onDrawn(true); invalidate();
     return () => { mats.forEach((x) => x.dispose()); };
-  }, [cards, fonts, u, size, camera, group, invalidate, onDrawn, root]);
+  }, [cards, fonts, u, size, camera, group, invalidate, onDrawn, root, actsH]);
   useEffect(() => () => { root?.querySelector('[data-testid="my-hand"]')?.classList.remove('is-posed'); }, [root]);
 
   // follow the camera (static between layout changes; frameloop is on demand)
-  useFrame(() => { group.position.copy(camera.position); group.quaternion.copy(camera.quaternion); });
+  // V10h: a dragged card follows the finger (offsets in px from handGestures, applied in camera space; lifted toward the camera)
+  useEffect(() => { onDragFrame(invalidate); return () => onDragFrame(() => {}); }, [invalidate]);
+  useFrame(() => {
+    group.position.copy(camera.position); group.quaternion.copy(camera.quaternion);
+    for (const g of group.children) {
+      const b = g.userData.base as { x: number; y: number; z: number } | undefined; if (!b) continue;
+      const o = dragOffsets.get(g.userData.idx as number), k = g.userData.pxw as number;
+      if (o) g.position.set(b.x + o.dx * k, b.y - o.dy * k, b.z + 0.03); else g.position.set(b.x, b.y, b.z);
+    }
+  });
   return <primitive object={group} />;
 }
