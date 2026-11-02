@@ -1,3 +1,4 @@
+import type { OptionValues } from '../src/options';
 /** Mode B — Tonk engine core (M8a): options, melds, turn flow, payouts, ending, and fast-check properties. */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
@@ -17,7 +18,7 @@ function total(s: TkState) {
 const deckSize = (s: TkState) => (s.opts.wilds === 'jokers' ? 54 : 52);
 
 /** A hand mid-game with chosen cards: hands, the top discard, then the rest of the deck as stock. */
-function rig(hands: string[][], top: string, opts: Record<string, unknown> = {}, phase: TkState['phase'] = 'start', turn = 0): TkState {
+function rig(hands: string[][], top: string, opts: OptionValues = {}, phase: TkState['phase'] = 'start', turn = 0): TkState {
   const base = R.newGame({ instantWin: 'off', ...opts }, hands.length, 'rig');
   const deck = buildDeck({ jokers: base.opts.wilds === 'jokers' ? 2 : 0 });
   const used = new Set([...hands.flat(), top]);
@@ -25,7 +26,7 @@ function rig(hands: string[][], top: string, opts: Record<string, unknown> = {},
 }
 const play = (s: TkState, seat: number, m: TkMove) => R.applyMove(s, seat, m);
 
-function runGame(opts: Record<string, unknown>, seats: number, seed: string, check?: (s: TkState) => void): TkState {
+function runGame(opts: OptionValues, seats: number, seed: string, check?: (s: TkState) => void): TkState {
   let s = R.newGame(opts, seats, seed);
   const rng = seededRng(`${seed}:fuzz`);
   let steps = 0;
