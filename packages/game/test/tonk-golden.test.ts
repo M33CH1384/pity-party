@@ -1,3 +1,4 @@
+import type { OptionValues } from '../src/options';
 /**
  * Fixed-seed reference games for Tonk (M8b), one per main option preset: seed → full move log → results.
  * The Tonk bot tiers play the seats (hard, normal, easy, …) with an RNG keyed like the server's (seed:bot:moveNo:seat). A rules or bot
@@ -9,7 +10,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { type TkMove, getBot, seededRng, tonkRules as R } from '../src';
 
-export const PRESETS: Record<string, { seats: number; seed: string; options: Record<string, unknown> }> = {
+export const PRESETS: Record<string, { seats: number; seed: string; options: OptionValues }> = {
   defaults: { seats: 4, seed: 'tk-defaults', options: {} },
   'fixedHands-7cards': { seats: 3, seed: 'tk-fixed', options: { gameEnd: 'fixedHands', gameHands: 6, handSize: '7' } },
   'jokers-aceHigh': { seats: 4, seed: 'tk-jokers', options: { wilds: 'jokers', aces: 'lowOrHigh', gameTarget: 8 } },

@@ -1,10 +1,11 @@
+import type { OptionValues } from '../src/options';
 /** M9a: Tonk bot tiers — legal, terminating, tell-free, deterministic, ordered by strength, varied. */
 import { describe, expect, it } from 'vitest';
 import fc from 'fast-check';
 import { type BotTier, type TkMove, type TkState, getBot, seededRng, shuffle, tonkRules as R } from '../src';
 
 const bot = getBot('tonk');
-function game(tiers: BotTier[], seed: string, opts: Record<string, unknown> = {}) {
+function game(tiers: BotTier[], seed: string, opts: OptionValues = {}) {
   let s = R.newGame(opts, tiers.length, seed); let n = 0;
   while (!s.over) {
     const seat = R.toAct(s)[0]!;

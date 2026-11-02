@@ -24,6 +24,7 @@ import { DurableObject } from 'cloudflare:workers';
 import { CODE_ALPHABET, CODE_LENGTH, GUEST_SESSION, type ServerMsg, isRoomCode, normalizeRoomCode } from '@pp/protocol';
 import { Room, type RoomData, ROOM_DATA_VERSION, newRoomData } from './room';
 import { dispatchTableMessage } from './dispatch';
+import { allowedOrigin } from './cors';
 import { FEEDBACK_LIMITS, type FeedbackRow, adminHtml, hashIp, notifyOwner, parseFeedback, rateOk, tokenOk } from './feedback';
 import { ADMIN_COOKIE, ADMIN_TTL_MS, adminCookieOk, adminLoginHtml, makeAdminCookie, readCookie } from './admin';
 import { type Bucket, LIMITS, type LimitEnv, hit, limited } from './limits';
@@ -85,18 +86,6 @@ const IDLE_DELETE_MS = 24 * 3600_000;
 const FAST_TIMING = { botMs: 40, trickPauseMs: 60, dealMs: 80, disconnectGraceMs: 3000, handOverMs: 1200, handEndHoldMs: 0 };
 
 /* ------------------------------------------------------------------ worker */
-
-function allowedOrigin(req: Request, env: Env): string | null {
-  const origin = req.headers.get('Origin');
-  if (!origin) return null;
-  // the Worker's own pages (feedback admin sign-in form)
-  if (origin === new URL(req.url).origin) return origin;
-  const list = (env.ALLOWED_ORIGINS ?? '*').split(',').map((s) => s.trim());
-  if (list.includes('*') || list.includes(origin)) return origin;
-  // preview deployments of the Pages project: <hash>.bid-wit-me.pages.dev
-  if (/^https:\/\/[a-z0-9-]+\.bid-wit-me\.pages\.dev$/.test(origin)) return origin;
-  return null;
-}
 
 function json(body: unknown, init: ResponseInit = {}, origin: string | null = null): Response {
   const h = new Headers(init.headers);

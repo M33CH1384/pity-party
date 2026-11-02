@@ -1,3 +1,4 @@
+import type { OptionValues } from '../src/options';
 /**
  * Mode A — Pitty Pat engine (milestone 6, PR 1). One test (or group) per docs/plan/RULES.md row; every
  * [UNVERIFIED] rule is an option and is tested both ways. Property tests: termination, 52-card conservation,
@@ -15,7 +16,7 @@ const C = (id: string): Card => { const c = DECK.find((d) => d.id === id); if (!
 const ids = (cs: readonly Card[]) => cs.map((c) => c.id);
 
 /** Rig a hand: given hands + upcard (+ optional stock head), the rest of the deck becomes the stock (conservation holds). */
-function rig(hands: string[][], upcard: string, opts0: Record<string, unknown> = {}, stockHead: string[] = []): PpState {
+function rig(hands: string[][], upcard: string, opts0: OptionValues = {}, stockHead: string[] = []): PpState {
   // rigged hands use natural ranks and the coin pot (to check coin flows) unless a test says otherwise
   const opts = { deucesWild: false, coinPot: true, ...opts0 };
   const base = R.newGame({ ...opts, dealtWinAuto: false, deadCardSteal: false }, hands.length, 'rig');
@@ -424,7 +425,7 @@ describe('views (hidden information)', () => {
 });
 
 /* ------------------------------------------------------------------ property / fuzz */
-function runGame(opts: Record<string, unknown>, seats: number, seed: string, pick?: (legal: PpMove[], s: PpState, rng: () => number) => PpMove, check?: (s: PpState) => void): PpState {
+function runGame(opts: OptionValues, seats: number, seed: string, pick?: (legal: PpMove[], s: PpState, rng: () => number) => PpMove, check?: (s: PpState) => void): PpState {
   let s = R.newGame(opts, seats, seed);
   const rng = seededRng(`${seed}:fuzz`);
   let steps = 0;
