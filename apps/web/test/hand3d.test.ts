@@ -32,6 +32,14 @@ describe('fan', () => {
     // every card's tap target is the full card (≥ 60 px wide), and neighbours' visible strips stay ≥ 44 px apart at the centres
     for (let i = 1; i < 5; i++) { expect(p[i]!.w).toBeGreaterThanOrEqual(60); expect(Math.hypot(p[i]!.cx - p[i - 1]!.cx, p[i]!.cy - p[i - 1]!.cy)).toBeGreaterThanOrEqual(44); }
   });
+  it('Tonk portrait: no card of a 5–7 fan hangs past the bottom edge (rolled corners included)', () => {
+    for (const [W, H] of [[393, 852], [375, 667], [390, 844], [430, 932]] as const) for (const n of [5, 6, 7]) for (const rise of [0, 64, 140]) {
+      const vh = 1, vw = vh * W / H;
+      const p = solveFan(n, W, H, vw, vh, rise, () => [1, 0.032, -0.032]);
+      const low = Math.max(...p.map((c) => c.cy + (c.h / 2) * Math.cos(c.roll) + (c.w / 2) * Math.abs(Math.sin(c.roll))));
+      expect(low).toBeLessThanOrEqual(H - 9.99);
+    }
+  });
 });
 
 describe('face textures', () => {

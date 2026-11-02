@@ -45,6 +45,11 @@ export function solveFan(n: number, W: number, H: number, vw: number, vh: number
     const roll = -0.66 * a;
     out.push({ x, y, roll, cx: (x / vw + 0.5) * W, cy: (0.5 - y / vh) * H, w: cw / pxw, h: ch / pxw, deg: (-roll * 180) / Math.PI });
   }
+  // keep every rolled card's lowest corner on screen (Tonk portrait: the outer cards of a 5+ fan hung past the bottom edge)
+  const margin = 10;
+  const low = Math.max(...out.map((p) => p.cy + (p.h / 2) * Math.cos(p.roll) + (p.w / 2) * Math.abs(Math.sin(p.roll))));
+  const up = low - (H - margin);
+  if (up > 0) for (const p of out) { p.cy -= up; p.y += up * pxw; }
   return out;
 }
 
