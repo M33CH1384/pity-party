@@ -40,7 +40,7 @@ export function ppLayout(n: number, me: number | null, aspect: number, cz: numbe
   return {
     portrait, seats,
     stock: [-dx, portrait ? cz - 0.08 : cz], up: [dx, portrait ? cz - 0.08 : cz],
-    me: me === null ? null : { plate: portrait ? [-0.42, cz + 0.38] : [-0.86, 0.26] },
+    me: me === null ? null : { plate: portrait ? [-0.5, cz + 0.27] : [-0.86, 0.26] },
   };
 }
 /** where card i of a shelf's top pair lies */

@@ -125,6 +125,7 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
     const edgeM = mat({ color: edgeCol });
 
     const slots = [...hand.querySelectorAll<HTMLElement>('.pp-card-slot')];
+    let fanTop = Infinity;
     cards.forEach((c, i) => {
       const parsed = parseCardText(c.text); const p = poses[i]!; if (!parsed) return;
       const cw = p.w * (vh / size.height), lift = c.lifted ? 0.18 * cw * ASPECT : 0;
@@ -144,6 +145,7 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
       g.userData.base = g.position.clone(); g.userData.idx = i; g.userData.pxw = vh / size.height;
       group.add(g);
       // pose the DOM tap target onto the drawn card (same centre, size and roll; lifted cards move with the lift)
+      fanTop = Math.min(fanTop, p.cy - (p.h / 2) * Math.cos(p.roll) - (p.w / 2) * Math.abs(Math.sin(p.roll)));
       const el = slots[i];
       if (el) {
         const ly = lift / (vh / size.height);
@@ -151,6 +153,8 @@ export function HandFan({ cards, u, onDrawn, root }: { cards: MirrorCard[]; u: T
         el.style.setProperty('--hw', `${p.w.toFixed(1)}px`); el.style.setProperty('--hh', `${p.h.toFixed(1)}px`); el.style.setProperty('--hr', `${p.deg.toFixed(2)}deg`);
       }
     });
+    // V10g-5: publish the fan's top edge so the status line can sit above the fan, never on it
+    if (Number.isFinite(fanTop)) (root as HTMLElement).style.setProperty('--t3d-fan-top', `${Math.round(fanTop)}px`);
     hand.classList.add('is-posed');
     onDrawn(true); invalidate();
     return () => { mats.forEach((x) => x.dispose()); };

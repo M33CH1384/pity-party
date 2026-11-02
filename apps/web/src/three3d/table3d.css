@@ -73,7 +73,7 @@ html[data-theme] .mode-screen[data-renderer="3d"] .pp-center { border-color: tra
 /* the hand's own notes (Tonk count, "No cards") leave the posed layer as a small plate at the upper left */
 .mode-screen[data-renderer="3d"][data-hand3d="on"] .my-hand.is-posed > :not(.pp-card-slot) { position: absolute; left: 12px; right: auto; width: fit-content; top: 148px; margin: 0; padding: 2px 8px; border-radius: 8px; background: var(--pp-plate); color: var(--pp-ink); pointer-events: none; }
 /* V10g-4: darker edges: a soft vignette over the canvas only (CSS, no draw call, no texture); B's daylight porch gets a light one */
-.table3d-layer::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 70% at 50% 58%, transparent 52%, color-mix(in srgb, var(--pp-3d-bg-out) 78%, transparent) 100%); }
+.table3d-layer::after { content: ''; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 75% 70% at 50% 58%, transparent 44%, color-mix(in srgb, var(--pp-3d-bg-out) 88%, transparent) 100%); }
 html[data-theme="B"] .table3d-layer::after { background: radial-gradient(ellipse 80% 75% at 50% 58%, transparent 60%, color-mix(in srgb, var(--pp-3d-bg-out) 35%, transparent) 100%); }
 /* V10h gestures: posed hand cards are dragged / flicked (no page pan under them); the deck tap box (≥ 44 px) over the 3D
    stock pulses when it's your draw; the coach hint sits above the turn line, never over the cards */
@@ -82,3 +82,8 @@ html[data-theme="B"] .table3d-layer::after { background: radial-gradient(ellipse
 @keyframes t3d-pulse { 50% { box-shadow: 0 0 0 2px var(--pp-accent), 0 0 18px color-mix(in srgb, var(--pp-accent) 40%, transparent); } }
 .t3d-coach { position: fixed; left: 50%; top: 22%; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 8px 12px; border-radius: 10px; background: var(--pp-plate); color: var(--pp-ink); font-size: 13px; text-align: center; pointer-events: none; z-index: 4; }
 @media (prefers-reduced-motion: reduce) { .t3d-stock-hit { animation: none; } }
+
+/* V10g-5: portrait status line sits just above the fan's top edge (HandFan publishes --t3d-fan-top), never on the cards */
+@media (max-aspect-ratio: 3/4) {
+  .mode-screen[data-renderer="3d"][data-hand3d="on"]:has(.my-hand.is-posed) .turn-line { position: fixed; left: 50%; top: calc(var(--t3d-fan-top, 70vh) - 8px); transform: translate(-50%, -100%); z-index: 3; margin: 0; max-width: calc(100vw - 24px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}

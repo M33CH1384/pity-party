@@ -26,7 +26,7 @@ export interface CameraPose { pos: [number, number, number]; target: [number, nu
 /** Portrait (aspect < .75), phone landscape (> 1.6), iPad / desktop in between. */
 export function cameraFor(aspect: number): CameraPose {
   // V10g-3 (hand-v2 §E: raised + tilted so opponents' pairs read) / V10g seated cameras (table-v2 NOTES: BWM 'sitting', low and across the felt, aimed at the far half)
-  if (aspect < 0.75) return { pos: [0, 2.78, 2.15], target: [0, 0.88, -0.46], fov: 56 };
+  if (aspect < 0.75) return { pos: [0, 2.78, 2.15], target: [0, 0.8, -0.05], fov: 56 };
   if (aspect > 1.6) return { pos: [0, 1.93, 1.84], target: [0, 0.93, -0.4], fov: 44 };
   return { pos: [0, 2.05, 1.74], target: [0, 0.93, -0.3], fov: 50 };
 }
