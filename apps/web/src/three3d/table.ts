@@ -155,7 +155,9 @@ export function buildTable(q: Quality, tx: TableTextures, cz: number, portrait =
   const applyTheme = (u: ThemeUniforms, inlayTex: Texture | null) => {
     woodM.color.copy(u.wood).multiplyScalar(0.25);
     // oxblood lacquer: the rail token pulled toward the felt (B keeps its cream rail)
-    railM.color.copy(u.rail); if (u.theme !== 'B') railM.color.lerp(u.felt, 0.4).multiplyScalar(0.6); railM.roughness = Math.min(0.3, u.railRough); railM.sheen = 0;
+    railM.color.copy(u.rail); if (u.theme !== 'B') railM.color.lerp(u.felt, 0.4).multiplyScalar(0.6); railM.roughness = Math.min(0.3, u.railRough);
+    // V10g-4: C lacquer gets a warm gold sheen (dark rail kept, per table-v2); other themes as their tokens say
+    railM.sheen = u.theme === 'C' ? u.railSheen : 0; railM.sheenColor.copy(u.railSheenColor); railM.sheenRoughness = 0.35;
     if (u.gingham) {
       gingham?.dispose(); gingham = ginghamTexture(u.felt, u.ginghamBand);
       feltM.map = gingham; feltM.color.set(1, 1, 1); feltM.roughness = 0.9; feltM.sheen = 0.4; feltM.sheenRoughness = 0.6; feltM.roughnessMap = null; feltM.normalScale.set(0.35, 0.35);

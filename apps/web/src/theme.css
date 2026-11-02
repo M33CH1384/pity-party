@@ -48,8 +48,8 @@ html[data-theme="C"] {
   /* V10b 3D table (fixed per theme; read by three3d/themeUniforms.ts). Spec V10-3D-SPEC §1a/1b/1d. */
   --pp-3d-rail: #0D0D10;
   --pp-3d-rail-rough: .25;
-  --pp-3d-rail-sheen: 0;
-  --pp-3d-rail-sheen-color: #0D0D10;
+  --pp-3d-rail-sheen: .55;
+  --pp-3d-rail-sheen-color: #C9A24A;
   --pp-3d-trim: var(--pp-accent);
   --pp-3d-trim-emissive: 2.2;
   --pp-3d-wood: #3A3036;
@@ -57,6 +57,7 @@ html[data-theme="C"] {
   --pp-3d-gnd: #140F24;
   --pp-3d-hemi: .22;
   --pp-3d-key: #F4F6FF;
+  --pp-3d-pendant: #FFC98A;
   --pp-3d-exp: .90;
   --pp-3d-neon: 1;
   --pp-3d-env: .40;
@@ -129,6 +130,7 @@ html[data-theme="A"] {
   --pp-3d-gnd: #140F24;
   --pp-3d-hemi: .22;
   --pp-3d-key: #FFFFFF;
+  --pp-3d-pendant: #FFD3A0;
   --pp-3d-exp: 1;
   --pp-3d-neon: .75;
   --pp-3d-env: .40;
@@ -201,6 +203,7 @@ html[data-theme="B"] {
   --pp-3d-gnd: #C8B49A;
   --pp-3d-hemi: .40;
   --pp-3d-key: #FFF6EA;
+  --pp-3d-pendant: #FFE2B8;
   --pp-3d-exp: .72;
   --pp-3d-neon: .06;
   --pp-3d-env: .45;
@@ -274,6 +277,7 @@ html[data-theme="K"] {
   --pp-3d-gnd: #140F24;
   --pp-3d-hemi: .22;
   --pp-3d-key: #FFFFFF;
+  --pp-3d-pendant: #FFC98A;
   --pp-3d-exp: 1;
   --pp-3d-neon: .45;
   --pp-3d-env: .40;

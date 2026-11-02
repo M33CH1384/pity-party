@@ -12,7 +12,7 @@ export interface ThemeUniforms {
   felt: Color; feltSheen: Color; accent: Color; accent2: Color; plate: string;
   rail: Color; railRough: number; railSheen: number; railSheenColor: Color;
   trim: Color; trimEmissive: number; wood: Color; disc: Color; spade: Color; lip: Color; ginghamBand: string;
-  hemiSky: Color; hemiGround: Color; hemi: number; key: Color;
+  hemiSky: Color; hemiGround: Color; hemi: number; key: Color; pendant: Color;
   exposure: number; neon: number; env: number; bgIn: Color; bgOut: Color;
   /** B: gingham felt, no glow anywhere */
   gingham: boolean; glow: boolean;
@@ -44,7 +44,7 @@ export function themeUniforms(root: HTMLElement = document.documentElement): The
     theme, felt, feltSheen, accent, accent2, plate: css(cs, '--pp-plate'),
     rail: c('--pp-3d-rail'), railRough: num(css(cs, '--pp-3d-rail-rough'), 0.45), railSheen: num(css(cs, '--pp-3d-rail-sheen'), 0), railSheenColor: c('--pp-3d-rail-sheen-color'),
     trim: c('--pp-3d-trim'), trimEmissive: num(css(cs, '--pp-3d-trim-emissive'), 0), wood: c('--pp-3d-wood'), disc: c('--pp-3d-disc'), spade: c('--pp-3d-spade'), lip: c('--pp-3d-lip'), ginghamBand: css(cs, '--pp-3d-gingham-band'),
-    hemiSky: c('--pp-3d-sky'), hemiGround: c('--pp-3d-gnd'), hemi: num(css(cs, '--pp-3d-hemi'), 0.22), key: c('--pp-3d-key'),
+    hemiSky: c('--pp-3d-sky'), hemiGround: c('--pp-3d-gnd'), hemi: num(css(cs, '--pp-3d-hemi'), 0.22), key: c('--pp-3d-key'), pendant: col(css(cs, '--pp-3d-pendant')) ?? c('--pp-3d-key'),
     exposure: num(css(cs, '--pp-3d-exp'), 1), neon: num(css(cs, '--pp-3d-neon'), 0.5), env: num(css(cs, '--pp-3d-env'), 0.4),
     bgIn: col(css(cs, '--pp-3d-bg-in')) ?? bgOut.clone().lerp(accent, 0.1), bgOut,
     gingham: theme === 'B', glow: theme !== 'B',

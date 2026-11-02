@@ -12,6 +12,7 @@ import { type CanvasTexture, Group, Mesh, MeshBasicMaterial, PlaneGeometry, Quat
 import type { TableSnap } from './handMirror';
 import { backTexture, badgeTexture, cardFontsReady, plateTexture, tableFaceTexture } from './cardTextures';
 import { faceGeometry } from './cardGeometry';
+import { contactTexture } from './contactShadow';
 import { CASPECT, CH, CW, pairX, ppLayout, type XZ } from './ppLayout';
 import { FELTY } from './table';
 import type { ThemeUniforms } from './themeUniforms';
@@ -56,6 +57,10 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
     const mats: MeshBasicMaterial[] = []; const texs: CanvasTexture[] = [];
     const mat = (o: ConstructorParameters<typeof MeshBasicMaterial>[0]) => { const m = new MeshBasicMaterial({ toneMapped: false, ...o }); mats.push(m); return m; };
     const backM = mat({ map: backTexture() });
+    // V10g-4 contact shadows: one shared blob material, a flat soft mask just above the felt under every pile (no shadow maps),
+    // nudged toward the viewer as if from the pendant overhead
+    const blobM = mat({ map: contactTexture(), color: 0x000000, transparent: true, opacity: u.theme === 'B' ? 0.28 : 0.5, depthWrite: false });
+    const blob = (xz: XZ, w: number, d: number) => { const m = new Mesh(plateGeo, blobM); m.name = 'contact'; m.quaternion.copy(FLAT); m.position.set(xz[0] + 0.006, FELTY + 0.0006, xz[1] + 0.012); m.scale.set(w, d, 1); group.add(m); };
     const edgeM = ink ? mat({ color: ink }) : null;
     const camQ = camera.quaternion.clone();
     const at = (xz: XZ, lift = 0) => new Vector3(xz[0], y + lift, xz[1]);
@@ -83,11 +88,13 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
 
     // stock: a short stack of backs + the count badge
     const stockN = Math.max(0, s.st);
+    if (stockN > 0) blob(L.stock, CW * 1.45, CH * 1.35);
     for (let k = 0; k < Math.min(3, Math.ceil(stockN / 8)); k++) card(null, at(L.stock, k * 0.004).add(new Vector3(-k * 0.003, 0, -k * 0.003)), 1, 'stock');
     if (stockN === 0) card(null, at(L.stock), 1, 'stock').visible = false;
     billboard(badgeTexture(String(stockN)), at(L.stock, 0.04).add(new Vector3(-CW * 0.95, 0, 0)), 0.15, 0.1, 'stock-count');
 
     // upcard
+    if (s.up) blob(L.up, CW * 1.4, CH * 1.3);
     const upObj = s.up ? card(tableFaceTexture(s.up[0], s.up[1]), at(L.up, 0.003), 1, 'upcard', `up:${s.up[0]}`) : null;
 
     // shelves + opponents' backs + plates
@@ -112,6 +119,7 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
       billboard(plateTexture(plate), at(slot.plate, 0.34), 0.5, 0.175, `plate-${seat}`);
       // opponent hand: backs only, a small fan (count capped at 5) under the plate
       const nb = Math.min(5, s.hc[seat] ?? 0);
+      if (nb) blob(slot.backs, CW * 0.6 * (1.2 + nb * 0.18), CH * 0.22);
       // V10g: an upright fan of backs standing at the seat (table-v2 / BWM), leaning back a little toward the far rail
       for (let k = 0; k < nb; k++) {
         const a = ((k - (nb - 1) / 2) * 12 * Math.PI) / 180, R = CH * 0.6;
@@ -127,7 +135,9 @@ export function PPTable3D({ snap, u, cz, aspect, onDrawn }: { snap: TableSnap | 
           texts.forEach((t, i) => card(tableFaceTexture(t, false, true), at([slot.shelf[0] + (i - (texts.length - 1) / 2) * step, z], 0.002 + r * 0.002 + i * 0.0006), sc, `spread-${seat}`, `sp${id}:${t}:${i}`));
         });
       }
+      if (rows.length) blob(slot.shelf, L.portrait ? 0.6 : 0.7, CH * 0.72 * (1 + 0.42 * (Math.min(3, rows.length) - 1)) * 1.2);
       if (!pairs) continue;
+      blob(slot.shelf, CW * 2.5, CH * 1.35);
       // older pairs: up to 3 stacked layers under the top pair
       for (let k = Math.min(3, pairs - 1); k >= 1; k--) for (const i of [0, 1]) card(null, at(slot.shelf, 0.0008 * (4 - k)).add(new Vector3(pairX(i, 2), 0, -k * 0.018)), 1, `shelf-under-${seat}`);
       const top = cards.slice(-2);

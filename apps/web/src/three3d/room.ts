@@ -49,12 +49,12 @@ export function buildRoom(q: Quality, wood: Texture, cz: number): Room {
   // High: back-bar glow + one warm shadow-casting pool on the felt (1024)
   const barLight = high ? new PointLight(0xffffff, 2.5, 3, 1.6) : null;
   if (barLight) { barLight.position.set(0, 1.6, ZF + 0.6); group.add(barLight); }
-  const pool = high ? new SpotLight(0xffffff, 6, 0, 0.42, 0.85, 1.6) : null;
-  if (pool) {
-    pool.position.set(0, lampY - 0.05, cz); pool.target.position.set(0, FELTY, cz);
-    pool.castShadow = true; pool.shadow.mapSize.set(1024, 1024); pool.shadow.bias = -0.0001; pool.shadow.radius = 6;
-    group.add(pool, pool.target);
-  }
+  // V10g-4: the pendant's warm pool on the felt on every quality (bright centre, soft falloff to darker edges);
+  // only High keeps its 1024 shadow map, Low/Medium get no shadow map at all (contact blobs do the grounding)
+  const pool = new SpotLight(0xffffff, high ? 6 : 5, 0, 0.5, 0.9, 1.7);
+  pool.position.set(0, lampY - 0.05, cz); pool.target.position.set(0, FELTY, cz);
+  if (high) { pool.castShadow = true; pool.shadow.mapSize.set(1024, 1024); pool.shadow.bias = -0.0001; pool.shadow.radius = 6; }
+  group.add(pool, pool.target);
 
   const applyTheme = (u: ThemeUniforms) => {
     const dark = (c: Color, k: number) => c.clone().multiplyScalar(k);
@@ -72,9 +72,9 @@ export function buildRoom(q: Quality, wood: Texture, cz: number): Room {
     (strip.material as MeshBasicMaterial).color.copy(u.accent2).multiplyScalar(glow * 1.6);
     (cord.material as MeshStandardMaterial).color.copy(u.bgOut);
     (shade.material as MeshPhysicalMaterial).color.copy(u.theme === 'K' ? u.trim : dark(u.rail, 0.8));
-    (bulb.material as MeshBasicMaterial).color.copy(u.key).multiplyScalar(1.5);
+    (bulb.material as MeshBasicMaterial).color.copy(u.pendant).multiplyScalar(1.5);
     if (barLight) { barLight.color.copy(u.accent2); barLight.intensity = 2.5 * glow; }
-    if (pool) pool.color.copy(u.key).lerp(u.wood, 0.25);
+    pool.color.copy(u.pendant);
   };
   return { group, applyTheme, dispose: () => ds.forEach((d) => d.dispose()) };
 }
